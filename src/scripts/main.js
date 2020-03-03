@@ -35,7 +35,7 @@ new Vue({
   },
   data: {
     warmup: WorkOuts.sessions[0].warmup,
-    workout: WorkOuts.sessions[0].workout,
+    workout: WorkOuts.sessions[0].workouts,
     cardio: WorkOuts.sessions[0].cardio,
   },
   computed: {
