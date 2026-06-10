@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Packet — Design Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset + base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 15px; }
+body {
+  margin: 0; background: #0c0c0c; color: #e8e8e8;
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+a { color: #B2F042; }
+code, pre { font-family: 'JetBrains Mono', monospace; }
+::selection { background: #B2F042; color: #101010; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.page { max-width: 900px; margin: 0 auto; padding: 60px 32px 120px; }
+@media (max-width: 640px) { .page { padding: 40px 20px 80px; } }
+
+/* ── Typography ───────────────────────────────────────────── */
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700; letter-spacing: -0.03em; margin: 0 0 8px; line-height: 1; }
+h2 { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 60px 0 20px; line-height: 1.1; color: #fff; }
+h3 { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 32px 0 12px; color: #fff; }
+h4 { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #666; margin: 24px 0 10px; }
+p { margin: 0 0 16px; color: #aaa; font-size: 14px; }
+li { color: #aaa; font-size: 14px; margin-bottom: 5px; }
+strong { color: #e8e8e8; font-weight: 600; }
+
+/* ── Section divider ──────────────────────────────────────── */
+.divider { height: 1px; background: linear-gradient(90deg, #222 0%, #333 50%, #222 100%); margin: 56px 0 0; }
+.section-n { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #444; font-weight: 500; letter-spacing: 0.05em; margin-bottom: 6px; }
+
+/* ── Tag / pill ───────────────────────────────────────────── */
+.tag { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.tag-lime { background: rgba(178,240,66,0.15); color: #B2F042; }
+.tag-lav  { background: rgba(178,134,253,0.15); color: #B286FD; }
+.tag-red  { background: rgba(229,87,51,0.15); color: #E55733; }
+.tag-sky  { background: rgba(96,198,255,0.15); color: #60C6FF; }
+.tag-gray { background: rgba(255,255,255,0.07); color: #888; }
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card { background: #1a1a1a; border-radius: 14px; padding: 20px 22px; border: 1px solid rgba(255,255,255,0.06); }
+.card + .card { margin-top: 10px; }
+
+/* ── Two-col grid ─────────────────────────────────────────── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+/* ── Color swatch ─────────────────────────────────────────── */
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.swatch { display: flex; flex-direction: column; gap: 7px; min-width: 100px; }
+.swatch-color { height: 52px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06); }
+.swatch-name { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #777; }
+.swatch-hex  { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #ccc; font-weight: 600; }
+.swatch-use  { font-size: 11px; color: #555; }
+
+/* ── Type sample ──────────────────────────────────────────── */
+.type-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid #1e1e1e; }
+.type-row:last-child { border-bottom: none; }
+.type-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; }
+.type-sample { color: #e8e8e8; }
+
+/* ── Token table ──────────────────────────────────────────── */
+.token-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
+.token-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #555; border-bottom: 1px solid #222; }
+.token-table td { padding: 9px 12px; border-bottom: 1px solid #1a1a1a; color: #aaa; vertical-align: middle; }
+.token-table td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #ccc; }
+.token-table td:nth-child(2) { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #B2F042; }
+.radius-preview { display: inline-block; width: 28px; height: 28px; background: #333; margin-right: 8px; vertical-align: middle; }
+
+/* ── Code block ───────────────────────────────────────────── */
+pre {
+  background: #111; border: 1px solid #252525; border-radius: 10px;
+  padding: 18px 20px; overflow-x: auto; font-size: 12.5px; line-height: 1.7;
+  color: #cdd6f4; margin: 0 0 20px;
+}
+.kw { color: #cba6f7; } /* keyword */
+.ty { color: #89b4fa; } /* type */
+.st { color: #a6e3a1; } /* string */
+.cm { color: #585b70; } /* comment */
+.nu { color: #fab387; } /* number */
+
+/* ── Screen spec card ─────────────────────────────────────── */
+.screen-card {
+  background: #131313; border-radius: 16px; padding: 24px 24px 28px;
+  border: 1px solid rgba(255,255,255,0.05); margin-bottom: 14px;
+}
+.screen-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.screen-num {
+  width: 44px; height: 44px; border-radius: 10px; background: #1e1e1e;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; color: #555;
+}
+.screen-num.active { background: rgba(178,240,66,0.15); color: #B2F042; }
+.screen-title-block .t { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -0.01em; color: #fff; }
+.screen-title-block .s { font-size: 13px; color: #666; margin-top: 2px; }
+.spec-grid { display: grid; grid-template-columns: 140px 1fr; gap: 10px 20px; font-size: 13px; }
+.spec-grid .k { color: #555; font-weight: 600; padding-top: 1px; }
+.spec-grid .v { color: #aaa; }
+.spec-grid .v ul { margin: 4px 0; padding-left: 16px; }
+.spec-grid .v li { margin-bottom: 3px; color: #aaa; }
+.screen-rule { height: 1px; background: #1e1e1e; margin: 16px 0; }
+
+/* ── Interaction timeline ─────────────────────────────────── */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-row { display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
+.tl-row:last-child { border-bottom: none; }
+.tl-event { width: 140px; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #B2F042; font-weight: 600; }
+.tl-desc { color: #999; flex: 1; }
+
+/* ── Flow diagram ─────────────────────────────────────────── */
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 16px 0; }
+.flow-node {
+  padding: 8px 14px; border-radius: 8px; background: #1e1e1e;
+  font-size: 12px; font-weight: 600; color: #ccc; border: 1px solid #2a2a2a;
+  white-space: nowrap;
+}
+.flow-node.current { background: rgba(178,240,66,0.12); color: #B2F042; border-color: rgba(178,240,66,0.3); }
+.flow-node.overlay { background: rgba(178,134,253,0.1); color: #B286FD; border-color: rgba(178,134,253,0.25); }
+.flow-arrow { color: #444; font-size: 16px; }
+
+/* ── Stat row ─────────────────────────────────────────────── */
+.stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.stat { background: #1a1a1a; border-radius: 10px; padding: 12px 16px; min-width: 100px; }
+.stat .v { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; color: #B2F042; }
+.stat .l { font-size: 11px; color: #555; margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ── Header block ─────────────────────────────────────────── */
+.doc-header { padding: 48px 0 40px; border-bottom: 1px solid #1e1e1e; margin-bottom: 8px; }
+.doc-header .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #555; margin-bottom: 10px; }
+.doc-header h1 { color: #fff; }
+.doc-header .sub { font-size: 15px; color: #666; margin-top: 10px; max-width: 520px; line-height: 1.5; }
+.doc-header .meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+/* ── Component spec ───────────────────────────────────────── */
+.comp-row { display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid #1a1a1a; }
+.comp-row:last-child { border-bottom: none; }
+.comp-name { min-width: 180px; font-weight: 700; font-size: 13px; color: #e8e8e8; flex-shrink: 0; }
+.comp-desc { font-size: 13px; color: #888; flex: 1; }
+.comp-states { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── HEADER ──────────────────────────────────────────────── -->
+  <div class="doc-header">
+    <div class="eyebrow">Design Handoff · June 2026</div>
+    <h1>Packet</h1>
+    <div class="sub">Offline-first workout tracker for pickleball players following a structured 3-month strength program. This document is the authoritative design reference for implementation.</div>
+    <div class="meta">
+      <span class="tag tag-lime">High fidelity</span>
+      <span class="tag tag-gray">Dark mode only</span>
+      <span class="tag tag-gray">Mobile-first (460px)</span>
+      <span class="tag tag-gray">PWA · Offline</span>
+      <span class="tag tag-lav">3 screens + overlays</span>
+    </div>
+  </div>
+
+  <!-- ── NOTE TO DEV ─────────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">00</div>
+  <h2>About This Document</h2>
+  <div class="card">
+    <p style="margin:0; color:#aaa; font-size:14px; line-height:1.7;">
+      The files in <code style="color:#B2F042;">packet/Packet.html</code> are <strong>high-fidelity design references built in HTML</strong> — not production code to ship. The task for the coding agent is to <strong>recreate these designs in the target codebase's environment</strong> (React Native, Expo, Swift, or a web stack — choose what fits) using its established patterns, libraries, and conventions. Pixel accuracy matters on spacing, color, and animation. Typography, corner radii, tap targets, and motion timing are all specified below.
+    </p>
+  </div>
+
+  <!-- ── BRAND SHEET ─────────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">01</div>
+  <h2>Brand Tokens</h2>
+
+  <h3>Color Palette</h3>
+  <h4>Brand Accents</h4>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#B2F042;"></div><div class="swatch-name">Lime Energy</div><div class="swatch-hex">#B2F042</div><div class="swatch-use">Primary CTA, active states, completion fill</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#B286FD;"></div><div class="swatch-name">Calm Lavender</div><div class="swatch-hex">#B286FD</div><div class="swatch-use">Secondary accent, Workout B marker</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#E55733;"></div><div class="swatch-name">Lovely Red</div><div class="swatch-hex">#E55733</div><div class="swatch-use">Skipped day, alert, Workout C marker</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#60C6FF;"></div><div class="swatch-name">Sky Blue</div><div class="swatch-hex">#60C6FF</div><div class="swatch-use">Informational, alternate accent</div></div>
+  </div>
+
+  <h4>Surfaces & Backgrounds</h4>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#101010;"></div><div class="swatch-name">App BG</div><div class="swatch-hex">#101010</div><div class="swatch-use">Root background</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#1E1E1E; border:1px solid #2a2a2a;"></div><div class="swatch-name">Surface 2</div><div class="swatch-hex">#1E1E1E</div><div class="swatch-use">Cards, exercise rows</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#252525; border:1px solid #2a2a2a;"></div><div class="swatch-name">Surface 3</div><div class="swatch-hex">#252525</div><div class="swatch-use">Inputs, steppers, set tiles</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#2E2E2E; border:1px solid #333;"></div><div class="swatch-name">Surface 4</div><div class="swatch-hex">#2E2E2E</div><div class="swatch-use">Active/selected, secondary buttons</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#333333; border:1px solid #3a3a3a;"></div><div class="swatch-name">Border</div><div class="swatch-hex">#333333</div><div class="swatch-use">Subtle separators</div></div>
+  </div>
+
+  <h4>Text</h4>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;"></div><div class="swatch-name">Primary</div><div class="swatch-hex">#FFFFFF</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#888888;"></div><div class="swatch-name">Secondary</div><div class="swatch-hex">#888888</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#555555;"></div><div class="swatch-name">Muted</div><div class="swatch-hex">#555555</div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#3A3A3A;"></div><div class="swatch-name">Disabled</div><div class="swatch-hex">#3A3A3A</div></div>
+  </div>
+
+  <h3>Typography</h3>
+  <div class="card" style="padding: 4px 20px;">
+    <div class="type-row">
+      <div class="type-meta">Space Grotesk · 700 · 32px · tracking −0.03em · lh 1.05 — Screen title</div>
+      <div class="type-sample" style="font-family:'Space Grotesk'; font-weight:700; font-size:32px; letter-spacing:-0.03em; line-height:1.05;">Today</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Space Grotesk · 700 · 28px · tracking −0.02em — Packet card title</div>
+      <div class="type-sample" style="font-family:'Space Grotesk'; font-weight:700; font-size:28px; letter-spacing:-0.02em;">Lower + Lateral Power</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Space Grotesk · 700 · 20px · tracking −0.01em — Sheet / section header</div>
+      <div class="type-sample" style="font-family:'Space Grotesk'; font-weight:700; font-size:20px; letter-spacing:-0.01em;">Goblet Squat</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter · 600 · 16px — Exercise name</div>
+      <div class="type-sample" style="font-family:'Inter'; font-weight:600; font-size:16px;">Bulgarian Split Squat</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter · 500 · 14px — Body / list items</div>
+      <div class="type-sample" style="font-family:'Inter'; font-weight:500; font-size:14px;">Sit tall between the heels</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">Inter · 700 · 12px · tracking +0.08em · UPPERCASE — Eyebrows, labels</div>
+      <div class="type-sample" style="font-family:'Inter'; font-weight:700; font-size:12px; letter-spacing:0.08em; text-transform:uppercase;">Packet 1 · Foundation</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">JetBrains Mono · 600 · 30px — Weight / reps display (steppers)</div>
+      <div class="type-sample" style="font-family:'JetBrains Mono'; font-weight:600; font-size:30px;">45 <span style="font-size:14px; color:#888;">lb</span></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">JetBrains Mono · 600 · 19px — Set tile weight display</div>
+      <div class="type-sample" style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px;">35 <span style="font-size:11px; color:#888;">×8</span></div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">JetBrains Mono · 500 · 17px — Session elapsed timer</div>
+      <div class="type-sample" style="font-family:'JetBrains Mono'; font-weight:500; font-size:17px;">12:47</div>
+    </div>
+  </div>
+
+  <h3>Spacing, Radius & Motion</h3>
+  <div class="grid2">
+    <div>
+      <h4>Corner Radius</h4>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Value</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>--radius-sm</td><td>6px</td><td><div class="radius-preview" style="border-radius:6px;"></div></td></tr>
+          <tr><td>--radius-md</td><td>10px</td><td><div class="radius-preview" style="border-radius:10px;"></div></td></tr>
+          <tr><td>--radius-lg</td><td>12px</td><td><div class="radius-preview" style="border-radius:12px;"></div></td></tr>
+          <tr><td>--radius-xl</td><td>16px</td><td><div class="radius-preview" style="border-radius:16px;"></div></td></tr>
+          <tr><td>--radius-2xl</td><td>20px</td><td><div class="radius-preview" style="border-radius:20px;"></div></td></tr>
+          <tr><td>--radius-pill</td><td>999px</td><td><div class="radius-preview" style="border-radius:999px; width:44px;"></div></td></tr>
+          <tr><td>--radius-tile</td><td>14px</td><td style="color:#888; font-size:12px;">Set tile radius</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h4>Motion</h4>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>--duration-fast</td><td>120ms</td></tr>
+          <tr><td>--duration-normal</td><td>220ms</td></tr>
+          <tr><td>--duration-slow</td><td>380ms</td></tr>
+          <tr><td>--ease-out</td><td>cubic-bezier(0.2,0,0,1)</td></tr>
+          <tr><td>--ease-spring</td><td>cubic-bezier(0.34,1.56,0.64,1)</td></tr>
+          <tr><td>--ease-default</td><td>cubic-bezier(0.4,0,0.2,1)</td></tr>
+        </tbody>
+      </table>
+      <h4>Shadows</h4>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>--shadow-sm</td><td>0 2px 8px rgba(0,0,0,0.4)</td></tr>
+          <tr><td>--shadow-md</td><td>0 4px 20px rgba(0,0,0,0.4)</td></tr>
+          <tr><td>--shadow-lg</td><td>0 8px 40px rgba(0,0,0,0.5)</td></tr>
+          <tr><td>--shadow-lime</td><td>0 6px 22px rgba(178,240,66,0.3)</td></tr>
+          <tr><td>--shadow-lavender</td><td>0 6px 22px rgba(178,134,253,0.3)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── NAVIGATION MAP ──────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">02</div>
+  <h2>Navigation & State Machine</h2>
+
+  <h3>Screen hierarchy</h3>
+  <div class="card">
+    <div style="font-size:13px; color:#666; margin-bottom:12px;">Bottom-tab shell with 3 permanent tabs. Session and editors are full-screen overlays pushed on top of the tab shell — the shell persists beneath.</div>
+    <div class="flow">
+      <span class="flow-node current">01 Today</span>
+      <span class="flow-arrow">↔</span>
+      <span class="flow-node">02 Program</span>
+      <span class="flow-arrow">↔</span>
+      <span class="flow-node">03 Calendar</span>
+    </div>
+    <div style="height:1px; background:#1e1e1e; margin:14px 0;"></div>
+    <div class="flow">
+      <span class="flow-node">01 Today</span>
+      <span class="flow-arrow">→ Start session →</span>
+      <span class="flow-node overlay">Active Session (overlay)</span>
+      <span class="flow-arrow">→ Finish →</span>
+      <span class="flow-node overlay">Session Complete (overlay)</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-node">01 Today</span>
+    </div>
+    <div style="height:1px; background:#1e1e1e; margin:14px 0;"></div>
+    <div class="flow">
+      <span class="flow-node overlay">Active Session</span>
+      <span class="flow-arrow">→ tap set tile →</span>
+      <span class="flow-node overlay">Log Set Sheet (bottom sheet)</span>
+    </div>
+    <div style="height:1px; background:#1e1e1e; margin:14px 0;"></div>
+    <div class="flow">
+      <span class="flow-node">02 Program</span>
+      <span class="flow-arrow">→ tap Edit →</span>
+      <span class="flow-node overlay">Workout Editor (overlay)</span>
+      <span class="flow-arrow">→ Add exercise →</span>
+      <span class="flow-node overlay">Exercise Library (sheet)</span>
+    </div>
+    <div style="height:1px; background:#1e1e1e; margin:14px 0;"></div>
+    <div class="flow">
+      <span class="flow-node">03 Calendar</span>
+      <span class="flow-arrow">→ tap completed day →</span>
+      <span class="flow-node overlay">Day Summary (bottom sheet)</span>
+    </div>
+  </div>
+
+  <h3>Bottom nav visibility</h3>
+  <table class="token-table" style="margin-top:12px;">
+    <thead><tr><th>State</th><th>Nav visible?</th></tr></thead>
+    <tbody>
+      <tr><td>Any tab, no overlay</td><td style="color:#B2F042;">Yes</td></tr>
+      <tr><td>Active Session overlay</td><td style="color:#E55733;">Hidden</td></tr>
+      <tr><td>Workout Editor overlay</td><td style="color:#E55733;">Hidden</td></tr>
+      <tr><td>Session Complete overlay</td><td style="color:#E55733;">Hidden</td></tr>
+      <tr><td>Bottom sheet open</td><td style="color:#B2F042;">Yes (behind sheet)</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── SCREENS ─────────────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">03</div>
+  <h2>Screens</h2>
+
+  <!-- 01 Today -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num active">01</div>
+      <div class="screen-title-block">
+        <div class="t">Today View</div>
+        <div class="s">Default landing screen · tab 1</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Purpose</span><span class="v">Shows today's scheduled workout with a single clear CTA to start the session. Also surfaces weekly rhythm via a 7-day strip.</span>
+      <span class="k">Layout</span><span class="v">Scrollable column. Header (eyebrow + title + streak pill). Packet hero card (full-bleed minus 18px margin). Week strip section (7 equal-width day tiles). Bottom nav.</span>
+      <span class="k">Packet card</span><span class="v">Surface-2 background, 22px padding, radius-2xl. Contains: staple-tab row (colored pill showing "Packet N · Name", ghost pills for week/workout). Large workout title in display font. Focus area chips. Exercise list (dashed dividers, monospace set×reps). Primary CTA button (pill, accent fill).</span>
+      <span class="k">Ruled texture</span><span class="v">Repeating horizontal lines at 34px interval, ~1.8% opacity, masked in from 120px from top — evoking a training notebook page.</span>
+      <span class="k">Streak pill</span><span class="v">Top-right. Surface-2 bg, flame icon (accent color), mono numeral + "wk streak".</span>
+      <span class="k">Week strip</span><span class="v">7 equal tiles. Status variants: today (accent fill, dark text), done (accent dot indicator), scheduled (gray dot), rest (no indicator). Dow label above, date numeral in display font.</span>
+      <span class="k">CTA</span><span class="v">"Start session" — full-width pill, accent bg, shadow-lime glow, display font 700 17px. Scale to 0.97 on press.</span>
+      <span class="k">Empty state</span><span class="v">Rest day: show "Rest day" card with next scheduled workout date. No CTA.</span>
+    </div>
+  </div>
+
+  <!-- 02 Active Session -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num active">02</div>
+      <div class="screen-title-block">
+        <div class="t">Active Session</div>
+        <div class="s">Full-screen overlay · primary logging surface</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Purpose</span><span class="v">Log sets for all exercises in the current workout. Target: complete a set tap in ≤5 seconds, one-handed.</span>
+      <span class="k">Header</span><span class="v">Sticky. Back chevron (icon-btn), workout title + packet context, elapsed timer (mono font, right-aligned, "ELAPSED" eyebrow). Progress bar below (5px, accent fill, spring-animated on each set logged).</span>
+      <span class="k">Exercise list</span><span class="v">Scrollable. Each exercise = a card (Surface-2, radius-xl, 16px padding). Cards gain accent border + tinted bg when all sets are complete.</span>
+      <span class="k">Exercise card</span><span class="v">Header row: progress ring (42px, SVG, spring-animated stroke) + exercise name + coaching cue + target (sets×reps). Checkmark icon fades in on completion. Below: row of set tiles.</span>
+      <span class="k">Set tile</span><span class="v">Flex-1, min 60px, height 68px, radius-tile. Idle: Surface-3, "+" icon + set number. Logged: accent fill, weight (mono 19px) + reps (mono 11px) + set label. See animation spec below.</span>
+      <span class="k">Finish bar</span><span class="v">Sticky bottom. Semi-transparent gradient mask. "Finish session" pill (accent, glow) when all done; "Finish early · N/M sets" (Surface-3, muted text) otherwise.</span>
+      <span class="k">Logging modes</span>
+      <span class="v"><ul>
+        <li><strong>Instant:</strong> Single tap logs the set at last-used weight + target reps. Flash animation. No sheet.</li>
+        <li><strong>Sheet:</strong> Tap opens Log Set bottom sheet with stepper controls.</li>
+        <li><strong>Pad:</strong> Tap opens Log Set bottom sheet with number pad.</li>
+      </ul></span>
+      <span class="k">Empty state</span><span class="v">No exercises in workout: prompt to build the workout from Program tab.</span>
+    </div>
+    <div class="screen-rule"></div>
+    <h4>Set tile animation spec</h4>
+    <div class="timeline">
+      <div class="tl-row"><span class="tl-event">Tap (instant)</span><span class="tl-desc">Scale to 0.93 immediately (fast, 120ms). Flash: white overlay fades from 0.4→0 in 280ms. Tile bg transitions to accent fill (220ms ease-out). Weight/reps text fades in.</span></div>
+      <div class="tl-row"><span class="tl-event">Tile → done</span><span class="tl-desc">Pop keyframe: 0→scale(0.93)→scale(1.06)→scale(1), total 220ms, ease-spring. Border color transitions to accent.</span></div>
+      <div class="tl-row"><span class="tl-event">Exercise complete</span><span class="tl-desc">Card border pulses accent (ripple: scale 1→1.04, opacity 0.8→0, 600ms ease-out). Checkmark icon: scale 0.5→1, opacity 0→1, 220ms ease-spring. Card bg tints to 7% accent. Haptic: [12, 40, 18] ms vibrate pattern.</span></div>
+      <div class="tl-row"><span class="tl-event">Progress ring</span><span class="tl-desc">stroke-dashoffset reduces on each set completion. Transition: 400ms cubic-bezier(0.34,1.56,0.64,1). Ring color = accent.</span></div>
+    </div>
+  </div>
+
+  <!-- 03 Log Set Sheet -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">03</div>
+      <div class="screen-title-block">
+        <div class="t">Log Set Sheet</div>
+        <div class="s">Bottom sheet overlay · triggered from set tile tap</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Trigger</span><span class="v">Tap any set tile in Sheet or Pad logging modes. Tap backdrop to dismiss.</span>
+      <span class="k">Header</span><span class="v">Grab handle (38×4px, Surface-border, rounded). Exercise name (display 700 20px) + "Set N" (accent, 12px bold uppercase, right-aligned).</span>
+      <span class="k">Previous line</span><span class="v">"Last time · <strong>X lb</strong> × N reps" in secondary text. First-time: shows target instead. Pre-fills steppers.</span>
+      <span class="k">Steppers mode</span><span class="v">Two stepper cards side by side (Surface-3). Weight stepper: −/+ buttons (44px, accent color, icon-btn style), value in mono 30px. Steps by 5 lb. Reps stepper: steps by 1 (or 5 for timed holds). Band exercises: stepper cycles Light → Med → Heavy. Bodyweight exercises: show reps only.</span>
+      <span class="k">Pad mode</span><span class="v">Two slot fields (weight active by default, accent border). 3×4 numpad (Surface-3, mono font). "Next" key switches focus. "Del" backspaces. Max 4 digits per field.</span>
+      <span class="k">Confirm</span><span class="v">Full-width pill, accent, "Log set N" with check icon. shadow-lime glow. Scale 0.98 on press.</span>
+      <span class="k">Sheet animation</span><span class="v">Slides up from bottom: translateY(100%)→0, 220ms ease-out. Backdrop fades in: opacity 0→1, 120ms. Dismiss: reverse.</span>
+    </div>
+  </div>
+
+  <!-- 04 Session Complete -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">04</div>
+      <div class="screen-title-block">
+        <div class="t">Session Complete</div>
+        <div class="s">Full-screen overlay · triggered on finish</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Layout</span><span class="v">Centered column. Confetti layer behind everything. Check circle. Eyebrow (packet context). Title "Session logged." Subdued copy "Filed away. Nice work today." Stat row. Two action buttons.</span>
+      <span class="k">Check circle</span><span class="v">96px, accent fill, check icon (50px, accent-ink). Pop animation: scale 0→1.12→1, 380ms ease-spring. shadow-lime 40% opacity.</span>
+      <span class="k">Stats</span><span class="v">Sets done/total, duration (minutes), exercises completed. Surface-2 cards in a flex row.</span>
+      <span class="k">Confetti</span><span class="v">64 pieces. Colors: accent, lavender, sky, white, red. Random left position, fall animation 1.4–2.8s, staggered 0–400ms delay, rotate 720deg. Remove from DOM after animation. Trigger: <code>completion !== 'subtle'</code>.</span>
+      <span class="k">Actions</span><span class="v">"Back to today" (accent pill) and "See it in calendar" (Surface-3 pill). Stacked, centered, max-width 300px.</span>
+    </div>
+  </div>
+
+  <!-- 05 Calendar -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">05</div>
+      <div class="screen-title-block">
+        <div class="t">Calendar / History</div>
+        <div class="s">Tab 3 · monthly view</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Layout</span><span class="v">Scrollable. Eyebrow + month title + prev/next nav. 3-up stat row. Day-of-week header (Mon first). 7-col calendar grid. Legend. Bottom padding for nav.</span>
+      <span class="k">Calendar grid</span><span class="v">7 columns equal-width. Each cell: 1:1 aspect ratio, radius-lg, date numeral (display 14px 700), status dot (6px circle). Empty cells (leading days) are transparent.</span>
+      <span class="k">Day statuses</span>
+      <span class="v"><ul>
+        <li><strong>done</strong>: accent-tinted bg (16%), accent numeral, accent dot. Tappable → Day Summary sheet.</li>
+        <li><strong>today</strong>: 2px accent border, 10% accent bg, accent numeral, accent dot.</li>
+        <li><strong>scheduled</strong>: Surface-bg, gray numeral, hollow 7px dot with 1.5px gray border.</li>
+        <li><strong>skipped</strong>: red numeral, red dot.</li>
+        <li><strong>rest</strong>: Surface-2, muted numeral, no dot.</li>
+      </ul></span>
+      <span class="k">Tap target</span><span class="v">Minimum 44×44px per cell. Scale to 0.92 on press (tappable days only).</span>
+      <span class="k">Stats row</span><span class="v">"Sessions done N/M", "Volume N.Nk lb", "Current streak N wk". Surface-2 cards, display font accent numerals.</span>
+    </div>
+  </div>
+
+  <!-- 06 Day Summary -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">06</div>
+      <div class="screen-title-block">
+        <div class="t">Day Summary Sheet</div>
+        <div class="s">Bottom sheet · triggered from completed calendar day tap</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Header</span><span class="v">52px date badge (accent fill, date numeral 22px + "Jun" 9px uppercase). Title + "Week N · completed" in secondary. Horizontal layout.</span>
+      <span class="k">Stats</span><span class="v">3-up row: duration (minutes), exercises count, volume (Nk lb). Surface-3 chips.</span>
+      <span class="k">Exercise log</span><span class="v">List of exercises with dashed separators. Each row: name (flex 1), sets (mono secondary), top weight (mono accent). No header row needed.</span>
+    </div>
+  </div>
+
+  <!-- 07 Program View -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">07</div>
+      <div class="screen-title-block">
+        <div class="t">Program View</div>
+        <div class="s">Tab 2 · packet overview</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Layout</span><span class="v">Scrollable. Eyebrow + title ("Packet 1 · Foundation"). Week progress bar (accent fill, 6px, spring-animated). Three workout cards (A, B, C). "New workout" dashed button.</span>
+      <span class="k">Progress bar</span><span class="v">Shows current week / total weeks. Label: "Wk 2 of 12" (mono, right-aligned).</span>
+      <span class="k">Workout card</span><span class="v">Surface-2, radius-xl. Header row: 40px letter badge (radius-lg, accent/lavender/red per workout), title + focus text, "Edit" ghost button (Surface-4, pill, 12px). Exercise chip row below: all exercise names as small Surface-3 pills. Today badge (accent tag) on current-day workout.</span>
+      <span class="k">New workout</span><span class="v">Dashed border pill button, full width, muted. Tapping creates a new empty workout and opens the editor.</span>
+    </div>
+  </div>
+
+  <!-- 08 Workout Editor -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">08</div>
+      <div class="screen-title-block">
+        <div class="t">Workout Editor</div>
+        <div class="s">Full-screen overlay · edit or create a workout</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Header</span><span class="v">Back chevron + workout title (tappable pencil → inline input with accent underline border) + exercise count in secondary + "Save" accent pill button.</span>
+      <span class="k">Exercise rows</span><span class="v">Surface-2 cards, radius-lg. Up/down reorder buttons (24×22px, chevron icons, disabled state at limits). Mono index. Exercise name + muscle group secondary. Sets×reps tappable badge (Surface-4, mono 13px + pencil icon). Delete button (32px, none bg → red on press).</span>
+      <span class="k">Inline editor</span><span class="v">Replaces the exercise list item. Surface-3 card. Sets stepper (same as log sheet) + reps text input (free text to support "10 ea", "30 s", etc.). Done + cancel buttons.</span>
+      <span class="k">Add exercise</span><span class="v">Dashed pill button, full width. Opens Exercise Library sheet.</span>
+      <span class="k">Empty state</span><span class="v">Center-aligned muted text "No exercises yet — tap below to browse the library."</span>
+    </div>
+  </div>
+
+  <!-- 09 Exercise Library -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num">09</div>
+      <div class="screen-title-block">
+        <div class="t">Exercise Library Sheet</div>
+        <div class="s">Bottom sheet · up to 85dvh · from Workout Editor</div>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Header</span><span class="v">"Exercise Library" (display 700 20px) + close icon-btn. Search input below (Surface-3, dumbbell icon, focus accent border).</span>
+      <span class="k">Category chips</span><span class="v">Horizontally scrolling pill row (hide scrollbar). Categories: All · Hinge · Squat · Push · Pull · Lateral · Rotational · Power · Carry. Active = accent fill. Tap to filter.</span>
+      <span class="k">Exercise rows</span><span class="v">Surface-2, radius-lg. Color dot (category color), name (600 14px), muscles (secondary 11.5px), category tag (tinted by category color), sets×reps (mono secondary). Chevron expand indicator. Tap row to expand.</span>
+      <span class="k">Expanded state</span><span class="v">Coach cue in italic secondary text. "Add to workout" accent pill button. Expanding/collapsing via show/hide (no animation required, though height transition preferred).</span>
+      <span class="k">Category colors</span><span class="v">Hinge/Squat/Power = lime. Push/Carry = lavender. Pull = sky. Lateral/Rotational = red.</span>
+      <span class="k">Exercise count</span><span class="v">31 exercises across 8 categories. All pickleball-strength focused.</span>
+    </div>
+  </div>
+
+  <!-- ── COMPONENT INVENTORY ────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">04</div>
+  <h2>Component Inventory</h2>
+
+  <div class="card" style="padding: 8px 20px;">
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">SetTile</div>
+        <div class="comp-states">
+          <span class="tag tag-gray">idle</span>
+          <span class="tag tag-lime">done</span>
+          <span class="tag tag-gray">flash</span>
+        </div>
+      </div>
+      <div class="comp-desc">Flex-1 tappable tile. Idle shows "+" + set number. Done shows weight (mono 19px 600) + reps (mono 11px) + set label. Flash: white overlay animation on instant-log. Done: tilePop animation + accent fill. Min-width 60px, height 68px (density-adjustable), radius-tile.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">ExerciseCard</div>
+        <div class="comp-states">
+          <span class="tag tag-gray">in-progress</span>
+          <span class="tag tag-lime">complete</span>
+        </div>
+      </div>
+      <div class="comp-desc">Surface-2 card. Contains: ProgressRing OR emoji icon, exercise name + checkmark (fade in on complete), coaching cue, target badge, set tile row. Complete state: accent border + 7% tint bg + ring fill + checkmark fade-in + ripple animation.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">ProgressRing</div>
+        <div class="comp-states">
+          <span class="tag tag-gray">0–100%</span>
+          <span class="tag tag-lime">complete</span>
+        </div>
+      </div>
+      <div class="comp-desc">42px SVG circle. Stroke: accent. Dash-offset animates on each set (400ms spring). Center shows "N/M" fraction or "✓" on complete. Rotated −90° for clock-start.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">BottomSheet</div>
+        <div class="comp-states">
+          <span class="tag tag-gray">open</span>
+          <span class="tag tag-gray">dismiss</span>
+        </div>
+      </div>
+      <div class="comp-desc">Grab handle + Surface-2 bg + 26px top radius. Backdrop 60% black. Slide-up animation 220ms. Tap backdrop to dismiss. Used for: Log Set, Day Summary, Exercise Library.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">PacketHeroCard</div>
+        <div class="comp-states">
+          <span class="tag tag-gray">today</span>
+          <span class="tag tag-gray">rest</span>
+        </div>
+      </div>
+      <div class="comp-desc">Notebook-page card with ruled line texture (repeating CSS gradient, masked). Colored staple-tab row. Title + focus chips + exercise list with dashed rows + start CTA.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">WeekStrip</div>
+        <div class="comp-states">
+          <span class="tag tag-lime">today</span>
+          <span class="tag tag-gray">done · scheduled · rest</span>
+        </div>
+      </div>
+      <div class="comp-desc">7 equal-width tiles. Each: dow label (11px 700 uppercase), date numeral (display 16px 700), status dot (7px circle). Today tile: full accent fill, dark text.</div>
+    </div>
+    <div class="comp-row">
+      <div>
+        <div class="comp-name">BottomNav</div>
+        <div class="comp-states">
+          <span class="tag tag-lime">active</span>
+          <span class="tag tag-gray">inactive</span>
+        </div>
+      </div>
+      <div class="comp-desc">3 equal tabs: Today (clipboard icon), Program (dumbbell icon), Calendar (grid icon). Active: accent color. Inactive: muted. Label 11px 700 semibold below icon. 76px total height + safe-area-inset-bottom. Hidden during session and editor overlays.</div>
+    </div>
+  </div>
+
+  <!-- ── DATA MODEL ──────────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">05</div>
+  <h2>Data Model (TypeScript)</h2>
+
+<pre><span class="cm">// ── Program structure (loaded from local config/JSON) ─────────</span>
+
+<span class="kw">interface</span> <span class="ty">Exercise</span> {
+  id:          <span class="ty">string</span>;         <span class="cm">// e.g. "goblet", "rdl"</span>
+  name:        <span class="ty">string</span>;
+  cue:         <span class="ty">string</span>;         <span class="cm">// coaching cue shown in active session</span>
+  icon:        <span class="ty">string</span>;         <span class="cm">// emoji (optional, behind toggle)</span>
+  sets:        <span class="ty">number</span>;
+  reps:        <span class="ty">string</span>;         <span class="cm">// "10" | "10 ea" | "30 s"</span>
+  unit:        <span class="st">'lb'</span> | <span class="st">'band'</span> | <span class="st">'bw'</span>;
+  defaultLast: <span class="ty">number</span> | <span class="ty">string</span> | <span class="ty">null</span>; <span class="cm">// pre-fill for first-ever session</span>
+}
+
+<span class="kw">interface</span> <span class="ty">Workout</span> {
+  id:        <span class="ty">string</span>;          <span class="cm">// e.g. "p1w2A"</span>
+  packet:    <span class="ty">number</span>;
+  week:      <span class="ty">number</span>;
+  letter:    <span class="st">'A'</span> | <span class="st">'B'</span> | <span class="st">'C'</span>;
+  title:     <span class="ty">string</span>;
+  focus:     <span class="ty">string</span>;          <span class="cm">// e.g. "Legs · Lateral · Rotational"</span>
+  estMin:    <span class="ty">number</span>;
+  exercises: <span class="ty">Exercise</span>[];
+}
+
+<span class="kw">interface</span> <span class="ty">Packet</span> {
+  id:          <span class="ty">number</span>;
+  name:        <span class="ty">string</span>;         <span class="cm">// e.g. "Foundation"</span>
+  totalWeeks:  <span class="ty">number</span>;
+  workouts:    <span class="ty">Workout</span>[];      <span class="cm">// 3 per week × N weeks</span>
+}
+
+<span class="cm">// ── Logged data (persisted in IndexedDB) ─────────────────────</span>
+
+<span class="kw">interface</span> <span class="ty">SetLog</span> {
+  weight:   <span class="ty">number</span> | <span class="ty">string</span>;  <span class="cm">// 45 | "Med" | "BW"</span>
+  reps:     <span class="ty">number</span>;
+  unit:     <span class="ty">string</span>;
+}
+
+<span class="kw">interface</span> <span class="ty">ExerciseLog</span> {
+  exerciseId:  <span class="ty">string</span>;
+  exerciseName:<span class="ty">string</span>;
+  sets:        <span class="ty">SetLog</span>[];
+}
+
+<span class="kw">interface</span> <span class="ty">SessionLog</span> {
+  id:          <span class="ty">string</span>;          <span class="cm">// uuid</span>
+  workoutId:   <span class="ty">string</span>;
+  date:        <span class="ty">string</span>;          <span class="cm">// ISO date "2026-06-09"</span>
+  startedAt:   <span class="ty">number</span>;          <span class="cm">// unix ms</span>
+  finishedAt:  <span class="ty">number</span>;
+  durationSec: <span class="ty">number</span>;
+  exercises:   <span class="ty">ExerciseLog</span>[];
+  totalVolume: <span class="ty">number</span>;          <span class="cm">// lb lifted (weight × reps, sum)</span>
+}
+
+<span class="cm">// ── Calendar / schedule ───────────────────────────────────────</span>
+
+<span class="kw">type</span> <span class="ty">DayStatus</span> = <span class="st">'done'</span> | <span class="st">'today'</span> | <span class="st">'scheduled'</span> | <span class="st">'skipped'</span> | <span class="st">'rest'</span>;
+
+<span class="kw">interface</span> <span class="ty">TrainingDay</span> {
+  date:      <span class="ty">string</span>;            <span class="cm">// ISO date</span>
+  status:    <span class="ty">DayStatus</span>;
+  workoutId: <span class="ty">string</span> | <span class="ty">null</span>;
+  sessionId: <span class="ty">string</span> | <span class="ty">null</span>;    <span class="cm">// null if not done</span>
+}
+
+<span class="cm">// ── User preferences (localStorage) ──────────────────────────</span>
+
+<span class="kw">interface</span> <span class="ty">UserPrefs</span> {
+  accent:        <span class="ty">string</span>;        <span class="cm">// hex — default #B2F042</span>
+  loggingMode:   <span class="st">'instant'</span> | <span class="st">'sheet'</span> | <span class="st">'pad'</span>;
+  completionFeel:<span class="st">'subtle'</span> | <span class="st">'punchy'</span> | <span class="st">'bold'</span>;
+  showEmoji:     <span class="ty">boolean</span>;
+  density:       <span class="st">'compact'</span> | <span class="st">'regular'</span> | <span class="st">'comfy'</span>;
+  roundness:     <span class="st">'sharp'</span> | <span class="st">'default'</span> | <span class="st">'soft'</span>;
+}</pre>
+
+  <!-- ── OFFLINE / PERSISTENCE ───────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">06</div>
+  <h2>Offline & Persistence Contract</h2>
+  <div class="grid2">
+    <div class="card">
+      <h4 style="margin-top:0;">IndexedDB (primary store)</h4>
+      <ul>
+        <li><strong>sessions</strong> — all <code>SessionLog</code> records, keyed by id</li>
+        <li><strong>program</strong> — user's packet/workout definitions (editable)</li>
+        <li><strong>exerciseLastUsed</strong> — <code>{ exerciseId → { weight, reps } }</code> for prefill</li>
+      </ul>
+      <p style="margin:0; font-size:12px; color:#555;">Writes immediately on set confirmation. Never wait for network. No network dependency.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0;">localStorage</h4>
+      <ul>
+        <li><strong>packet:prefs</strong> — <code>UserPrefs</code> JSON</li>
+        <li><strong>packet:activeSession</strong> — in-progress session state (resume after crash/close)</li>
+        <li><strong>packet:currentWorkoutId</strong> — which workout is "today"</li>
+      </ul>
+      <p style="margin:0; font-size:12px; color:#555;">Small, sync reads only. Write on every change.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:0;">
+    <h4 style="margin-top:0;">Session persistence (crash recovery)</h4>
+    <p style="margin:0; color:#aaa; font-size:13px; line-height:1.7;">When a session is started, serialize the current set state (which sets are logged) to <code>localStorage:packet:activeSession</code> on every set confirmation. On app boot, if an active session record exists and the date matches today, offer to resume. On session complete or explicit abandon, clear the key.</p>
+  </div>
+
+  <!-- ── TECHNICAL REQUIREMENTS ─────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">07</div>
+  <h2>Technical Requirements</h2>
+  <div class="grid2">
+    <div>
+      <h3>Platform</h3>
+      <ul>
+        <li><strong>Target:</strong> Progressive Web App (PWA) installable on iOS/Android home screen. Web is primary delivery; no App Store required for v1.</li>
+        <li><strong>Viewport:</strong> Mobile-first, max-width 460px centered column. Letterboxed on desktop with subtle drop shadow on the shell.</li>
+        <li><strong>Offline:</strong> Fully functional with no network after initial load. Service worker + Cache API for asset caching.</li>
+        <li><strong>Orientation:</strong> Portrait only.</li>
+        <li><strong>Safe areas:</strong> All fixed elements respect <code>env(safe-area-inset-*)</code>.</li>
+      </ul>
+      <h3>Accessibility</h3>
+      <ul>
+        <li>Minimum tap target: <strong>44×44px</strong> on all interactive elements.</li>
+        <li>All icon-only buttons need <code>aria-label</code>.</li>
+        <li>Color is never the sole differentiator for status (dot + color).</li>
+        <li>Completion animations must respect <code>prefers-reduced-motion</code> — show end-state immediately, skip keyframe animations.</li>
+        <li>Contrast: primary text on Surface-2 passes AA (white on #1E1E1E = 13.5:1).</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Performance</h3>
+      <ul>
+        <li>Set logging interaction must feel instantaneous — no async operations in the tap handler critical path.</li>
+        <li>Haptic feedback via <code>navigator.vibrate()</code> where available (wrap in try/catch).</li>
+        <li>Fonts: preload Space Grotesk + Inter + JetBrains Mono from Google Fonts or self-host for offline reliability.</li>
+        <li>Animations use <code>transform</code> and <code>opacity</code> only — no layout-triggering properties.</li>
+      </ul>
+      <h3>Density system</h3>
+      <p style="font-size:13px; color:#888;">Three density modes adjustable by user. Implemented via CSS custom properties on <code>:root</code>:</p>
+      <table class="token-table" style="font-size:12px;">
+        <thead><tr><th>Mode</th><th>--tile-h</th><th>--card-gap</th></tr></thead>
+        <tbody>
+          <tr><td>compact</td><td>60px</td><td>9px</td></tr>
+          <tr><td>regular</td><td>68px</td><td>12px</td></tr>
+          <tr><td>comfy</td><td>78px</td><td>16px</td></tr>
+        </tbody>
+      </table>
+      <h3>Roundness system</h3>
+      <table class="token-table" style="font-size:12px;">
+        <thead><tr><th>Mode</th><th>tile</th><th>xl</th><th>2xl</th></tr></thead>
+        <tbody>
+          <tr><td>sharp</td><td>6px</td><td>10px</td><td>12px</td></tr>
+          <tr><td>default</td><td>14px</td><td>16px</td><td>20px</td></tr>
+          <tr><td>soft</td><td>20px</td><td>24px</td><td>28px</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── FEATURE CONCEPTS ────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">08</div>
+  <h2>Feature Concepts</h2>
+  <p style="margin-bottom:4px;">Nine features designed and ready to implement. Each has a working visual mockup in <code>packet/Feature Exploration.html</code> — open it in a browser and click any artboard to focus fullscreen before reading these specs.</p>
+  <div style="margin-bottom:28px; display:flex; flex-wrap:wrap; gap:8px;">
+    <span class="tag tag-lime">In the Gym ×4</span>
+    <span class="tag tag-lav">Before You Start ×2</span>
+    <span class="tag tag-sky">Progress &amp; Sharing ×3</span>
+  </div>
+
+  <!-- F1 Rest Timer -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,240,66,.12); color:#B2F042;">F1</div>
+      <div class="screen-title-block">
+        <div class="t">Rest Timer</div>
+        <div class="s">In-session overlay · between sets</div>
+      </div>
+      <span class="tag tag-lime" style="margin-left:auto; flex-shrink:0;">High priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Trigger</span><span class="v">Auto-starts after any set is logged. Can also be skipped entirely from settings.</span>
+      <span class="k">Layout</span><span class="v">Full-screen overlay (rgba(7,7,7,0.93)) on top of blurred session content. Centered: "REST" eyebrow, 158px circular SVG countdown ring, time remaining (mono 38px), next-set label, timer controls, skip button.</span>
+      <span class="k">Countdown ring</span><span class="v">SVG circle, r=72, stroke=7px, accent color. stroke-dashoffset animates linearly from 0 to full circumference (452px) over the rest duration. Track ring in Surface-4.</span>
+      <span class="k">Default durations</span><span class="v">90s for compound lifts (squat, hinge, press, pull). 60s for isolation/accessory. 45s for bodyweight/band work. Configurable per exercise type.</span>
+      <span class="k">Controls</span><span class="v">Three buttons: "−30s" (ghost pill, Surface-3), "+30s" (ghost pill), "Skip rest" (ghost pill, muted). When timer hits 0: ring pulses accent, haptic buzz ([30, 50, 30]), overlay auto-dismisses after 1.5s OR user taps "Let's go" accent button.</span>
+      <span class="k">Next set preview</span><span class="v">Surface-2 chip below ring: accent dot + "Next · Set N of M · Exercise Name". Tapping it dismisses the timer early.</span>
+      <span class="k">Data additions</span><span class="v">Add <code>defaultRestSec: number</code> to Exercise interface. Add <code>restTimerEnabled: boolean</code> and <code>customRestSec?: number</code> to UserPrefs.</span>
+    </div>
+    <div class="screen-rule"></div>
+    <h4>Animation spec</h4>
+    <div class="timeline">
+      <div class="tl-row"><span class="tl-event">Timer start</span><span class="tl-desc">Overlay fades in (opacity 0→1, 180ms). Ring begins linear dashoffset animation for full rest duration.</span></div>
+      <div class="tl-row"><span class="tl-event">10s warning</span><span class="tl-desc">Ring color transitions from accent to a slightly desaturated accent. Optional short haptic pulse.</span></div>
+      <div class="tl-row"><span class="tl-event">Timer end</span><span class="tl-desc">Haptic: [30,50,30]. "Skip rest" button transforms into "Let's go" accent button (color transition, 220ms). Overlay auto-dismisses after 1.5s if user doesn't tap.</span></div>
+      <div class="tl-row"><span class="tl-event">Skip / dismiss</span><span class="tl-desc">Overlay slides down off screen (translateY 0→100%, 200ms ease-in). Resume normal scroll position.</span></div>
+    </div>
+  </div>
+
+  <!-- F2 Progressive Overload Nudge -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,240,66,.12); color:#B2F042;">F2</div>
+      <div class="screen-title-block">
+        <div class="t">Progressive Overload Nudge</div>
+        <div class="s">Exercise card · pre-set suggestion</div>
+      </div>
+      <span class="tag tag-lime" style="margin-left:auto; flex-shrink:0;">High priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Context</span><span class="v">Shown on an exercise card when the user has logged that exercise before AND the system detects an opportunity to increase load (hit all reps last time). Appears between the exercise header and set tiles.</span>
+      <span class="k">Nudge chip</span><span class="v">Full-width row inside the exercise card. Accent-tinted background (rgba(lime,0.1)), accent border (0.2 opacity). Up-arrow icon (lime), bold title "Try X lb today", secondary text "You hit Y lb × Z last week". Dismiss ×button (right edge, muted).</span>
+      <span class="k">Logic</span><span class="v">Show nudge when: last session all sets hit target reps at logged weight. Suggested weight = last weight + exercise increment (5 lb for compounds, 2.5 lb for isolation, next band level for band work).</span>
+      <span class="k">Tap to apply</span><span class="v">Tapping the nudge chip (not the ×) pre-fills all set tiles for that exercise with the suggested weight. Tiles show suggested weight in a pending state (ghost numeral). User can still adjust via sheet.</span>
+      <span class="k">Dismiss</span><span class="v">Tapping × hides nudge for this exercise for this session only. Does not affect future sessions.</span>
+      <span class="k">Data additions</span><span class="v">Add <code>incrementLb: number</code> to Exercise interface. Query <code>exerciseLastUsed</code> store for previous session data to compute suggestion.</span>
+    </div>
+  </div>
+
+  <!-- F3 Personal Records -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,240,66,.12); color:#B2F042;">F3</div>
+      <div class="screen-title-block">
+        <div class="t">Personal Records (PR)</div>
+        <div class="s">Set tile + exercise card · post-set feedback</div>
+      </div>
+      <span class="tag tag-lime" style="margin-left:auto; flex-shrink:0;">High priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Detection</span><span class="v">After logging a set, compare weight against all historical logs for that exercise. If new top weight: trigger PR state.</span>
+      <span class="k">PR badge</span><span class="v">Small badge overlaid on the top-right corner of the set tile: dark background (#101010), 1.5px accent border, "PR" text (9px, 800 weight, accent color, 0.06em tracking). Position: absolute, top −7px, right −5px, z-index 2.</span>
+      <span class="k">PR celebration chip</span><span class="v">Appears below the set tile row after exercise completes with a PR. Surface-2 card with accent-tinted bg. Trophy icon (accent stroke). Bold title "New personal best", secondary "X lb × Y — up Z lb from last PR". Same fade-in animation as exercise completion checkmark.</span>
+      <span class="k">Data additions</span><span class="v">Add <code>prs</code> table to IndexedDB: <code>{ exerciseId, weight, reps, date, sessionId }</code>. Query on set confirm to detect new PRs.</span>
+    </div>
+  </div>
+
+  <!-- F4 Volume Trend Sparkline -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,240,66,.12); color:#B2F042;">F4</div>
+      <div class="screen-title-block">
+        <div class="t">Volume Trend Sparkline</div>
+        <div class="s">Exercise card · historical trend</div>
+      </div>
+      <span class="tag tag-gray" style="margin-left:auto; flex-shrink:0;">Medium priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Context</span><span class="v">Shown inside completed exercise cards, below the set tile row. Only visible when ≥3 prior sessions of that exercise exist.</span>
+      <span class="k">Chart</span><span class="v">Inline SVG, full-width, 56px tall, viewBox 0 0 296 52. Line: 2px accent stroke, rounded joins. Area fill: accent gradient (0.2→0 opacity). Data points: 2.5px circles (accent stroke, dark fill), last point: 4px solid accent. X-axis: week labels (W1–W8), 9px mono, muted.</span>
+      <span class="k">Metric</span><span class="v">Volume = sum of (weight × reps) per session for that exercise. Normalize to SVG coordinate space: min→bottom, max→top.</span>
+      <span class="k">Trend label</span><span class="v">Right-aligned, above chart. Format: "↑ X% this packet" or "↓ X%" if declining. Color: accent for positive, red for negative. Up-arrow SVG icon (12px).</span>
+      <span class="k">Separator</span><span class="v">1px rgba(255,255,255,0.07) horizontal rule separates set tiles from sparkline section. "VOLUME · 8 WEEKS" eyebrow label left-aligned above chart.</span>
+      <span class="k">Data additions</span><span class="v">Query <code>sessions</code> store: filter by exerciseId, sort by date, take last 8, compute volume per session.</span>
+    </div>
+  </div>
+
+  <!-- F5 Post-Match Logging -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,134,253,.12); color:#B286FD;">F5</div>
+      <div class="screen-title-block">
+        <div class="t">Post-Match Logging</div>
+        <div class="s">Today view · pre-session card</div>
+      </div>
+      <span class="tag tag-lav" style="margin-left:auto; flex-shrink:0;">Medium priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Context</span><span class="v">Card injected above the Packet hero card on the Today view, on training days only. Represents the connection between pickleball performance and strength training.</span>
+      <span class="k">Layout</span><span class="v">Surface-2 card, radius-2xl, 3px accent left border (visual cue: this is about on-court performance). Header: "How was your game?" (display 700 17px) + "Skip" link (right). Subtitle: "Rate today's session on court". Rating row. Collapsed note input.</span>
+      <span class="k">Rating row</span><span class="v">5 equal-width tiles, each: square aspect ratio, radius-lg. Labels: "Rough" / "Off" / "Solid" / "Good" / "Fire". Selected: accent fill + dark numeral. Unselected: Surface-4 + muted numeral. Tap to select, tap again to deselect. Only one active at a time.</span>
+      <span class="k">Note input</span><span class="v">Collapsed by default. Shows "Add a note about your game…" in a Surface-3 tappable row with edit icon. Expands to a text input inline. 120 char max.</span>
+      <span class="k">Skip</span><span class="v">Dismisses card for today. Does not show again until next training day.</span>
+      <span class="k">On submit</span><span class="v">Card shrinks and is replaced by a small "Game: Good · Jun 9" chip above the packet card. Data persists with the session log for that day.</span>
+      <span class="k">Data additions</span><span class="v">Add <code>gameRating?: 1|2|3|4|5</code> and <code>gameNote?: string</code> to SessionLog interface.</span>
+    </div>
+  </div>
+
+  <!-- F6 Readiness Check -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(178,134,253,.12); color:#B286FD;">F6</div>
+      <div class="screen-title-block">
+        <div class="t">Readiness Check</div>
+        <div class="s">Pre-session overlay · 3-question check-in</div>
+      </div>
+      <span class="tag tag-lav" style="margin-left:auto; flex-shrink:0;">Medium priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Trigger</span><span class="v">Appears as an overlay when tapping "Start session". Dismissible — "Skip readiness check" link at bottom.</span>
+      <span class="k">Layout</span><span class="v">Full-screen. Eyebrow "Before you start". Title "How are you feeling today?" (display 700 26px). Subtitle "10 seconds. Adjusts intensity suggestions." Three metric cards. Score recommendation card. CTA.</span>
+      <span class="k">Metric cards</span><span class="v">Each: Surface-2, radius-lg, 14px. Row: metric label (left) + hint text (right, secondary). Below: 5-segment bar — each segment is a rounded pill (height 9px, flex-1). Filled segments: accent (or red for Soreness). Tap anywhere on bar to set level.</span>
+      <span class="k">Metrics</span><span class="v">Sleep (1–5, "Last night"), Soreness (1–5, "Body feels"), Energy (1–5, "Right now").</span>
+      <span class="k">Recommendation</span><span class="v">Computed from scores. Show a card if soreness ≥ 4: red-tinted (rgba(red,0.1)), red border, warning icon, "High soreness detected — consider reducing weights 10–15% today." Show nothing if all scores normal. Show accent-tinted encouragement if all scores ≥ 4: "Feeling great — go for it."</span>
+      <span class="k">CTA</span><span class="v">"I'm ready — let's go" accent pill (full width). Proceeds into Active Session with readiness data attached to the in-progress session record.</span>
+      <span class="k">Data additions</span><span class="v">Add <code>readiness?: { sleep: number, soreness: number, energy: number }</code> to SessionLog interface.</span>
+    </div>
+  </div>
+
+  <!-- F7 Streak + Consistency -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(96,198,255,.12); color:#60C6FF;">F7</div>
+      <div class="screen-title-block">
+        <div class="t">Streak &amp; Consistency Heatmap</div>
+        <div class="s">Today view · enhanced header</div>
+      </div>
+      <span class="tag tag-sky" style="margin-left:auto; flex-shrink:0;">High priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Streak counter</span><span class="v">Replaces the simple streak pill with a standalone Surface-2 card (radius-lg, top-right of Today header). Large mono numeral (28px, accent) + "wk streak" label (10px uppercase muted). Resets to 0 if a scheduled session is skipped (not completed within the day).</span>
+      <span class="k">Consistency heatmap</span><span class="v">Surface-2 card, full-width, below the streak/title row. Header: "June consistency" (13px 700) + "21/24" fraction (mono, accent). Grid: 8 rows (weeks) × 3 columns (training days). Each cell: 28×28px, radius-lg. Done = accent fill + check icon. Skipped = transparent, no border (blank). Scheduled (future) = Surface-4. Week label "W1"–"W8" left of each row (mono 9px muted). "Now" label after current week's last cell.</span>
+      <span class="k">Progress bar</span><span class="v">Below grid. 5px accent fill, rounded. Percentage label right-aligned (lime, 11px 700). "X sessions completed" left-aligned (secondary 11px).</span>
+      <span class="k">Calculation</span><span class="v">Consistency = completed sessions / total scheduled sessions for current month × 100. Streak = consecutive weeks with all 3 scheduled sessions completed.</span>
+      <span class="k">Data additions</span><span class="v">No new data — computed from existing SessionLog + TrainingDay records. Consider caching computed stats in localStorage with a dirty flag.</span>
+    </div>
+  </div>
+
+  <!-- F8 Packet 2 Preview -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(96,198,255,.12); color:#60C6FF;">F8</div>
+      <div class="screen-title-block">
+        <div class="t">Packet 2 Preview</div>
+        <div class="s">Full-screen overlay · post-packet completion</div>
+      </div>
+      <span class="tag tag-sky" style="margin-left:auto; flex-shrink:0;">Medium priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Trigger</span><span class="v">Shown when the final session of a Packet is completed (last workout of week 12, or whatever the packet's totalWeeks is). Appears instead of the standard Session Complete screen.</span>
+      <span class="k">Layout</span><span class="v">Full-screen. Centered column. 72px check circle (accent). Eyebrow "Packet 1 Complete" (accent). Title "12 weeks. Filed." (display 700 32px). Subtitle. Packet stats (3-up row). Divider. Packet 2 teaser card. Two action buttons.</span>
+      <span class="k">Packet stats</span><span class="v">Sessions completed, total weeks, total volume lifted. Surface-2 cards, accent numerals.</span>
+      <span class="k">Packet 2 teaser card</span><span class="v">Surface-2, radius-xl, lavender top border (2px gradient). Lavender accent throughout (replaces lime for this card). Eyebrow "Up next", Packet 2 name badge, title, description, focus area chips.</span>
+      <span class="k">Actions</span><span class="v">"Begin Packet 2" — lavender pill (since Packet 2 uses lavender accent). "Review Packet 1 history" — ghost pill. Stacked full-width.</span>
+      <span class="k">Data additions</span><span class="v">Multi-packet support: <code>Packet[]</code> array in program store. Each packet has an accent color. "Current packet" pointer in prefs. Transitioning to next packet: update pointer, write new TrainingDay schedule.</span>
+    </div>
+  </div>
+
+  <!-- F9 Session Share Card -->
+  <div class="screen-card">
+    <div class="screen-header">
+      <div class="screen-num" style="background:rgba(96,198,255,.12); color:#60C6FF;">F9</div>
+      <div class="screen-title-block">
+        <div class="t">Session Share Card</div>
+        <div class="s">Post-session · shareable image</div>
+      </div>
+      <span class="tag tag-sky" style="margin-left:auto; flex-shrink:0;">Low priority</span>
+    </div>
+    <div class="spec-grid">
+      <span class="k">Entry</span><span class="v">Button on the Session Complete screen: "Share session". Opens a sheet showing the shareable card + share/copy actions.</span>
+      <span class="k">Card design</span><span class="v">Dark card (linear-gradient #161616→#111, radius-20). Faint ruled line texture (same as Packet hero card). Packet wordmark top-left (logo icon + "Packet" bold). Date + workout code top-right (mono muted). Large set count (display 700 48px, accent). Volume secondary stat. Exercise list (4 rows max): name, sets×reps (mono secondary), top weight (mono accent). Footer: "Packet N · Name · X min".</span>
+      <span class="k">Share action</span><span class="v">Uses Web Share API (<code>navigator.share()</code>) where supported. Falls back to copying image to clipboard via Canvas API + <code>navigator.clipboard.write()</code>. Render card to canvas with <code>html-to-image</code> or equivalent.</span>
+      <span class="k">Copy image</span><span class="v">Renders the card DOM node to a PNG blob via html-to-image, writes to clipboard. Toast confirmation: "Copied to clipboard".</span>
+      <span class="k">Data needed</span><span class="v">All data available from the just-completed SessionLog record. No new data model changes required.</span>
+    </div>
+  </div>
+
+  <!-- ── OPEN QUESTIONS ──────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">09</div>
+  <h2>Open Design Questions</h2>
+  <div class="card">
+    <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:10px;">
+      <li><strong>Rest timer durations:</strong> Confirm default rest durations per exercise category (current spec: 90s compound, 60s accessory, 45s bodyweight). Should the user set a global default, or per-exercise?</li>
+      <li><strong>Plate calculator:</strong> Useful for barbell lifts — input target weight, output plates per side. Could be a sheet triggered from the weight stepper. In scope for v1?</li>
+      <li><strong>Program sync/backup:</strong> Are sessions stored locally only, or synced to a backend? Affects data layer significantly and offline conflict resolution strategy.</li>
+      <li><strong>Multiple packets:</strong> Does the app ship with Packet 2+ pre-defined, or does a coach upload new packets? Who authors the program?</li>
+      <li><strong>Skipped day handling:</strong> Can users manually mark a day as skipped, or is it inferred automatically after midnight?</li>
+      <li><strong>Post-match logging timing:</strong> Should the "How was your game?" card appear before OR after the workout? Currently designed as pre-session. Some users may prefer logging game quality after lifting.</li>
+      <li><strong>Readiness check opt-in:</strong> Should the readiness check be opt-in (off by default, user enables) or opt-out (on by default, user disables)? Affects first-run experience.</li>
+      <li><strong>Share card implementation:</strong> <code>html-to-image</code> library vs Canvas API for rendering the share card. Consider font rendering fidelity on iOS.</li>
+      <li><strong>Accent ink:</strong> When user picks a custom accent color, use luminance to decide text color: <code>(r*299 + g*587 + b*114)/1000 &gt; 140</code> → black ink, else white.</li>
+    </ul>
+  </div>
+
+  <!-- ── FILES ───────────────────────────────────────────────── -->
+  <div class="divider"></div>
+  <div class="section-n">10</div>
+  <h2>Reference Files</h2>
+  <div class="card">
+    <table class="token-table" style="margin:0;">
+      <thead><tr><th>File</th><th>Contents</th></tr></thead>
+      <tbody>
+        <tr><td>packet/Packet.html</td><td>Main prototype — all 3 core screens + session + program editor. Run in browser.</td></tr>
+        <tr><td>packet/Feature Exploration.html</td><td>Design canvas with all 9 feature concept mockups. Open in browser, click any artboard to focus fullscreen.</td></tr>
+        <tr><td>packet/tokens.css</td><td>All CSS custom properties (color, type, spacing, radius, motion).</td></tr>
+        <tr><td>packet/app.css</td><td>Full app stylesheet — component rules, animations, layout.</td></tr>
+        <tr><td>packet/data.jsx</td><td>Mock data: program, calendar, exercise library (31 exercises).</td></tr>
+        <tr><td>packet/components.jsx</td><td>Icon set, ProgressRing SVG component, confetti helper.</td></tr>
+        <tr><td>packet/today.jsx</td><td>Today view component.</td></tr>
+        <tr><td>packet/session.jsx</td><td>Active session + LogSheet (steppers &amp; number pad).</td></tr>
+        <tr><td>packet/calendar.jsx</td><td>Calendar grid + DaySummary sheet.</td></tr>
+        <tr><td>packet/program.jsx</td><td>Program view + WorkoutEditor + ExerciseLibrary sheet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:60px; text-align:center; color:#333; font-size:12px; font-family:'JetBrains Mono', monospace;">
+    Packet Design Handoff · June 2026 · cosmicstrawberry.com
+  </div>
+
+</div>
+</body>
+</html>

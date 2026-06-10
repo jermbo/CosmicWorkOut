@@ -1,0 +1,201 @@
+// data.jsx — Packet program + history mock data
+// Exported to window for use across babel script scopes.
+
+// ── Today's workout: Packet 1 · Week 2 · Workout A ──────────────
+// A believable pickleball strength session: lower body, lateral
+// stability and rotational power. Swap in your real program anytime.
+const WORKOUT_A = {
+  packet: 1,
+  packetName: 'Foundation',
+  week: 2,
+  workout: 'A',
+  title: 'Lower + Lateral Power',
+  focus: 'Legs · Lateral · Rotational',
+  estMin: 45,
+  exercises: [
+    {
+      id: 'goblet',
+      name: 'Goblet Squat',
+      icon: '🏋️',
+      cue: 'Sit tall between the heels',
+      sets: 4, reps: '8', unit: 'lb', last: 35,
+    },
+    {
+      id: 'rdl',
+      name: 'Romanian Deadlift',
+      icon: '🏋️',
+      cue: 'Hinge — feel the hamstrings load',
+      sets: 3, reps: '10', unit: 'lb', last: 95,
+    },
+    {
+      id: 'split',
+      name: 'Bulgarian Split Squat',
+      icon: '🦵',
+      cue: 'Single-leg stability for the court',
+      sets: 3, reps: '10 ea', unit: 'lb', last: 30,
+    },
+    {
+      id: 'band',
+      name: 'Lateral Band Walk',
+      icon: '↔️',
+      cue: 'Low, slow, glutes burning',
+      sets: 3, reps: '15 ea', unit: 'band', last: 'Med',
+    },
+    {
+      id: 'medball',
+      name: 'Med-Ball Rotational Slam',
+      icon: '💥',
+      cue: 'Explode through the hips',
+      sets: 3, reps: '6 ea', unit: 'lb', last: 10,
+    },
+    {
+      id: 'copenhagen',
+      name: 'Copenhagen Plank',
+      icon: '🪵',
+      cue: 'Adductor armor — hold steady',
+      sets: 3, reps: '30 s', unit: 'bw', last: null,
+    },
+  ],
+};
+
+// ── Calendar: June 2026 ─────────────────────────────────────────
+// Schedule = Tue / Thu / Sat. Today is Tue June 9 (Week 2, Workout A).
+// status: 'done' | 'today' | 'scheduled' | 'skipped' | 'rest'
+const TODAY_DATE = 9;
+const MONTH_LABEL = 'June 2026';
+const MONTH_START_DOW = 1; // June 1 2026 is a Monday (0=Sun)
+const DAYS_IN_MONTH = 30;
+
+const TRAINING = {
+  2:  { status: 'done',      workout: 'A', week: 1, title: 'Upper + Reactive', min: 41, sets: 17, volume: 7820 },
+  4:  { status: 'skipped',   workout: 'B', week: 1, title: 'Lower + Power' },
+  6:  { status: 'done',      workout: 'C', week: 1, title: 'Full + Conditioning', min: 38, sets: 15, volume: 6240 },
+  9:  { status: 'today',     workout: 'A', week: 2, title: 'Lower + Lateral Power' },
+  11: { status: 'scheduled', workout: 'B', week: 2, title: 'Upper + Reactive' },
+  13: { status: 'scheduled', workout: 'C', week: 2, title: 'Full + Conditioning' },
+  16: { status: 'scheduled', workout: 'A', week: 3, title: 'Lower + Lateral Power' },
+  18: { status: 'scheduled', workout: 'B', week: 3, title: 'Upper + Reactive' },
+  20: { status: 'scheduled', workout: 'C', week: 3, title: 'Full + Conditioning' },
+  23: { status: 'scheduled', workout: 'A', week: 4, title: 'Lower + Lateral Power' },
+  25: { status: 'scheduled', workout: 'B', week: 4, title: 'Upper + Reactive' },
+  27: { status: 'scheduled', workout: 'C', week: 4, title: 'Deload + Mobility' },
+  30: { status: 'scheduled', workout: 'A', week: 5, title: 'Packet 2 · Build' },
+};
+
+// Logged detail for a completed day (shown in day summary).
+const DAY_LOG = {
+  2: [
+    { name: 'DB Bench Press',     sets: '4×8',  top: '45 lb' },
+    { name: 'Chest-Supported Row',sets: '4×10', top: '40 lb' },
+    { name: 'Reactive Pogo Hops', sets: '3×20', top: 'BW' },
+    { name: 'Pallof Press',       sets: '3×12', top: 'Med' },
+  ],
+  6: [
+    { name: 'Trap-Bar Deadlift',  sets: '4×6',  top: '155 lb' },
+    { name: 'Push Press',         sets: '3×8',  top: '55 lb' },
+    { name: 'Sled Push',          sets: '4×20m',top: '90 lb' },
+    { name: 'Farmer Carry',       sets: '3×40m',top: '50 lb' },
+  ],
+};
+
+// Mini calendar strip for Today view: this week (Mon–Sun of week 2).
+const WEEK_STRIP = [
+  { dow: 'M', date: 8,  status: 'rest' },
+  { dow: 'T', date: 9,  status: 'today' },
+  { dow: 'W', date: 10, status: 'rest' },
+  { dow: 'T', date: 11, status: 'scheduled' },
+  { dow: 'F', date: 12, status: 'rest' },
+  { dow: 'S', date: 13, status: 'scheduled' },
+  { dow: 'S', date: 14, status: 'rest' },
+];
+
+// ── Exercise Library ────────────────────────────────────────
+// Organized by training category — pickleball-relevant strength work.
+const EXERCISE_LIBRARY = [
+  // ── HINGE ─────────────────────────────────────────────────
+  { id: 'rdl',         cat: 'Hinge',      name: 'Romanian Deadlift',       muscles: 'Hamstrings · Glutes',      defaultSets: 3, defaultReps: '10',    unit: 'lb', cue: 'Hinge — feel the hamstrings load' },
+  { id: 'trap-dl',     cat: 'Hinge',      name: 'Trap-Bar Deadlift',        muscles: 'Posterior chain',          defaultSets: 4, defaultReps: '6',     unit: 'lb', cue: 'Drive through the floor, stay tall' },
+  { id: 'kb-swing',    cat: 'Hinge',      name: 'Kettlebell Swing',         muscles: 'Glutes · Hamstrings',      defaultSets: 3, defaultReps: '15',    unit: 'lb', cue: 'Hip snap — not a squat' },
+  { id: 'good-morn',   cat: 'Hinge',      name: 'Good Morning',             muscles: 'Hamstrings · Erectors',    defaultSets: 3, defaultReps: '12',    unit: 'lb', cue: 'Bar stays loaded, spine neutral' },
+  // ── SQUAT ─────────────────────────────────────────────────
+  { id: 'goblet',      cat: 'Squat',      name: 'Goblet Squat',             muscles: 'Quads · Glutes',           defaultSets: 4, defaultReps: '8',     unit: 'lb', cue: 'Sit tall between the heels' },
+  { id: 'split',       cat: 'Squat',      name: 'Bulgarian Split Squat',    muscles: 'Quads · Glutes · Balance', defaultSets: 3, defaultReps: '10 ea', unit: 'lb', cue: 'Single-leg stability for the court' },
+  { id: 'box-squat',   cat: 'Squat',      name: 'Box Squat',                muscles: 'Quads · Glutes',           defaultSets: 4, defaultReps: '6',     unit: 'lb', cue: 'Pause on the box, explode up' },
+  { id: 'step-up',     cat: 'Squat',      name: 'Step-Up',                  muscles: 'Quads · Glutes · Balance', defaultSets: 3, defaultReps: '10 ea', unit: 'lb', cue: 'Drive through the heel, no push off' },
+  // ── UPPER PUSH ────────────────────────────────────────────
+  { id: 'db-bench',    cat: 'Push',       name: 'DB Bench Press',           muscles: 'Chest · Triceps · Front delt', defaultSets: 4, defaultReps: '8', unit: 'lb', cue: 'Controlled on the way down' },
+  { id: 'push-press',  cat: 'Push',       name: 'Push Press',               muscles: 'Shoulders · Triceps',      defaultSets: 3, defaultReps: '8',     unit: 'lb', cue: 'Leg drive into lockout overhead' },
+  { id: 'landmine',    cat: 'Push',       name: 'Landmine Press',           muscles: 'Shoulders · Serratus',     defaultSets: 3, defaultReps: '10 ea', unit: 'lb', cue: 'Arc up and away, core tight' },
+  { id: 'db-ohp',      cat: 'Push',       name: 'DB Shoulder Press',        muscles: 'Shoulders · Triceps',      defaultSets: 3, defaultReps: '10',    unit: 'lb', cue: 'Neutral grip, packed shoulders' },
+  // ── UPPER PULL ────────────────────────────────────────────
+  { id: 'cs-row',      cat: 'Pull',       name: 'Chest-Supported Row',      muscles: 'Upper back · Biceps',      defaultSets: 4, defaultReps: '10',    unit: 'lb', cue: 'Pull elbows back past the pad' },
+  { id: 'pull-up',     cat: 'Pull',       name: 'Pull-Up',                  muscles: 'Lats · Biceps',            defaultSets: 3, defaultReps: '6',     unit: 'bw', cue: 'Full hang to chin over bar' },
+  { id: 'face-pull',   cat: 'Pull',       name: 'Face Pull',                muscles: 'Rear delt · Rotator cuff', defaultSets: 3, defaultReps: '15',    unit: 'band', cue: 'High elbows, external rotation at end' },
+  { id: 'band-pull',   cat: 'Pull',       name: 'Band Pull-Apart',          muscles: 'Rear delt · Mid trap',     defaultSets: 3, defaultReps: '20',    unit: 'band', cue: 'Straight arms, squeeze at end' },
+  // ── LATERAL ───────────────────────────────────────────────
+  { id: 'band-walk',   cat: 'Lateral',    name: 'Lateral Band Walk',        muscles: 'Glute med · Hip abductors', defaultSets: 3, defaultReps: '15 ea', unit: 'band', cue: 'Low, slow, glutes burning' },
+  { id: 'copenhagen',  cat: 'Lateral',    name: 'Copenhagen Plank',         muscles: 'Adductors · Core',         defaultSets: 3, defaultReps: '30 s', unit: 'bw', cue: 'Adductor armor — hold steady' },
+  { id: 'side-plank',  cat: 'Lateral',    name: 'Side Plank',               muscles: 'Obliques · Glute med',     defaultSets: 3, defaultReps: '30 s', unit: 'bw', cue: 'Hips up, body straight' },
+  { id: 'sl-rdl',      cat: 'Lateral',    name: 'Single-Leg RDL',           muscles: 'Hamstrings · Balance',     defaultSets: 3, defaultReps: '8 ea',  unit: 'lb', cue: 'Slow and controlled, don\'t rush' },
+  // ── ROTATIONAL ────────────────────────────────────────────
+  { id: 'medball',     cat: 'Rotational', name: 'Med-Ball Rotational Slam', muscles: 'Obliques · Hips · Core',   defaultSets: 3, defaultReps: '6 ea',  unit: 'lb', cue: 'Explode through the hips' },
+  { id: 'pallof',      cat: 'Rotational', name: 'Pallof Press',             muscles: 'Anti-rotation core',       defaultSets: 3, defaultReps: '12',    unit: 'band', cue: 'Press and hold — resist the pull' },
+  { id: 'woodchop',    cat: 'Rotational', name: 'Cable Woodchop',           muscles: 'Obliques · Shoulders',     defaultSets: 3, defaultReps: '12 ea', unit: 'lb', cue: 'Rotate from the hips, not the arms' },
+  { id: 'mb-rainbow',  cat: 'Rotational', name: 'Med-Ball Rainbow',         muscles: 'Full rotational chain',    defaultSets: 3, defaultReps: '8 ea',  unit: 'lb', cue: 'Arc overhead, control the landing' },
+  // ── POWER ─────────────────────────────────────────────────
+  { id: 'pogo',        cat: 'Power',      name: 'Reactive Pogo Hops',       muscles: 'Calves · Achilles',        defaultSets: 3, defaultReps: '20',    unit: 'bw', cue: 'Stiff ankles, fast contacts' },
+  { id: 'box-jump',    cat: 'Power',      name: 'Box Jump',                 muscles: 'Quads · Glutes · Power',   defaultSets: 4, defaultReps: '5',     unit: 'bw', cue: 'Full extension at takeoff' },
+  { id: 'broad-jump',  cat: 'Power',      name: 'Broad Jump',               muscles: 'Full lower body power',    defaultSets: 4, defaultReps: '5',     unit: 'bw', cue: 'Stick the landing, absorb well' },
+  { id: 'mb-chest',    cat: 'Power',      name: 'Med-Ball Chest Pass',      muscles: 'Chest · Triceps · Core',   defaultSets: 3, defaultReps: '8',     unit: 'lb', cue: 'Explosive — like a fast pickleball punch' },
+  // ── CARRY ─────────────────────────────────────────────────
+  { id: 'farmer',      cat: 'Carry',      name: 'Farmer Carry',             muscles: 'Grip · Traps · Core',      defaultSets: 3, defaultReps: '40m',   unit: 'lb', cue: 'Tall spine, controlled breathing' },
+  { id: 'suitcase',    cat: 'Carry',      name: 'Suitcase Carry',           muscles: 'Anti-lateral core · Grip', defaultSets: 3, defaultReps: '30m ea',unit: 'lb', cue: 'Don\'t let the loaded side pull you down' },
+  { id: 'sled-push',   cat: 'Carry',      name: 'Sled Push',                muscles: 'Full body conditioning',   defaultSets: 4, defaultReps: '20m',   unit: 'lb', cue: 'Low and hard, eyes down' },
+];
+
+const LIBRARY_CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
+
+// The 3 workouts in the current packet (editable structure)
+const PACKET_WORKOUTS = [
+  {
+    id: 'wA', letter: 'A', title: 'Lower + Lateral Power',
+    focus: 'Legs · Lateral · Rotational', color: 'lime',
+    exercises: [
+      { ...null, id: 'goblet',   name: 'Goblet Squat',            sets: 4, reps: '8',     unit: 'lb' },
+      { ...null, id: 'rdl',      name: 'Romanian Deadlift',        sets: 3, reps: '10',    unit: 'lb' },
+      { ...null, id: 'split',    name: 'Bulgarian Split Squat',    sets: 3, reps: '10 ea', unit: 'lb' },
+      { ...null, id: 'band-walk',name: 'Lateral Band Walk',        sets: 3, reps: '15 ea', unit: 'band' },
+      { ...null, id: 'medball',  name: 'Med-Ball Rotational Slam', sets: 3, reps: '6 ea',  unit: 'lb' },
+      { ...null, id: 'copenhagen',name:'Copenhagen Plank',         sets: 3, reps: '30 s',  unit: 'bw' },
+    ],
+  },
+  {
+    id: 'wB', letter: 'B', title: 'Upper + Reactive',
+    focus: 'Push · Pull · Power', color: 'lavender',
+    exercises: [
+      { ...null, id: 'db-bench', name: 'DB Bench Press',      sets: 4, reps: '8',  unit: 'lb' },
+      { ...null, id: 'cs-row',   name: 'Chest-Supported Row', sets: 4, reps: '10', unit: 'lb' },
+      { ...null, id: 'push-press',name:'Push Press',          sets: 3, reps: '8',  unit: 'lb' },
+      { ...null, id: 'face-pull',name: 'Face Pull',           sets: 3, reps: '15', unit: 'band' },
+      { ...null, id: 'pogo',     name: 'Reactive Pogo Hops',  sets: 3, reps: '20', unit: 'bw' },
+      { ...null, id: 'pallof',   name: 'Pallof Press',        sets: 3, reps: '12', unit: 'band' },
+    ],
+  },
+  {
+    id: 'wC', letter: 'C', title: 'Full + Conditioning',
+    focus: 'Posterior chain · Carry · Power', color: 'red',
+    exercises: [
+      { ...null, id: 'trap-dl',  name: 'Trap-Bar Deadlift', sets: 4, reps: '6',    unit: 'lb' },
+      { ...null, id: 'push-press',name:'Push Press',        sets: 3, reps: '8',    unit: 'lb' },
+      { ...null, id: 'sled-push',name: 'Sled Push',         sets: 4, reps: '20m',  unit: 'lb' },
+      { ...null, id: 'farmer',   name: 'Farmer Carry',      sets: 3, reps: '40m',  unit: 'lb' },
+      { ...null, id: 'woodchop', name: 'Cable Woodchop',    sets: 3, reps: '12 ea',unit: 'lb' },
+    ],
+  },
+];
+
+Object.assign(window, {
+  WORKOUT_A, TRAINING, DAY_LOG, WEEK_STRIP,
+  TODAY_DATE, MONTH_LABEL, MONTH_START_DOW, DAYS_IN_MONTH,
+  EXERCISE_LIBRARY, LIBRARY_CATS, PACKET_WORKOUTS,
+});

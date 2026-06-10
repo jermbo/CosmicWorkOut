@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Packet — Feature Exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+/* Shared artboard content styles — all scoped to .ab (artboard root) */
+.ab {
+  width: 100%; height: 100%;
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  position: relative;
+}
+.ab * { box-sizing: border-box; }
+.ab .dp  { font-family: var(--font-display); }
+.ab .mn  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.ab .ey  { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--color-text-secondary); }
+.ab .surf2 { background: var(--color-surface-2); border-radius: 16px; border: 1px solid rgba(255,255,255,.04); }
+.ab .surf3 { background: var(--color-surface-3); border-radius: 12px; }
+.ab .chip  { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.ab .lime  { color: var(--color-lime); }
+.ab .muted { color: var(--color-text-muted); }
+.ab .sec   { color: var(--color-text-secondary); }
+.ab .pill  { padding: 14px 22px; border-radius: 999px; border: none; cursor: pointer; }
+/* set tile */
+.ab .tile { flex: 1; min-width: 54px; height: 64px; border-radius: 13px; background: var(--color-surface-3); border: 1.5px solid var(--color-border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.ab .tile.done { background: var(--color-lime); border-color: var(--color-lime); }
+.ab .tile.done .tw { color: #101010; }
+.ab .tile.done .tr { color: rgba(16,16,16,.65); }
+.ab .tile .tp  { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-muted); }
+.ab .tile.done .tp { color: rgba(16,16,16,.55); }
+.ab .tile .tw  { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--color-text-primary); line-height: 1; }
+.ab .tile .tr  { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); }
+.ab .tile .plus { font-size: 20px; font-weight: 300; color: var(--color-text-secondary); line-height: 1; }
+/* ex card */
+.ab .excard { padding: 16px; margin: 0 16px; }
+.ab .exhead { display: flex; align-items: center; gap: 12px; margin-bottom: 13px; }
+.ab .exname { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.ab .excue  { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+.ab .extgt  { flex-shrink: 0; text-align: right; }
+.ab .extgt .v { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+.ab .extgt .l { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; }
+.ab .tiles { display: flex; gap: 8px; }
+/* session header */
+.ab .ses-hd { padding: 18px 16px 10px; }
+.ab .ses-bar { display: flex; align-items: center; gap: 10px; }
+.ab .ses-back { width: 36px; height: 36px; border-radius: 999px; background: var(--color-surface-3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ab .ses-tt { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -.01em; flex: 1; }
+.ab .ses-st { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; }
+.ab .ses-elapsed { text-align: right; font-family: var(--font-mono); font-size: 16px; font-weight: 500; flex-shrink: 0; }
+.ab .prog-bar { margin: 10px 16px 0; height: 5px; border-radius: 4px; background: var(--color-surface-3); overflow: hidden; }
+.ab .prog-bar > i { display: block; height: 100%; border-radius: 4px; background: var(--color-lime); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="../design-canvas.jsx"></script>
+<script type="text/babel">
+
+function Chevron() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 5l-7 7 7 7"/></svg>;
+}
+function Check() {
+  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>;
+}
+
+/* ─── ARTBOARD CONTENT ─────────────────────────────────── */
+
+// 1. Rest Timer
+function ArtRestTimer() {
+  const r = 72, sw = 7, c = 2 * Math.PI * r;
+  const pct = 84/90; // 1:24 remaining of 1:30
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column' }}>
+      {/* blurred session context behind */}
+      <div className="ses-hd">
+        <div className="ses-bar">
+          <div className="ses-back"><Chevron /></div>
+          <div><div className="ses-tt">Workout A · Lower + Lateral</div><div className="ses-st">Packet 1 · Week 2</div></div>
+          <div className="ses-elapsed mn">14:22</div>
+        </div>
+        <div className="prog-bar"><i style={{width:'58%'}} /></div>
+      </div>
+      {/* blurred exercise cards */}
+      <div style={{ flex:1, padding:'8px 16px', opacity:.18, filter:'blur(1.5px)', display:'flex', flexDirection:'column', gap:10 }}>
+        {['Goblet Squat','Romanian Deadlift'].map((n,i) => (
+          <div key={i} className="surf2" style={{ padding:'14px 14px', opacity: i===0 ? 1 : 0.6 }}>
+            <div style={{ fontSize:13, fontWeight:600, marginBottom:8 }}>{n}</div>
+            <div style={{ display:'flex', gap:7 }}>
+              {[1,2,3,4].map(s => <div key={s} className={`tile${s<=4 && i===0 ? ' done' : ''}`}><span className="tw">{i===0 ? '35' : '–'}</span></div>)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Rest overlay */}
+      <div style={{ position:'absolute', inset:0, background:'rgba(7,7,7,.93)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:0 }}>
+        <div className="ey" style={{ marginBottom:16 }}>Rest</div>
+
+        {/* Ring */}
+        <div style={{ position:'relative', width:158, height:158, marginBottom:20 }}>
+          <svg width="158" height="158" viewBox="0 0 158 158" style={{ transform:'rotate(-90deg)' }}>
+            <circle cx="79" cy="79" r={r} fill="none" stroke="var(--color-surface-4)" strokeWidth={sw} />
+            <circle cx="79" cy="79" r={r} fill="none" stroke="var(--color-lime)" strokeWidth={sw}
+              strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c*(1-pct)} />
+          </svg>
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+            <div className="mn dp" style={{ fontSize:38, fontWeight:700, letterSpacing:'-0.02em', lineHeight:1 }}>1:24</div>
+            <div style={{ fontSize:12, color:'var(--color-text-secondary)', marginTop:4 }}>of 1:30</div>
+          </div>
+        </div>
+
+        {/* Next set label */}
+        <div style={{ background:'var(--color-surface-2)', borderRadius:10, padding:'10px 18px', marginBottom:28, display:'flex', alignItems:'center', gap:10, border:'1px solid rgba(255,255,255,.05)' }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'var(--color-lime)' }} />
+          <span style={{ fontSize:13, fontWeight:600 }}>Next · Set 3 of 4 · Goblet Squat</span>
+        </div>
+
+        {/* Timer controls */}
+        <div style={{ display:'flex', gap:10, marginBottom:24 }}>
+          {['−30s', '+30s'].map(l => (
+            <button key={l} style={{ padding:'11px 20px', borderRadius:999, border:'1px solid var(--color-border)', background:'none', color:'var(--color-text-secondary)', fontSize:13, fontWeight:700, fontFamily:'var(--font-body)', cursor:'pointer' }}>{l}</button>
+          ))}
+        </div>
+
+        <button style={{ padding:'15px 48px', borderRadius:999, border:'none', background:'var(--color-surface-3)', color:'var(--color-text-secondary)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:15, cursor:'pointer' }}>
+          Skip rest
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// 2. Progressive Overload Nudge
+function ArtOverloadNudge() {
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', paddingTop:16 }}>
+      <div className="ses-hd" style={{ paddingTop:8 }}>
+        <div className="ses-bar">
+          <div className="ses-back"><Chevron /></div>
+          <div><div className="ses-tt">Workout A · Lower + Lateral</div><div className="ses-st">Packet 1 · Week 2</div></div>
+          <div className="ses-elapsed mn">08:14</div>
+        </div>
+        <div className="prog-bar"><i style={{width:'28%'}} /></div>
+      </div>
+
+      <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', gap:10 }}>
+        {/* Completed exercise (goblet) */}
+        <div className="surf2 excard" style={{ margin:0, borderColor:'rgba(178,240,66,.35)', background:'rgba(178,240,66,.06)' }}>
+          <div className="exhead">
+            <div style={{ flex:1 }}>
+              <div className="exname">Goblet Squat <span style={{ marginLeft:6, fontSize:13, color:'var(--color-lime)' }}>✓</span></div>
+              <div className="excue">Sit tall between the heels</div>
+            </div>
+            <div className="extgt"><div className="v mn">4×8</div></div>
+          </div>
+          <div className="tiles">
+            {[1,2,3,4].map(s => <div key={s} className="tile done"><span className="tp">Set {s}</span><span className="tw">35</span><span className="tr">×8</span></div>)}
+          </div>
+        </div>
+
+        {/* Exercise with nudge */}
+        <div className="surf2 excard" style={{ margin:0 }}>
+          <div className="exhead">
+            <div style={{ flex:1 }}>
+              <div className="exname">Romanian Deadlift</div>
+              <div className="excue">Hinge — feel the hamstrings load</div>
+            </div>
+            <div className="extgt"><div className="v mn">3×10</div></div>
+          </div>
+
+          {/* Nudge chip */}
+          <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 12px', borderRadius:10, background:'rgba(178,240,66,.1)', border:'1px solid rgba(178,240,66,.2)', marginBottom:12 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B2F042" strokeWidth="2.2" strokeLinecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:12.5, fontWeight:600, color:'var(--color-lime)' }}>Try 100 lb today</div>
+              <div style={{ fontSize:11, color:'var(--color-text-secondary)', marginTop:1 }}>You hit 95 lb × 10 last week</div>
+            </div>
+            <button style={{ background:'none', border:'none', color:'var(--color-text-muted)', fontSize:16, cursor:'pointer', padding:'0 2px', lineHeight:1 }}>×</button>
+          </div>
+
+          <div className="tiles">
+            {[1,2,3].map(s => (
+              <div key={s} className="tile">
+                <span className="plus">+</span>
+                <span className="tp">Set {s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 3. Personal Record
+function ArtPRBadge() {
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', paddingTop:16 }}>
+      <div className="ses-hd" style={{ paddingTop:8 }}>
+        <div className="ses-bar">
+          <div className="ses-back"><Chevron /></div>
+          <div><div className="ses-tt">Workout A · Lower + Lateral</div><div className="ses-st">Packet 1 · Week 2</div></div>
+          <div className="ses-elapsed mn">22:05</div>
+        </div>
+        <div className="prog-bar"><i style={{width:'72%'}} /></div>
+      </div>
+
+      <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', gap:10 }}>
+        <div className="surf2 excard" style={{ margin:0, borderColor:'rgba(178,240,66,.35)', background:'rgba(178,240,66,.06)' }}>
+          <div className="exhead">
+            <div style={{ flex:1 }}>
+              <div className="exname">Romanian Deadlift <span style={{ marginLeft:6, fontSize:13, color:'var(--color-lime)' }}>✓</span></div>
+              <div className="excue">Hinge — feel the hamstrings load</div>
+            </div>
+            <div className="extgt"><div className="v mn">3×10</div></div>
+          </div>
+
+          <div className="tiles">
+            {[{w:95,r:10},{w:95,r:10},{w:105,r:10,pr:true}].map((s,i) => (
+              <div key={i} className="tile done" style={{ position:'relative' }}>
+                {s.pr && (
+                  <div style={{ position:'absolute', top:-7, right:-5, background:'#101010', border:'1.5px solid var(--color-lime)', borderRadius:999, padding:'1px 6px', fontSize:9, fontWeight:800, color:'var(--color-lime)', letterSpacing:'.06em', zIndex:2 }}>PR</div>
+                )}
+                <span className="tp">Set {i+1}</span>
+                <span className="tw">{s.w}</span>
+                <span className="tr">×{s.r}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* PR celebration */}
+          <div style={{ marginTop:12, display:'flex', alignItems:'center', gap:10, padding:'10px 12px', borderRadius:10, background:'rgba(178,240,66,.12)', border:'1px solid rgba(178,240,66,.25)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B2F042" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            <div>
+              <div style={{ fontSize:13, fontWeight:700, color:'var(--color-lime)' }}>New personal best</div>
+              <div style={{ fontSize:11.5, color:'var(--color-text-secondary)' }}>105 lb × 10 — up 10 lb from last PR</div>
+            </div>
+          </div>
+        </div>
+
+        {/* next exercise */}
+        <div className="surf2 excard" style={{ margin:0, opacity:.55 }}>
+          <div className="exhead">
+            <div style={{ flex:1 }}><div className="exname">Bulgarian Split Squat</div><div className="excue">Single-leg stability for the court</div></div>
+            <div className="extgt"><div className="v mn">3×10</div><div className="l">ea</div></div>
+          </div>
+          <div className="tiles">
+            {[1,2,3].map(s => <div key={s} className="tile"><span className="plus">+</span><span className="tp">Set {s}</span></div>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 4. Volume Trend Sparkline
+function ArtSparkline() {
+  // 8 weeks of goblet squat volume (lb)
+  const pts = [3360, 3640, 3920, 4200, 3780, 4480, 4760, 5040];
+  const min = Math.min(...pts), max = Math.max(...pts), range = max - min;
+  const W = 296, H = 52;
+  const coords = pts.map((v,i) => [i*(W/7), H - ((v-min)/range)*H]);
+  const path = coords.map((p,i) => `${i===0?'M':'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const area = path + ` L ${W},${H} L 0,${H} Z`;
+
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', paddingTop:16 }}>
+      <div className="ses-hd" style={{ paddingTop:8 }}>
+        <div className="ses-bar">
+          <div className="ses-back"><Chevron /></div>
+          <div><div className="ses-tt">Workout A · Lower + Lateral</div></div>
+          <div className="ses-elapsed mn">11:40</div>
+        </div>
+        <div className="prog-bar"><i style={{width:'44%'}} /></div>
+      </div>
+
+      <div style={{ padding:'14px 16px', display:'flex', flexDirection:'column', gap:10 }}>
+        <div className="surf2 excard" style={{ margin:0, borderColor:'rgba(178,240,66,.35)', background:'rgba(178,240,66,.06)' }}>
+          <div className="exhead">
+            <div style={{ flex:1 }}><div className="exname">Goblet Squat <span style={{ marginLeft:6, fontSize:13, color:'var(--color-lime)' }}>✓</span></div><div className="excue">Sit tall between the heels</div></div>
+            <div className="extgt"><div className="v mn">4×8</div></div>
+          </div>
+          <div className="tiles" style={{ marginBottom:14 }}>
+            {[{w:40,r:8},{w:40,r:8},{w:40,r:8},{w:40,r:8}].map((s,i) => (
+              <div key={i} className="tile done"><span className="tp">Set {i+1}</span><span className="tw">{s.w}</span><span className="tr">×{s.r}</span></div>
+            ))}
+          </div>
+
+          {/* Sparkline */}
+          <div style={{ borderTop:'1px solid rgba(255,255,255,.07)', paddingTop:12 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+              <span className="ey" style={{ fontSize:10 }}>Volume · 8 weeks</span>
+              <span style={{ fontSize:11.5, fontWeight:700, color:'var(--color-lime)', display:'flex', alignItems:'center', gap:4 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                +50% this packet
+              </span>
+            </div>
+            <svg viewBox={`0 0 ${W} ${H+4}`} width="100%" height="56" style={{ overflow:'visible' }}>
+              <defs>
+                <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#B2F042" stopOpacity="0.2"/>
+                  <stop offset="100%" stopColor="#B2F042" stopOpacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d={area} fill="url(#sg)" />
+              <path d={path} fill="none" stroke="#B2F042" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              {coords.map((p,i) => (
+                <circle key={i} cx={p[0]} cy={p[1]} r={i===7?4:2.5} fill={i===7?"#B2F042":"#101010"} stroke="#B2F042" strokeWidth={i===7?0:1.5}/>
+              ))}
+            </svg>
+            <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+              {['W1','W2','W3','W4','W5','W6','W7','W8'].map(w => (
+                <span key={w} style={{ fontSize:9, color:'var(--color-text-muted)', fontFamily:'var(--font-mono)', fontWeight:600 }}>{w}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="surf2 excard" style={{ margin:0, opacity:.5 }}>
+          <div className="exhead"><div style={{flex:1}}><div className="exname">Romanian Deadlift</div></div><div className="extgt"><div className="v mn">3×10</div></div></div>
+          <div className="tiles">{[1,2,3].map(s=><div key={s} className="tile"><span className="plus">+</span><span className="tp">Set {s}</span></div>)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 5. Post-Match Logging
+function ArtPostMatch() {
+  const levels = ['Rough','Off','Solid','Good','Fire'];
+  const sel = 3;
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column' }}>
+      {/* Today header */}
+      <div style={{ padding:'20px 18px 16px' }}>
+        <div className="ey" style={{ marginBottom:5 }}>Tue · Jun 9</div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:28, letterSpacing:'-.03em' }}>Today</div>
+      </div>
+
+      {/* Post-match card */}
+      <div style={{ margin:'0 18px 14px', background:'var(--color-surface-2)', borderRadius:18, padding:'18px 18px 20px', border:'1px solid rgba(178,240,66,.2)', position:'relative' }}>
+        <div style={{ position:'absolute', top:0, left:0, width:3, height:'100%', borderRadius:'3px 0 0 3px', background:'var(--color-lime)' }} />
+        <div style={{ paddingLeft:8 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 }}>
+            <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:17, letterSpacing:'-.01em' }}>How was your game?</div>
+            <button style={{ background:'none', border:'none', color:'var(--color-text-muted)', fontSize:13, cursor:'pointer', fontFamily:'var(--font-body)', padding:0 }}>Skip</button>
+          </div>
+          <div style={{ fontSize:12, color:'var(--color-text-secondary)', marginBottom:16 }}>Rate today's session on court</div>
+
+          {/* Rating row */}
+          <div style={{ display:'flex', gap:8, marginBottom:14 }}>
+            {levels.map((l,i) => (
+              <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:7 }}>
+                <div style={{ width:'100%', aspectRatio:'1/1', borderRadius:12, background: i===sel ? 'var(--color-lime)' : 'var(--color-surface-4)', border: i===sel ? 'none' : '1.5px solid var(--color-border)', display:'flex', alignItems:'center', justifyContent:'center', transition:'all .15s' }}>
+                  <span style={{ fontFamily:'var(--font-mono)', fontWeight:700, fontSize:16, color: i===sel ? '#101010' : 'var(--color-text-muted)' }}>{i+1}</span>
+                </div>
+                <span style={{ fontSize:9, fontWeight:700, letterSpacing:'.04em', textTransform:'uppercase', color: i===sel ? 'var(--color-lime)' : 'var(--color-text-muted)' }}>{l}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Note */}
+          <div style={{ background:'var(--color-surface-3)', borderRadius:10, padding:'11px 13px', display:'flex', alignItems:'center', gap:8 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" strokeLinecap="round"><path d="M4 20h4L18 10l-4-4L4 16v4ZM13 7l4 4"/></svg>
+            <span style={{ fontSize:13, color:'var(--color-text-muted)' }}>Add a note about your game…</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Packet card preview */}
+      <div style={{ margin:'0 18px', background:'var(--color-surface-2)', borderRadius:18, padding:'18px', border:'1px solid rgba(255,255,255,.04)', opacity:.65 }}>
+        <div style={{ display:'flex', gap:8, marginBottom:12 }}>
+          <span style={{ padding:'5px 10px', borderRadius:999, background:'var(--color-lime)', color:'#101010', fontSize:10, fontWeight:800, letterSpacing:'.06em', textTransform:'uppercase' }}>Packet 1 · Foundation</span>
+          <span style={{ padding:'5px 10px', borderRadius:999, background:'var(--color-surface-4)', color:'var(--color-text-secondary)', fontSize:10, fontWeight:700 }}>Week 2</span>
+        </div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:22, letterSpacing:'-.02em', marginBottom:14 }}>Lower + Lateral Power</div>
+        <div style={{ width:'100%', padding:'14px', borderRadius:999, background:'var(--color-lime)', color:'#101010', fontFamily:'var(--font-display)', fontWeight:700, fontSize:15, textAlign:'center' }}>Start session</div>
+      </div>
+    </div>
+  );
+}
+
+// 6. Readiness Check
+function ArtReadiness() {
+  const metrics = [
+    { label:'Sleep',    val:4, hint:'Last night' },
+    { label:'Soreness', val:2, hint:'Body feels' },
+    { label:'Energy',   val:3, hint:'Right now' },
+  ];
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', alignItems:'stretch', padding:'24px 22px 22px' }}>
+      <div style={{ marginBottom:8 }}>
+        <div className="ey" style={{ marginBottom:10 }}>Before you start</div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:26, letterSpacing:'-.025em', lineHeight:1.1, marginBottom:8 }}>How are you<br/>feeling today?</div>
+        <div style={{ fontSize:13, color:'var(--color-text-secondary)', marginBottom:24 }}>10 seconds. Adjusts intensity suggestions.</div>
+      </div>
+
+      <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:18 }}>
+        {metrics.map((m,i) => (
+          <div key={i} style={{ background:'var(--color-surface-2)', borderRadius:14, padding:'14px 16px', border:'1px solid rgba(255,255,255,.04)' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+              <span style={{ fontSize:14, fontWeight:700 }}>{m.label}</span>
+              <span style={{ fontSize:11, color:'var(--color-text-secondary)' }}>{m.hint}</span>
+            </div>
+            <div style={{ display:'flex', gap:8 }}>
+              {[1,2,3,4,5].map(n => (
+                <div key={n} style={{ flex:1, height:9, borderRadius:999, background: n <= m.val ? (m.label==='Soreness' ? 'var(--color-red)' : 'var(--color-lime)') : 'var(--color-surface-4)', transition:'background .15s' }} />
+              ))}
+            </div>
+            <div style={{ display:'flex', justifyContent:'space-between', marginTop:5 }}>
+              <span style={{ fontSize:9, color:'var(--color-text-muted)', fontWeight:700 }}>Low</span>
+              <span style={{ fontSize:9, color:'var(--color-text-muted)', fontWeight:700 }}>High</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recommendation */}
+      <div style={{ background:'rgba(229,87,51,.1)', borderRadius:12, padding:'12px 14px', border:'1px solid rgba(229,87,51,.25)', marginBottom:20, display:'flex', gap:10, alignItems:'flex-start' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E55733" strokeWidth="2.2" strokeLinecap="round" style={{flexShrink:0,marginTop:1}}><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div>
+          <div style={{ fontSize:12.5, fontWeight:700, color:'#E55733', marginBottom:2 }}>High soreness detected</div>
+          <div style={{ fontSize:12, color:'var(--color-text-secondary)' }}>Consider reducing working weights 10–15% today.</div>
+        </div>
+      </div>
+
+      <button style={{ padding:'15px', borderRadius:999, border:'none', background:'var(--color-lime)', color:'#101010', fontFamily:'var(--font-display)', fontWeight:700, fontSize:16, cursor:'pointer', marginBottom:12 }}>I'm ready — let's go</button>
+      <div style={{ textAlign:'center', fontSize:12.5, color:'var(--color-text-muted)', cursor:'pointer' }}>Skip readiness check</div>
+    </div>
+  );
+}
+
+// 7. Streak + Consistency
+function ArtStreak() {
+  // 8 weeks × 3 training days heatmap
+  const weeks = [
+    [1,1,1],[1,1,0],[1,1,1],[1,0,1],[1,1,1],[1,1,1],[1,1,0],[1,1,'t'],
+  ];
+  const totalDone = 8*3 - 3; // approx
+
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column' }}>
+      <div style={{ padding:'20px 18px 0' }}>
+        <div className="ey" style={{ marginBottom:8 }}>Tue · Jun 9</div>
+
+        {/* Enhanced header */}
+        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:18 }}>
+          <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:28, letterSpacing:'-.03em' }}>Today</div>
+          <div style={{ background:'var(--color-surface-2)', borderRadius:12, padding:'10px 14px', border:'1px solid rgba(255,255,255,.05)', textAlign:'center' }}>
+            <div style={{ fontFamily:'var(--font-mono)', fontWeight:700, fontSize:28, color:'var(--color-lime)', lineHeight:1 }}>5</div>
+            <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', color:'var(--color-text-muted)', marginTop:3 }}>wk streak</div>
+          </div>
+        </div>
+
+        {/* Consistency heatmap */}
+        <div style={{ background:'var(--color-surface-2)', borderRadius:16, padding:'16px', border:'1px solid rgba(255,255,255,.04)', marginBottom:14 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+            <span style={{ fontSize:13, fontWeight:700 }}>June consistency</span>
+            <span style={{ fontSize:13, fontWeight:700, color:'var(--color-lime)', fontFamily:'var(--font-mono)' }}>21/24</span>
+          </div>
+
+          {/* Heatmap grid */}
+          <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:14 }}>
+            {weeks.map((week, wi) => (
+              <div key={wi} style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <span style={{ fontFamily:'var(--font-mono)', fontSize:9, color:'var(--color-text-muted)', width:20, flexShrink:0, fontWeight:600 }}>W{wi+1}</span>
+                <div style={{ display:'flex', gap:7 }}>
+                  {week.map((d,di) => (
+                    <div key={di} style={{ width:28, height:28, borderRadius:8, background: d==='t' ? 'rgba(178,240,66,.3)' : d===1 ? 'var(--color-lime)' : d===0 ? 'var(--color-surface-4)' : 'var(--color-surface-3)', border: d==='t' ? '2px solid var(--color-lime)' : 'none', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      {d===1 && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#101010" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>}
+                    </div>
+                  ))}
+                </div>
+                {wi === 7 && <span style={{ fontSize:10, fontWeight:700, color:'var(--color-lime)', letterSpacing:'.04em', textTransform:'uppercase' }}>Now</span>}
+              </div>
+            ))}
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ height:5, borderRadius:999, background:'var(--color-surface-4)', overflow:'hidden' }}>
+            <div style={{ height:'100%', width:'87.5%', background:'var(--color-lime)', borderRadius:999 }} />
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', marginTop:5 }}>
+            <span style={{ fontSize:11, color:'var(--color-text-secondary)' }}>21 sessions completed</span>
+            <span style={{ fontSize:11, color:'var(--color-lime)', fontWeight:700 }}>87.5%</span>
+          </div>
+        </div>
+
+        {/* Packet card preview */}
+        <div style={{ background:'var(--color-surface-2)', borderRadius:16, padding:'16px', border:'1px solid rgba(255,255,255,.04)', opacity:.75 }}>
+          <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:18, letterSpacing:'-.01em', marginBottom:12 }}>Lower + Lateral Power</div>
+          <div style={{ width:'100%', padding:'13px', borderRadius:999, background:'var(--color-lime)', color:'#101010', fontFamily:'var(--font-display)', fontWeight:700, fontSize:14, textAlign:'center' }}>Start session</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 8. Packet 2 Preview
+function ArtPacket2() {
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', padding:'24px 20px 22px' }}>
+      {/* Completion badge */}
+      <div style={{ display:'flex', justifyContent:'center', marginBottom:20 }}>
+        <div style={{ width:72, height:72, borderRadius:'50%', background:'var(--color-lime)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 10px 40px rgba(178,240,66,.35)' }}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#101010" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 6.5"/></svg>
+        </div>
+      </div>
+
+      <div style={{ textAlign:'center', marginBottom:22 }}>
+        <div className="ey" style={{ color:'var(--color-lime)', marginBottom:8 }}>Packet 1 Complete</div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:32, letterSpacing:'-.03em', lineHeight:1.05, marginBottom:6 }}>12 weeks.<br/>Filed.</div>
+        <div style={{ fontSize:14, color:'var(--color-text-secondary)' }}>Foundation program complete. You built the base.</div>
+      </div>
+
+      {/* Stats */}
+      <div style={{ display:'flex', gap:8, marginBottom:22 }}>
+        {[['36','sessions'],['12','weeks'],['248k','lb lifted']].map(([v,l]) => (
+          <div key={l} style={{ flex:1, background:'var(--color-surface-2)', borderRadius:12, padding:'12px 8px', textAlign:'center', border:'1px solid rgba(255,255,255,.04)' }}>
+            <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:20, color:'var(--color-lime)' }}>{v}</div>
+            <div style={{ fontSize:10, color:'var(--color-text-muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.05em', marginTop:2 }}>{l}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Packet 2 teaser */}
+      <div style={{ background:'var(--color-surface-2)', borderRadius:16, padding:'16px', border:'1px solid rgba(178,134,253,.25)', marginBottom:14, position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'linear-gradient(90deg, var(--color-lavender), transparent)' }} />
+        <div className="ey" style={{ color:'var(--color-lavender)', marginBottom:8 }}>Up next</div>
+        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+          <span style={{ padding:'5px 10px', borderRadius:999, background:'var(--color-lavender)', color:'#101010', fontSize:10, fontWeight:800 }}>Packet 2 · Build</span>
+        </div>
+        <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:18, letterSpacing:'-.01em', marginBottom:6 }}>Progressive Overload</div>
+        <div style={{ fontSize:12.5, color:'var(--color-text-secondary)', marginBottom:14 }}>Heavier loads, longer sets, trap-bar progression. 12 weeks.</div>
+        <div style={{ display:'flex', gap:8 }}>
+          {['Hinge','Squat','Upper','Conditioning'].map(f => (
+            <span key={f} style={{ padding:'4px 9px', borderRadius:999, background:'var(--color-surface-4)', color:'var(--color-text-secondary)', fontSize:11, fontWeight:600 }}>{f}</span>
+          ))}
+        </div>
+      </div>
+
+      <button style={{ padding:'14px', borderRadius:999, border:'none', background:'var(--color-lavender)', color:'#101010', fontFamily:'var(--font-display)', fontWeight:700, fontSize:15, cursor:'pointer', marginBottom:10 }}>Begin Packet 2</button>
+      <button style={{ padding:'12px', borderRadius:999, border:'1px solid var(--color-border)', background:'none', color:'var(--color-text-secondary)', fontFamily:'var(--font-body)', fontWeight:700, fontSize:13, cursor:'pointer' }}>Review Packet 1 history</button>
+    </div>
+  );
+}
+
+// 9. Session Share Card
+function ArtShareCard() {
+  return (
+    <div className="ab" style={{ display:'flex', flexDirection:'column', padding:'18px 18px 16px', alignItems:'center' }}>
+      <div className="ey" style={{ marginBottom:14, alignSelf:'flex-start' }}>Share session</div>
+
+      {/* The shareable card */}
+      <div style={{ width:'100%', background:'linear-gradient(145deg, #161616 0%, #111 100%)', borderRadius:20, padding:'20px', border:'1px solid rgba(255,255,255,.07)', marginBottom:16, position:'relative', overflow:'hidden' }}>
+        {/* subtle ruled lines */}
+        <div style={{ position:'absolute', inset:0, backgroundImage:'repeating-linear-gradient(180deg, transparent 0 27px, rgba(255,255,255,.025) 27px 28px)', borderRadius:20 }} />
+
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16, position:'relative' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <div style={{ width:28, height:28, borderRadius:7, background:'var(--color-lime)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#101010" strokeWidth="2.4" strokeLinecap="round"><path d="M5 8v8M9 6v10M13 8v8M17 6v10"/></svg>
+            </div>
+            <span style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:15, letterSpacing:'-.01em' }}>Packet</span>
+          </div>
+          <span style={{ fontFamily:'var(--font-mono)', fontSize:11, color:'var(--color-text-muted)' }}>Jun 9 · W2A</span>
+        </div>
+
+        {/* Big stat */}
+        <div style={{ marginBottom:14, position:'relative' }}>
+          <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:48, letterSpacing:'-.04em', lineHeight:1, color:'var(--color-lime)' }}>18</div>
+          <div style={{ fontSize:14, color:'var(--color-text-secondary)', fontWeight:600 }}>sets · 7,240 lb lifted</div>
+        </div>
+
+        {/* Exercise list */}
+        <div style={{ display:'flex', flexDirection:'column', gap:0, marginBottom:14, position:'relative' }}>
+          {[
+            ['Goblet Squat','4×8','40 lb'],
+            ['Romanian Deadlift','3×10','105 lb'],
+            ['Lateral Band Walk','3×15','Med'],
+            ['Med-Ball Slam','3×6','10 lb'],
+          ].map(([n,s,w],i) => (
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', borderBottom: i<3 ? '1px solid rgba(255,255,255,.06)' : 'none' }}>
+              <span style={{ flex:1, fontSize:12.5, fontWeight:500, color:'#ccc' }}>{n}</span>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--color-text-secondary)' }}>{s}</span>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:12, color:'var(--color-lime)', fontWeight:700, minWidth:42, textAlign:'right' }}>{w}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', position:'relative' }}>
+          <span style={{ fontSize:11, color:'var(--color-text-muted)' }}>Packet 1 · Foundation · 45 min</span>
+          <span style={{ fontSize:10, color:'var(--color-text-muted)', fontFamily:'var(--font-mono)' }}>🏓</span>
+        </div>
+      </div>
+
+      {/* Share actions */}
+      <div style={{ display:'flex', gap:10, width:'100%' }}>
+        <button style={{ flex:1, padding:'13px', borderRadius:999, border:'none', background:'var(--color-lime)', color:'#101010', fontFamily:'var(--font-display)', fontWeight:700, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+          Share
+        </button>
+        <button style={{ flex:1, padding:'13px', borderRadius:999, border:'1px solid var(--color-border)', background:'none', color:'var(--color-text-secondary)', fontFamily:'var(--font-body)', fontWeight:700, fontSize:14, cursor:'pointer' }}>Copy image</button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── CANVAS ────────────────────────────────────────────── */
+function App() {
+  return (
+    <DesignCanvas>
+      <DCSection id="s1" title="In the Gym" subtitle="Session enhancements — features that make logging faster and more rewarding">
+        <DCArtboard id="rt" label="Rest Timer" width={390} height={700}><ArtRestTimer /></DCArtboard>
+        <DCArtboard id="on" label="Overload Nudge" width={390} height={540}><ArtOverloadNudge /></DCArtboard>
+        <DCArtboard id="pr" label="Personal Record" width={390} height={540}><ArtPRBadge /></DCArtboard>
+        <DCArtboard id="sp" label="Volume Sparkline" width={390} height={600}><ArtSparkline /></DCArtboard>
+      </DCSection>
+
+      <DCSection id="s2" title="Before You Start" subtitle="Pre-session context that connects training to how you actually feel">
+        <DCArtboard id="pm" label="Post-Match Logging" width={390} height={680}><ArtPostMatch /></DCArtboard>
+        <DCArtboard id="rc" label="Readiness Check" width={390} height={700}><ArtReadiness /></DCArtboard>
+      </DCSection>
+
+      <DCSection id="s3" title="Progress & Sharing" subtitle="Features that make the habit visible and worth showing off">
+        <DCArtboard id="st" label="Streak & Consistency" width={390} height={680}><ArtStreak /></DCArtboard>
+        <DCArtboard id="p2" label="Packet 2 Preview" width={390} height={740}><ArtPacket2 /></DCArtboard>
+        <DCArtboard id="sc" label="Session Share Card" width={390} height={620}><ArtShareCard /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

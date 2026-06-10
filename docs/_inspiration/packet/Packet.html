@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Packet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="data.jsx"></script>
+<script type="text/babel" src="today.jsx"></script>
+<script type="text/babel" src="session.jsx"></script>
+<script type="text/babel" src="calendar.jsx"></script>
+<script type="text/babel" src="program.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#B2F042",
+  "logging": "sheet",
+  "completion": "bold",
+  "emoji": false,
+  "density": "comfy",
+  "roundness": "sharp"
+}/*EDITMODE-END*/;
+
+// luminance → choose readable ink color on the accent
+function inkFor(hex) {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.replace(/./g, c => c + c) : h, 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return (r * 299 + g * 587 + b * 114) / 1000 > 140 ? '#101010' : '#ffffff';
+}
+
+const DENSITY = {
+  compact: { '--tile-h': '60px', '--card-gap': '9px' },
+  regular: { '--tile-h': '68px', '--card-gap': '12px' },
+  comfy:   { '--tile-h': '78px', '--card-gap': '16px' },
+};
+const ROUNDNESS = {
+  sharp:   { '--radius-tile': '6px',  '--radius-xl': '10px', '--radius-2xl': '12px', '--radius-lg': '8px' },
+  default: { '--radius-tile': '14px', '--radius-xl': '16px', '--radius-2xl': '20px', '--radius-lg': '12px' },
+  soft:    { '--radius-tile': '20px', '--radius-xl': '24px', '--radius-2xl': '28px', '--radius-lg': '18px' },
+};
+
+function DoneOverlay({ stats, accent, completion, onHome, onCalendar }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (completion !== 'subtle') fireConfetti(ref.current, accent);
+    vibe && vibe([18, 50, 24, 50, 30]);
+  }, []);
+  const mins = Math.max(1, Math.round(stats.elapsed / 60));
+  return (
+    <div className="done-overlay" ref={ref}>
+      <div className="done-check"><Icon name="check" /></div>
+      <div className="done-eyebrow">Packet 1 · Week 2 · Workout A</div>
+      <div className="done-title">Session logged.</div>
+      <div className="done-sub">Filed away. Nice work today.</div>
+      <div className="done-stats">
+        <div className="done-stat"><div className="v">{stats.doneSets}<small>/{stats.totalSets}</small></div><div className="l">Sets</div></div>
+        <div className="done-stat"><div className="v">{mins}<small> min</small></div><div className="l">Duration</div></div>
+        <div className="done-stat"><div className="v">{stats.exDoneCount}<small>/6</small></div><div className="l">Exercises</div></div>
+      </div>
+      <div className="done-actions">
+        <button className="finish-btn" onClick={onHome}>Back to today</button>
+        <button className="finish-btn muted" onClick={onCalendar}>See it in calendar</button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [screen, setScreen] = useState('today');
+  const [inSession, setInSession] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [editWorkout, setEditWorkout] = useState(null); // null=closed, obj=editing
+
+  // apply accent + density + roundness to :root
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--accent', t.accent);
+    root.style.setProperty('--accent-ink', inkFor(t.accent));
+    const d = DENSITY[t.density] || DENSITY.regular;
+    const r = ROUNDNESS[t.roundness] || ROUNDNESS.default;
+    Object.entries({ ...d, ...r }).forEach(([k, v]) => root.style.setProperty(k, v));
+  }, [t.accent, t.density, t.roundness]);
+
+  const weekDone = WEEK_STRIP.filter(d => d.status === 'done').length + (summary ? 1 : 0);
+
+  return (
+    <div className="app-root">
+      <div className="app-shell">
+        {screen === 'today' && (
+          <TodayView
+            workout={WORKOUT_A}
+            weekStrip={WEEK_STRIP}
+            weekDone={1} weekTotal={3}
+            showEmoji={t.emoji}
+            onStart={() => setInSession(true)}
+          />
+        )}
+        {screen === 'calendar' && (
+          <CalendarView
+            training={TRAINING} dayLog={DAY_LOG}
+            monthLabel={MONTH_LABEL} monthStartDow={MONTH_START_DOW}
+            daysInMonth={DAYS_IN_MONTH} todayDate={TODAY_DATE}
+          />
+        )}
+        {screen === 'program' && !editWorkout && (
+          <ProgramView onEdit={(w) => setEditWorkout(w || { _new: true })} />
+        )}
+
+        {/* Bottom nav (hidden during session/summary/editor) */}
+        {!inSession && !summary && !editWorkout && (
+          <nav className="bottom-nav">
+            <button className={`nav-btn${screen === 'today' ? ' active' : ''}`} onClick={() => setScreen('today')}>
+              <Icon name="today" /><span>Today</span>
+            </button>
+            <button className={`nav-btn${screen === 'program' ? ' active' : ''}`} onClick={() => setScreen('program')}>
+              <Icon name="dumbbell" /><span>Program</span>
+            </button>
+            <button className={`nav-btn${screen === 'calendar' ? ' active' : ''}`} onClick={() => setScreen('calendar')}>
+              <Icon name="calendar" /><span>Calendar</span>
+            </button>
+          </nav>
+        )}
+
+        {/* Workout editor overlay */}
+        {editWorkout && (
+          <WorkoutEditor
+            workout={editWorkout._new ? null : editWorkout}
+            onBack={() => setEditWorkout(null)}
+          />
+        )}
+
+        {/* Active session overlay */}
+        {inSession && (
+          <SessionView
+            workout={WORKOUT_A}
+            loggingMode={t.logging}
+            completionLevel={t.completion}
+            showEmoji={t.emoji}
+            accent={t.accent}
+            onClose={() => setInSession(false)}
+            onFinish={(stats) => { setInSession(false); setSummary(stats); }}
+          />
+        )}
+
+        {/* Session complete */}
+        {summary && (
+          <DoneOverlay
+            stats={summary} accent={t.accent} completion={t.completion}
+            onHome={() => { setSummary(null); setScreen('today'); }}
+            onCalendar={() => { setSummary(null); setScreen('calendar'); }}
+          />
+        )}
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Brand" />
+        <TweakColor label="Accent" value={t.accent}
+          options={['#B2F042', '#B286FD', '#60C6FF', '#E55733']}
+          onChange={(v) => setTweak('accent', v)} />
+        <TweakToggle label="Emoji exercise icons" value={t.emoji}
+          onChange={(v) => setTweak('emoji', v)} />
+
+        <TweakSection label="Logging" />
+        <TweakRadio label="Log a set by" value={t.logging}
+          options={[{ value: 'instant', label: 'Instant' }, { value: 'sheet', label: 'Sheet' }, { value: 'pad', label: 'Pad' }]}
+          onChange={(v) => setTweak('logging', v)} />
+        <TweakRadio label="Completion feel" value={t.completion}
+          options={[{ value: 'subtle', label: 'Subtle' }, { value: 'punchy', label: 'Punchy' }, { value: 'bold', label: 'Bold' }]}
+          onChange={(v) => setTweak('completion', v)} />
+
+        <TweakSection label="Form" />
+        <TweakRadio label="Density" value={t.density}
+          options={['compact', 'regular', 'comfy']}
+          onChange={(v) => setTweak('density', v)} />
+        <TweakRadio label="Roundness" value={t.roundness}
+          options={[{ value: 'sharp', label: 'Sharp' }, { value: 'default', label: 'Default' }, { value: 'soft', label: 'Soft' }]}
+          onChange={(v) => setTweak('roundness', v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
