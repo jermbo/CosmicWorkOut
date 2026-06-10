@@ -1,32 +1,34 @@
 {
-  "name": "cosmic_work_out",
-  "version": "0.0.1",
-  "description": "A place to store my work out plans",
-  "main": "index.js",
-  "author": "Jeremy 'Jermbo' Lawson",
-  "license": "MIT",
-  "scripts": {
-    "dev": "gulp",
-    "compile": "gulp compile-project"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
-    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
-    "@babel/preset-env": "^7.8.6",
-    "@babel/register": "^7.8.6",
-    "browser-sync": "^2.26.7",
-    "del": "^5.1.0",
-    "eslint": "^6.8.0",
-    "gulp": "^4.0.2",
-    "gulp-autoprefixer": "^7.0.1",
-    "gulp-changed": "^4.0.2",
-    "gulp-babel": "^8.0.0",
-    "gulp-load-plugins": "^2.0.2",
-    "gulp-notify": "^3.2.0",
-    "gulp-plumber": "^1.2.1",
-    "gulp-sass": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "yargs": "^15.1.0"
-  }
+	"name": "cosmic-workout",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev --open --port 5678",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"@eslint/js": "10.0.1",
+		"@sveltejs/adapter-auto": "7.0.1",
+		"@sveltejs/kit": "2.63.0",
+		"@sveltejs/vite-plugin-svelte": "7.1.2",
+		"@types/node": "24",
+		"eslint": "10.4.1",
+		"eslint-config-prettier": "10.1.8",
+		"eslint-plugin-svelte": "3.19.0",
+		"globals": "17.6.0",
+		"prettier": "3.8.3",
+		"prettier-plugin-svelte": "4.1.0",
+		"svelte": "5.56.1",
+		"svelte-check": "4.6.0",
+		"typescript": "6.0.3",
+		"typescript-eslint": "8.60.1",
+		"vite": "8.0.16"
+	}
 }
