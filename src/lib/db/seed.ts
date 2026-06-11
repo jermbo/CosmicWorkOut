@@ -1,0 +1,430 @@
+import type { Exercise, Program, Week, Workout } from './types';
+
+export const builtInExercises: Exercise[] = [
+	// ── HINGE ──────────────────────────────────────────────────────
+	{
+		id: 'rdl',
+		cat: 'Hinge',
+		name: 'Romanian Deadlift',
+		muscles: 'Hamstrings · Glutes',
+		cue: 'Hinge — feel the hamstrings load',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '10',
+		isBuiltIn: true
+	},
+	{
+		id: 'trap-dl',
+		cat: 'Hinge',
+		name: 'Trap-Bar Deadlift',
+		muscles: 'Posterior chain',
+		cue: 'Drive through the floor, stay tall',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '6',
+		isBuiltIn: true
+	},
+	{
+		id: 'kb-swing',
+		cat: 'Hinge',
+		name: 'Kettlebell Swing',
+		muscles: 'Glutes · Hamstrings',
+		cue: 'Hip snap — not a squat',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '15',
+		isBuiltIn: true
+	},
+	{
+		id: 'good-morn',
+		cat: 'Hinge',
+		name: 'Good Morning',
+		muscles: 'Hamstrings · Erectors',
+		cue: 'Bar stays loaded, spine neutral',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '12',
+		isBuiltIn: true
+	},
+	// ── SQUAT ──────────────────────────────────────────────────────
+	{
+		id: 'goblet',
+		cat: 'Squat',
+		name: 'Goblet Squat',
+		muscles: 'Quads · Glutes',
+		cue: 'Sit tall between the heels',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '8',
+		isBuiltIn: true
+	},
+	{
+		id: 'split',
+		cat: 'Squat',
+		name: 'Bulgarian Split Squat',
+		muscles: 'Quads · Glutes · Balance',
+		cue: 'Single-leg stability for the court',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '10 ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'box-squat',
+		cat: 'Squat',
+		name: 'Box Squat',
+		muscles: 'Quads · Glutes',
+		cue: 'Pause on the box, explode up',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '6',
+		isBuiltIn: true
+	},
+	{
+		id: 'step-up',
+		cat: 'Squat',
+		name: 'Step-Up',
+		muscles: 'Quads · Glutes · Balance',
+		cue: 'Drive through the heel, no push off',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '10 ea',
+		isBuiltIn: true
+	},
+	// ── PUSH ───────────────────────────────────────────────────────
+	{
+		id: 'db-bench',
+		cat: 'Push',
+		name: 'DB Bench Press',
+		muscles: 'Chest · Triceps · Front delt',
+		cue: 'Controlled on the way down',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '8',
+		isBuiltIn: true
+	},
+	{
+		id: 'push-press',
+		cat: 'Push',
+		name: 'Push Press',
+		muscles: 'Shoulders · Triceps',
+		cue: 'Leg drive into lockout overhead',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '8',
+		isBuiltIn: true
+	},
+	{
+		id: 'landmine',
+		cat: 'Push',
+		name: 'Landmine Press',
+		muscles: 'Shoulders · Serratus',
+		cue: 'Arc up and away, core tight',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '10 ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'db-ohp',
+		cat: 'Push',
+		name: 'DB Shoulder Press',
+		muscles: 'Shoulders · Triceps',
+		cue: 'Neutral grip, packed shoulders',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '10',
+		isBuiltIn: true
+	},
+	// ── PULL ───────────────────────────────────────────────────────
+	{
+		id: 'cs-row',
+		cat: 'Pull',
+		name: 'Chest-Supported Row',
+		muscles: 'Upper back · Biceps',
+		cue: 'Pull elbows back past the pad',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '10',
+		isBuiltIn: true
+	},
+	{
+		id: 'pull-up',
+		cat: 'Pull',
+		name: 'Pull-Up',
+		muscles: 'Lats · Biceps',
+		cue: 'Full hang to chin over bar',
+		unit: 'bodyweight',
+		defaultSets: 3,
+		defaultReps: '6',
+		isBuiltIn: true
+	},
+	{
+		id: 'face-pull',
+		cat: 'Pull',
+		name: 'Face Pull',
+		muscles: 'Rear delt · Rotator cuff',
+		cue: 'High elbows, external rotation at end',
+		unit: 'band',
+		defaultSets: 3,
+		defaultReps: '15',
+		isBuiltIn: true
+	},
+	{
+		id: 'band-pull',
+		cat: 'Pull',
+		name: 'Band Pull-Apart',
+		muscles: 'Rear delt · Mid trap',
+		cue: 'Straight arms, squeeze at end',
+		unit: 'band',
+		defaultSets: 3,
+		defaultReps: '20',
+		isBuiltIn: true
+	},
+	// ── LATERAL ────────────────────────────────────────────────────
+	{
+		id: 'band-walk',
+		cat: 'Lateral',
+		name: 'Lateral Band Walk',
+		muscles: 'Glute med · Hip abductors',
+		cue: 'Low, slow, glutes burning',
+		unit: 'band',
+		defaultSets: 3,
+		defaultReps: '15 ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'copenhagen',
+		cat: 'Lateral',
+		name: 'Copenhagen Plank',
+		muscles: 'Adductors · Core',
+		cue: 'Adductor armor — hold steady',
+		unit: 'bodyweight',
+		defaultSets: 3,
+		defaultReps: '30 s',
+		isBuiltIn: true
+	},
+	{
+		id: 'side-plank',
+		cat: 'Lateral',
+		name: 'Side Plank',
+		muscles: 'Obliques · Glute med',
+		cue: 'Hips up, body straight',
+		unit: 'bodyweight',
+		defaultSets: 3,
+		defaultReps: '30 s',
+		isBuiltIn: true
+	},
+	{
+		id: 'sl-rdl',
+		cat: 'Lateral',
+		name: 'Single-Leg RDL',
+		muscles: 'Hamstrings · Balance',
+		cue: "Slow and controlled, don't rush",
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '8 ea',
+		isBuiltIn: true
+	},
+	// ── ROTATIONAL ─────────────────────────────────────────────────
+	{
+		id: 'medball',
+		cat: 'Rotational',
+		name: 'Med-Ball Rotational Slam',
+		muscles: 'Obliques · Hips · Core',
+		cue: 'Explode through the hips',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '6 ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'pallof',
+		cat: 'Rotational',
+		name: 'Pallof Press',
+		muscles: 'Anti-rotation core',
+		cue: 'Press and hold — resist the pull',
+		unit: 'band',
+		defaultSets: 3,
+		defaultReps: '12',
+		isBuiltIn: true
+	},
+	{
+		id: 'woodchop',
+		cat: 'Rotational',
+		name: 'Cable Woodchop',
+		muscles: 'Obliques · Shoulders',
+		cue: 'Rotate from the hips, not the arms',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '12 ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'mb-rainbow',
+		cat: 'Rotational',
+		name: 'Med-Ball Rainbow',
+		muscles: 'Full rotational chain',
+		cue: 'Arc overhead, control the landing',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '8 ea',
+		isBuiltIn: true
+	},
+	// ── POWER ──────────────────────────────────────────────────────
+	{
+		id: 'pogo',
+		cat: 'Power',
+		name: 'Reactive Pogo Hops',
+		muscles: 'Calves · Achilles',
+		cue: 'Stiff ankles, fast contacts',
+		unit: 'bodyweight',
+		defaultSets: 3,
+		defaultReps: '20',
+		isBuiltIn: true
+	},
+	{
+		id: 'box-jump',
+		cat: 'Power',
+		name: 'Box Jump',
+		muscles: 'Quads · Glutes · Power',
+		cue: 'Full extension at takeoff',
+		unit: 'bodyweight',
+		defaultSets: 4,
+		defaultReps: '5',
+		isBuiltIn: true
+	},
+	{
+		id: 'broad-jump',
+		cat: 'Power',
+		name: 'Broad Jump',
+		muscles: 'Full lower body power',
+		cue: 'Stick the landing, absorb well',
+		unit: 'bodyweight',
+		defaultSets: 4,
+		defaultReps: '5',
+		isBuiltIn: true
+	},
+	{
+		id: 'mb-chest',
+		cat: 'Power',
+		name: 'Med-Ball Chest Pass',
+		muscles: 'Chest · Triceps · Core',
+		cue: 'Explosive — like a fast punch',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '8',
+		isBuiltIn: true
+	},
+	// ── CARRY ──────────────────────────────────────────────────────
+	{
+		id: 'farmer',
+		cat: 'Carry',
+		name: 'Farmer Carry',
+		muscles: 'Grip · Traps · Core',
+		cue: 'Tall spine, controlled breathing',
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '40m',
+		isBuiltIn: true
+	},
+	{
+		id: 'suitcase',
+		cat: 'Carry',
+		name: 'Suitcase Carry',
+		muscles: 'Anti-lateral core · Grip',
+		cue: "Don't let the loaded side pull you down",
+		unit: 'lb',
+		defaultSets: 3,
+		defaultReps: '30m ea',
+		isBuiltIn: true
+	},
+	{
+		id: 'sled-push',
+		cat: 'Carry',
+		name: 'Sled Push',
+		muscles: 'Full body conditioning',
+		cue: 'Low and hard, eyes down',
+		unit: 'lb',
+		defaultSets: 4,
+		defaultReps: '20m',
+		isBuiltIn: true
+	}
+];
+
+function makeWorkoutA(weekNum: number): Workout {
+	return {
+		id: `w${weekNum}-lower`,
+		name: 'Lower + Lateral Power',
+		letter: 'A',
+		focus: 'Legs · Lateral · Rotational',
+		color: 'lime',
+		estMin: 45,
+		exercises: [
+			{ exerciseId: 'goblet', sets: 4, reps: '8' },
+			{ exerciseId: 'rdl', sets: 3, reps: '10' },
+			{ exerciseId: 'split', sets: 3, reps: '10 ea' },
+			{ exerciseId: 'band-walk', sets: 3, reps: '15 ea' },
+			{ exerciseId: 'medball', sets: 3, reps: '6 ea' },
+			{ exerciseId: 'copenhagen', sets: 3, reps: '30 s' }
+		]
+	};
+}
+
+function makeWorkoutB(weekNum: number): Workout {
+	return {
+		id: `w${weekNum}-upper`,
+		name: 'Upper + Reactive',
+		letter: 'B',
+		focus: 'Push · Pull · Power',
+		color: 'lavender',
+		estMin: 40,
+		exercises: [
+			{ exerciseId: 'db-bench', sets: 4, reps: '8' },
+			{ exerciseId: 'cs-row', sets: 4, reps: '10' },
+			{ exerciseId: 'push-press', sets: 3, reps: '8' },
+			{ exerciseId: 'face-pull', sets: 3, reps: '15' },
+			{ exerciseId: 'pogo', sets: 3, reps: '20' },
+			{ exerciseId: 'pallof', sets: 3, reps: '12' }
+		]
+	};
+}
+
+function makeWorkoutC(weekNum: number): Workout {
+	return {
+		id: `w${weekNum}-conditioning`,
+		name: 'Full + Conditioning',
+		letter: 'C',
+		focus: 'Posterior chain · Carry · Power',
+		color: 'red',
+		estMin: 50,
+		exercises: [
+			{ exerciseId: 'trap-dl', sets: 4, reps: '6' },
+			{ exerciseId: 'push-press', sets: 3, reps: '8' },
+			{ exerciseId: 'sled-push', sets: 4, reps: '20m' },
+			{ exerciseId: 'farmer', sets: 3, reps: '40m' },
+			{ exerciseId: 'woodchop', sets: 3, reps: '12 ea' }
+		]
+	};
+}
+
+function makeWeek(weekNum: number): Week {
+	return {
+		weekNumber: weekNum,
+		workouts: [makeWorkoutA(weekNum), makeWorkoutB(weekNum), makeWorkoutC(weekNum)]
+	};
+}
+
+export const builtInPrograms: Program[] = [
+	{
+		id: 'strength-foundation',
+		name: 'Strength Foundation',
+		description:
+			'A 12-week full-body strength program. Alternates lower body, upper push, and upper pull sessions across 3 days per week.',
+		durationWeeks: 12,
+		daysPerWeek: 3,
+		weeks: Array.from({ length: 12 }, (_, i) => makeWeek(i + 1)),
+		createdAt: new Date().toISOString(),
+		isBuiltIn: true
+	}
+];
