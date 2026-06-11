@@ -17,6 +17,8 @@
 		onSave?: (ex: Exercise) => void;
 	} = $props();
 
+	const WEIGHT_INCREMENTS = [2.5, 5, 10];
+
 	// Snapshot prop at open time — form fields are intentionally frozen
 	const snap = untrack(() => ({
 		name: exercise?.name ?? '',
@@ -25,7 +27,8 @@
 		cat: exercise?.cat ?? ('Push' as ExerciseCat),
 		unit: exercise?.unit ?? ('lb' as WeightUnit),
 		defaultSets: exercise?.defaultSets ?? 3,
-		defaultReps: exercise?.defaultReps ?? '8-10'
+		defaultReps: exercise?.defaultReps ?? '8-10',
+		weightIncrement: exercise?.weightIncrement ?? 5
 	}));
 
 	let name = $state(snap.name);
@@ -35,6 +38,7 @@
 	let unit = $state<WeightUnit>(snap.unit);
 	let defaultSets = $state(snap.defaultSets);
 	let defaultReps = $state(snap.defaultReps);
+	let weightIncrement = $state(snap.weightIncrement);
 	let saving = $state(false);
 	let errors = $state<Record<string, string>>({});
 
@@ -51,8 +55,9 @@
 		saving = true;
 
 		let saved: Exercise;
+		const inc = (unit === 'lb' || unit === 'kg') ? weightIncrement : undefined;
 		if (exercise) {
-			const updated: Exercise = { ...exercise, name: name.trim(), cue: cue.trim(), muscles: muscles.trim(), cat, unit, defaultSets, defaultReps };
+			const updated: Exercise = { ...exercise, name: name.trim(), cue: cue.trim(), muscles: muscles.trim(), cat, unit, defaultSets, defaultReps, weightIncrement: inc };
 			await programStore.updateExercise(updated);
 			saved = updated;
 		} else {
@@ -63,7 +68,8 @@
 				cat,
 				unit,
 				defaultSets,
-				defaultReps
+				defaultReps,
+				weightIncrement: inc
 			});
 		}
 
@@ -151,6 +157,24 @@
 					<input id="ex-reps" class="form-field__input" type="text" bind:value={defaultReps} placeholder="e.g. 8-10" />
 				</div>
 			</div>
+
+			{#if unit === 'lb' || unit === 'kg'}
+				<div class="form-field">
+					<span class="form-field__label" id="ex-increment-label">Weight increment ({unit})</span>
+					<div class="seg-control" role="radiogroup" aria-labelledby="ex-increment-label">
+						{#each WEIGHT_INCREMENTS as inc}
+							<button
+								type="button"
+								class="seg-control__btn"
+								class:seg-control__btn--active={weightIncrement === inc}
+								role="radio"
+								aria-checked={weightIncrement === inc}
+								onclick={() => (weightIncrement = inc)}
+							>{inc}</button>
+						{/each}
+					</div>
+				</div>
+			{/if}
 
 			<button type="submit" class="ex-form__submit" disabled={saving} aria-busy={saving}>
 				{saving ? 'Saving…' : exercise ? 'Save changes' : 'Add exercise'}

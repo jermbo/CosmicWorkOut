@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { LoggingMode, CompletionFeel, Density, Roundness } from '$lib/db/types';
+	import type { CompletionFeel, Density, Roundness } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 
 	const ACCENT_PRESETS = [
@@ -9,12 +9,6 @@
 		{ label: 'Red', value: '#e55733' },
 		{ label: 'Orange', value: '#f97316' },
 		{ label: 'Teal', value: '#2dd4bf' }
-	];
-
-	const LOGGING_MODES: { value: LoggingMode; label: string; desc: string }[] = [
-		{ value: 'instant', label: 'Instant', desc: 'One tap logs at last weight' },
-		{ value: 'stepper', label: 'Stepper', desc: 'Tap opens +/− controls' },
-		{ value: 'numpad', label: 'Numpad', desc: 'Tap opens numeric keyboard' }
 	];
 
 	const DENSITIES: { value: Density; label: string }[] = [
@@ -96,28 +90,6 @@
 						onkeydown={(e) => e.key === 'Enter' && applyCustomHex()}
 					/>
 				</div>
-			</div>
-		</section>
-
-		<!-- Logging mode -->
-		<section class="settings-section" aria-labelledby="section-logging">
-			<h2 class="settings-section__title" id="section-logging">Set Logging Mode</h2>
-			<div class="option-list" role="radiogroup" aria-labelledby="section-logging">
-				{#each LOGGING_MODES as mode}
-					<button
-						class="option-row"
-						class:option-row--active={prefsStore.loggingMode === mode.value}
-						role="radio"
-						aria-checked={prefsStore.loggingMode === mode.value}
-						onclick={() => prefsStore.setLoggingMode(mode.value)}
-					>
-						<div class="option-row__info">
-							<span class="option-row__label">{mode.label}</span>
-							<span class="option-row__desc">{mode.desc}</span>
-						</div>
-						<span class="option-row__radio" aria-hidden="true"></span>
-					</button>
-				{/each}
 			</div>
 		</section>
 

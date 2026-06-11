@@ -1,5 +1,4 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
-export type LoggingMode = 'instant' | 'stepper' | 'numpad';
 export type CompletionFeel = 'full' | 'subtle';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
@@ -14,6 +13,7 @@ export interface Exercise {
 	unit: WeightUnit;
 	defaultSets: number;
 	defaultReps: string;
+	weightIncrement?: number;
 	isBuiltIn: boolean;
 }
 
@@ -83,7 +83,6 @@ export interface ExerciseLastUsed {
 
 export interface UserPrefs {
 	accentColor: string;
-	loggingMode: LoggingMode;
 	completionFeel: CompletionFeel;
 	density: Density;
 	roundness: Roundness;

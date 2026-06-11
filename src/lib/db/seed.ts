@@ -11,6 +11,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -22,6 +23,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '6',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -33,6 +35,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '15',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -44,6 +47,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── SQUAT ──────────────────────────────────────────────────────
@@ -56,6 +60,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '8',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -67,6 +72,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -78,6 +84,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '6',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -89,6 +96,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── PUSH ───────────────────────────────────────────────────────
@@ -101,6 +109,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '8',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -112,6 +121,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '8',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -123,6 +133,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -134,6 +145,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── PULL ───────────────────────────────────────────────────────
@@ -146,6 +158,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '10',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -224,6 +237,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '8 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── ROTATIONAL ─────────────────────────────────────────────────
@@ -236,6 +250,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '6 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -258,6 +273,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -269,6 +285,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '8 ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── POWER ──────────────────────────────────────────────────────
@@ -314,6 +331,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '8',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	// ── CARRY ──────────────────────────────────────────────────────
@@ -326,6 +344,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '40m',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -337,6 +356,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '30m ea',
+		weightIncrement: 5,
 		isBuiltIn: true
 	},
 	{
@@ -348,6 +368,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '20m',
+		weightIncrement: 5,
 		isBuiltIn: true
 	}
 ];

@@ -2,7 +2,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
 
@@ -64,10 +63,27 @@
 	}
 
 	function handleSetTap(exerciseIndex: number, setIndex: number) {
-		if (prefsStore.loggingMode === 'instant') {
-			sessionStore.completeSet(exerciseIndex, setIndex);
-		} else {
+		const activeExercise = sessionStore.active?.exercises[exerciseIndex];
+		const set = activeExercise?.sets[setIndex];
+		if (!set) return;
+
+		if (set.completed) {
+			// adjust a completed set
 			sheetTarget = { exerciseIndex, setIndex };
+		} else {
+			const hasWeight =
+				activeExercise!.unit === 'bodyweight' ||
+				activeExercise!.unit === 'band' ||
+				(typeof set.weight === 'number' && set.weight > 0) ||
+				(typeof set.weight === 'string' && Boolean(set.weight));
+
+			if (hasWeight) {
+				// weight already known — one tap logs it
+				sessionStore.completeSet(exerciseIndex, setIndex);
+			} else {
+				// first time — need to enter a weight
+				sheetTarget = { exerciseIndex, setIndex };
+			}
 		}
 	}
 

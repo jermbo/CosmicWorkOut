@@ -32,14 +32,16 @@
 	}
 
 	function handleTap() {
-		if (set.completed || isAnimating) {
+		if (isAnimating) {
 			return;
 		}
-		isAnimating = true;
+		if (!set.completed) {
+			isAnimating = true;
+			setTimeout(() => {
+				isAnimating = false;
+			}, 400);
+		}
 		onTap();
-		setTimeout(() => {
-			isAnimating = false;
-		}, 400);
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -56,7 +58,6 @@
 	class:set-tile--animating={isAnimating}
 	onclick={handleTap}
 	onkeydown={handleKeydown}
-	disabled={set.completed}
 	aria-label={buildAriaLabel()}
 >
 	{#if set.completed}
@@ -151,7 +152,7 @@
 		background: var(--color-accent);
 		border-color: var(--color-accent);
 		color: var(--color-accent-ink);
-		cursor: default;
+		cursor: pointer;
 	}
 
 	.set-tile__plus {

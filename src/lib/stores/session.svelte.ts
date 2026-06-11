@@ -100,7 +100,6 @@ class SessionStore {
 		this.persist();
 	}
 
-	// Instant mode: log set with pre-filled weight/reps
 	async completeSet(exerciseIndex: number, setIndex: number): Promise<void> {
 		if (!this.active) {
 			return;
@@ -119,6 +118,13 @@ class SessionStore {
 		set.completed = true;
 		set.completedAt = new Date().toISOString();
 
+		// cascade weight to subsequent uncompleted sets
+		for (let i = setIndex + 1; i < exercise.sets.length; i++) {
+			if (!exercise.sets[i].completed) {
+				exercise.sets[i].weight = set.weight;
+			}
+		}
+
 		await db.exerciseLastUsed.put($state.snapshot({
 			exerciseId: exercise.exerciseId,
 			weight: set.weight,
@@ -128,7 +134,6 @@ class SessionStore {
 		this.persist();
 	}
 
-	// Sheet mode: log set with explicit weight and reps
 	async logSet(
 		exerciseIndex: number,
 		setIndex: number,
@@ -145,14 +150,21 @@ class SessionStore {
 		}
 
 		const set = exercise.sets[setIndex];
-		if (!set || set.completed) {
+		if (!set) {
 			return;
 		}
 
 		set.weight = weight;
 		set.reps = reps;
 		set.completed = true;
-		set.completedAt = new Date().toISOString();
+		set.completedAt = set.completedAt ?? new Date().toISOString();
+
+		// cascade new weight to all subsequent uncompleted sets
+		for (let i = setIndex + 1; i < exercise.sets.length; i++) {
+			if (!exercise.sets[i].completed) {
+				exercise.sets[i].weight = weight;
+			}
+		}
 
 		await db.exerciseLastUsed.put($state.snapshot({
 			exerciseId: exercise.exerciseId,

@@ -1,10 +1,9 @@
-import type { UserPrefs, LoggingMode, CompletionFeel, Density, Roundness } from '$lib/db/types';
+import type { UserPrefs, CompletionFeel, Density, Roundness } from '$lib/db/types';
 
 const PREFS_KEY = 'cwout:prefs';
 
 const DEFAULTS: UserPrefs = {
 	accentColor: '#b2f042',
-	loggingMode: 'instant',
 	completionFeel: 'full',
 	density: 'comfortable',
 	roundness: 'default',
@@ -13,7 +12,6 @@ const DEFAULTS: UserPrefs = {
 
 class PrefsStore {
 	accentColor = $state(DEFAULTS.accentColor);
-	loggingMode = $state<LoggingMode>(DEFAULTS.loggingMode);
 	completionFeel = $state<CompletionFeel>(DEFAULTS.completionFeel);
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
@@ -24,7 +22,6 @@ class PrefsStore {
 		if (stored) {
 			const parsed = JSON.parse(stored) as UserPrefs;
 			this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
-			this.loggingMode = parsed.loggingMode ?? DEFAULTS.loggingMode;
 			this.completionFeel = parsed.completionFeel ?? DEFAULTS.completionFeel;
 			this.density = parsed.density ?? DEFAULTS.density;
 			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
@@ -39,7 +36,6 @@ class PrefsStore {
 	private save(): void {
 		const prefs: UserPrefs = {
 			accentColor: this.accentColor,
-			loggingMode: this.loggingMode,
 			completionFeel: this.completionFeel,
 			density: this.density,
 			roundness: this.roundness,
@@ -76,11 +72,6 @@ class PrefsStore {
 	setAccentColor(color: string): void {
 		this.accentColor = color;
 		this.applyAccentColor();
-		this.save();
-	}
-
-	setLoggingMode(mode: LoggingMode): void {
-		this.loggingMode = mode;
 		this.save();
 	}
 
