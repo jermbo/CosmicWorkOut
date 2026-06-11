@@ -239,8 +239,6 @@
 		position: fixed;
 		inset: 0;
 		inline-size: 100%;
-		max-inline-size: var(--max-width);
-		margin-inline: auto;
 		block-size: 100dvh;
 		max-block-size: 100dvh;
 		background: var(--color-bg);
@@ -251,6 +249,21 @@
 
 		&::backdrop {
 			background: rgba(0, 0, 0, 0.8);
+		}
+	}
+
+	@container app (inline-size >= 720px) {
+		.session-overlay {
+			inset-block: 5dvh;
+			inset-inline-start: var(--side-nav-width);
+			inset-inline-end: 0;
+			margin-inline: auto;
+			inline-size: min(580px, calc(100dvw - var(--side-nav-width) - var(--space-8)));
+			block-size: 90dvh;
+			max-block-size: 90dvh;
+			border-radius: var(--r-2xl);
+			border: 1px solid var(--color-border);
+			box-shadow: var(--shadow-lg);
 		}
 	}
 

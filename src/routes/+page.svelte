@@ -14,32 +14,6 @@
 	const dayName = DAYS_SHORT[now.getDay()];
 	const dateStr = `${MONTHS_SHORT[now.getMonth()]} ${now.getDate()}`;
 
-	// Simple streak: consecutive days with sessions ending today or yesterday
-	function computeWeekStreak(sessions: typeof programStore.sessions): number {
-		if (sessions.length === 0) return 0;
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		let streak = 0;
-		// Count distinct weeks with at least one session
-		const weekSet = new Set<string>();
-		for (const s of sessions) {
-			const d = new Date(s.date + 'T00:00:00');
-			const weekKey = `${d.getFullYear()}-W${getWeekNumber(d)}`;
-			weekSet.add(weekKey);
-		}
-		return weekSet.size;
-	}
-
-	function getWeekNumber(d: Date): number {
-		const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-		const dayNum = date.getUTCDay() || 7;
-		date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-		const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
-		return Math.ceil((((date.valueOf() - yearStart.valueOf()) / 86400000) + 1) / 7);
-	}
-
-	let streak = $derived(computeWeekStreak(programStore.sessions));
-
 	async function startSession() {
 		const workout = programStore.todaysWorkout;
 		const program = programStore.activeProgram;
@@ -63,65 +37,68 @@
 				<p class="today-page__eyebrow">{dayName} · {dateStr}</p>
 				<h1 class="today-page__title">Today</h1>
 			</div>
-			{#if streak > 0}
-				<div class="today-page__streak" aria-label="{streak} week streak">
-					<svg
-						viewBox="0 0 24 24"
-						fill="currentColor"
-						aria-hidden="true"
-					>
+			{#if programStore.weekStreak > 0}
+				<div class="today-page__streak" aria-label="{programStore.weekStreak} week streak">
+					<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 						<path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" />
 					</svg>
-					<span><strong>{streak}</strong> wk streak</span>
+					<span><strong>{programStore.weekStreak}</strong> wk streak</span>
 				</div>
 			{/if}
 		</div>
 	</header>
 
-	<div class="today-page__body">
-		{#if !programStore.loaded}
-			<div class="today-page__loading" aria-busy="true" aria-label="Loading workout">
-				<div class="today-page__loading-spinner"></div>
+	<div class="today-page__layout">
+		<div class="today-page__primary">
+			<div class="today-page__body">
+				{#if !programStore.loaded}
+					<div class="today-page__loading" aria-busy="true" aria-label="Loading workout">
+						<div class="today-page__loading-spinner"></div>
+					</div>
+				{:else if programStore.todaySession}
+					<div class="today-page__done" role="status">
+						<div class="today-page__done-icon" aria-hidden="true">
+							<svg
+								viewBox="0 0 40 40"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="3"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<polyline points="8 20 16 28 32 12" />
+							</svg>
+						</div>
+						<h2 class="today-page__done-title">Workout complete</h2>
+						<p class="today-page__done-subtitle">
+							{programStore.getWorkoutById(programStore.todaySession.workoutId)?.name ?? 'Session logged'}
+						</p>
+					</div>
+				{:else if programStore.todaysWorkout}
+					<TodayWorkout
+						workout={programStore.todaysWorkout}
+						exerciseMap={programStore.exerciseMap}
+						onStart={startSession}
+					/>
+				{:else}
+					<div class="today-page__empty">
+						<p>No program active. Head to <a href="/program">Program</a> to get started.</p>
+					</div>
+				{/if}
 			</div>
-		{:else if programStore.todaySession}
-			<div class="today-page__done" role="status">
-				<div class="today-page__done-icon" aria-hidden="true">
-					<svg
-						viewBox="0 0 40 40"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<polyline points="8 20 16 28 32 12" />
-					</svg>
-				</div>
-				<h2 class="today-page__done-title">Workout complete</h2>
-				<p class="today-page__done-subtitle">
-					{programStore.getWorkoutById(programStore.todaySession.workoutId)?.name ?? 'Session logged'}
-				</p>
-			</div>
-		{:else if programStore.todaysWorkout}
-			<TodayWorkout
-				workout={programStore.todaysWorkout}
-				exerciseMap={programStore.exerciseMap}
-				onStart={startSession}
-			/>
-		{:else}
-			<div class="today-page__empty">
-				<p>No program active. Head to <a href="/program">Program</a> to get started.</p>
-			</div>
+		</div>
+
+		{#if programStore.loaded}
+			<aside class="today-page__aside">
+				<WeekStrip sessions={programStore.sessions} />
+			</aside>
 		{/if}
 	</div>
-
-	{#if programStore.loaded}
-		<WeekStrip sessions={programStore.sessions} />
-	{/if}
 </div>
 
 <style>
 	.today-page {
+		container-type: inline-size;
 		padding-block-start: calc(var(--safe-top) + var(--space-6));
 		padding-block-end: var(--space-8);
 	}
@@ -176,6 +153,49 @@
 
 		strong {
 			color: var(--color-text-primary);
+		}
+	}
+
+	.today-page__layout {
+		display: contents;
+	}
+
+	.today-page__primary {
+		display: contents;
+	}
+
+	.today-page__aside {
+		display: contents;
+	}
+
+	@container main (inline-size >= 600px) {
+		.today-page {
+			max-inline-size: 860px;
+			margin-inline: auto;
+			padding-inline: var(--space-8);
+		}
+
+		.today-page__header {
+			padding-inline: 0;
+		}
+	}
+
+	@container main (inline-size >= 900px) {
+		.today-page__layout {
+			display: grid;
+			grid-template-columns: 1fr 280px;
+			gap: var(--space-6);
+			align-items: start;
+		}
+
+		.today-page__primary {
+			display: block;
+		}
+
+		.today-page__aside {
+			display: block;
+			position: sticky;
+			top: var(--space-6);
 		}
 	}
 

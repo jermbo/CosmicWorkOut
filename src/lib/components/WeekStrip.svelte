@@ -68,6 +68,7 @@
 
 <style>
 	.week-strip {
+		container-type: inline-size;
 		padding-inline: var(--space-4);
 		margin-block-start: var(--space-6);
 	}

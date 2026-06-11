@@ -95,6 +95,12 @@
 		animation: sheet-slide-up 220ms var(--ease-out) both;
 	}
 
+	@container app (inline-size >= 720px) {
+		.bottom-sheet__panel {
+			inset-inline-start: var(--side-nav-width);
+		}
+	}
+
 	.bottom-sheet__grab {
 		inline-size: 38px;
 		block-size: 4px;

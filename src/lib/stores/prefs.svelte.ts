@@ -89,6 +89,18 @@ class PrefsStore {
 		this.save();
 	}
 
+	setDensity(density: Density): void {
+		this.density = density;
+		this.applyDensity();
+		this.save();
+	}
+
+	setRoundness(roundness: Roundness): void {
+		this.roundness = roundness;
+		this.applyRoundness();
+		this.save();
+	}
+
 	setWeightUnit(unit: 'lb' | 'kg'): void {
 		this.weightUnit = unit;
 		this.save();

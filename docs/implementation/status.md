@@ -11,14 +11,17 @@ flowchart LR
         C[Calendar + day summary]
         D[IndexedDB persistence]
         R[Crash recovery]
+        S[Settings UI]
+        SEL[Program selection + copy]
+        NEW[Create program]
+        EX[Custom exercise CRUD]
+        WK[Browse all weeks]
+        STK[Streak — correct logic]
+        SKP[Scheduled/skipped days]
     end
 
     subgraph gap ["Not built"]
-        S[Settings UI]
-        SEL[Program selection]
-        NEW[Create program]
         PWA[Service worker / PWA]
-        SKP[Scheduled/skipped days]
     end
 
     built --> gap
@@ -49,16 +52,22 @@ flowchart LR
 
 | Feature | Status | Doc reference |
 |---------|--------|---------------|
-| Settings UI | ❌ Not built | Store exists, no `/settings` route |
-| Program selection screen | ❌ Not built | Auto-selects first program |
-| Create new program | ❌ Not built | Only edit workouts in active program |
-| Copy built-in program | ❌ Not built | Built-in is editable in-place |
-| Custom exercise CRUD | ❌ Not built | Library is read-only in UI |
 | Service worker / PWA | ❌ Not built | Planned in offline strategy |
-| Scheduled/skipped day status | ❌ Not built | Calendar shows completed/today only |
-| Weekly consistency streak | ⚠️ Partial | Today: distinct-week count; Calendar: consecutive-day count — neither matches spec |
-| Browse all program weeks | ❌ Not built | Program page shows week 1 templates only |
-| Workout rename on edit | ⚠️ Broken | Title edit doesn't persist for existing workouts |
+
+## Recently Completed
+
+| Feature | Notes |
+|---------|-------|
+| Settings UI | `/settings` route with all 6 prefs — accent color (swatches + hex), logging mode, weight unit, completion feel, density, roundness |
+| Program selection screen | Bottom sheet listing all programs; built-in programs use "Use copy" (deep-clones before activating) |
+| Create new program | 2-step full-screen flow — details then workout names; scaffolds all weeks |
+| Copy built-in before editing | Guard dialog prompts copy+switch when editing a built-in program |
+| Custom exercise CRUD | Create/edit/delete in ExerciseLibrarySheet; built-in exercises are read-only |
+| Browse all program weeks | Week picker chevrons on program page; shows workouts for any week |
+| Weekly consistency streak | Correct logic: consecutive weeks where sessions ≥ daysPerWeek; single calculation used on both Today and Calendar |
+| Scheduled/skipped day status | Calendar infers training days-of-week from session history (≥ 2× daysPerWeek samples); shows scheduled (future) and missed (past) day indicators with legend |
+| Workout rename on edit | Fixed: `saveWorkout` now persists name/letter/focus alongside exercises, matched by original name across all weeks |
+| Density/roundness setters | `prefsStore.setDensity()` and `setRoundness()` added |
 
 ---
 

@@ -63,6 +63,7 @@
 
 	--nav-height: 68px;
 	--max-width: 460px;
+	--side-nav-width: 220px;
 
 	/* Density defaults (comfortable) */
 	--tile-h: 68px;
@@ -163,18 +164,32 @@ a {
    App shell
    ============================================================ */
 .app {
+	container-type: inline-size;
+	container-name: app;
 	display: flex;
 	flex-direction: column;
 	min-height: 100dvh;
-	max-width: var(--max-width);
-	margin-inline: auto;
 	position: relative;
 }
 
 .app__main {
+	container-type: inline-size;
+	container-name: main;
 	flex: 1;
 	overflow-y: auto;
 	padding-block-end: calc(var(--nav-height) + var(--safe-bottom));
+}
+
+@container app (inline-size >= 720px) {
+	.app__main {
+		padding-inline-start: var(--side-nav-width);
+		padding-block-end: var(--space-8);
+	}
+
+	.recovery-banner {
+		inset-inline-start: calc(var(--side-nav-width) + var(--space-4));
+		inset-block-end: var(--space-4);
+	}
 }
 
 /* ============================================================
@@ -203,8 +218,9 @@ a {
 	position: fixed;
 	inset-inline: var(--space-4);
 	inset-block-end: calc(var(--nav-height) + var(--safe-bottom) + var(--space-4));
-	max-inline-size: calc(var(--max-width) - var(--space-8));
+	max-inline-size: 420px;
 	margin-inline: auto;
+	z-index: 100;
 	background: var(--color-surface-2);
 	border: 1px solid var(--color-border-strong);
 	border-radius: var(--radius-2xl);
