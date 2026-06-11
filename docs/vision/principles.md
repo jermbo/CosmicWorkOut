@@ -2,6 +2,22 @@
 
 These principles are derived from the [North Star](north-star.md). When a product or technical decision is unclear, test it against these.
 
+```mermaid
+flowchart TB
+    NS[North Star] --> P1[Speed Over Completeness]
+    NS --> P2[Offline First]
+    NS --> P3[Flexibility Without Complexity]
+    NS --> P4[Dark, Tactile, Satisfying]
+    NS --> P5[Small Surface Area]
+    NS --> P6[Web Tech, Web Idioms]
+    P1 --> SL[Session Logging]
+    P2 --> OS[Offline Strategy]
+    P3 --> PM[Program Management]
+    P4 --> UI[Components + animations]
+    P5 --> Scope[Feature scope decisions]
+    P6 --> TS[Tech Stack]
+```
+
 ---
 
 ## 1. Speed Over Completeness
@@ -52,7 +68,7 @@ This app is for a small group of known users. Do not build for hypothetical futu
 
 ## 6. Web Tech, Web Idioms
 
-The implementation stays in web technology (HTML, CSS, JavaScript/TypeScript, React). This is the developer's area of expertise and the best leverage point. Native-feeling behavior is achieved through CSS and JS, not a native framework. PWA is a secondary goal — not a constraint on architecture.
+The implementation stays in web technology (HTML, CSS, JavaScript/TypeScript, Svelte). Native-feeling behavior is achieved through CSS and JS, not a native framework. PWA is a secondary goal — not a constraint on architecture.
 
 See [Tech Stack](../architecture/tech-stack.md) for specifics.
 

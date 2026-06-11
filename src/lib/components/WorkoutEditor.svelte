@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { Workout, WorkoutExercise, Exercise } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseLibrarySheet from './ExerciseLibrarySheet.svelte';
@@ -12,20 +12,27 @@
 		onBack: () => void;
 	} = $props();
 
-	let isNew = $derived(initWorkout === null);
+	// Snapshot prop at open time — editor data is intentionally frozen
+	const snap = untrack(() => ({
+		isNew: initWorkout === null,
+		name: initWorkout?.name ?? 'New Workout',
+		letter: initWorkout?.letter ?? 'D',
+		focus: initWorkout?.focus ?? '',
+		exercises: initWorkout?.exercises.map((e, i) => ({ ...e, _key: i })) ?? []
+	}));
 
-	let title = $state(initWorkout?.name ?? 'New Workout');
-	let letter = $state(initWorkout?.letter ?? 'D');
-	let focus = $state(initWorkout?.focus ?? '');
-	let exercises = $state<(WorkoutExercise & { _key: number })[]>(
-		initWorkout?.exercises.map((e, i) => ({ ...e, _key: i })) ?? []
-	);
+	const isNew = snap.isNew;
+
+	let title = $state(snap.name);
+	let letter = $state(snap.letter);
+	let focus = $state(snap.focus);
+	let exercises = $state<(WorkoutExercise & { _key: number })[]>(snap.exercises);
 	let editingIndex = $state<number | null>(null);
 	let showLibrary = $state(false);
 	let editingTitle = $state(false);
 	let saving = $state(false);
 
-	let keyCounter = exercises.length;
+	let keyCounter = untrack(() => exercises.length);
 	let titleInputEl = $state<HTMLInputElement | null>(null);
 
 	function moveExercise(i: number, dir: number) {

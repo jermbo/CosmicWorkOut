@@ -1,103 +1,143 @@
 # System Overview
 
-CosmicWorkOut is a client-only web application. There is no backend, no server, no API. All data lives on the user's device.
+CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no auth. All data lives on the user's device.
 
 ---
 
 ## High-Level Architecture
 
-```
-┌─────────────────────────────────────────────┐
-│                  Browser                     │
-│                                             │
-│  ┌──────────────┐    ┌────────────────────┐ │
-│  │  React App   │◄──►│  IndexedDB / Local  │ │
-│  │  (UI Layer)  │    │  Storage (Data)     │ │
-│  └──────┬───────┘    └────────────────────┘ │
-│         │                                   │
-│  ┌──────▼───────┐                           │
-│  │ Service      │  ← caches app shell       │
-│  │ Worker       │  ← enables PWA install    │
-│  └──────────────┘                           │
-└─────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph browser ["Browser"]
+        UI["SvelteKit UI<br/>3 routes + overlays"]
+        Stores["Svelte Stores<br/>program · session · prefs"]
+        IDB[("IndexedDB<br/>exercises · programs · sessions")]
+        LS[("localStorage<br/>prefs · activeSession")]
+        SW["Service Worker<br/>planned — not built"]
+    end
+
+    UI <--> Stores
+    Stores <--> IDB
+    Stores <--> LS
+    UI -.-> SW
 ```
 
-No network requests after initial page load. The service worker caches the app shell so the app launches even with no connection.
+After the first page load the app runs entirely in the browser. A service worker for offline shell caching is **planned but not yet implemented** — see [Offline Strategy](offline-strategy.md).
 
 ---
 
 ## Layers
 
-### UI Layer — React
+### UI Layer — Svelte 5 + SvelteKit
 
-The interface is built in React. It renders program views, session logging, calendar history, and settings. It reads from and writes to the data layer directly — no state server, no REST calls.
+Three routes: **Today** (`/`), **Program** (`/program`), **Calendar** (`/calendar`). Global overlays (active session, completion screen, crash recovery) live in the root layout.
 
-See [Tech Stack](tech-stack.md) for framework specifics.
+The UI reads and writes through three Svelte stores — no REST, no server state.
+
+See [App Structure](../implementation/app-structure.md) and [Tech Stack](tech-stack.md).
 
 ### Data Layer — IndexedDB + localStorage
 
-All persistent data lives in IndexedDB. Lightweight user preferences and crash-recovery state live in localStorage for simpler synchronous access.
+Persistent workout data in IndexedDB via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences and in-progress sessions in localStorage for synchronous access.
 
-See [Data Model](data-model.md) for entity definitions and [Offline Strategy](offline-strategy.md) for persistence rules.
+See [Data Model](data-model.md) and [State Management](../implementation/state.md).
 
-### Service Worker
+### Service Worker — Planned
 
-Caches the app shell (HTML, CSS, JS, fonts) on first load. Subsequent launches work without a network connection. Required for PWA installability.
+Not built yet. When added, it will cache the app shell for offline launch and PWA install. Core functionality already works offline after first load in a normal browser tab.
 
 ---
 
 ## Data Flow
 
 ### Logging a set
-```
-User taps set tile
-  → UI triggers set-complete action
-  → SessionLog updated in IndexedDB immediately
-  → exerciseLastUsed updated in IndexedDB
-  → activeSession written to localStorage (crash recovery)
-  → UI re-renders to reflect completed state
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Tile as SetTile
+    participant SS as sessionStore
+    participant IDB as IndexedDB
+    participant LS as localStorage
+
+    User->>Tile: tap set
+    Tile->>SS: completeSet() or logSet()
+    SS->>IDB: put exerciseLastUsed
+    SS->>LS: persist activeSession
+    SS-->>Tile: reactive update
+    Tile-->>User: completed animation
 ```
 
 ### Starting the app
-```
-App boot
-  → Load UserPrefs from localStorage
-  → Check localStorage for activeSession (crash recovery)
-  → Load today's workout from IndexedDB
-  → Render Today view
+
+```mermaid
+sequenceDiagram
+    participant Layout as +layout.svelte
+    participant DB as initDB()
+    participant Prefs as prefsStore
+    participant Prog as programStore
+    participant Sess as sessionStore
+    participant UI as Today view
+
+    Layout->>DB: open IndexedDB, seed data
+    Layout->>Prefs: load() + apply CSS vars
+    Layout->>Prog: load() programs, exercises, sessions
+    Layout->>Sess: checkForRecovery()
+    alt unfinished session from today
+        Sess-->>Layout: show resume banner
+    end
+    Layout->>UI: appReady = true
 ```
 
 ### Editing a program
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Editor as WorkoutEditor
+    participant PS as programStore
+    participant IDB as IndexedDB
+
+    User->>Editor: save workout
+    Editor->>PS: saveWorkoutExercises() or addWorkout()
+    PS->>IDB: put program
+    PS-->>Editor: reactive update
+    Editor-->>User: updated workout cards
 ```
-User edits workout
-  → Changes written to IndexedDB program store on save
-  → UI reflects updated program
+
+---
+
+## Program Progression
+
+Today's workout is **not calendar-based**. The app advances linearly through the program:
+
+```mermaid
+flowchart LR
+    SC["completedSessionCount"] --> IDX["index = count % allWorkouts.length"]
+    IDX --> TW["todaysWorkout"]
+    SC --> WK["week = floor(count / daysPerWeek) + 1"]
 ```
+
+`completedSessionCount` = number of finished sessions for the active program. Week number is derived from session count ÷ days per week.
+
+See [Program Progression](../implementation/program-progression.md).
 
 ---
 
 ## What Does Not Exist (By Design)
 
-- **No backend API** — v1 is local-only. This may never change.
-- **No authentication** — single-user per device installation
-- **No cloud sync** — data stays on the device
+- **No backend API** — v1 is local-only
+- **No authentication** — single-user per device
+- **No cloud sync** — data stays on device
 - **No analytics or telemetry**
-- **No push notifications** (beyond what the browser provides natively)
-
----
-
-## Future Considerations
-
-These are noted here for awareness, not as planned work:
-
-- **SQLite/WASM** (e.g., PGlite) as an alternative to IndexedDB — better query expressiveness, worth exploring after v1 ships. See [Tech Stack](tech-stack.md).
-- **Optional cloud backup** — export/import as a bridge before any sync story is needed
 
 ---
 
 ## Related
 
-- [Data Model](data-model.md) — What gets stored and how
-- [Tech Stack](tech-stack.md) — Technology choices
-- [Offline Strategy](offline-strategy.md) — How offline-first is implemented
-- [North Star](../vision/north-star.md) — Why this architecture was chosen
+- [How It Works](../implementation/behavior.md) — Mental model for the whole app
+- [Data Model](data-model.md) — What gets stored
+- [Tech Stack](tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
+- [Offline Strategy](offline-strategy.md) — What's built vs planned
+- [Implementation Status](../implementation/status.md) — Feature checklist
+- [North Star](../vision/north-star.md) — Why this architecture

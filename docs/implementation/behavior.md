@@ -1,0 +1,221 @@
+# How It Works
+
+The mental model for CosmicWorkOut — what actually happens when you use the app. No code, just behavior.
+
+---
+
+## The Big Picture
+
+CosmicWorkOut is a **single-user, local-only** workout log. You pick up where your program left off, log sets during a session, and review history on a calendar. There is no server, no account, and no sync.
+
+```mermaid
+flowchart LR
+    Boot[Open app] --> Today[Today tab]
+    Today -->|Start| Session[Session overlay]
+    Session -->|Finish| Done[Completion screen]
+    Done --> Today
+    Today --> Program[Program tab]
+    Today --> Calendar[Calendar tab]
+```
+
+Three tabs, always visible: **Today**, **Program**, **Calendar**. Active sessions and completion screens appear as overlays — you never navigate away mid-workout.
+
+---
+
+## What "Today" Means
+
+**Today is not a calendar day assignment.** The app doesn't know you train Mon/Wed/Fri. It gives you the **next workout in sequence** based on how many sessions you've already finished.
+
+| You've completed | You see next |
+|------------------|--------------|
+| 0 sessions | Workout A (week 1) |
+| 1 session | Workout B |
+| 2 sessions | Workout C |
+| 3 sessions | Workout A (week 2) |
+| 36 sessions | Wraps back to week 1, workout A |
+
+If you already logged a session **today**, the Today tab shows "Workout complete" — you can't start a second session on the same calendar day.
+
+See [Program Progression](program-progression.md) for the full logic.
+
+---
+
+## Session Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Ready: no active session
+    Ready --> Active: tap Start session
+    Active --> Active: log sets
+    Active --> Saved: Finish (any time)
+    Active --> Discarded: End session (abandon)
+    Saved --> Ready: dismiss completion
+    Discarded --> Ready
+    Active --> Active: browser crash → resume on reopen
+```
+
+### Starting
+
+Tap **Start session** on the Today card. A full-screen overlay opens with every exercise and its set tiles. The session is saved to local storage immediately so a browser crash won't lose it.
+
+### Logging sets
+
+**Instant mode (default):** Tap a set tile → it's logged at the pre-filled weight and reps. The tile flips from a "+" to show the logged values.
+
+**Stepper / numpad mode:** Tap opens a bottom sheet to adjust weight and reps before confirming.
+
+Pre-filled values come from your last logged weight/reps for that exercise. First time defaults to **0 weight** (shown as "BW" on the tile) and the first number in the target rep range — there is no first-time prompt.
+
+**Important:** Incomplete set tiles only show a "+" and set number — not the weight/reps that will be logged. You see those values only after tapping.
+
+Haptic feedback fires when you **complete an exercise** (all its sets), not on individual set taps.
+
+### Finishing early vs abandoning
+
+These are different:
+
+| Action | How | What gets saved |
+|--------|-----|-----------------|
+| **Finish** | Footer button — says "Finish early · X/Y sets" if incomplete | Only **completed** sets are saved as a SessionLog. Unlogged sets are dropped. No confirmation dialog. |
+| **Abandon** | Back arrow → "End session" confirm | **Nothing** saved. All progress lost. |
+
+Both clear the in-progress session from local storage.
+
+### After finish
+
+A completion overlay shows duration, volume, and set count. Confetti appears unless `completionFeel` is set to `subtle`. You can return to Today or jump to Calendar.
+
+---
+
+## Program Tab
+
+Shows your **active program** with a week progress bar and workout cards (A, B, C from week 1 as templates).
+
+| What you can do | What you can't do yet |
+|-----------------|----------------------|
+| See workout names, focus areas, exercise chips | Browse all 12 weeks individually |
+| Edit a workout's exercises, sets, reps | Switch to a different program |
+| Add a new workout (propagates to all weeks) | Create a brand-new program |
+| See which workout is "today" via badge | Copy a built-in before editing |
+
+Edits match workouts **by name** across all 12 weeks — changing "Lower + Lateral Power" updates every week's copy. Historical session logs are not affected.
+
+**Known limitation:** Renaming a workout title in the editor doesn't persist on save for existing workouts — the original name is used as the lookup key.
+
+---
+
+## Calendar Tab
+
+Monthly grid showing which days you trained. Tap a completed day to see a read-only summary (duration, exercises, sets, volume).
+
+**Day colors today:**
+
+| Status | Meaning |
+|--------|---------|
+| Accent fill | You logged a session that day (active program) |
+| Outlined | Today |
+| Muted | Future dates |
+| Plain | Past dates with no session |
+
+Scheduled, rest, and skipped days are **not shown** — only actual logged sessions.
+
+### Stats (top of calendar)
+
+- **Sessions** — count this month for active program
+- **Volume** — total lbs this month (numeric weights only)
+- **Day streak** — consecutive days with *any* session going backward from today (up to 90 days), not filtered by program
+
+### Today page streak
+
+Shows **total distinct weeks** (all time, all programs) that contain at least one session — labeled "wk streak." This is not a consecutive-week counter.
+
+---
+
+## Data & Persistence
+
+```mermaid
+flowchart TB
+    subgraph during ["During session"]
+        AS[activeSession in localStorage]
+    end
+
+    subgraph permanent ["Permanent storage"]
+        IDB[("IndexedDB")]
+    end
+
+    AS -->|each set tap| AS
+    AS -->|finish| Sess[SessionLog → IndexedDB]
+    AS -->|abandon| Gone[deleted]
+    IDB --- Prog[programs]
+    IDB --- Ex[exercises]
+    IDB --- Logs[sessions]
+    IDB --- Last[exerciseLastUsed]
+```
+
+- **Programs & exercises** — IndexedDB, seeded on first launch
+- **Completed sessions** — IndexedDB, written on finish only
+- **Last-used weight/reps** — IndexedDB, updated each set
+- **In-progress session** — localStorage, updated each set
+- **Preferences** — localStorage, loaded at boot
+
+No service worker yet — offline works after first browser load, but the app isn't installable as a PWA.
+
+---
+
+## Preferences
+
+Six preferences exist in storage and affect runtime behavior — but **there is no Settings screen**. Change them via browser DevTools → Application → localStorage → `cwout:prefs`.
+
+| Pref | Default | Effect |
+|------|---------|--------|
+| `loggingMode` | `instant` | How set taps behave |
+| `accentColor` | `#b2f042` | UI accent + ink color |
+| `completionFeel` | `full` | Confetti on/off |
+| `density` | `comfortable` | Tile height, card gaps |
+| `roundness` | `default` | Border radius scale |
+| `weightUnit` | `lb` | Display label on tiles/sheets |
+
+Density and roundness apply on load but have no in-app setter yet (only `accentColor`, `loggingMode`, `completionFeel`, `weightUnit` have store methods).
+
+---
+
+## Built-In Content
+
+- **1 program:** Strength Foundation — 12 weeks, 3 days/week, workouts A/B/C
+- **31 exercises** across 8 categories, pickleball-strength focused
+- On boot: exercises always upserted (field updates propagate); programs seed only if database is empty
+
+---
+
+## What's Not Built
+
+See [Implementation Status](status.md) for the full checklist. The biggest gaps:
+
+- Settings UI
+- Program selection / switching
+- Create new program from scratch
+- Custom exercise CRUD
+- PWA / service worker
+- Calendar schedule projection (scheduled/rest/skipped)
+- Proper streak logic (consecutive weeks)
+
+---
+
+## Exercise Units
+
+Exercises can use different weight types. The log sheet adapts:
+
+- **lb/kg** — numeric weight with stepper or numpad
+- **band** — Light / Med / Heavy (stored as string)
+- **bodyweight** — reps only; weight displays as "BW"
+
+Volume calculation only includes numeric weights (bands and bodyweight don't add to total volume).
+
+---
+
+## Related
+
+- [Program Progression](program-progression.md) — Schedule math
+- [State Management](state.md) — Which store owns what
+- [Session Logging](../requirements/session-logging.md) — Target UX spec
+- [Implementation Status](status.md) — Built vs gap checklist

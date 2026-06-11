@@ -1,42 +1,49 @@
-# sv
+# CosmicWorkOut
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A simple, offline-first fitness tracker for following structured strength programs. Log sets in one tap, track history, stay out of the way.
 
-## Creating a project
+Built with **Svelte 5 + SvelteKit**. All data stays on your device (IndexedDB + localStorage). No backend, no accounts.
 
-If you're seeing this, you've probably already done this step. Congrats!
+---
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+## Quick Start
 
 ```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --types ts --add prettier eslint --install npm cosmic-workout
+npm install
+npm run dev    # opens http://localhost:5678
 ```
 
-## Developing
+---
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Documentation
 
-```sh
-npm run dev
+Full project wiki: **[docs/README.md](docs/README.md)** — includes mermaid diagrams for architecture, flows, and data models.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```mermaid
+flowchart LR
+    Wiki[docs/README.md] --> Vision[Vision]
+    Wiki --> Arch[Architecture]
+    Wiki --> Req[Requirements]
+    Wiki --> Impl[Implementation]
+    Vision --> Arch --> Impl
+    Req --> Impl
 ```
 
-## Building
+| Start here | What you'll learn |
+|------------|-------------------|
+| [North Star](docs/vision/north-star.md) | What this app is and isn't |
+| [How It Works](docs/implementation/behavior.md) | Mental model — start here to understand the app |
+| [System Overview](docs/architecture/overview.md) | Architecture at a glance |
+| [Implementation Status](docs/implementation/status.md) | What's built vs planned |
+| [Dev Guide](docs/implementation/dev-guide.md) | Running and navigating the code |
 
-To create a production version of your app:
+---
 
-```sh
-npm run build
-```
+## Scripts
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Dev server (port 5678) |
+| `npm run build` | Production build |
+| `npm run check` | Type checking |
+| `npm run lint` | Lint + format check |

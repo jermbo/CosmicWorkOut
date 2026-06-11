@@ -1,4 +1,6 @@
-# Packet — Developer Handoff
+# Packet — Design Inspiration
+
+> **This is a design reference, not the product codebase.** CosmicWorkOut was built from these patterns in **Svelte 5**, not React. See [How It Works](../implementation/behavior.md) for what shipped.
 
 > Offline-first workout tracker for pickleball players following a structured 3-month strength program.
 

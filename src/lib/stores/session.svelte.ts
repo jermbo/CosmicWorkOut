@@ -8,6 +8,7 @@ import type {
 	Exercise
 } from '$lib/db/types';
 import { db } from '$lib/db/database';
+import { generateId } from '$lib/utils';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
@@ -87,7 +88,7 @@ class SessionStore {
 		}
 
 		this.active = {
-			id: crypto.randomUUID(),
+			id: generateId(),
 			date: today,
 			workoutId: workout.id,
 			workoutName: workout.name,

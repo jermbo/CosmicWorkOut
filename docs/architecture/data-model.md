@@ -1,6 +1,6 @@
 # Data Model
 
-All data is stored locally on the device. See [Offline Strategy](offline-strategy.md) for where each entity lives and when it's written.
+All data is stored locally. Source of truth: `src/lib/db/types.ts`. See [Offline Strategy](offline-strategy.md) for write timing.
 
 ---
 
@@ -12,60 +12,62 @@ A single movement — the atomic unit of any workout.
 
 ```typescript
 type Exercise = {
-  id: string;            // uuid
-  name: string;          // "Goblet Squat"
-  cue: string;           // short coaching note, optional
+  id: string;
+  name: string;
+  cue: string;              // coaching note shown during session
+  muscles: string;          // e.g. "Hamstrings · Glutes"
+  cat: ExerciseCat;         // Hinge | Squat | Push | Pull | ...
   unit: "lb" | "kg" | "band" | "bodyweight";
   defaultSets: number;
-  defaultReps: string;   // "8-10" or "5" — string to support ranges
-  defaultRestSec?: number;
-  incrementUnit?: number; // suggested weight jump for progressive overload
+  defaultReps: string;      // "8-10" or "10 ea" — string for ranges
+  isBuiltIn: boolean;
 };
 ```
 
-Exercises live in a library. Built-in exercises ship with the app; users can add custom ones.
+Built-in exercises ship in `src/lib/db/seed.ts` and are upserted on every boot.
 
 ---
 
 ### Program
 
-A full training plan. Contains one or more weeks, each containing scheduled workout days.
+A multi-week training plan.
 
 ```typescript
 type Program = {
   id: string;
-  name: string;           // "My 3-Month Strength Plan"
-  description?: string;
-  durationWeeks: number;  // total length
-  daysPerWeek: number;    // how many training days per week
+  name: string;
+  description: string;
+  durationWeeks: number;
+  daysPerWeek: number;
   weeks: Week[];
-  createdAt: string;      // ISO date
-  isBuiltIn: boolean;     // true for shipped plans, false for user-created
-};
-
-type Week = {
-  weekNumber: number;
-  workouts: Workout[];    // one per training day
+  createdAt: string;        // ISO datetime
+  isBuiltIn: boolean;
 };
 ```
+
+Currently ships one built-in: **Strength Foundation** (12 weeks, 3 days/week).
 
 ---
 
 ### Workout
 
-A single training day — a named list of exercises with prescribed sets/reps.
+A single training day.
 
 ```typescript
 type Workout = {
   id: string;
-  name: string;           // "Day A", "Lower Body", "Week 1 – Day 1"
+  name: string;             // "Lower + Lateral Power"
+  letter?: string;          // "A", "B", "C"
+  focus?: string;           // "Legs · Lateral · Rotational"
+  color?: "lime" | "lavender" | "red";
+  estMin?: number;
   exercises: WorkoutExercise[];
 };
 
 type WorkoutExercise = {
-  exerciseId: string;     // references Exercise.id
+  exerciseId: string;
   sets: number;
-  reps: string;           // "8-10"
+  reps: string;
   notes?: string;
 };
 ```
@@ -74,62 +76,75 @@ type WorkoutExercise = {
 
 ### SessionLog
 
-A completed workout session. Written as the user logs sets; finalized when session ends.
+A completed workout session. Written on session finish.
 
 ```typescript
 type SessionLog = {
-  id: string;             // uuid
-  date: string;           // ISO date "2025-06-10"
-  workoutId: string;      // which workout was performed
+  id: string;
+  date: string;             // ISO date "2025-06-10"
+  workoutId: string;
   programId: string;
-  startedAt: string;      // ISO datetime
-  finishedAt?: string;    // set on session complete
-  totalVolumeLbs?: number;
+  startedAt: string;
+  finishedAt: string;
+  durationSeconds: number;
+  totalVolume: number;      // sum of weight × reps (numeric weights only)
+  totalSets: number;
   exercises: LoggedExercise[];
-};
-
-type LoggedExercise = {
-  exerciseId: string;
-  sets: LoggedSet[];
 };
 
 type LoggedSet = {
   setNumber: number;
-  weight: number;
+  weight: number | string;  // string for band levels
   reps: number;
-  completedAt: string;    // ISO datetime
+  completedAt: string;
 };
 ```
 
 ---
 
-### TrainingDay
+### ActiveSession (in-memory + localStorage)
 
-Represents a calendar day's status relative to the active program.
+In-progress session for crash recovery. Not an IndexedDB entity.
 
 ```typescript
-type TrainingDay = {
-  date: string;           // ISO date
-  status: "completed" | "today" | "scheduled" | "skipped" | "rest";
-  sessionId?: string;     // references SessionLog.id if completed
+type ActiveSession = {
+  id: string;
+  date: string;
+  workoutId: string;
+  workoutName: string;
+  programId: string;
+  startedAt: string;
+  exercises: ActiveExercise[];
 };
 ```
 
-This is derived from the program schedule + session logs, not stored separately.
+---
+
+### ExerciseLastUsed
+
+Last logged weight and reps per exercise. Drives instant-mode defaults.
+
+```typescript
+type ExerciseLastUsed = {
+  exerciseId: string;
+  weight: number | string;
+  reps: number;
+};
+```
 
 ---
 
 ### UserPrefs
 
-Lightweight user preferences. Stored in localStorage, not IndexedDB.
+Stored in localStorage (`cwout:prefs`).
 
 ```typescript
 type UserPrefs = {
-  accentColor: string;    // hex, default "#B2F042"
+  accentColor: string;      // hex, default "#b2f042"
   loggingMode: "instant" | "stepper" | "numpad";
   completionFeel: "full" | "subtle";
-  density: "comfortable" | "compact";
-  roundness: "sharp" | "rounded" | "pill";
+  density: "compact" | "comfortable" | "spacious";
+  roundness: "sharp" | "default" | "soft";
   weightUnit: "lb" | "kg";
 };
 ```
@@ -138,28 +153,51 @@ type UserPrefs = {
 
 ## Relationships
 
+```mermaid
+erDiagram
+    Program ||--|{ Week : contains
+    Week ||--|{ Workout : contains
+    Workout ||--|{ WorkoutExercise : contains
+    WorkoutExercise }o--|| Exercise : references
+    SessionLog }o--|| Workout : "performed (workoutId)"
+    SessionLog }o--|| Program : "belongs to (programId)"
+    SessionLog ||--|{ LoggedExercise : contains
+    LoggedExercise }o--|| Exercise : references
+    LoggedExercise ||--|{ LoggedSet : contains
+    ActiveSession ||--|{ ActiveExercise : "in-progress"
+    ActiveExercise ||--|{ ActiveSet : contains
+    ActiveSession ||--|| SessionLog : "becomes on finish"
+    ExerciseLastUsed }o--|| Exercise : "last weight/reps"
 ```
-Program
-  └── Week[]
-        └── Workout[]
-              └── WorkoutExercise[] ──► Exercise (library)
 
-SessionLog ──► Workout
-SessionLog
-  └── LoggedExercise[] ──► Exercise
-        └── LoggedSet[]
+```mermaid
+flowchart TB
+    subgraph idb ["IndexedDB"]
+        E[exercises]
+        P[programs]
+        S[sessions]
+        ELU[exerciseLastUsed]
+    end
+
+    subgraph ls ["localStorage"]
+        PREFS[cwout:prefs]
+        ACTIVE[cwout:activeSession]
+        PROGID[cwout:activeProgramId]
+    end
 ```
 
 ---
 
 ## IndexedDB Stores
 
-| Store | Key | Contents |
-|-------|-----|----------|
-| `exercises` | `id` | Exercise library (built-in + custom) |
-| `programs` | `id` | All Program records |
-| `sessions` | `id` | All SessionLog records, indexed by `date` |
-| `exerciseLastUsed` | `exerciseId` | Last logged weight + reps per exercise |
+| Store | Key | Index | Contents |
+|-------|-----|-------|----------|
+| `exercises` | `id` | — | Exercise library |
+| `programs` | `id` | — | All programs |
+| `sessions` | `id` | `by_date` | Completed sessions |
+| `exerciseLastUsed` | `exerciseId` | — | Last weight/reps per exercise |
+
+DB name: `cosmic-workout`, version: `1`.
 
 ---
 
@@ -168,22 +206,13 @@ SessionLog
 | Key | Contents |
 |-----|----------|
 | `cwout:prefs` | UserPrefs JSON |
-| `cwout:activeSession` | In-progress SessionLog (crash recovery) |
-| `cwout:activeProgramId` | Which Program is currently active |
-
----
-
-## Open Questions
-
-- Should `TrainingDay` status be fully derived at runtime, or materialized for performance?
-- When a user edits a workout mid-program, do historical session logs reflect the old or new exercise list?
-- Multiple active programs simultaneously, or one at a time?
+| `cwout:activeSession` | ActiveSession JSON (crash recovery) |
+| `cwout:activeProgramId` | Active program ID |
 
 ---
 
 ## Related
 
-- [Offline Strategy](offline-strategy.md) — When and how each store is written
-- [Tech Stack](tech-stack.md) — IndexedDB wrapper choice
-- [Program Management](../requirements/program-management.md) — Program editing requirements
-- [Session Logging](../requirements/session-logging.md) — How SessionLog is built up during a workout
+- [Offline Strategy](offline-strategy.md) — When each store is written
+- [State Management](../implementation/state.md) — How stores read/write these types
+- [Program Progression](../implementation/program-progression.md) — How sessions advance the schedule

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Exercise, ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
@@ -19,10 +20,6 @@
 		onClose: () => void;
 	} = $props();
 
-	let isLb = $derived(exercise.unit === 'lb');
-	let isBand = $derived(exercise.unit === 'band');
-	let isBw = $derived(exercise.unit === 'bodyweight');
-
 	function parseTargetReps(r: string): { n: number; suffix: string } {
 		const m = r.match(/^(\d+)\s*(.*)$/);
 		if (!m) {
@@ -31,16 +28,28 @@
 		return { n: parseInt(m[1], 10), suffix: m[2].trim() };
 	}
 
-	const { n: defReps, suffix } = parseTargetReps(activeSet.targetReps);
+	// Snapshot props at open time — sheet data is intentionally frozen while open
+	const snap = untrack(() => {
+		const unit = exercise.unit;
+		const parsed = parseTargetReps(activeSet.targetReps);
+		return {
+			unit,
+			weight: activeSet.weight,
+			reps: activeSet.reps,
+			defReps: parsed.n,
+			suffix: parsed.suffix
+		};
+	});
 
-	let stepWeight = $state(
-		isLb ? (typeof activeSet.weight === 'number' ? activeSet.weight : 0) : 0
-	);
-	let stepBand = $state(
-		isBand ? (typeof activeSet.weight === 'string' ? activeSet.weight : 'Med') : 'Med'
-	);
-	let stepReps = $state(activeSet.reps > 0 ? activeSet.reps : defReps);
+	const isLb = snap.unit === 'lb';
+	const isBand = snap.unit === 'band';
+	const isBw = snap.unit === 'bodyweight';
+	const defReps = snap.defReps;
+	const suffix = snap.suffix;
 
+	let stepWeight = $state(isLb ? (typeof snap.weight === 'number' ? snap.weight : 0) : 0);
+	let stepBand = $state(isBand ? (typeof snap.weight === 'string' ? snap.weight : 'Med') : 'Med');
+	let stepReps = $state(snap.reps > 0 ? snap.reps : defReps);
 	let padField = $state<'weight' | 'reps'>(isLb ? 'weight' : 'reps');
 	let padStr = $state('');
 

@@ -2,13 +2,42 @@
 
 User-configurable behavior and appearance.
 
-**Tied to:** [Data Model — UserPrefs](../architecture/data-model.md) | [Design Principles](../vision/principles.md)
+**Tied to:** [Data Model — UserPrefs](../architecture/data-model.md) | [State Management](../implementation/state.md)
+
+---
+
+## Implementation Status
+
+| Story | Status |
+|-------|--------|
+| Preferences store + localStorage persistence | ✅ Built |
+| Accent color applied at runtime | ✅ Built |
+| Density/roundness via data attributes | ✅ Built |
+| Logging mode affects session behavior | ✅ Built |
+| Completion feel toggles confetti | ✅ Built |
+| Weight unit in display/input | ✅ Built |
+| Settings UI / route | ❌ Not built — no way to change prefs in-app |
+| Change density / roundness in-app | ❌ Store loads them but has no public setters |
+
+Prefs can be changed via browser DevTools → localStorage → `cwout:prefs`.
 
 ---
 
 ## Goal
 
 A small set of meaningful preferences that change how the app feels and behaves — nothing more. No settings for the sake of settings.
+
+```mermaid
+flowchart LR
+    Change[Pref change] --> Store[prefsStore]
+    Store --> LS[("localStorage<br/>cwout:prefs")]
+    Store --> Apply{Apply immediately}
+    Apply --> CSS["--color-accent on :root"]
+    Apply --> Data["data-density / data-roundness"]
+    Apply --> Session[loggingMode → SessionOverlay]
+    Apply --> Feel[completionFeel → Confetti]
+    Apply --> Unit[weightUnit → SetTile / LogSetSheet]
+```
 
 ---
 
@@ -63,8 +92,11 @@ Separate from `prefers-reduced-motion` (which is a system setting). This is a co
 
 > As a user, I want the UI to feel comfortable on my specific device.
 
-- **Comfortable** (default) — standard spacing
-- **Compact** — tighter spacing, fits more on screen
+Three values in storage (applied via `data-density` on `<html>`):
+
+- **comfortable** (default) — standard tile height and gaps
+- **compact** — tighter spacing
+- **spacious** — more room between elements
 
 ---
 
@@ -72,9 +104,11 @@ Separate from `prefers-reduced-motion` (which is a system setting). This is a co
 
 > As a user, I want the UI to match my aesthetic preference.
 
-- **Rounded** (default)
-- **Sharp** — less border radius everywhere
-- **Pill** — maximum roundness on interactive elements
+Three values in storage (applied via `data-roundness` on `<html>`):
+
+- **default** — standard border radius
+- **sharp** — smaller radius everywhere
+- **soft** — larger, rounder corners
 
 ---
 

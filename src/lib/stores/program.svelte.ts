@@ -1,5 +1,6 @@
 import type { Program, Exercise, Workout, WorkoutExercise, SessionLog } from '$lib/db/types';
 import { db } from '$lib/db/database';
+import { generateId } from '$lib/utils';
 
 const ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
@@ -141,7 +142,7 @@ class ProgramStore {
 			...week,
 			workouts: [
 				...week.workouts,
-				{ ...workout, id: `w${week.weekNumber}-${crypto.randomUUID().slice(0, 8)}` }
+				{ ...workout, id: `w${week.weekNumber}-${generateId().slice(0, 8)}` }
 			]
 		}));
 

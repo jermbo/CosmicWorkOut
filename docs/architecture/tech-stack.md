@@ -1,111 +1,154 @@
 # Tech Stack
 
-Technology choices for CosmicWorkOut, with rationale. All choices prioritize web-native approaches — this is the developer's area of expertise and the right leverage point.
+Technology choices for CosmicWorkOut. All choices prioritize web-native approaches.
+
+```mermaid
+flowchart TB
+    subgraph ui ["UI Layer"]
+        SK[SvelteKit routes + layout]
+        SV[Svelte 5 components + runes]
+        CSS[CSS custom properties]
+    end
+
+    subgraph state ["State Layer"]
+        PS[programStore]
+        SS[sessionStore]
+        PR[prefsStore]
+    end
+
+    subgraph data ["Data Layer"]
+        IDB[("IndexedDB")]
+        LS[("localStorage")]
+    end
+
+    subgraph build ["Build"]
+        Vite[Vite dev + build]
+        TS[TypeScript]
+    end
+
+    subgraph planned ["Planned"]
+        SW[Service Worker + PWA]
+    end
+
+    SK --> SV --> PS & SS & PR
+    PS & SS --> IDB
+    PR --> LS
+    SS --> LS
+    Vite --> SK
+    SV -.-> SW
+```
 
 ---
 
-## UI Framework — React
+## UI Framework — Svelte 5 + SvelteKit
 
-React for component rendering. The design is component-heavy (set tiles, exercise cards, bottom sheets, overlays) and React's model fits naturally.
+**Svelte 5** with runes (`$state`, `$derived`, `$effect`) for reactive state. **SvelteKit** for routing, layout, and build tooling.
 
-No specific meta-framework (Next.js, Remix) is needed — there is no server, no routing that requires SSR, and no API layer. A simple Vite + React setup is sufficient.
+Three file-based routes plus a root layout that owns global overlays (session, completion, recovery banner). SSR is disabled (`ssr = false`) — the app is fully client-rendered.
 
-**Alternatives considered:** Svelte, SolidJS — valid, but React expertise is already in place.
+```typescript
+// src/routes/+layout.ts
+export const ssr = false;
+```
+
+**Why Svelte:** Component-heavy UI (set tiles, bottom sheets, overlays) with minimal boilerplate. Svelte 5 runes give fine-grained reactivity without a virtual DOM.
 
 ---
 
 ## Build Tool — Vite
 
-Fast dev server, simple config, first-class React + TypeScript support. No configuration overhead for a project of this size.
+Fast dev server on port **5678** (`npm run dev`). Vite + `@sveltejs/vite-plugin-svelte` with runes mode enabled project-wide.
 
 ---
 
 ## Language — TypeScript
 
-All application code in TypeScript. The data model has enough interconnected entities that type safety pays off quickly. See [Data Model](data-model.md) for the type definitions.
+All application code in TypeScript. Types live in `src/lib/db/types.ts` and mirror IndexedDB records. See [Data Model](data-model.md).
 
 ---
 
-## Styling — CSS Custom Properties + Scoped CSS
+## Styling — CSS Custom Properties + Scoped Svelte CSS
 
-Design tokens (colors, spacing, radius, timing) as CSS custom properties. See the `tokens.css` in the [inspiration package](../_inspiration/packet/tokens.css) for reference values.
+Design tokens in `src/app.css` as CSS custom properties (colors, spacing, radius, timing, fonts). Component styles are scoped `<style>` blocks in each `.svelte` file.
 
-Component styles can be scoped via CSS Modules or a utility-class approach — TBD based on developer preference. The key constraint: all theming (accent color, density, roundness) must be achievable by swapping CSS custom property values at runtime.
+Runtime theming via `data-density` and `data-roundness` attributes on `<html>`, plus `--color-accent` set by the prefs store.
 
-**No CSS-in-JS** — keeps the bundle lean and avoids runtime style computation for something that should be trivially fast.
+Reference tokens also exist in the [inspiration package](../_inspiration/packet/tokens.css).
+
+**No CSS-in-JS** — keeps the bundle lean.
 
 ---
 
-## Data Persistence — IndexedDB
+## Data Persistence — IndexedDB (raw API)
 
-All session and program data lives in IndexedDB. It's the only viable option for structured offline data storage in a web app at this scale.
-
-### Wrapper: Dexie.js (recommended)
-
-Raw IndexedDB API is verbose and callback-based. Dexie.js provides a clean Promise-based API, schema versioning, and good TypeScript support — without adding meaningful bundle weight.
+All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db/database.ts` — **not Dexie.js**.
 
 ```typescript
-// Example with Dexie
-const db = new Dexie('CosmicWorkOut');
-db.version(1).stores({
-  exercises: 'id',
-  programs: 'id',
-  sessions: 'id, date',
-  exerciseLastUsed: 'exerciseId'
-});
+// DB name: 'cosmic-workout', version 1
+// Stores: exercises, programs, sessions (indexed by date), exerciseLastUsed
 ```
 
-### Future consideration: SQLite/WASM
-
-PGlite (PostgreSQL compiled to WASM) or wa-sqlite are worth exploring post-v1. Benefits: richer query language, familiar SQL mental model, easier complex aggregations (volume trends, PR tracking). Cost: larger bundle, more setup. Not a v1 concern — revisit once the data model is stable.
+Built-in exercises are upserted on every boot (so new fields land on old records). Programs seed only on first run.
 
 ---
 
-## Offline / PWA — Service Worker + Workbox
+## State Management — Svelte Stores
 
-Service worker handles caching the app shell (HTML, JS, CSS, fonts) for offline launch. Workbox simplifies service worker authoring and cache strategy management.
+Three class-based stores using Svelte 5 runes:
 
-PWA installability (manifest, icons, splash) is a secondary goal — implement after core functionality is solid.
+| Store | File | Responsibility |
+|-------|------|----------------|
+| `programStore` | `program.svelte.ts` | Programs, exercises, sessions, today's workout |
+| `sessionStore` | `session.svelte.ts` | Active session, set logging, finish/abandon |
+| `prefsStore` | `prefs.svelte.ts` | User preferences, accent color, density |
 
-See [Offline Strategy](offline-strategy.md) for the full caching approach.
+See [State Management](../implementation/state.md).
+
+---
+
+## Offline / PWA — Not Yet Implemented
+
+Service worker, Workbox, and web app manifest are **planned** but not built. The app works offline after first load in a browser tab (assets cached by the browser), but there is no installable PWA yet.
+
+See [Offline Strategy](offline-strategy.md) for the target approach.
 
 ---
 
 ## Animations
 
-CSS keyframes + transitions for all motion. No animation library needed for v1. Key properties:
+CSS keyframes + transitions. Key properties:
 
-- `transform` and `opacity` only — no layout-triggering properties
-- `cubic-bezier(0.34, 1.56, 0.64, 1)` as the spring easing (referenced in design tokens as `--ease-spring`)
-- All animations respect `prefers-reduced-motion` — skip to end state when set
+- `transform` and `opacity` only
+- `--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)` for spring feel
+- `prefers-reduced-motion` respected in component styles
 
 ---
 
 ## Haptics
 
-`navigator.vibrate()` for tactile feedback on set completion and exercise completion. Always wrapped in `try/catch` — not available on all browsers/devices, and failure should be silent.
+`navigator.vibrate()` on set completion and exercise completion. Wrapped in `try/catch` — silent failure on unsupported devices.
 
 ---
 
 ## Fonts
 
+Loaded from Google Fonts CDN in `app.html`:
+
 - **Space Grotesk 700** — display headings
 - **Inter** — body text
 - **JetBrains Mono** — numbers (weight, reps)
-
-Loaded from a CDN on first visit, cached by service worker thereafter.
 
 ---
 
 ## No Backend (By Design)
 
-There is no server, no database backend, no API, no auth service. See [System Overview](overview.md) for the rationale. v1 is intentionally local-only.
+No server, database backend, API, or auth. See [System Overview](overview.md).
 
 ---
 
 ## Related
 
-- [System Overview](overview.md) — How these pieces fit together
-- [Data Model](data-model.md) — What IndexedDB stores
-- [Offline Strategy](offline-strategy.md) — Service worker and caching details
-- [Design Principles](../vision/principles.md) — Why web-native was the right call
+- [System Overview](overview.md) — How pieces fit together
+- [Data Model](data-model.md) — IndexedDB stores
+- [Offline Strategy](offline-strategy.md) — Caching plan
+- [Dev Guide](../implementation/dev-guide.md) — Running locally

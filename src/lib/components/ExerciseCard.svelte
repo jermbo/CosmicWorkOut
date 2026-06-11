@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { ActiveExercise, Exercise } from '$lib/db/types';
 	import ProgressRing from './ProgressRing.svelte';
 	import SetTile from './SetTile.svelte';
@@ -19,7 +20,7 @@
 	let totalSets = $derived(activeExercise.sets.length);
 	let allSetsCompleted = $derived(doneSets === totalSets && totalSets > 0);
 	let justCompleted = $state(false);
-	let wasCompleted = $state(allSetsCompleted);
+	let wasCompleted = $state(untrack(() => allSetsCompleted));
 
 	$effect(() => {
 		if (allSetsCompleted && !wasCompleted) {

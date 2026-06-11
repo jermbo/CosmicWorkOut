@@ -31,6 +31,20 @@ The developer and a small group of friends. These are people who:
 
 ---
 
+## Core User Journey
+
+```mermaid
+flowchart LR
+    Open[Open app] --> Today[See today's workout]
+    Today --> Start[Start session]
+    Start --> Log[Log sets — one tap each]
+    Log --> Finish[Finish session]
+    Finish --> History[Review in calendar]
+    History --> Open
+```
+
+---
+
 ## Core Promise
 
 1. **You can log a set in under 5 seconds.** One tap in the default mode.
