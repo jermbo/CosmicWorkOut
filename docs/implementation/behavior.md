@@ -60,15 +60,19 @@ Tap **Start session** on the Today card. A full-screen overlay opens with every 
 
 ### Logging sets
 
-**Instant mode (default):** Tap a set tile → it's logged at the pre-filled weight and reps. The tile flips from a "+" to show the logged values.
+**Tap an uncompleted set:**
+- If a weight is already known (from last session or a previous set this session) → logs instantly, no sheet
+- If no weight yet (first time ever for this exercise) → opens a sheet with a number input; value is rounded to the nearest 2.5 lb
 
-**Stepper / numpad mode:** Tap opens a bottom sheet to adjust weight and reps before confirming.
+After any set is logged, the new weight cascades forward to all remaining uncompleted sets in that exercise.
 
-Pre-filled values come from your last logged weight/reps for that exercise. First time defaults to **0 weight** (shown as "BW" on the tile) and the first number in the target rep range — there is no first-time prompt.
+**Tap a completed set:** Opens the sheet to adjust weight or reps. Changes cascade forward to uncompleted sets.
 
-**Important:** Incomplete set tiles only show a "+" and set number — not the weight/reps that will be logged. You see those values only after tapping.
+**Weight memory:** Last logged weight/reps are saved per exercise. When you start a new session, sets are pre-filled with your last values — you just tap through.
 
-Haptic feedback fires when you **complete an exercise** (all its sets), not on individual set taps.
+**Incomplete set tiles** show a "+" and set number only. Weight and reps appear on the tile only after it's logged.
+
+Haptic feedback fires when you **complete an exercise** (all sets done), not on individual set taps.
 
 ### Finishing early vs abandoning
 
@@ -164,18 +168,17 @@ No service worker yet — offline works after first browser load, but the app is
 
 ## Preferences
 
-Six preferences exist in storage and affect runtime behavior — but **there is no Settings screen**. Change them via browser DevTools → Application → localStorage → `cwout:prefs`.
+All preferences are editable via the **Settings tab** (`/settings`). Stored in `cwout:prefs` (localStorage).
 
 | Pref | Default | Effect |
 |------|---------|--------|
-| `loggingMode` | `instant` | How set taps behave |
 | `accentColor` | `#b2f042` | UI accent + ink color |
 | `completionFeel` | `full` | Confetti on/off |
 | `density` | `comfortable` | Tile height, card gaps |
 | `roundness` | `default` | Border radius scale |
 | `weightUnit` | `lb` | Display label on tiles/sheets |
 
-Density and roundness apply on load but have no in-app setter yet (only `accentColor`, `loggingMode`, `completionFeel`, `weightUnit` have store methods).
+**Per-exercise weight increment** (2.5 / 5 / 10 lb) is set on the exercise itself, not in global prefs. Defaults to 5.
 
 ---
 
@@ -205,8 +208,8 @@ See [Implementation Status](status.md) for the full checklist. The biggest gaps:
 
 Exercises can use different weight types. The log sheet adapts:
 
-- **lb/kg** — numeric weight with stepper or numpad
-- **band** — Light / Med / Heavy (stored as string)
+- **lb/kg** — numeric weight; first-time entry is a number input, subsequent sets use a stepper (increment configured per exercise)
+- **band** — Light / Med / Heavy selector (stored as string)
 - **bodyweight** — reps only; weight displays as "BW"
 
 Volume calculation only includes numeric weights (bands and bodyweight don't add to total volume).
