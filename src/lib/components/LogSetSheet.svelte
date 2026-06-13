@@ -50,7 +50,7 @@
 	const weightStep = snap.weightIncrement;
 
 	function roundWeight(v: number): number {
-		return Math.round(v / 2.5) * 2.5;
+		return Math.round(v / weightStep) * weightStep;
 	}
 
 	// First time = no previous numeric weight logged

@@ -82,6 +82,19 @@ async function putRecord<T>(storeName: string, value: T): Promise<void> {
 	});
 }
 
+async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeName, 'readwrite');
+		const store = tx.objectStore(storeName);
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => reject(tx.error);
+		for (const value of values) {
+			store.put(value);
+		}
+	});
+}
+
 async function removeRecord(storeName: string, key: string): Promise<void> {
 	const db = await openDB();
 	return new Promise((resolve, reject) => {
@@ -95,17 +108,13 @@ async function removeRecord(storeName: string, key: string): Promise<void> {
 }
 
 export async function initDB(): Promise<void> {
-	// Always upsert built-in exercises so new fields (cat, muscles) land on old records
-	for (const exercise of builtInExercises) {
-		await putRecord('exercises', exercise);
-	}
+	// Upsert all built-in exercises in a single transaction
+	await putAllRecords('exercises', builtInExercises);
 
 	// Only seed programs on first run
 	const programs = await getAll<Program>('programs');
 	if (programs.length === 0) {
-		for (const program of builtInPrograms) {
-			await putRecord('programs', program);
-		}
+		await putAllRecords('programs', builtInPrograms);
 	}
 }
 
@@ -126,17 +135,7 @@ export const db = {
 	sessions: {
 		getAll: () => getAll<SessionLog>('sessions'),
 		getOne: (id: string) => getOne<SessionLog>('sessions', id),
-		put: (session: SessionLog) => putRecord('sessions', session),
-
-		getByDate: async (date: string): Promise<SessionLog | undefined> => {
-			const all = await getAll<SessionLog>('sessions');
-			return all.find((s) => s.date === date);
-		},
-
-		getForProgram: async (programId: string): Promise<SessionLog[]> => {
-			const all = await getAll<SessionLog>('sessions');
-			return all.filter((s) => s.programId === programId);
-		}
+		put: (session: SessionLog) => putRecord('sessions', session)
 	},
 
 	exerciseLastUsed: {

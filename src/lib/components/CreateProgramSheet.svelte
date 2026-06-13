@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 
 	let { onClose }: { onClose: () => void } = $props();
@@ -8,6 +9,7 @@
 	let step = $state<Step>('details');
 	let saving = $state(false);
 	let errors = $state<Record<string, string>>({});
+	let dialog: HTMLDialogElement;
 
 	// Step 1 fields
 	let name = $state('');
@@ -15,16 +17,12 @@
 	let durationWeeks = $state(12);
 	let daysPerWeek = $state(3);
 
-	// Step 2: one template per day
-	let workoutTemplates = $derived(
-		Array.from({ length: daysPerWeek }, (_, i) => ({
-			name: `Workout ${String.fromCharCode(65 + i)}`,
-			focus: ''
-		}))
-	);
-
-	// Editable copy of templates
+	// Step 2: editable templates seeded when advancing to step 2
 	let templates = $state<{ name: string; focus: string }[]>([]);
+
+	onMount(() => {
+		dialog.showModal();
+	});
 
 	function goToWorkouts() {
 		const e: Record<string, string> = {};
@@ -34,8 +32,10 @@
 		errors = e;
 		if (Object.keys(e).length > 0) return;
 
-		// Seed editable templates from derived defaults
-		templates = workoutTemplates.map((t) => ({ ...t }));
+		templates = Array.from({ length: daysPerWeek }, (_, i) => ({
+			name: `Workout ${String.fromCharCode(65 + i)}`,
+			focus: ''
+		}));
 		step = 'workouts';
 	}
 
@@ -61,8 +61,13 @@
 	}
 </script>
 
-<!-- Full-screen overlay (not a BottomSheet, since we have two steps) -->
-<div class="create-overlay" role="dialog" aria-labelledby="create-title" aria-modal="true">
+<dialog
+	bind:this={dialog}
+	class="create-overlay"
+	oncancel={(e) => { e.preventDefault(); onClose(); }}
+	aria-labelledby="create-title"
+	aria-modal="true"
+>
 	<div class="create-overlay__inner">
 		<!-- Header -->
 		<div class="create-overlay__top">
@@ -179,7 +184,7 @@
 			{/if}
 		</div>
 	</div>
-</div>
+</dialog>
 
 <style>
 	.create-overlay {
@@ -190,9 +195,16 @@
 		margin-inline: auto;
 		block-size: 100dvh;
 		background: var(--color-bg);
+		border: none;
+		padding: 0;
+		overflow: hidden;
 		z-index: 200;
 		display: flex;
 		flex-direction: column;
+
+		&::backdrop {
+			background: rgba(0, 0, 0, 0.8);
+		}
 	}
 
 	@container app (inline-size >= 720px) {

@@ -5,14 +5,14 @@
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
 
 	const CAT_COLORS: Record<string, string> = {
-		Hinge: '#b2f042',
-		Squat: '#b2f042',
-		Push: '#b286fd',
-		Pull: '#60c6ff',
-		Lateral: '#e55733',
-		Rotational: '#e55733',
-		Power: '#b2f042',
-		Carry: '#b286fd'
+		Hinge: 'var(--color-lime)',
+		Squat: 'var(--color-lime)',
+		Push: 'var(--color-lavender)',
+		Pull: 'var(--color-sky)',
+		Lateral: 'var(--color-red)',
+		Rotational: 'var(--color-red)',
+		Power: 'var(--color-lime)',
+		Carry: 'var(--color-lavender)'
 	};
 
 	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
@@ -32,6 +32,7 @@
 	let expandedId = $state<string | null>(null);
 	let formExercise = $state<Exercise | null | undefined>(undefined);
 	// undefined = closed, null = new, Exercise = editing
+	let confirmDeleteId = $state<string | null>(null);
 
 	let filtered = $derived(
 		exercises.filter((ex) => {
@@ -52,6 +53,11 @@
 	}
 
 	async function deleteExercise(ex: Exercise) {
+		if (confirmDeleteId !== ex.id) {
+			confirmDeleteId = ex.id;
+			return;
+		}
+		confirmDeleteId = null;
 		await programStore.deleteExercise(ex.id);
 		if (expandedId === ex.id) expandedId = null;
 	}
@@ -175,18 +181,38 @@
 											<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 										</svg>
 									</button>
-									<button
-										class="lib-row__delete"
-										onclick={() => deleteExercise(ex)}
-										aria-label="Delete {ex.name}"
-									>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-											<polyline points="3 6 5 6 21 6" />
-											<path d="M19 6l-1 14H6L5 6" />
-											<path d="M10 11v6M14 11v6" />
-											<path d="M9 6V4h6v2" />
-										</svg>
-									</button>
+									{#if confirmDeleteId === ex.id}
+										<button
+											class="lib-row__delete lib-row__delete--confirm"
+											onclick={() => deleteExercise(ex)}
+											aria-label="Confirm delete {ex.name}"
+										>
+											Sure?
+										</button>
+										<button
+											class="lib-row__delete"
+											onclick={() => (confirmDeleteId = null)}
+											aria-label="Cancel delete"
+										>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									{:else}
+										<button
+											class="lib-row__delete"
+											onclick={() => deleteExercise(ex)}
+											aria-label="Delete {ex.name}"
+										>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+												<polyline points="3 6 5 6 21 6" />
+												<path d="M19 6l-1 14H6L5 6" />
+												<path d="M10 11v6M14 11v6" />
+												<path d="M9 6V4h6v2" />
+											</svg>
+										</button>
+									{/if}
 								{/if}
 							</div>
 						</div>
@@ -486,4 +512,13 @@
 	}
 
 	.lib-row__delete:hover { color: var(--color-red); }
+
+	.lib-row__delete--confirm {
+		inline-size: auto;
+		padding-inline: var(--space-2);
+		background: var(--color-red);
+		color: #ffffff;
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
 </style>

@@ -23,27 +23,30 @@ class SessionStore {
 
 	checkForRecovery(): boolean {
 		const stored = localStorage.getItem(ACTIVE_SESSION_KEY);
-		if (!stored) {
-			return false;
-		}
+		if (!stored) return false;
 
-		const session = JSON.parse(stored) as ActiveSession;
-		const today = new Date().toISOString().split('T')[0];
-
-		if (session.date !== today) {
+		try {
+			const session = JSON.parse(stored) as ActiveSession;
+			const today = new Date().toISOString().split('T')[0];
+			if (session.date !== today) {
+				localStorage.removeItem(ACTIVE_SESSION_KEY);
+				return false;
+			}
+			return true;
+		} catch {
 			localStorage.removeItem(ACTIVE_SESSION_KEY);
 			return false;
 		}
-
-		return true;
 	}
 
 	recoverSession(): void {
 		const stored = localStorage.getItem(ACTIVE_SESSION_KEY);
-		if (!stored) {
-			return;
+		if (!stored) return;
+		try {
+			this.active = JSON.parse(stored) as ActiveSession;
+		} catch {
+			localStorage.removeItem(ACTIVE_SESSION_KEY);
 		}
-		this.active = JSON.parse(stored) as ActiveSession;
 	}
 
 	async start(workout: Workout, program: Program, exerciseMap: Map<string, Exercise>): Promise<void> {
@@ -80,8 +83,6 @@ class SessionStore {
 
 			exercises.push({
 				exerciseId: exercise.id,
-				exerciseName: exercise.name,
-				cue: exercise.cue,
 				unit: exercise.unit,
 				sets
 			});
@@ -101,37 +102,12 @@ class SessionStore {
 	}
 
 	async completeSet(exerciseIndex: number, setIndex: number): Promise<void> {
-		if (!this.active) {
-			return;
-		}
-
+		if (!this.active) return;
 		const exercise = this.active.exercises[exerciseIndex];
-		if (!exercise) {
-			return;
-		}
-
+		if (!exercise) return;
 		const set = exercise.sets[setIndex];
-		if (!set || set.completed) {
-			return;
-		}
-
-		set.completed = true;
-		set.completedAt = new Date().toISOString();
-
-		// cascade weight to subsequent uncompleted sets
-		for (let i = setIndex + 1; i < exercise.sets.length; i++) {
-			if (!exercise.sets[i].completed) {
-				exercise.sets[i].weight = set.weight;
-			}
-		}
-
-		await db.exerciseLastUsed.put($state.snapshot({
-			exerciseId: exercise.exerciseId,
-			weight: set.weight,
-			reps: set.reps
-		}));
-
-		this.persist();
+		if (!set || set.completed) return;
+		await this.logSet(exerciseIndex, setIndex, set.weight, set.reps);
 	}
 
 	async logSet(
@@ -166,11 +142,15 @@ class SessionStore {
 			}
 		}
 
-		await db.exerciseLastUsed.put($state.snapshot({
-			exerciseId: exercise.exerciseId,
-			weight,
-			reps
-		}));
+		try {
+			await db.exerciseLastUsed.put($state.snapshot({
+				exerciseId: exercise.exerciseId,
+				weight,
+				reps
+			}));
+		} catch (e) {
+			console.error('Failed to save last used weight:', e);
+		}
 
 		this.persist();
 	}
@@ -181,30 +161,29 @@ class SessionStore {
 		}
 
 		const now = new Date().toISOString();
+
+		const loggedExercises = this.active.exercises.map((ae) => ({
+			exerciseId: ae.exerciseId,
+			sets: ae.sets
+				.filter((s) => s.completed)
+				.map((s, i) => ({
+					setNumber: i + 1,
+					weight: s.weight,
+					reps: s.reps,
+					completedAt: s.completedAt ?? now
+				}))
+		}));
+
 		let totalVolume = 0;
 		let totalSets = 0;
-
-		const loggedExercises = this.active.exercises.map((ae) => {
-			const completedSets = ae.sets
-				.filter((s) => s.completed)
-				.map((s, i) => {
-					if (typeof s.weight === 'number') {
-						totalVolume += s.weight * s.reps;
-					}
-					totalSets++;
-					return {
-						setNumber: i + 1,
-						weight: s.weight,
-						reps: s.reps,
-						completedAt: s.completedAt ?? now
-					};
-				});
-
-			return {
-				exerciseId: ae.exerciseId,
-				sets: completedSets
-			};
-		});
+		for (const ex of loggedExercises) {
+			totalSets += ex.sets.length;
+			for (const s of ex.sets) {
+				if (typeof s.weight === 'number') {
+					totalVolume += s.weight * s.reps;
+				}
+			}
+		}
 
 		const elapsed =
 			durationSeconds ??
@@ -223,7 +202,12 @@ class SessionStore {
 			exercises: loggedExercises
 		};
 
-		await db.sessions.put($state.snapshot(sessionLog));
+		try {
+			await db.sessions.put($state.snapshot(sessionLog));
+		} catch (e) {
+			console.error('Failed to save session:', e);
+			throw e;
+		}
 		localStorage.removeItem(ACTIVE_SESSION_KEY);
 
 		this.completedSession = sessionLog;

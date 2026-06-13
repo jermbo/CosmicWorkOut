@@ -100,8 +100,6 @@ export interface ActiveSet {
 
 export interface ActiveExercise {
 	exerciseId: string;
-	exerciseName: string;
-	cue: string;
 	unit: WeightUnit;
 	sets: ActiveSet[];
 }

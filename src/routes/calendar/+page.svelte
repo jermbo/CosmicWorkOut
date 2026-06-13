@@ -15,21 +15,29 @@
 	const today = new Date();
 	const todayStr = today.toISOString().split('T')[0];
 
+	// Single pass over sessions — O(1) lookups for status and detail
+	let sessionsByDate = $derived.by(() => {
+		const map = new Map<string, SessionLog>();
+		for (const s of programStore.sessions) {
+			if (s.programId === programStore.activeProgram?.id) {
+				map.set(s.date, s);
+			}
+		}
+		return map;
+	});
+
 	// Derive training days-of-week from session history (0=Sun … 6=Sat).
 	// Requires ≥ 2×daysPerWeek sessions to avoid noise.
 	let trainingDayOfWeek = $derived.by(() => {
-		const programSessions = programStore.sessions.filter(
-			(s) => s.programId === programStore.activeProgram?.id
-		);
 		const minSamples = (programStore.activeProgram?.daysPerWeek ?? 3) * 2;
-		if (programSessions.length < minSamples) return new Set<number>();
+		if (sessionsByDate.size < minSamples) return new Set<number>();
 
 		const counts = new Array(7).fill(0);
-		for (const s of programSessions) {
+		for (const s of sessionsByDate.values()) {
 			const dow = new Date(s.date + 'T00:00:00').getDay();
 			counts[dow]++;
 		}
-		const total = programSessions.length;
+		const total = sessionsByDate.size;
 		return new Set(counts.map((c, i) => (c / total > 0.2 ? i : -1)).filter((i) => i >= 0));
 	});
 
@@ -55,11 +63,7 @@
 
 	function getDayStatus(dateStr: string): DayStatus {
 		if (dateStr === todayStr) return 'today';
-
-		const hasSession = programStore.sessions.some(
-			(s) => s.date === dateStr && s.programId === programStore.activeProgram?.id
-		);
-		if (hasSession) return 'completed';
+		if (sessionsByDate.has(dateStr)) return 'completed';
 
 		const dow = new Date(dateStr + 'T00:00:00').getDay();
 		const isTrainingDay = trainingDayOfWeek.size > 0 && trainingDayOfWeek.has(dow);
@@ -69,9 +73,7 @@
 	}
 
 	function getSessionForDay(dateStr: string): SessionLog | undefined {
-		return programStore.sessions.find(
-			(s) => s.date === dateStr && s.programId === programStore.activeProgram?.id
-		);
+		return sessionsByDate.get(dateStr);
 	}
 
 	function prevMonth() {
@@ -96,9 +98,7 @@
 	);
 
 	let monthSessions = $derived(
-		programStore.sessions.filter(
-			(s) => s.date.startsWith(monthKey) && s.programId === programStore.activeProgram?.id
-		)
+		[...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey))
 	);
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));

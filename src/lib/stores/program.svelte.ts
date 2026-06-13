@@ -6,6 +6,15 @@ const ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
 const WORKOUT_COLORS: ('lime' | 'lavender' | 'red')[] = ['lime', 'lavender', 'red'];
 
+function isoWeekKey(d: Date): string {
+	const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+	const day = utc.getUTCDay() || 7;
+	utc.setUTCDate(utc.getUTCDate() + 4 - day);
+	const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+	const week = Math.ceil(((utc.valueOf() - yearStart.valueOf()) / 86400000 + 1) / 7);
+	return `${utc.getUTCFullYear()}-W${week}`;
+}
+
 class ProgramStore {
 	programs = $state<Program[]>([]);
 	exercises = $state<Exercise[]>([]);
@@ -33,15 +42,6 @@ class ProgramStore {
 		const programSessions = this.sessions.filter((s) => s.programId === this.activeProgram!.id);
 		if (programSessions.length === 0) return 0;
 		const daysPerWeek = this.activeProgram.daysPerWeek;
-
-		function isoWeekKey(d: Date): string {
-			const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-			const day = utc.getUTCDay() || 7;
-			utc.setUTCDate(utc.getUTCDate() + 4 - day);
-			const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-			const week = Math.ceil(((utc.valueOf() - yearStart.valueOf()) / 86400000 + 1) / 7);
-			return `${utc.getUTCFullYear()}-W${week}`;
-		}
 
 		const weekCounts = new Map<string, number>();
 		for (const s of programSessions) {
@@ -123,7 +123,10 @@ class ProgramStore {
 			db.programs.getAll(),
 			db.exercises.getAll(),
 			db.sessions.getAll()
-		]);
+		]).catch((e) => {
+			console.error('Failed to load data from IndexedDB:', e);
+			throw e;
+		});
 
 		this.programs = programs;
 		this.exercises = exercises;
@@ -171,7 +174,12 @@ class ProgramStore {
 		}));
 
 		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
-		await db.programs.put($state.snapshot(this.activeProgram));
+		try {
+			await db.programs.put($state.snapshot(this.activeProgram));
+		} catch (e) {
+			console.error('Failed to save workout:', e);
+			throw e;
+		}
 		this.programs = this.programs.map((p) =>
 			p.id === this.activeProgram!.id ? this.activeProgram! : p
 		);
@@ -185,12 +193,17 @@ class ProgramStore {
 			...week,
 			workouts: [
 				...week.workouts,
-				{ ...workout, id: `w${week.weekNumber}-${generateId().slice(0, 8)}` }
+				{ ...workout, id: generateId() }
 			]
 		}));
 
 		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
-		await db.programs.put($state.snapshot(this.activeProgram));
+		try {
+			await db.programs.put($state.snapshot(this.activeProgram));
+		} catch (e) {
+			console.error('Failed to add workout:', e);
+			throw e;
+		}
 		this.programs = this.programs.map((p) =>
 			p.id === this.activeProgram!.id ? this.activeProgram! : p
 		);
@@ -214,12 +227,14 @@ class ProgramStore {
 		};
 		copy.weeks = copy.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.map((w) => ({
-				...w,
-				id: `w${week.weekNumber}-${generateId().slice(0, 8)}`
-			}))
+			workouts: week.workouts.map((w) => ({ ...w, id: generateId() }))
 		}));
-		await db.programs.put(copy);
+		try {
+			await db.programs.put(copy);
+		} catch (e) {
+			console.error('Failed to copy program:', e);
+			throw e;
+		}
 		this.programs = [...this.programs, copy];
 		return copy;
 	}
@@ -254,7 +269,12 @@ class ProgramStore {
 			isBuiltIn: false
 		};
 
-		await db.programs.put(program);
+		try {
+			await db.programs.put(program);
+		} catch (e) {
+			console.error('Failed to create program:', e);
+			throw e;
+		}
 		this.programs = [...this.programs, program];
 		return program;
 	}
@@ -262,18 +282,33 @@ class ProgramStore {
 	// Exercise management
 	async addExercise(exercise: Omit<Exercise, 'id' | 'isBuiltIn'>): Promise<Exercise> {
 		const newEx: Exercise = { ...exercise, id: generateId(), isBuiltIn: false };
-		await db.exercises.put(newEx);
+		try {
+			await db.exercises.put(newEx);
+		} catch (e) {
+			console.error('Failed to add exercise:', e);
+			throw e;
+		}
 		this.exercises = [...this.exercises, newEx];
 		return newEx;
 	}
 
 	async updateExercise(exercise: Exercise): Promise<void> {
-		await db.exercises.put(exercise);
+		try {
+			await db.exercises.put(exercise);
+		} catch (e) {
+			console.error('Failed to update exercise:', e);
+			throw e;
+		}
 		this.exercises = this.exercises.map((e) => (e.id === exercise.id ? exercise : e));
 	}
 
 	async deleteExercise(id: string): Promise<void> {
-		await db.exercises.remove(id);
+		try {
+			await db.exercises.remove(id);
+		} catch (e) {
+			console.error('Failed to delete exercise:', e);
+			throw e;
+		}
 		this.exercises = this.exercises.filter((e) => e.id !== id);
 	}
 }
