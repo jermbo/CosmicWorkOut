@@ -47,7 +47,7 @@
 	<title>Settings — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="settings-page">
+<div class="page page--wide settings-page">
 	<header class="settings-page__header">
 		<p class="settings-page__eyebrow">Preferences</p>
 		<h1 class="settings-page__title">Settings</h1>
@@ -174,17 +174,6 @@
 <style>
 	.settings-page {
 		container-type: inline-size;
-		padding-inline: var(--space-4);
-		padding-block-start: calc(var(--safe-top) + var(--space-6));
-		padding-block-end: var(--space-8);
-	}
-
-	@container main (inline-size >= 600px) {
-		.settings-page {
-			max-inline-size: 900px;
-			margin-inline: auto;
-			padding-inline: var(--space-8);
-		}
 	}
 
 	.settings-grid {
@@ -192,7 +181,7 @@
 		flex-direction: column;
 	}
 
-	@container (inline-size >= 560px) {
+	@container page (inline-size >= 560px) {
 		.settings-grid {
 			display: grid;
 			grid-template-columns: repeat(2, 1fr);

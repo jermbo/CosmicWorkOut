@@ -39,6 +39,7 @@
 
 	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
 	let allDone = $derived(totalSets > 0 && doneSets === totalSets);
+	let isEditing = $derived(sessionStore.active?.isEditing === true);
 
 	function handleCancel(event: Event) {
 		event.preventDefault();
@@ -144,7 +145,11 @@
 						{sessionStore.active?.workoutName ?? ''}
 					</p>
 					<p class="session-overlay__context">
-						{doneSets}/{totalSets} sets
+						{#if isEditing}
+							Editing · {doneSets} sets logged
+						{:else}
+							{doneSets}/{totalSets} sets
+						{/if}
 					</p>
 				</div>
 
@@ -193,7 +198,9 @@
 				class:session-overlay__finish--all-done={allDone}
 				onclick={handleFinish}
 			>
-				{#if allDone}
+				{#if isEditing}
+					Save changes
+				{:else if allDone}
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -220,8 +227,16 @@
 			aria-labelledby="confirm-title"
 			aria-modal="true"
 		>
-			<p class="session-overlay__confirm-title" id="confirm-title">End this session?</p>
-			<p class="session-overlay__confirm-body">Your progress will not be saved.</p>
+			<p class="session-overlay__confirm-title" id="confirm-title">
+				{isEditing ? 'Discard changes?' : 'End this session?'}
+			</p>
+			<p class="session-overlay__confirm-body">
+				{#if isEditing}
+					Your saved session will be kept. Only unsaved edits are lost.
+				{:else}
+					Your progress will not be saved.
+				{/if}
+			</p>
 			<div class="session-overlay__confirm-actions">
 				<button
 					class="session-overlay__confirm-btn session-overlay__confirm-btn--cancel"
@@ -233,7 +248,7 @@
 					class="session-overlay__confirm-btn session-overlay__confirm-btn--end"
 					onclick={handleAbandonConfirm}
 				>
-					End session
+					{isEditing ? 'Discard' : 'End session'}
 				</button>
 			</div>
 		</div>
@@ -286,12 +301,15 @@
 	.session-overlay__inner {
 		display: flex;
 		flex-direction: column;
+		align-items: stretch;
 		block-size: 100%;
 	}
 
 	.session-overlay__header {
 		flex-shrink: 0;
 		border-block-end: 1px solid var(--color-border);
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__top-row {
@@ -386,6 +404,8 @@
 		flex-direction: column;
 		gap: var(--space-3);
 		overscroll-behavior: contain;
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__footer {
@@ -393,6 +413,8 @@
 		padding: var(--space-4) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
 		border-block-start: 1px solid var(--color-border);
 		background: var(--color-bg);
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__finish {

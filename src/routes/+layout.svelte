@@ -61,7 +61,7 @@
 				aria-modal="true"
 			>
 				<p class="recovery-banner__title" id="recovery-title">Resume session?</p>
-				<p class="recovery-banner__body">You have an unfinished workout from earlier today.</p>
+				<p class="recovery-banner__body">You have an unfinished workout to resume.</p>
 				<div class="recovery-banner__actions">
 					<button class="recovery-banner__btn recovery-banner__btn--resume" onclick={handleResumeSession}>
 						Resume

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
+	import { goto } from '$app/navigation';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 
 	let { sessions }: { sessions: SessionLog[] } = $props();
 
@@ -38,9 +40,12 @@
 
 	let weekDays = $derived(getWeekDays());
 	let doneDays = $derived(weekDays.filter((d) => d.status === 'done').length);
-	let totalTrainingDays = $derived(
-		weekDays.filter((d) => d.status === 'done' || d.status === 'today').length
-	);
+
+	function handleDayTap(dateStr: string) {
+		if (dateStr > todayStr) return;
+		loggingContext.setDate(dateStr);
+		goto(dateStr === todayStr ? '/' : `/?date=${dateStr}`);
+	}
 </script>
 
 <section class="week-strip">
@@ -48,29 +53,31 @@
 		<h3 class="week-strip__label">This week</h3>
 		<span class="week-strip__count">{doneDays} done</span>
 	</div>
-	<div class="week-strip__days" role="list" aria-label="Weekly training schedule">
+	<div class="week-strip__days" aria-label="Weekly training schedule">
 		{#each weekDays as day}
-			<div
+			<button
+				type="button"
 				class="week-day"
 				class:week-day--today={day.status === 'today'}
 				class:week-day--done={day.status === 'done'}
 				class:week-day--future={day.status === 'future'}
-				role="listitem"
+				class:week-day--tappable={day.dateStr <= todayStr}
+				disabled={day.dateStr > todayStr}
 				aria-label="{day.dow} {day.date}{day.status === 'done' ? ', completed' : ''}{day.status === 'today' ? ', today' : ''}"
+				onclick={() => handleDayTap(day.dateStr)}
 			>
 				<span class="week-day__dow">{day.dow}</span>
 				<span class="week-day__date">{day.date}</span>
 				<span class="week-day__indicator" aria-hidden="true"></span>
-			</div>
+			</button>
 		{/each}
 	</div>
 </section>
 
 <style>
 	.week-strip {
-		container-type: inline-size;
-		padding-inline: var(--space-4);
-		margin-block-start: var(--space-6);
+		inline-size: 100%;
+		margin-block-end: var(--space-4);
 	}
 
 	.week-strip__header {
@@ -96,7 +103,7 @@
 
 	.week-strip__days {
 		display: grid;
-		grid-template-columns: repeat(7, 1fr);
+		grid-template-columns: repeat(7, minmax(0, 1fr));
 		gap: var(--space-1);
 	}
 
@@ -110,6 +117,14 @@
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
 		transition: background-color var(--duration-fast) var(--ease-out);
+	}
+
+	.week-day--tappable:not(:disabled):active {
+		transform: scale(0.95);
+	}
+
+	.week-day:disabled {
+		cursor: default;
 	}
 
 	.week-day--today {

@@ -161,6 +161,11 @@
 	.bottom-nav__list {
 		display: flex;
 		block-size: var(--nav-height);
+		inline-size: 100%;
+		max-inline-size: var(--max-width);
+		margin-inline: auto;
+		padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+		padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
 	}
 
 	.bottom-nav__item {

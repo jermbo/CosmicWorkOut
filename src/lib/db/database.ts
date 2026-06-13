@@ -135,7 +135,8 @@ export const db = {
 	sessions: {
 		getAll: () => getAll<SessionLog>('sessions'),
 		getOne: (id: string) => getOne<SessionLog>('sessions', id),
-		put: (session: SessionLog) => putRecord('sessions', session)
+		put: (session: SessionLog) => putRecord('sessions', session),
+		delete: (id: string) => removeRecord('sessions', id)
 	},
 
 	exerciseLastUsed: {

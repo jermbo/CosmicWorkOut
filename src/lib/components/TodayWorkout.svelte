@@ -149,11 +149,11 @@
 		container-type: inline-size;
 		container-name: workout-card;
 		position: relative;
+		inline-size: 100%;
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
 		border-radius: var(--r-2xl);
 		padding: var(--space-5);
-		margin-inline: var(--space-4);
 		overflow: hidden;
 		animation: slide-up var(--duration-normal) var(--ease-out) both;
 	}

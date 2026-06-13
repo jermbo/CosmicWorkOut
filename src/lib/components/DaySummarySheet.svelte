@@ -1,16 +1,30 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
+	import { programStore } from '$lib/stores/program.svelte';
+	import { sessionStore } from '$lib/stores/session.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
 	let {
 		session,
 		exerciseMap,
-		onClose
+		onClose,
+		onEdit,
+		onDelete
 	}: {
 		session: SessionLog;
 		exerciseMap: Map<string, Exercise>;
 		onClose: () => void;
+		onEdit?: () => void;
+		onDelete?: () => void;
 	} = $props();
+
+	let showDeleteConfirm = $state(false);
+
+	let workoutName = $derived(
+		programStore.getWorkoutForSession(session)?.name ??
+			programStore.getWorkoutById(session.workoutId)?.name ??
+			'Workout'
+	);
 
 	function formatDate(dateStr: string): string {
 		const d = new Date(dateStr + 'T00:00:00');
@@ -34,9 +48,19 @@
 		return String(volume);
 	}
 
-	let totalSets = $derived(
-		session.exercises.reduce((acc, ex) => acc + ex.sets.length, 0)
-	);
+	async function handleEdit() {
+		const workout = programStore.getWorkoutForSession(session);
+		if (!workout) return;
+		await sessionStore.editSession(session, workout, exerciseMap);
+		onEdit?.();
+		onClose();
+	}
+
+	async function handleDeleteConfirm() {
+		await programStore.deleteSession(session.id);
+		onDelete?.();
+		onClose();
+	}
 </script>
 
 <BottomSheet onclose={onClose}>
@@ -44,6 +68,8 @@
 		<div class="day-summary__date-badge">
 			{formatDate(session.date)}
 		</div>
+
+		<h2 class="day-summary__workout-name">{workoutName}</h2>
 
 		<div class="day-summary__stats">
 			<div class="day-summary__stat">
@@ -86,7 +112,43 @@
 				{/if}
 			{/each}
 		</div>
+
+		<div class="day-summary__actions">
+			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
+			<button
+				class="day-summary__delete-btn"
+				onclick={() => (showDeleteConfirm = true)}
+			>
+				Delete
+			</button>
+		</div>
 	</div>
+
+	{#if showDeleteConfirm}
+		<div
+			class="day-summary__confirm"
+			role="alertdialog"
+			aria-labelledby="delete-title"
+			aria-modal="true"
+		>
+			<p class="day-summary__confirm-title" id="delete-title">Delete this session?</p>
+			<p class="day-summary__confirm-body">This cannot be undone.</p>
+			<div class="day-summary__confirm-actions">
+				<button
+					class="day-summary__confirm-btn day-summary__confirm-btn--cancel"
+					onclick={() => (showDeleteConfirm = false)}
+				>
+					Cancel
+				</button>
+				<button
+					class="day-summary__confirm-btn day-summary__confirm-btn--delete"
+					onclick={handleDeleteConfirm}
+				>
+					Delete
+				</button>
+			</div>
+		</div>
+	{/if}
 </BottomSheet>
 
 <style>
@@ -108,6 +170,13 @@
 		font-weight: 700;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
+		margin-block-end: var(--space-2);
+	}
+
+	.day-summary__workout-name {
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 700;
 		margin-block-end: var(--space-4);
 	}
 
@@ -155,6 +224,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0;
+		margin-block-end: var(--space-5);
 	}
 
 	.day-summary__exercise {
@@ -187,5 +257,80 @@
 		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
 		margin-block-start: 2px;
+	}
+
+	.day-summary__actions {
+		display: flex;
+		gap: var(--space-2);
+	}
+
+	.day-summary__edit-btn,
+	.day-summary__delete-btn {
+		flex: 1;
+		padding-block: var(--space-3);
+		border-radius: var(--radius-md);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		min-block-size: 48px;
+	}
+
+	.day-summary__edit-btn {
+		background: var(--color-accent);
+		color: #101010;
+	}
+
+	.day-summary__delete-btn {
+		background: var(--color-surface-3);
+		color: var(--color-red);
+		border: 1px solid var(--color-border);
+	}
+
+	.day-summary__confirm {
+		position: absolute;
+		inset-inline: var(--space-4);
+		inset-block-end: var(--space-4);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--r-2xl);
+		padding: var(--space-5);
+		z-index: 10;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.day-summary__confirm-title {
+		font-family: var(--font-display);
+		font-size: 1.0625rem;
+		font-weight: 700;
+		margin-block-end: var(--space-1);
+	}
+
+	.day-summary__confirm-body {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+		margin-block-end: var(--space-4);
+	}
+
+	.day-summary__confirm-actions {
+		display: flex;
+		gap: var(--space-2);
+	}
+
+	.day-summary__confirm-btn {
+		flex: 1;
+		padding-block: var(--space-3);
+		border-radius: var(--radius-md);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		min-block-size: 48px;
+	}
+
+	.day-summary__confirm-btn--cancel {
+		background: var(--color-surface-3);
+		color: var(--color-text-primary);
+	}
+
+	.day-summary__confirm-btn--delete {
+		background: var(--color-red);
+		color: #ffffff;
 	}
 </style>

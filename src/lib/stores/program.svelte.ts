@@ -101,13 +101,24 @@ class ProgramStore {
 
 	todaySession = $derived.by(() => {
 		const today = new Date().toISOString().split('T')[0];
-		const found = this.sessions.find(
-			(s) => s.date === today && s.programId === this.activeProgram?.id
-		);
-		if (!found) {
-			return null;
-		}
-		return found;
+		return this.sessionForDate(today);
+	});
+
+	workoutsForCurrentWeek = $derived.by(() => {
+		if (!this.activeProgram) return [] as Workout[];
+		const week = this.activeProgram.weeks[this.currentWeekNumber - 1];
+		return week?.workouts ?? [];
+	});
+
+	suggestedWorkoutInCurrentWeek = $derived.by(() => {
+		const weekWorkouts = this.workoutsForCurrentWeek;
+		const suggested = this.todaysWorkout;
+		if (weekWorkouts.length === 0) return null as Workout | null;
+		if (!suggested) return weekWorkouts[0];
+		const byLetter = weekWorkouts.find((w) => w.letter === suggested.letter);
+		if (byLetter) return byLetter;
+		const byName = weekWorkouts.find((w) => w.name === suggested.name);
+		return byName ?? weekWorkouts[0];
 	});
 
 	// Get unique workout templates from week 1 (canonical definitions)
@@ -155,6 +166,50 @@ class ProgramStore {
 
 	getWorkoutById(workoutId: string): Workout | undefined {
 		return this.allWorkouts.find((w) => w.id === workoutId);
+	}
+
+	getWorkoutForSession(log: SessionLog): Workout | null {
+		const direct = this.getWorkoutById(log.workoutId);
+		if (direct) return direct;
+
+		// Fallback: match by letter suffix (e.g. w5-lower → lower)
+		const suffix = log.workoutId.split('-').slice(1).join('-');
+		if (suffix) {
+			const bySuffix = this.allWorkouts.find((w) => w.id.endsWith(`-${suffix}`));
+			if (bySuffix) return bySuffix;
+		}
+
+		if (log.exercises.length === 0) return null;
+
+		// Last resort: build a minimal workout from the logged data
+		return {
+			id: log.workoutId,
+			name: 'Logged workout',
+			exercises: log.exercises.map((le) => ({
+				exerciseId: le.exerciseId,
+				sets: le.sets.length,
+				reps: String(le.sets[0]?.reps ?? 8)
+			}))
+		};
+	}
+
+	sessionForDate(date: string): SessionLog | null {
+		if (!this.activeProgram) return null;
+		return (
+			this.sessions.find(
+				(s) => s.date === date && s.programId === this.activeProgram!.id
+			) ?? null
+		);
+	}
+
+	async deleteSession(id: string): Promise<void> {
+		try {
+			await db.sessions.delete(id);
+		} catch (e) {
+			console.error('Failed to delete session:', e);
+			throw e;
+		}
+		await this.refreshSessions();
 	}
 
 	// Save workout metadata + exercises across all weeks (matched by original name)

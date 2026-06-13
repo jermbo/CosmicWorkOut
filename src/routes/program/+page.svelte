@@ -81,7 +81,7 @@
 	<title>Program — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="program-page">
+<div class="page page--wide program-page">
 	{#if programStore.activeProgram}
 		<header class="program-page__header">
 			<div class="program-page__header-row">
@@ -269,9 +269,6 @@
 <style>
 	.program-page {
 		container-type: inline-size;
-		padding-inline: var(--space-4);
-		padding-block-start: calc(var(--safe-top) + var(--space-6));
-		padding-block-end: var(--space-8);
 	}
 
 	.program-page__header {
@@ -446,14 +443,6 @@
 		align-items: center;
 	}
 
-	@container main (inline-size >= 600px) {
-		.program-page {
-			max-inline-size: 900px;
-			margin-inline: auto;
-			padding-inline: var(--space-8);
-		}
-	}
-
 	/* Workout cards */
 	.program-page__workouts {
 		display: flex;
@@ -461,7 +450,7 @@
 		gap: var(--space-3);
 	}
 
-	@container (inline-size >= 560px) {
+	@container page (inline-size >= 560px) {
 		.program-page__workouts {
 			display: grid;
 			grid-template-columns: repeat(2, 1fr);

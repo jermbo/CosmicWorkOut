@@ -112,4 +112,7 @@ export interface ActiveSession {
 	programId: string;
 	startedAt: string;
 	exercises: ActiveExercise[];
+	isEditing?: boolean;
+	originalFinishedAt?: string;
+	originalDurationSeconds?: number;
 }

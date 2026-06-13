@@ -98,6 +98,7 @@
 	@container app (inline-size >= 720px) {
 		.bottom-sheet__panel {
 			inset-inline-start: var(--side-nav-width);
+			inset-inline-end: 0;
 		}
 	}
 

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
+	import { goto } from '$app/navigation';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 
 	const DAYS_SHORT = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -90,7 +92,20 @@
 
 	function handleDayTap(dateStr: string) {
 		const session = getSessionForDay(dateStr);
-		if (session) selectedSession = session;
+		if (session) {
+			selectedSession = session;
+			return;
+		}
+		if (dateStr <= todayStr) {
+			loggingContext.setDate(dateStr);
+			goto(`/?date=${dateStr}`);
+		}
+	}
+
+	function isDayTappable(dateStr: string, status: DayStatus): boolean {
+		if (status === 'completed') return true;
+		if (dateStr <= todayStr && status !== 'future') return true;
+		return false;
 	}
 
 	let monthKey = $derived(
@@ -115,9 +130,10 @@
 	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
 		const base = `${MONTHS[viewDate.getMonth()]} ${dayNum}`;
 		if (status === 'completed') return `${base}, workout logged — tap to view`;
-		if (status === 'today') return `${base}, today`;
+		if (status === 'today') return `${base}, today — tap to log`;
 		if (status === 'scheduled') return `${base}, scheduled training day`;
-		if (status === 'skipped') return `${base}, missed training day`;
+		if (status === 'skipped') return `${base}, missed — tap to log`;
+		if (status === 'default' && dateStr <= todayStr) return `${base}, tap to log`;
 		return base;
 	}
 </script>
@@ -126,7 +142,7 @@
 	<title>Calendar — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="calendar-page">
+<div class="page page--wide calendar-page">
 	<header class="calendar-page__header">
 		<h1 class="calendar-page__title">History</h1>
 	</header>
@@ -183,7 +199,7 @@
 				{#each calendarDays as cell}
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
-						{@const tappable = status === 'completed'}
+						{@const tappable = isDayTappable(cell.date, status)}
 						<button
 							class="calendar-day"
 							class:calendar-day--completed={status === 'completed'}
@@ -191,6 +207,7 @@
 							class:calendar-day--scheduled={status === 'scheduled'}
 							class:calendar-day--skipped={status === 'skipped'}
 							class:calendar-day--future={status === 'future'}
+							class:calendar-day--tappable={tappable && status !== 'completed'}
 							role="gridcell"
 							aria-label={ariaLabel(cell.date, status, cell.dayNum)}
 							onclick={() => tappable && handleDayTap(cell.date!)}
@@ -228,20 +245,9 @@
 <style>
 	.calendar-page {
 		container-type: inline-size;
-		padding-inline: var(--space-4);
-		padding-block-start: calc(var(--safe-top) + var(--space-6));
-		padding-block-end: var(--space-8);
 	}
 
-	@container main (inline-size >= 600px) {
-		.calendar-page {
-			max-inline-size: 900px;
-			margin-inline: auto;
-			padding-inline: var(--space-8);
-		}
-	}
-
-	@container main (inline-size >= 800px) {
+	@container page (inline-size >= 800px) {
 		.calendar-page {
 			display: grid;
 			grid-template-columns: 1fr 300px;
@@ -443,6 +449,16 @@
 
 	.calendar-day--future { opacity: 0.3; }
 	.calendar-day--empty { pointer-events: none; }
+
+	.calendar-day--tappable {
+		cursor: pointer;
+
+		&:active { transform: scale(0.93); }
+	}
+
+	.calendar-day--today.calendar-day--tappable {
+		cursor: pointer;
+	}
 
 	.calendar-day__num { line-height: 1; }
 
