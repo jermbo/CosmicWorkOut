@@ -96,6 +96,18 @@ class PrefsStore {
 		this.weightUnit = unit;
 		this.save();
 	}
+
+	resetToDefaults(): void {
+		this.accentColor = DEFAULTS.accentColor;
+		this.completionFeel = DEFAULTS.completionFeel;
+		this.density = DEFAULTS.density;
+		this.roundness = DEFAULTS.roundness;
+		this.weightUnit = DEFAULTS.weightUnit;
+		this.applyAccentColor();
+		this.applyDensity();
+		this.applyRoundness();
+		this.save();
+	}
 }
 
 export const prefsStore = new PrefsStore();

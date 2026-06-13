@@ -17,6 +17,8 @@ User-configurable behavior and appearance.
 | Completion feel toggles confetti | ✅ Built |
 | Weight unit in display/input | ✅ Built |
 | Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
+| Clear workout data (settings) | ✅ Built | Wipes IndexedDB + session state; keeps prefs |
+| Reset preferences to defaults (settings) | ✅ Built | Resets `cwout:prefs`; workout data untouched |
 
 ---
 

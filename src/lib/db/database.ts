@@ -107,6 +107,28 @@ async function removeRecord(storeName: string, key: string): Promise<void> {
 	});
 }
 
+export async function clearWorkoutData(): Promise<void> {
+	if (dbInstance) {
+		dbInstance.close();
+		dbInstance = null;
+	}
+
+	return new Promise((resolve, reject) => {
+		const request = indexedDB.deleteDatabase(DB_NAME);
+		request.onsuccess = () => resolve();
+		request.onerror = () => reject(request.error);
+		request.onblocked = () =>
+			reject(new Error('Database deletion blocked — close other CosmicWorkOut tabs and try again'));
+	});
+}
+
+export async function resetWorkoutData(): Promise<void> {
+	await clearWorkoutData();
+	localStorage.removeItem('cwout:activeSession');
+	localStorage.removeItem('cwout:activeProgramId');
+	location.reload();
+}
+
 export async function initDB(): Promise<void> {
 	// Upsert all built-in exercises in a single transaction
 	await putAllRecords('exercises', builtInExercises);

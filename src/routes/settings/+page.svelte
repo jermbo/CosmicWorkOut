@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { CompletionFeel, Density, Roundness } from '$lib/db/types';
+	import { resetWorkoutData } from '$lib/db/database';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { sessionStore } from '$lib/stores/session.svelte';
 
 	const ACCENT_PRESETS = [
 		{ label: 'Lime', value: '#b2f042' },
@@ -25,6 +27,10 @@
 
 	let customHex = $state(prefsStore.accentColor);
 	let hexError = $state(false);
+	let showClearDataConfirm = $state(false);
+	let showResetPrefsConfirm = $state(false);
+	let clearDataError = $state<string | null>(null);
+	let clearingData = $state(false);
 
 	function applyCustomHex() {
 		const val = customHex.trim();
@@ -40,6 +46,25 @@
 		customHex = value;
 		prefsStore.setAccentColor(value);
 		hexError = false;
+	}
+
+	async function handleClearWorkoutData() {
+		clearingData = true;
+		clearDataError = null;
+		try {
+			await resetWorkoutData();
+		} catch (err) {
+			clearDataError =
+				err instanceof Error ? err.message : 'Could not clear data. Please try again.';
+			clearingData = false;
+		}
+	}
+
+	function handleResetPreferences() {
+		prefsStore.resetToDefaults();
+		customHex = prefsStore.accentColor;
+		hexError = false;
+		showResetPrefsConfirm = false;
 	}
 </script>
 
@@ -168,8 +193,116 @@
 				{/each}
 			</div>
 		</section>
+
+		<section class="settings-section settings-section--data" aria-labelledby="section-data">
+			<h2 class="settings-section__title" id="section-data">Data</h2>
+
+			<div class="data-action">
+				<p class="data-action__desc">
+					Remove session history, custom programs and exercises, weight memory, and any in-progress session.
+					Your appearance preferences are kept.
+				</p>
+				<button
+					class="data-action__btn data-action__btn--danger"
+					onclick={() => {
+						clearDataError = null;
+						showClearDataConfirm = true;
+					}}
+				>
+					Clear workout data
+				</button>
+			</div>
+
+			<div class="data-action">
+				<p class="data-action__desc">
+					Reset accent color, weight unit, completion feel, density, and roundness to their defaults.
+					Workout data is not affected.
+				</p>
+				<button
+					class="data-action__btn data-action__btn--secondary"
+					onclick={() => (showResetPrefsConfirm = true)}
+				>
+					Reset preferences
+				</button>
+			</div>
+		</section>
 	</div>
 </div>
+
+{#if showClearDataConfirm}
+	<div
+		class="settings-confirm-backdrop"
+		role="presentation"
+		onclick={() => !clearingData && (showClearDataConfirm = false)}
+	></div>
+	<div
+		class="settings-confirm"
+		role="alertdialog"
+		aria-labelledby="clear-data-title"
+		aria-modal="true"
+	>
+		<p class="settings-confirm__title" id="clear-data-title">Clear workout data?</p>
+		<p class="settings-confirm__body">
+			This removes session history, custom programs and exercises, weight memory, and any in-progress
+			session. Built-in content will be restored. This cannot be undone.
+			{#if sessionStore.isActive}
+				<br /><br />You have a session in progress — it will be discarded.
+			{/if}
+		</p>
+		{#if clearDataError}
+			<p class="settings-confirm__error">{clearDataError}</p>
+		{/if}
+		<div class="settings-confirm__actions">
+			<button
+				class="settings-confirm__btn settings-confirm__btn--cancel"
+				disabled={clearingData}
+				onclick={() => (showClearDataConfirm = false)}
+			>
+				Cancel
+			</button>
+			<button
+				class="settings-confirm__btn settings-confirm__btn--danger"
+				disabled={clearingData}
+				onclick={handleClearWorkoutData}
+			>
+				{clearingData ? 'Clearing…' : 'Clear workout data'}
+			</button>
+		</div>
+	</div>
+{/if}
+
+{#if showResetPrefsConfirm}
+	<div
+		class="settings-confirm-backdrop"
+		role="presentation"
+		onclick={() => (showResetPrefsConfirm = false)}
+	></div>
+	<div
+		class="settings-confirm"
+		role="alertdialog"
+		aria-labelledby="reset-prefs-title"
+		aria-modal="true"
+	>
+		<p class="settings-confirm__title" id="reset-prefs-title">Reset preferences?</p>
+		<p class="settings-confirm__body">
+			Reset accent color, weight unit, completion feel, density, and roundness to defaults?
+		</p>
+		<div class="settings-confirm__actions">
+			<button
+				class="settings-confirm__btn settings-confirm__btn--cancel"
+				onclick={() => (showResetPrefsConfirm = false)}
+			>
+				Cancel
+			</button>
+			<button
+				class="settings-confirm__btn settings-confirm__btn--danger"
+				onclick={handleResetPreferences}
+			>
+				Reset preferences
+			</button>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.settings-page {
@@ -189,6 +322,10 @@
 		}
 
 		.settings-section--accent {
+			grid-column: 1 / -1;
+		}
+
+		.settings-section--data {
 			grid-column: 1 / -1;
 		}
 	}
@@ -398,5 +535,113 @@
 	.seg-control__btn--active {
 		background: var(--color-surface-3);
 		color: var(--color-text-primary);
+	}
+
+	/* Data actions */
+	.data-action {
+		margin-block-end: var(--space-5);
+
+		&:last-child {
+			margin-block-end: 0;
+		}
+	}
+
+	.data-action__desc {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+		line-height: 1.5;
+		margin-block-end: var(--space-3);
+	}
+
+	.data-action__btn {
+		inline-size: 100%;
+		block-size: 44px;
+		border-radius: var(--radius-md);
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.data-action__btn--danger {
+		background: var(--color-red);
+		color: #ffffff;
+	}
+
+	.data-action__btn--secondary {
+		background: var(--color-surface-3);
+		color: var(--color-red);
+		border: 1px solid var(--color-border);
+	}
+
+	/* Confirm dialogs */
+	.settings-confirm-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		z-index: 90;
+	}
+
+	.settings-confirm {
+		position: fixed;
+		inset-inline: var(--space-4);
+		inset-block-start: 50%;
+		transform: translateY(-50%);
+		max-inline-size: 400px;
+		margin-inline: auto;
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--r-xl);
+		padding: var(--space-5);
+		z-index: 91;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.settings-confirm__title {
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 700;
+		margin-block-end: var(--space-2);
+	}
+
+	.settings-confirm__body {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+		margin-block-end: var(--space-4);
+		line-height: 1.5;
+	}
+
+	.settings-confirm__error {
+		font-size: 0.875rem;
+		color: var(--color-red);
+		margin-block-end: var(--space-4);
+		line-height: 1.5;
+	}
+
+	.settings-confirm__actions {
+		display: flex;
+		gap: var(--space-2);
+	}
+
+	.settings-confirm__btn {
+		flex: 1;
+		padding-block: var(--space-3);
+		border-radius: var(--radius-md);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		min-block-size: 48px;
+	}
+
+	.settings-confirm__btn--cancel {
+		background: var(--color-surface-3);
+		color: var(--color-text-primary);
+	}
+
+	.settings-confirm__btn--danger {
+		background: var(--color-red);
+		color: #ffffff;
+	}
+
+	.settings-confirm__btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
 	}
 </style>
