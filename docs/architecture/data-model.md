@@ -20,6 +20,7 @@ type Exercise = {
   unit: "lb" | "kg" | "band" | "bodyweight";
   defaultSets: number;
   defaultReps: string;      // "8-10" or "10 ea" — string for ranges
+  weightIncrement?: number; // stepper step size in lb/kg — default 5, not used for band/bodyweight
   isBuiltIn: boolean;
 };
 ```
@@ -122,7 +123,7 @@ type ActiveSession = {
 
 ### ExerciseLastUsed
 
-Last logged weight and reps per exercise. Drives instant-mode defaults.
+Last logged weight and reps per exercise. Pre-fills weight when a new session starts for that exercise.
 
 ```typescript
 type ExerciseLastUsed = {
@@ -141,7 +142,6 @@ Stored in localStorage (`cwout:prefs`).
 ```typescript
 type UserPrefs = {
   accentColor: string;      // hex, default "#b2f042"
-  loggingMode: "instant" | "stepper" | "numpad";
   completionFeel: "full" | "subtle";
   density: "compact" | "comfortable" | "spacious";
   roundness: "sharp" | "default" | "soft";

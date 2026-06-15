@@ -1,28 +1,50 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
+	import { goto } from '$app/navigation';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 
 	let { sessions }: { sessions: SessionLog[] } = $props();
 
+	const MONTHS_SHORT = [
+		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+	];
+
 	const todayDate = new Date();
-	const todayStr = todayDate.toISOString().split('T')[0];
+	const todayStr = toLocalDateStr(todayDate);
 
-	function getWeekDays() {
+	function toLocalDateStr(d: Date): string {
+		const y = d.getFullYear();
+		const m = String(d.getMonth() + 1).padStart(2, '0');
+		const day = String(d.getDate()).padStart(2, '0');
+		return `${y}-${m}-${day}`;
+	}
+
+	function mondayOf(dateStr: string): string {
+		const d = new Date(dateStr + 'T00:00:00');
+		const day = d.getDay();
+		d.setDate(d.getDate() - ((day + 6) % 7));
+		return toLocalDateStr(d);
+	}
+
+	function addDays(dateStr: string, days: number): string {
+		const d = new Date(dateStr + 'T00:00:00');
+		d.setDate(d.getDate() + days);
+		return toLocalDateStr(d);
+	}
+
+	function getWeekDays(weekStartStr: string) {
 		const days: { dow: string; date: number; dateStr: string; status: string }[] = [];
-		const dayOfWeek = todayDate.getDay(); // 0=Sun
-		const monday = new Date(todayDate);
-		monday.setDate(todayDate.getDate() - ((dayOfWeek + 6) % 7));
-
+		const monday = new Date(weekStartStr + 'T00:00:00');
 		const DOW_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 		for (let i = 0; i < 7; i++) {
 			const d = new Date(monday);
 			d.setDate(monday.getDate() + i);
-			const dateStr = d.toISOString().split('T')[0];
+			const dateStr = toLocalDateStr(d);
 
 			let status: string;
-			if (dateStr === todayStr) {
-				status = 'today';
-			} else if (sessions.some((s) => s.date === dateStr)) {
+			if (sessions.some((s) => s.date === dateStr)) {
 				status = 'done';
 			} else if (dateStr > todayStr) {
 				status = 'future';
@@ -36,47 +58,198 @@
 		return days;
 	}
 
-	let weekDays = $derived(getWeekDays());
+	function formatWeekRange(weekStartStr: string): string {
+		const start = new Date(weekStartStr + 'T00:00:00');
+		const end = new Date(weekStartStr + 'T00:00:00');
+		end.setDate(end.getDate() + 6);
+
+		const startLabel = `${MONTHS_SHORT[start.getMonth()]} ${start.getDate()}`;
+		const endLabel =
+			start.getMonth() === end.getMonth()
+				? String(end.getDate())
+				: `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`;
+
+		return `${startLabel} – ${endLabel}`;
+	}
+
+	let selectedDate = $derived(loggingContext.date);
+	let currentWeekStart = $derived(mondayOf(todayStr));
+	let viewWeekStart = $derived(mondayOf(selectedDate));
+	let isCurrentWeek = $derived(viewWeekStart === currentWeekStart);
+
+	let weekDays = $derived(getWeekDays(viewWeekStart));
 	let doneDays = $derived(weekDays.filter((d) => d.status === 'done').length);
-	let totalTrainingDays = $derived(
-		weekDays.filter((d) => d.status === 'done' || d.status === 'today').length
-	);
+
+	let weekLabel = $derived(isCurrentWeek ? 'This week' : formatWeekRange(viewWeekStart));
+
+	let weeksAgo = $derived.by(() => {
+		if (isCurrentWeek) return 0;
+		const start = new Date(viewWeekStart + 'T00:00:00');
+		const current = new Date(currentWeekStart + 'T00:00:00');
+		return Math.round((current.getTime() - start.getTime()) / (7 * 86400000));
+	});
+
+	let weekOffsetLabel = $derived.by(() => {
+		if (weeksAgo === 1) return 'Last week';
+		if (weeksAgo > 1) return `${weeksAgo} weeks ago`;
+		return '';
+	});
+
+	let canGoNextWeek = $derived(viewWeekStart < currentWeekStart);
+	let viewingPastDate = $derived(selectedDate !== todayStr);
+
+	function dayAriaLabel(day: (typeof weekDays)[number]): string {
+		const parts = [`${day.dow} ${day.date}`];
+		if (day.dateStr === selectedDate) parts.push('selected');
+		if (day.dateStr === todayStr) parts.push('today');
+		if (day.status === 'done') parts.push('completed');
+		return parts.join(', ');
+	}
+
+	function navigateToDate(dateStr: string) {
+		loggingContext.setDate(dateStr);
+		goto(dateStr === todayStr ? '/' : `/?date=${dateStr}`);
+	}
+
+	function handleDayTap(dateStr: string) {
+		if (dateStr > todayStr) return;
+		navigateToDate(dateStr);
+	}
+
+	function shiftWeek(delta: number) {
+		let newDate = addDays(selectedDate, delta * 7);
+		if (newDate > todayStr) newDate = todayStr;
+		navigateToDate(newDate);
+	}
 </script>
 
-<section class="week-strip">
+<section class="week-strip" aria-label="{weekLabel} schedule">
 	<div class="week-strip__header">
-		<h3 class="week-strip__label">This week</h3>
+		<div class="week-strip__nav-row">
+			<button
+				type="button"
+				class="week-strip__nav-btn"
+				aria-label="Previous week"
+				onclick={() => shiftWeek(-1)}
+			>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<polyline points="15 18 9 12 15 6" />
+				</svg>
+			</button>
+
+			<div class="week-strip__title">
+				<h3 class="week-strip__label">{weekLabel}</h3>
+				{#if weekOffsetLabel}
+					<span class="week-strip__offset">{weekOffsetLabel}</span>
+				{/if}
+			</div>
+
+			<button
+				type="button"
+				class="week-strip__nav-btn"
+				aria-label="Next week"
+				disabled={!canGoNextWeek}
+				onclick={() => shiftWeek(1)}
+			>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<polyline points="9 18 15 12 9 6" />
+				</svg>
+			</button>
+		</div>
+
 		<span class="week-strip__count">{doneDays} done</span>
 	</div>
-	<div class="week-strip__days" role="list" aria-label="Weekly training schedule">
+
+	<div class="week-strip__days" aria-label="Days in {weekLabel}">
 		{#each weekDays as day}
-			<div
+			<button
+				type="button"
 				class="week-day"
-				class:week-day--today={day.status === 'today'}
+				class:week-day--selected={day.dateStr === selectedDate}
+				class:week-day--actual-today={day.dateStr === todayStr}
 				class:week-day--done={day.status === 'done'}
 				class:week-day--future={day.status === 'future'}
-				role="listitem"
-				aria-label="{day.dow} {day.date}{day.status === 'done' ? ', completed' : ''}{day.status === 'today' ? ', today' : ''}"
+				class:week-day--tappable={day.dateStr <= todayStr}
+				disabled={day.dateStr > todayStr}
+				aria-label={dayAriaLabel(day)}
+				aria-current={day.dateStr === selectedDate ? 'date' : undefined}
+				onclick={() => handleDayTap(day.dateStr)}
 			>
 				<span class="week-day__dow">{day.dow}</span>
 				<span class="week-day__date">{day.date}</span>
 				<span class="week-day__indicator" aria-hidden="true"></span>
-			</div>
+			</button>
 		{/each}
 	</div>
+
+	{#if viewingPastDate || !isCurrentWeek}
+		<p class="week-strip__legend" aria-hidden="true">
+			<span class="week-strip__legend-item week-strip__legend-item--selected">Selected</span>
+			{#if !isCurrentWeek}
+				<span class="week-strip__legend-item week-strip__legend-item--current-week">This week</span>
+			{:else}
+				<span class="week-strip__legend-item week-strip__legend-item--today">Today</span>
+			{/if}
+		</p>
+	{/if}
 </section>
 
 <style>
 	.week-strip {
-		padding-inline: var(--space-4);
-		margin-block-start: var(--space-6);
+		inline-size: 100%;
+		margin-block-end: var(--space-4);
 	}
 
 	.week-strip__header {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		justify-content: space-between;
+		gap: var(--space-3);
 		margin-block-end: var(--space-3);
+	}
+
+	.week-strip__nav-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-inline-size: 0;
+		flex: 1;
+	}
+
+	.week-strip__nav-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-secondary);
+		flex-shrink: 0;
+
+		svg {
+			inline-size: 16px;
+			block-size: 16px;
+		}
+
+		&:disabled {
+			opacity: 0.35;
+			cursor: default;
+		}
+
+		&:not(:disabled):active {
+			transform: scale(0.93);
+		}
+	}
+
+	.week-strip__title {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		min-inline-size: 0;
+		flex: 1;
 	}
 
 	.week-strip__label {
@@ -85,17 +258,29 @@
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--color-text-secondary);
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	.week-strip__offset {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
 	}
 
 	.week-strip__count {
 		font-family: var(--font-mono);
 		font-size: 0.75rem;
 		color: var(--color-text-secondary);
+		flex-shrink: 0;
+		padding-block-start: 6px;
 	}
 
 	.week-strip__days {
 		display: grid;
-		grid-template-columns: repeat(7, 1fr);
+		grid-template-columns: repeat(7, minmax(0, 1fr));
 		gap: var(--space-1);
 	}
 
@@ -111,9 +296,22 @@
 		transition: background-color var(--duration-fast) var(--ease-out);
 	}
 
-	.week-day--today {
+	.week-day--tappable:not(:disabled):active {
+		transform: scale(0.95);
+	}
+
+	.week-day:disabled {
+		cursor: default;
+	}
+
+	.week-day--selected {
 		background: var(--color-accent);
 		border-color: var(--color-accent);
+	}
+
+	.week-day--actual-today:not(.week-day--selected) {
+		border-color: var(--color-accent);
+		box-shadow: inset 0 0 0 1px var(--color-accent);
 	}
 
 	.week-day__dow {
@@ -123,9 +321,13 @@
 		color: var(--color-text-secondary);
 		letter-spacing: 0.04em;
 
-		.week-day--today & {
+		.week-day--selected & {
 			color: var(--color-accent-ink);
 			opacity: 0.7;
+		}
+
+		.week-day--actual-today:not(.week-day--selected) & {
+			color: var(--color-accent);
 		}
 	}
 
@@ -136,7 +338,7 @@
 		line-height: 1;
 		color: var(--color-text-primary);
 
-		.week-day--today & {
+		.week-day--selected & {
 			color: var(--color-accent-ink);
 		}
 
@@ -151,13 +353,61 @@
 		border-radius: var(--radius-full);
 		background: transparent;
 
-		.week-day--done & {
+		.week-day--done:not(.week-day--selected) & {
 			background: var(--color-accent);
 		}
 
-		.week-day--today & {
+		.week-day--done.week-day--selected & {
+			background: var(--color-accent-ink);
+			opacity: 0.55;
+		}
+
+		.week-day--actual-today:not(.week-day--selected) & {
+			background: var(--color-accent);
+		}
+
+		.week-day--selected.week-day--actual-today & {
 			background: var(--color-accent-ink);
 			opacity: 0.5;
 		}
+	}
+
+	.week-strip__legend {
+		display: flex;
+		justify-content: center;
+		gap: var(--space-4);
+		margin-block-start: var(--space-2);
+	}
+
+	.week-strip__legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--color-text-muted);
+
+		&::before {
+			content: '';
+			display: block;
+			inline-size: 10px;
+			block-size: 10px;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--color-border);
+		}
+	}
+
+	.week-strip__legend-item--selected::before {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+	}
+
+	.week-strip__legend-item--today::before,
+	.week-strip__legend-item--current-week::before {
+		background: transparent;
+		border-color: var(--color-accent);
+		box-shadow: inset 0 0 0 1px var(--color-accent);
 	}
 </style>

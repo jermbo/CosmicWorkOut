@@ -1,16 +1,18 @@
 <script lang="ts">
-	import type { Exercise, WorkoutExercise } from '$lib/db/types';
+	import type { Exercise } from '$lib/db/types';
+	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
 
 	const CAT_COLORS: Record<string, string> = {
-		Hinge: '#b2f042',
-		Squat: '#b2f042',
-		Push: '#b286fd',
-		Pull: '#60c6ff',
-		Lateral: '#e55733',
-		Rotational: '#e55733',
-		Power: '#b2f042',
-		Carry: '#b286fd'
+		Hinge: 'var(--color-lime)',
+		Squat: 'var(--color-lime)',
+		Push: 'var(--color-lavender)',
+		Pull: 'var(--color-sky)',
+		Lateral: 'var(--color-red)',
+		Rotational: 'var(--color-red)',
+		Power: 'var(--color-lime)',
+		Carry: 'var(--color-lavender)'
 	};
 
 	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
@@ -28,6 +30,9 @@
 	let activeCat = $state('All');
 	let query = $state('');
 	let expandedId = $state<string | null>(null);
+	let formExercise = $state<Exercise | null | undefined>(undefined);
+	// undefined = closed, null = new, Exercise = editing
+	let confirmDeleteId = $state<string | null>(null);
 
 	let filtered = $derived(
 		exercises.filter((ex) => {
@@ -44,11 +49,17 @@
 	);
 
 	function toggleExpand(id: string) {
-		if (expandedId === id) {
-			expandedId = null;
-		} else {
-			expandedId = id;
+		expandedId = expandedId === id ? null : id;
+	}
+
+	async function deleteExercise(ex: Exercise) {
+		if (confirmDeleteId !== ex.id) {
+			confirmDeleteId = ex.id;
+			return;
 		}
+		confirmDeleteId = null;
+		await programStore.deleteExercise(ex.id);
+		if (expandedId === ex.id) expandedId = null;
 	}
 </script>
 
@@ -56,19 +67,21 @@
 	<div class="lib-sheet">
 		<div class="lib-sheet__header">
 			<h2 class="lib-sheet__title">Exercise Library</h2>
-			<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
-			</button>
+			<div class="lib-sheet__header-actions">
+				<button class="lib-sheet__add-btn" onclick={() => (formExercise = null)} aria-label="Add custom exercise">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+						<line x1="12" y1="5" x2="12" y2="19" />
+						<line x1="5" y1="12" x2="19" y2="12" />
+					</svg>
+					New
+				</button>
+				<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+						<line x1="18" y1="6" x2="6" y2="18" />
+						<line x1="6" y1="6" x2="18" y2="18" />
+					</svg>
+				</button>
+			</div>
 		</div>
 
 		<div class="lib-sheet__search">
@@ -143,27 +156,65 @@
 					</button>
 					{#if isOpen}
 						<div class="lib-row__detail">
-							<p class="lib-row__cue">"{ex.cue}"</p>
-							<button
-								class="lib-row__add"
-								onclick={() => {
-									onAdd(ex);
-									expandedId = null;
-								}}
-							>
-								<svg
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2.5"
-									stroke-linecap="round"
-									aria-hidden="true"
+							{#if ex.cue}
+								<p class="lib-row__cue">"{ex.cue}"</p>
+							{/if}
+							<div class="lib-row__actions">
+								<button
+									class="lib-row__add"
+									onclick={() => { onAdd(ex); expandedId = null; }}
 								>
-									<line x1="12" y1="5" x2="12" y2="19" />
-									<line x1="5" y1="12" x2="19" y2="12" />
-								</svg>
-								Add to workout
-							</button>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+										<line x1="12" y1="5" x2="12" y2="19" />
+										<line x1="5" y1="12" x2="19" y2="12" />
+									</svg>
+									Add to workout
+								</button>
+								{#if !ex.isBuiltIn}
+									<button
+										class="lib-row__edit"
+										onclick={() => (formExercise = ex)}
+										aria-label="Edit {ex.name}"
+									>
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+											<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+											<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+										</svg>
+									</button>
+									{#if confirmDeleteId === ex.id}
+										<button
+											class="lib-row__delete lib-row__delete--confirm"
+											onclick={() => deleteExercise(ex)}
+											aria-label="Confirm delete {ex.name}"
+										>
+											Sure?
+										</button>
+										<button
+											class="lib-row__delete"
+											onclick={() => (confirmDeleteId = null)}
+											aria-label="Cancel delete"
+										>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+												<line x1="18" y1="6" x2="6" y2="18" />
+												<line x1="6" y1="6" x2="18" y2="18" />
+											</svg>
+										</button>
+									{:else}
+										<button
+											class="lib-row__delete"
+											onclick={() => deleteExercise(ex)}
+											aria-label="Delete {ex.name}"
+										>
+											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+												<polyline points="3 6 5 6 21 6" />
+												<path d="M19 6l-1 14H6L5 6" />
+												<path d="M10 11v6M14 11v6" />
+												<path d="M9 6V4h6v2" />
+											</svg>
+										</button>
+									{/if}
+								{/if}
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -171,6 +222,13 @@
 		</div>
 	</div>
 </BottomSheet>
+
+{#if formExercise !== undefined}
+	<ExerciseFormSheet
+		exercise={formExercise}
+		onClose={() => (formExercise = undefined)}
+	/>
+{/if}
 
 <style>
 	.lib-sheet {
@@ -185,6 +243,31 @@
 		justify-content: space-between;
 		padding-inline: var(--space-5);
 		padding-block-end: var(--space-3);
+	}
+
+	.lib-sheet__header-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.lib-sheet__add-btn {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding-inline: var(--space-3);
+		block-size: 36px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		transition: background-color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 14px; block-size: 14px; }
+
+		&:hover { background: var(--color-surface-2); }
 	}
 
 	.lib-sheet__title {
@@ -388,11 +471,17 @@
 		margin-block-end: var(--space-3);
 	}
 
+	.lib-row__actions {
+		display: flex;
+		gap: var(--space-2);
+		align-items: center;
+	}
+
 	.lib-row__add {
+		flex: 1;
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		inline-size: 100%;
 		padding-block: var(--space-2);
 		padding-inline: var(--space-3);
 		background: var(--color-accent);
@@ -402,9 +491,34 @@
 		font-weight: 700;
 		justify-content: center;
 
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
+		svg { inline-size: 16px; block-size: 16px; }
+	}
+
+	.lib-row__edit,
+	.lib-row__delete {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 40px;
+		block-size: 36px;
+		border-radius: var(--radius-md);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-secondary);
+		flex-shrink: 0;
+		transition: color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 15px; block-size: 15px; }
+	}
+
+	.lib-row__delete:hover { color: var(--color-red); }
+
+	.lib-row__delete--confirm {
+		inline-size: auto;
+		padding-inline: var(--space-2);
+		background: var(--color-red);
+		color: #ffffff;
+		font-size: 0.75rem;
+		font-weight: 700;
 	}
 </style>

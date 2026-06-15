@@ -57,13 +57,11 @@
 			>
 				<path d="M5 8v8M9 6v10M13 8v8M17 6v10" />
 			</svg>
-			{programStore.activeProgram?.name ?? 'Program'}
+			<span class="packet-card__tab-text">{programStore.activeProgram?.name ?? 'Program'}</span>
 		</span>
+		<span class="packet-card__tab packet-card__tab--ghost">Wk {programStore.currentWeekNumber}</span>
 		<span class="packet-card__tab packet-card__tab--ghost">
-			Wk {programStore.currentWeekNumber}
-		</span>
-		<span class="packet-card__tab packet-card__tab--ghost">
-			Workout {workout.letter ?? programStore.currentWorkoutLetter}
+			{workout.letter ?? programStore.currentWorkoutLetter}
 		</span>
 	</div>
 
@@ -148,12 +146,14 @@
 
 <style>
 	.packet-card {
+		container-type: inline-size;
+		container-name: workout-card;
 		position: relative;
+		inline-size: 100%;
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
 		border-radius: var(--r-2xl);
 		padding: var(--space-5);
-		margin-inline: var(--space-4);
 		overflow: hidden;
 		animation: slide-up var(--duration-normal) var(--ease-out) both;
 	}
@@ -181,6 +181,7 @@
 		margin-block-end: var(--space-4);
 		position: relative;
 		z-index: 1;
+		min-inline-size: 0;
 	}
 
 	.packet-card__tab {
@@ -188,16 +189,28 @@
 		align-items: center;
 		gap: 5px;
 		padding-inline: var(--space-3);
-		block-size: 26px;
+		block-size: 28px;
 		border-radius: var(--radius-full);
 		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.01em;
+		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.packet-card__tab--active {
 		background: var(--workout-accent);
 		color: #101010;
+		flex-shrink: 1;
+		min-inline-size: 0;
+		max-inline-size: 52cqi;
+	}
+
+	.packet-card__tab-text {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-inline-size: 0;
 	}
 
 	.packet-card__tab--ghost {
@@ -210,6 +223,7 @@
 		inline-size: 14px;
 		block-size: 14px;
 		opacity: 0.6;
+		flex-shrink: 0;
 	}
 
 	/* Title */

@@ -143,8 +143,6 @@
 		position: fixed;
 		inset: 0;
 		inline-size: 100%;
-		max-inline-size: var(--max-width);
-		margin-inline: auto;
 		block-size: 100dvh;
 		background: var(--color-bg);
 		border: none;
@@ -153,6 +151,20 @@
 
 		&::backdrop {
 			background: rgba(0, 0, 0, 0.9);
+		}
+	}
+
+	@container app (inline-size >= 720px) {
+		.session-complete {
+			inset-block: 10dvh;
+			inset-inline-start: var(--side-nav-width);
+			inset-inline-end: 0;
+			margin-inline: auto;
+			inline-size: min(480px, calc(100dvw - var(--side-nav-width) - var(--space-8)));
+			block-size: 80dvh;
+			border-radius: var(--r-2xl);
+			border: 1px solid var(--color-border);
+			box-shadow: var(--shadow-lg);
 		}
 	}
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { untrack, onDestroy } from 'svelte';
 	import type { ActiveExercise, Exercise } from '$lib/db/types';
 	import ProgressRing from './ProgressRing.svelte';
 	import SetTile from './SetTile.svelte';
@@ -21,6 +21,11 @@
 	let allSetsCompleted = $derived(doneSets === totalSets && totalSets > 0);
 	let justCompleted = $state(false);
 	let wasCompleted = $state(untrack(() => allSetsCompleted));
+	let completionTimer: ReturnType<typeof setTimeout> | null = null;
+
+	onDestroy(() => {
+		if (completionTimer !== null) clearTimeout(completionTimer);
+	});
 
 	$effect(() => {
 		if (allSetsCompleted && !wasCompleted) {
@@ -33,7 +38,7 @@
 				// vibrate not available
 			}
 
-			setTimeout(() => {
+			completionTimer = setTimeout(() => {
 				justCompleted = false;
 			}, 700);
 		}

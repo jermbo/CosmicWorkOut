@@ -18,7 +18,8 @@ Viewing past sessions and tracking progress over time.
 | Scheduled/rest/skipped day status | ❌ Not built |
 | Weekly consistency streak | ⚠️ Wrong logic | See "Streak behavior" below |
 | Week strip program filter | ⚠️ Partial | Shows all sessions, not active-program only |
-| Edit past sessions | ❌ By design for v1 |
+| Edit past sessions | ✅ Built | Edit + delete from DaySummarySheet |
+| Backfill missed days | ✅ Built | Tap past/skipped days on calendar → Today with date set |
 
 ---
 
@@ -115,7 +116,7 @@ sequenceDiagram
 
 ## Constraints
 
-- History is read-only in v1 — no editing past sessions
+- History supports edit and delete from the day summary sheet
 - Calendar must work fully offline — all data comes from IndexedDB
 - Performance: month rendering should not be slow even if IndexedDB has years of sessions
 

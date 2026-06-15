@@ -70,7 +70,9 @@ flowchart TB
 
 Open browser DevTools → Application → IndexedDB → `cosmic-workout`. LocalStorage keys are prefixed `cwout:`.
 
-To reset all data: delete the IndexedDB database and clear localStorage, then reload.
+To reset workout data in-app: Settings → Data → **Clear workout data**. To reset preferences only: Settings → Data → **Reset preferences**.
+
+For a full manual reset via DevTools: delete the IndexedDB database and clear localStorage, then reload.
 
 ---
 

@@ -8,19 +8,21 @@ The core action of the app — recording a completed workout.
 
 ## Implementation Status
 
-| Story | Status |
-|-------|--------|
-| Start session from Today | ✅ Built |
-| Instant-mode one-tap logging | ✅ Built |
-| Stepper/numpad via LogSetSheet | ✅ Built |
-| Exercise completion animation + haptics | ✅ Built |
+| Story | Status | Notes |
+|-------|--------|-------|
+| Start session from Today | ✅ Built | |
+| Smart tap: instant if weight known, sheet if first time | ✅ Built | |
+| First-time weight entry (number input) | ✅ Built | Autofocuses, rounds to nearest 2.5 |
+| Weight carries forward within session | ✅ Built | Cascades to uncompleted sets |
+| Weight remembered across sessions | ✅ Built | Via `exerciseLastUsed` |
+| Tap completed set to adjust | ✅ Built | Sheet reopens; cascades to remaining sets |
+| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on exercise, default 5 |
+| Exercise completion animation + haptics | ✅ Built | |
 | Finish session + completion overlay | ✅ Built | No confirm dialog; saves completed sets only |
 | Abandon session | ✅ Built | Back arrow → confirm; nothing saved |
-| Crash recovery (resume/discard) | ✅ Built |
-| First-time weight prompt | ⚠️ Defaults to 0/BW, no prompt |
-| Set tile shows weight before log | ❌ Shows "+" only until completed |
-| Haptic on set tap | ❌ Haptic only on exercise completion |
-| Long press to adjust | ❌ Use stepper/numpad logging mode instead |
+| Crash recovery (resume/discard) | ✅ Built | |
+| Set tile shows weight before log | ❌ | Shows "+" only until completed |
+| Haptic on set tap | ❌ | Haptic only on exercise completion |
 
 ---
 
@@ -60,21 +62,31 @@ stateDiagram-v2
 
 ---
 
-### Logging a Set (Instant Mode — Default)
+### Logging a Set
 
-> As a user, I want to log a set with one tap, so I can do it between sets without breaking focus.
+> As a user, I want to log a set with one tap so I can do it between sets without breaking focus. If weight changes, I should be able to update it quickly.
 
-**Built today:**
-- Incomplete tiles show a "+" and set number only — weight/reps appear after logging
-- One tap logs at pre-filled weight/reps (from `exerciseLastUsed` or defaults)
-- Spring pop + white flash animation on tap; no haptic on individual sets
-- Weight 0 displays as "BW" on completed tiles
+```mermaid
+flowchart TD
+    Tap[User taps set tile] --> Done{Already completed?}
+    Done -->|Yes| Sheet[Open LogSetSheet — adjust mode]
+    Done -->|No| Known{Weight known?}
+    Known -->|Yes| Instant[Log instantly at current weight + reps]
+    Known -->|No — first time| Sheet2[Open LogSetSheet — entry mode]
+    Sheet --> Confirm[Adjust weight/reps → confirm]
+    Sheet2 --> Confirm
+    Instant --> Cascade[Cascade weight to remaining sets]
+    Confirm --> Cascade
+    Cascade --> Persist[Write exerciseLastUsed + activeSession]
+```
 
-**Target (not yet):**
-- Show last-used weight on the tile before tapping
-- Prompt for first-time weight input when no history exists
+**Weight known** = exercise has `lb/kg` weight > 0, or `band`/`bodyweight` (no numeric weight needed).
 
-The tap animation sequence (from design reference):
+**First-time entry:** Number input autofocuses. Value is rounded to the nearest 2.5 lb on save.
+
+**Weight cascade:** After any set is logged or adjusted, the new weight propagates forward to all uncompleted sets in that exercise. Completed sets keep their original value.
+
+**Tap animation sequence:**
 ```
 tap → scale down (0.93) immediately
   → white flash overlay (opacity 0.4→0, 280ms)
@@ -82,34 +94,6 @@ tap → scale down (0.93) immediately
   → spring pop: scale 0.93→1.06→1 (220ms)
   → weight/reps text fades in
 ```
-
----
-
-### Adjusting Weight or Reps Before Confirming
-
-> As a user, I want to be able to change the weight or reps before logging a set, so my data is accurate.
-
-- Stepper/numpad logging mode opens an input sheet on tap (no long press)
-- I can adjust weight and reps, then confirm
-- The confirmed values are logged and become the new `exerciseLastUsed`
-
-Logging mode is a user preference (see [Settings](settings-preferences.md)):
-
-```mermaid
-flowchart TD
-    Tap[User taps set tile] --> Mode{loggingMode?}
-    Mode -->|instant| Complete[completeSet at last-used values]
-    Mode -->|stepper| Sheet[Open LogSetSheet +/-]
-    Mode -->|numpad| Sheet
-    Sheet --> Confirm[User confirms weight + reps]
-    Confirm --> Log[logSet with explicit values]
-    Complete --> Persist[Write exerciseLastUsed + activeSession]
-    Log --> Persist
-```
-
-- **Instant** — one tap logs at last-used values (default)
-- **Stepper** — tap opens a +/- stepper for weight/reps before confirming
-- **Numpad** — tap opens a full numeric input
 
 ---
 
@@ -187,5 +171,5 @@ See [Offline Strategy — Crash Recovery](../architecture/offline-strategy.md).
 - [Data Model — SessionLog, LoggedSet](../architecture/data-model.md)
 - [Offline Strategy — Crash Recovery](../architecture/offline-strategy.md)
 - [Program Management](program-management.md) — Where the workout definition comes from
-- [Settings & Preferences](settings-preferences.md) — Logging mode, completion feel
+- [Settings & Preferences](settings-preferences.md) — Completion feel, weight unit
 - [History & Calendar](history-calendar.md) — Where completed sessions go

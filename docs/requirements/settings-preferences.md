@@ -11,15 +11,14 @@ User-configurable behavior and appearance.
 | Story | Status |
 |-------|--------|
 | Preferences store + localStorage persistence | ✅ Built |
-| Accent color applied at runtime | ✅ Built |
-| Density/roundness via data attributes | ✅ Built |
-| Logging mode affects session behavior | ✅ Built |
+| Settings UI / route (`/settings`) | ✅ Built |
+| Accent color (presets + custom hex) | ✅ Built |
+| Density / roundness via data attributes | ✅ Built |
 | Completion feel toggles confetti | ✅ Built |
 | Weight unit in display/input | ✅ Built |
-| Settings UI / route | ❌ Not built — no way to change prefs in-app |
-| Change density / roundness in-app | ❌ Store loads them but has no public setters |
-
-Prefs can be changed via browser DevTools → localStorage → `cwout:prefs`.
+| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
+| Clear workout data (settings) | ✅ Built | Wipes IndexedDB + session state; keeps prefs |
+| Reset preferences to defaults (settings) | ✅ Built | Resets `cwout:prefs`; workout data untouched |
 
 ---
 
@@ -34,7 +33,6 @@ flowchart LR
     Store --> Apply{Apply immediately}
     Apply --> CSS["--color-accent on :root"]
     Apply --> Data["data-density / data-roundness"]
-    Apply --> Session[loggingMode → SessionOverlay]
     Apply --> Feel[completionFeel → Confetti]
     Apply --> Unit[weightUnit → SetTile / LogSetSheet]
 ```
@@ -42,19 +40,6 @@ flowchart LR
 ---
 
 ## User Stories
-
-### Choosing a Logging Mode
-
-> As a user, I want to choose how I log sets so the input method matches how I train.
-
-Three modes:
-- **Instant** (default) — one tap logs at last-used weight + target reps. Fastest.
-- **Stepper** — tap opens a +/- stepper. Good for users who regularly adjust weight.
-- **Numpad** — tap opens a full numeric keyboard. Good for users who always type exact values.
-
-Setting persists in `cwout:prefs`.
-
----
 
 ### Choosing an Accent Color
 
@@ -131,5 +116,5 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 ## Related
 
 - [Data Model — UserPrefs](../architecture/data-model.md)
-- [Session Logging](session-logging.md) — Logging mode is used here
+- [Session Logging](session-logging.md) — Where weight increment and completion feel are applied
 - [Design Principles](../vision/principles.md) — Why dark-only and small surface area

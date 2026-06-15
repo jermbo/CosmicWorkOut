@@ -88,7 +88,13 @@
 				exercises: clean
 			});
 		} else {
-			await programStore.saveWorkoutExercises(initWorkout!.name, clean);
+			await programStore.saveWorkout(initWorkout!.name, {
+				name: title,
+				letter,
+				focus,
+				color: initWorkout!.color ?? 'lime',
+				exercises: clean
+			});
 		}
 
 		saving = false;
@@ -374,6 +380,14 @@
 
 		&::backdrop {
 			background: rgba(0, 0, 0, 0.8);
+		}
+	}
+
+	@container app (inline-size >= 720px) {
+		.workout-editor {
+			inset-inline-start: var(--side-nav-width);
+			margin-inline-start: 0;
+			margin-inline-end: auto;
 		}
 	}
 

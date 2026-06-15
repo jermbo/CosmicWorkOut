@@ -2,7 +2,6 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
 
@@ -40,6 +39,7 @@
 
 	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
 	let allDone = $derived(totalSets > 0 && doneSets === totalSets);
+	let isEditing = $derived(sessionStore.active?.isEditing === true);
 
 	function handleCancel(event: Event) {
 		event.preventDefault();
@@ -64,10 +64,27 @@
 	}
 
 	function handleSetTap(exerciseIndex: number, setIndex: number) {
-		if (prefsStore.loggingMode === 'instant') {
-			sessionStore.completeSet(exerciseIndex, setIndex);
-		} else {
+		const activeExercise = sessionStore.active?.exercises[exerciseIndex];
+		const set = activeExercise?.sets[setIndex];
+		if (!set) return;
+
+		if (set.completed) {
+			// adjust a completed set
 			sheetTarget = { exerciseIndex, setIndex };
+		} else {
+			const hasWeight =
+				activeExercise!.unit === 'bodyweight' ||
+				activeExercise!.unit === 'band' ||
+				(typeof set.weight === 'number' && set.weight > 0) ||
+				(typeof set.weight === 'string' && Boolean(set.weight));
+
+			if (hasWeight) {
+				// weight already known — one tap logs it
+				sessionStore.completeSet(exerciseIndex, setIndex);
+			} else {
+				// first time — need to enter a weight
+				sheetTarget = { exerciseIndex, setIndex };
+			}
 		}
 	}
 
@@ -128,7 +145,11 @@
 						{sessionStore.active?.workoutName ?? ''}
 					</p>
 					<p class="session-overlay__context">
-						{doneSets}/{totalSets} sets
+						{#if isEditing}
+							Editing · {doneSets} sets logged
+						{:else}
+							{doneSets}/{totalSets} sets
+						{/if}
 					</p>
 				</div>
 
@@ -177,7 +198,9 @@
 				class:session-overlay__finish--all-done={allDone}
 				onclick={handleFinish}
 			>
-				{#if allDone}
+				{#if isEditing}
+					Save changes
+				{:else if allDone}
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -204,8 +227,16 @@
 			aria-labelledby="confirm-title"
 			aria-modal="true"
 		>
-			<p class="session-overlay__confirm-title" id="confirm-title">End this session?</p>
-			<p class="session-overlay__confirm-body">Your progress will not be saved.</p>
+			<p class="session-overlay__confirm-title" id="confirm-title">
+				{isEditing ? 'Discard changes?' : 'End this session?'}
+			</p>
+			<p class="session-overlay__confirm-body">
+				{#if isEditing}
+					Your saved session will be kept. Only unsaved edits are lost.
+				{:else}
+					Your progress will not be saved.
+				{/if}
+			</p>
 			<div class="session-overlay__confirm-actions">
 				<button
 					class="session-overlay__confirm-btn session-overlay__confirm-btn--cancel"
@@ -217,7 +248,7 @@
 					class="session-overlay__confirm-btn session-overlay__confirm-btn--end"
 					onclick={handleAbandonConfirm}
 				>
-					End session
+					{isEditing ? 'Discard' : 'End session'}
 				</button>
 			</div>
 		</div>
@@ -239,8 +270,6 @@
 		position: fixed;
 		inset: 0;
 		inline-size: 100%;
-		max-inline-size: var(--max-width);
-		margin-inline: auto;
 		block-size: 100dvh;
 		max-block-size: 100dvh;
 		background: var(--color-bg);
@@ -254,15 +283,33 @@
 		}
 	}
 
+	@container app (inline-size >= 720px) {
+		.session-overlay {
+			inset-block: 5dvh;
+			inset-inline-start: var(--side-nav-width);
+			inset-inline-end: 0;
+			margin-inline: auto;
+			inline-size: min(580px, calc(100dvw - var(--side-nav-width) - var(--space-8)));
+			block-size: 90dvh;
+			max-block-size: 90dvh;
+			border-radius: var(--r-2xl);
+			border: 1px solid var(--color-border);
+			box-shadow: var(--shadow-lg);
+		}
+	}
+
 	.session-overlay__inner {
 		display: flex;
 		flex-direction: column;
+		align-items: stretch;
 		block-size: 100%;
 	}
 
 	.session-overlay__header {
 		flex-shrink: 0;
 		border-block-end: 1px solid var(--color-border);
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__top-row {
@@ -357,6 +404,8 @@
 		flex-direction: column;
 		gap: var(--space-3);
 		overscroll-behavior: contain;
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__footer {
@@ -364,6 +413,8 @@
 		padding: var(--space-4) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
 		border-block-start: 1px solid var(--color-border);
 		background: var(--color-bg);
+		inline-size: min(100%, var(--max-width));
+		margin-inline: auto;
 	}
 
 	.session-overlay__finish {

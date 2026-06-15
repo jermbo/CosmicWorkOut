@@ -37,23 +37,32 @@
 			weight: activeSet.weight,
 			reps: activeSet.reps,
 			defReps: parsed.n,
-			suffix: parsed.suffix
+			suffix: parsed.suffix,
+			weightIncrement: exercise.weightIncrement ?? 5
 		};
 	});
 
-	const isLb = snap.unit === 'lb';
+	const isLb = snap.unit === 'lb' || snap.unit === 'kg';
 	const isBand = snap.unit === 'band';
 	const isBw = snap.unit === 'bodyweight';
 	const defReps = snap.defReps;
 	const suffix = snap.suffix;
+	const weightStep = snap.weightIncrement;
 
-	let stepWeight = $state(isLb ? (typeof snap.weight === 'number' ? snap.weight : 0) : 0);
+	function roundWeight(v: number): number {
+		return Math.round(v / weightStep) * weightStep;
+	}
+
+	// First time = no previous numeric weight logged
+	const isFirstTime = isLb && (typeof snap.weight !== 'number' || snap.weight <= 0);
+
+	let stepWeight = $state(
+		isLb ? roundWeight(typeof snap.weight === 'number' ? snap.weight : 0) : 0
+	);
 	let stepBand = $state(isBand ? (typeof snap.weight === 'string' ? snap.weight : 'Med') : 'Med');
 	let stepReps = $state(snap.reps > 0 ? snap.reps : defReps);
-	let padField = $state<'weight' | 'reps'>(isLb ? 'weight' : 'reps');
-	let padStr = $state('');
+	let manualWeightStr = $state('');
 
-	const isNumpad = prefsStore.loggingMode === 'numpad';
 	const repStep = suffix === 's' ? 5 : 1;
 
 	function bumpWeight(d: number) {
@@ -61,7 +70,7 @@
 			const idx = Math.max(0, Math.min(BANDS.length - 1, BANDS.indexOf(stepBand) + d));
 			stepBand = BANDS[idx];
 		} else {
-			stepWeight = Math.max(0, stepWeight + d * 5);
+			stepWeight = Math.max(0, stepWeight + d * weightStep);
 		}
 	}
 
@@ -69,47 +78,19 @@
 		stepReps = Math.max(0, stepReps + d * repStep);
 	}
 
-	function applyPad() {
-		if (!padStr) {
-			return;
-		}
-		const v = parseInt(padStr, 10);
-		if (padField === 'weight') {
-			stepWeight = v;
-		} else {
-			stepReps = v;
-		}
-	}
-
-	function padPress(k: string) {
-		if (k === 'del') {
-			padStr = padStr.slice(0, -1);
-			return;
-		}
-		if (k === 'next') {
-			applyPad();
-			padField = padField === 'weight' ? 'reps' : 'weight';
-			padStr = '';
-			return;
-		}
-		if (padStr.length >= 4) {
-			return;
-		}
-		padStr = padStr + k;
-	}
-
 	function handleSave() {
-		if (isNumpad) {
-			applyPad();
+		let finalWeight: number | string;
+		if (isBw) {
+			finalWeight = 0;
+		} else if (isBand) {
+			finalWeight = stepBand;
+		} else if (isFirstTime) {
+			finalWeight = manualWeightStr ? roundWeight(parseFloat(manualWeightStr)) : 0;
+		} else {
+			finalWeight = stepWeight;
 		}
-		const finalWeight: number | string = isBw ? 0 : isBand ? stepBand : stepWeight;
 		onSave(finalWeight, stepReps);
 	}
-
-	let displayWeight = $derived(
-		padField === 'weight' && padStr !== '' ? padStr : isBand ? stepBand : String(stepWeight)
-	);
-	let displayReps = $derived(padField === 'reps' && padStr !== '' ? padStr : String(stepReps));
 
 	let hasPrevious = $derived(
 		isBand
@@ -136,12 +117,24 @@
 			{/if}
 		</p>
 
-		{#if !isNumpad}
-			<!-- Stepper mode -->
-			<div class="log-sheet__steppers">
-				{#if !isBw}
-					<div class="stepper">
-						<div class="stepper__cap">{isBand ? 'Band' : 'Weight'}</div>
+		<div class="log-sheet__steppers">
+			{#if !isBw}
+				<div class="stepper">
+					<div class="stepper__cap">{isBand ? 'Band' : 'Weight'}</div>
+					{#if isFirstTime}
+						<div class="stepper__first-time">
+							<input
+								class="stepper__manual-input"
+								type="number"
+								inputmode="decimal"
+								placeholder="0"
+								bind:value={manualWeightStr}
+								autofocus
+								aria-label="Enter weight in {prefsStore.weightUnit}"
+							/>
+							<span class="stepper__u">{prefsStore.weightUnit}</span>
+						</div>
+					{:else}
 						<div class="stepper__row">
 							<button
 								class="stepper__btn"
@@ -181,82 +174,44 @@
 								</svg>
 							</button>
 						</div>
+					{/if}
+				</div>
+			{/if}
+			<div class="stepper">
+				<div class="stepper__cap">{suffix === 's' ? 'Hold (sec)' : 'Reps'}</div>
+				<div class="stepper__row">
+					<button class="stepper__btn" onclick={() => bumpReps(-1)} aria-label="Decrease reps">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<line x1="5" y1="12" x2="19" y2="12" />
+						</svg>
+					</button>
+					<div class="stepper__val">
+						<span class="stepper__n">{stepReps}</span>
+						<span class="stepper__u">{suffix === 's' ? 'sec' : suffix === 'ea' ? 'each' : 'reps'}</span>
 					</div>
-				{/if}
-				<div class="stepper">
-					<div class="stepper__cap">{suffix === 's' ? 'Hold (sec)' : 'Reps'}</div>
-					<div class="stepper__row">
-						<button class="stepper__btn" onclick={() => bumpReps(-1)} aria-label="Decrease reps">
-							<svg
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								aria-hidden="true"
-							>
-								<line x1="5" y1="12" x2="19" y2="12" />
-							</svg>
-						</button>
-						<div class="stepper__val">
-							<span class="stepper__n">{stepReps}</span>
-							<span class="stepper__u">{suffix === 's' ? 'sec' : suffix === 'ea' ? 'each' : 'reps'}</span>
-						</div>
-						<button class="stepper__btn" onclick={() => bumpReps(1)} aria-label="Increase reps">
-							<svg
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								aria-hidden="true"
-							>
-								<line x1="12" y1="5" x2="12" y2="19" />
-								<line x1="5" y1="12" x2="19" y2="12" />
-							</svg>
-						</button>
-					</div>
+					<button class="stepper__btn" onclick={() => bumpReps(1)} aria-label="Increase reps">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<line x1="12" y1="5" x2="12" y2="19" />
+							<line x1="5" y1="12" x2="19" y2="12" />
+						</svg>
+					</button>
 				</div>
 			</div>
-		{:else}
-			<!-- Numpad mode -->
-			<div class="log-sheet__pad-fields">
-				{#if !isBw}
-					<button
-						class="pad-slot"
-						class:pad-slot--active={padField === 'weight'}
-						onclick={() => {
-							applyPad();
-							padField = 'weight';
-							padStr = '';
-						}}
-					>
-						<div class="pad-slot__label">{isBand ? 'Band' : `Weight (${prefsStore.weightUnit})`}</div>
-						<div class="pad-slot__val">{displayWeight}</div>
-					</button>
-				{/if}
-				<button
-					class="pad-slot"
-					class:pad-slot--active={padField === 'reps'}
-					onclick={() => {
-						applyPad();
-						padField = 'reps';
-						padStr = '';
-					}}
-				>
-					<div class="pad-slot__label">{suffix === 's' ? 'Hold (s)' : 'Reps'}</div>
-					<div class="pad-slot__val">{displayReps}</div>
-				</button>
-			</div>
-			<div class="numpad" role="group" aria-label="Number pad">
-				{#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as k}
-					<button class="numpad__key" onclick={() => padPress(k)}>{k}</button>
-				{/each}
-				<button class="numpad__key numpad__key--fn" onclick={() => padPress('del')}>Del</button>
-				<button class="numpad__key" onclick={() => padPress('0')}>0</button>
-				<button class="numpad__key numpad__key--fn" onclick={() => padPress('next')}>Next</button>
-			</div>
-		{/if}
+		</div>
 
 		<button class="log-sheet__confirm" onclick={handleSave}>
 			<svg
@@ -270,7 +225,7 @@
 			>
 				<polyline points="20 6 9 17 4 12" />
 			</svg>
-			Log set {setIndex + 1}
+			{activeSet.completed ? 'Update set' : `Log set ${setIndex + 1}`}
 		</button>
 	</div>
 </BottomSheet>
@@ -345,6 +300,38 @@
 		gap: var(--space-2);
 	}
 
+	.stepper__first-time {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-1);
+		padding-block: var(--space-1);
+	}
+
+	.stepper__manual-input {
+		inline-size: 100%;
+		background: none;
+		border: none;
+		border-block-end: 2px solid var(--color-accent);
+		outline: none;
+		font-family: var(--font-mono);
+		font-size: 1.875rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+		text-align: center;
+		padding-block: var(--space-1);
+
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
+
+		/* hide browser spinners */
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+			-webkit-appearance: none;
+		}
+	}
+
 	.stepper__btn {
 		display: flex;
 		align-items: center;
@@ -386,74 +373,6 @@
 		font-size: 0.6875rem;
 		color: var(--color-text-secondary);
 		margin-block-start: 2px;
-	}
-
-	/* Numpad */
-	.log-sheet__pad-fields {
-		display: flex;
-		gap: var(--space-3);
-		margin-block-end: var(--space-4);
-	}
-
-	.pad-slot {
-		flex: 1;
-		background: var(--color-surface-3);
-		border: 2px solid var(--color-border);
-		border-radius: var(--radius-xl);
-		padding: var(--space-3) var(--space-4);
-		text-align: start;
-		transition: border-color var(--duration-fast) var(--ease-out);
-	}
-
-	.pad-slot--active {
-		border-color: var(--color-accent);
-	}
-
-	.pad-slot__label {
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-1);
-	}
-
-	.pad-slot__val {
-		font-family: var(--font-mono);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-		min-block-size: 36px;
-	}
-
-	.numpad {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--space-2);
-		margin-block-end: var(--space-4);
-	}
-
-	.numpad__key {
-		block-size: 56px;
-		border-radius: var(--radius-lg);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		font-family: var(--font-mono);
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
-		transition: background-color var(--duration-fast) var(--ease-out);
-
-		&:active {
-			background: var(--color-surface-2);
-		}
-	}
-
-	.numpad__key--fn {
-		font-family: var(--font-body);
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
 	}
 
 	/* Confirm button */
