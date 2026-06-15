@@ -3,6 +3,9 @@ export type CompletionFeel = 'full' | 'subtle';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
 export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
+export type ActivityType = 'Run' | 'Walk' | 'Bike' | 'Swim' | 'Hike' | 'Pickleball' | 'Tennis' | 'Basketball' | 'Yoga' | 'Stretching' | 'Cardio' | 'Other';
+export type ActivityIntensity = 'Easy' | 'Moderate' | 'Hard';
+export type HabitType = 'count' | 'duration' | 'boolean';
 
 export interface Exercise {
 	id: string;
@@ -115,4 +118,32 @@ export interface ActiveSession {
 	isEditing?: boolean;
 	originalFinishedAt?: string;
 	originalDurationSeconds?: number;
+}
+
+export interface ActivityLog {
+	id: string;
+	date: string;
+	type: ActivityType;
+	customType?: string;
+	durationMinutes: number;
+	intensity: ActivityIntensity;
+	createdAt: string;
+}
+
+export interface Habit {
+	id: string;
+	name: string;
+	unit: string;
+	type: HabitType;
+	dailyGoal?: number;
+	active: boolean;
+	sortOrder: number;
+	createdAt: string;
+}
+
+export interface HabitLog {
+	id: string;
+	habitId: string;
+	date: string;
+	value: number;
 }

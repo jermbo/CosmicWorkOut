@@ -5,6 +5,8 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
+	import { activityStore } from '$lib/stores/activities.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
@@ -17,7 +19,11 @@
 	onMount(async () => {
 		await initDB();
 		prefsStore.load();
-		await programStore.load();
+		await Promise.all([
+			programStore.load(),
+			habitStore.load(),
+			activityStore.load()
+		]);
 
 		if (sessionStore.checkForRecovery()) {
 			hasRecoverableSession = true;

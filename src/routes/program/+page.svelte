@@ -10,8 +10,10 @@
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
-	let showCopyConfirm = $state<Workout | null | 'new' | undefined>(undefined);
-	// showCopyConfirm: the workout we want to edit (or 'new'), pending copy confirmation
+
+	let showDeleteProgramConfirm = $state(false);
+	let deletingProgram = $state(false);
+	let removeWorkoutName = $state<string | null>(null);
 
 	let selectedWeek = $state(1);
 
@@ -51,29 +53,24 @@
 	}
 
 	function requestEdit(workout: Workout | null) {
-		if (programStore.activeProgram?.isBuiltIn) {
-			showCopyConfirm = workout;
-		} else {
-			editingWorkout = workout;
+		editingWorkout = workout;
+	}
+
+	async function handleDeleteProgram() {
+		if (!programStore.activeProgram || deletingProgram) return;
+		deletingProgram = true;
+		try {
+			await programStore.deleteProgram(programStore.activeProgram.id);
+		} finally {
+			deletingProgram = false;
+			showDeleteProgramConfirm = false;
 		}
 	}
 
-	async function handleCopyAndEdit() {
-		if (!programStore.activeProgram) return;
-		const pending = showCopyConfirm;
-		showCopyConfirm = undefined;
-		const copy = await programStore.copyProgram(programStore.activeProgram);
-		programStore.setActiveProgram(copy.id);
-		// Now open the equivalent workout in the copy
-		if (pending === null || pending === 'new') {
-			editingWorkout = null;
-		} else if (pending) {
-			// Find the workout by name in the new program
-			const match = programStore.activeProgram?.weeks[0]?.workouts.find(
-				(w) => w.name === (pending as Workout).name
-			);
-			editingWorkout = match ?? null;
-		}
+	async function handleRemoveWorkout() {
+		if (!removeWorkoutName) return;
+		await programStore.removeWorkout(removeWorkoutName);
+		removeWorkoutName = null;
 	}
 </script>
 
@@ -92,6 +89,19 @@
 				<div class="program-page__header-actions">
 					{#if programStore.activeProgram.isBuiltIn}
 						<span class="built-in-badge" aria-label="Built-in program">Built-in</span>
+					{:else}
+						<button
+							class="program-page__delete-btn"
+							onclick={() => (showDeleteProgramConfirm = true)}
+							aria-label="Delete program"
+						>
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<polyline points="3 6 5 6 21 6" />
+								<path d="M19 6l-1 14H6L5 6" />
+								<path d="M10 11v6M14 11v6" />
+								<path d="M9 6V4h6v2" />
+							</svg>
+						</button>
 					{/if}
 					<button
 						class="program-page__switch-btn"
@@ -189,17 +199,31 @@
 								<p class="workout-card__focus">{workout.focus}</p>
 							{/if}
 						</div>
-						<button
-							class="workout-card__edit-btn"
-							onclick={() => requestEdit(workout)}
-							aria-label="Edit {workout.name}"
-						>
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-							</svg>
-							Edit
-						</button>
+						<div class="workout-card__actions">
+							<button
+								class="workout-card__edit-btn"
+								onclick={() => requestEdit(workout)}
+								aria-label="Edit {workout.name}"
+							>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+									<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+									<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+								</svg>
+								Edit
+							</button>
+							{#if !programStore.activeProgram?.isBuiltIn && weekWorkouts.length > 1}
+								<button
+									class="workout-card__remove-btn"
+									onclick={() => (removeWorkoutName = workout.name)}
+									aria-label="Remove {workout.name}"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+										<line x1="18" y1="6" x2="6" y2="18" />
+										<line x1="6" y1="6" x2="18" y2="18" />
+									</svg>
+								</button>
+							{/if}
+						</div>
 					</div>
 
 					{#if workout.exercises.length > 0}
@@ -234,19 +258,31 @@
 	{/if}
 </div>
 
-<!-- Copy-before-edit confirmation -->
-{#if showCopyConfirm !== undefined}
-	<div class="copy-confirm-backdrop" role="presentation" onclick={() => (showCopyConfirm = undefined)}></div>
-	<div class="copy-confirm" role="alertdialog" aria-labelledby="copy-confirm-title" aria-modal="true">
-		<p class="copy-confirm__title" id="copy-confirm-title">Edit a copy?</p>
-		<p class="copy-confirm__body">This is a built-in program. Editing will create a personal copy and switch to it.</p>
+
+{#if showDeleteProgramConfirm}
+	<div class="copy-confirm-backdrop" role="presentation" onclick={() => !deletingProgram && (showDeleteProgramConfirm = false)}></div>
+	<div class="copy-confirm" role="alertdialog" aria-labelledby="delete-prog-title" aria-modal="true">
+		<p class="copy-confirm__title" id="delete-prog-title">Delete program?</p>
+		<p class="copy-confirm__body">"{programStore.activeProgram?.name}" will be removed from your library. Sessions logged under this program are kept.</p>
 		<div class="copy-confirm__actions">
-			<button class="copy-confirm__btn copy-confirm__btn--primary" onclick={handleCopyAndEdit}>
-				Copy &amp; Edit
+			<button class="copy-confirm__btn copy-confirm__btn--danger" onclick={handleDeleteProgram} disabled={deletingProgram}>
+				{deletingProgram ? 'Deleting…' : 'Delete'}
 			</button>
-			<button class="copy-confirm__btn copy-confirm__btn--ghost" onclick={() => (showCopyConfirm = undefined)}>
+			<button class="copy-confirm__btn copy-confirm__btn--ghost" onclick={() => (showDeleteProgramConfirm = false)} disabled={deletingProgram}>
 				Cancel
 			</button>
+		</div>
+	</div>
+{/if}
+
+{#if removeWorkoutName}
+	<div class="copy-confirm-backdrop" role="presentation" onclick={() => (removeWorkoutName = null)}></div>
+	<div class="copy-confirm" role="alertdialog" aria-labelledby="remove-workout-title" aria-modal="true">
+		<p class="copy-confirm__title" id="remove-workout-title">Remove workout?</p>
+		<p class="copy-confirm__body">"{removeWorkoutName}" will be removed from all weeks in this program.</p>
+		<div class="copy-confirm__actions">
+			<button class="copy-confirm__btn copy-confirm__btn--danger" onclick={handleRemoveWorkout}>Remove</button>
+			<button class="copy-confirm__btn copy-confirm__btn--ghost" onclick={() => (removeWorkoutName = null)}>Cancel</button>
 		</div>
 	</div>
 {/if}
@@ -536,6 +572,13 @@
 		font-weight: 500;
 	}
 
+	.workout-card__actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+		flex-shrink: 0;
+	}
+
 	.workout-card__edit-btn {
 		display: flex;
 		align-items: center;
@@ -559,6 +602,39 @@
 		&:hover {
 			color: var(--color-text-primary);
 		}
+	}
+
+	.workout-card__remove-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 30px;
+		block-size: 30px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+		transition: color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 13px; block-size: 13px; }
+		&:hover { color: var(--color-red); }
+	}
+
+	.program-page__delete-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 38px;
+		block-size: 38px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		transition: color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 16px; block-size: 16px; }
+		&:hover { color: var(--color-red); }
 	}
 
 	.workout-card__chips {
@@ -679,13 +755,15 @@
 		font-weight: 700;
 	}
 
-	.copy-confirm__btn--primary {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
-	}
-
 	.copy-confirm__btn--ghost {
 		background: var(--color-surface-3);
 		color: var(--color-text-secondary);
+	}
+
+	.copy-confirm__btn--danger {
+		background: var(--color-red);
+		color: #ffffff;
+
+		&:disabled { opacity: 0.6; cursor: default; }
 	}
 </style>

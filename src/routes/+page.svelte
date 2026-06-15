@@ -4,9 +4,13 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
+	import { activityStore } from '$lib/stores/activities.svelte';
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import HabitWidgets from '$lib/components/HabitWidgets.svelte';
+	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 
 	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const MONTHS_SHORT = [
@@ -26,7 +30,6 @@
 	});
 
 	let contextDate = $derived(loggingContext.date);
-	let isToday = $derived(contextDate === todayStr);
 
 	let displayDate = $derived.by(() => {
 		const d = new Date(contextDate + 'T00:00:00');
@@ -89,6 +92,26 @@
 		if (!workout) return;
 		await sessionStore.editSession(session, workout, programStore.exerciseMap);
 	}
+
+	let showActivitySheet = $state(false);
+	let editingActivity = $state<typeof activityStore.activities[0] | null>(null);
+
+	function openNewActivity() {
+		editingActivity = null;
+		showActivitySheet = true;
+	}
+
+	function openEditActivity(activity: typeof activityStore.activities[0]) {
+		editingActivity = activity;
+		showActivitySheet = true;
+	}
+
+	function activityChipLabel(activity: typeof activityStore.activities[0]): string {
+		const name = activity.type === 'Other' ? (activity.customType || 'Other') : activity.type;
+		return `${name} · ${activity.durationMinutes} min · ${activity.intensity}`;
+	}
+
+	let isToday = $derived(contextDate === todayStr);
 </script>
 
 <svelte:head>
@@ -141,54 +164,98 @@
 	{/if}
 
 	<div class="today-page__body">
-		{#if !programStore.loaded}
-			<div class="today-page__loading" aria-busy="true" aria-label="Loading workout">
-				<div class="today-page__loading-spinner"></div>
-			</div>
-		{:else if sessionForDate}
-			<div class="today-page__done" role="status">
-				<div class="today-page__done-icon" aria-hidden="true">
-					<svg
-						viewBox="0 0 40 40"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="3"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<polyline points="8 20 16 28 32 12" />
-					</svg>
+		<!-- Workout section -->
+		<section class="today-section" aria-labelledby="section-workout">
+			<h2 class="today-section__label" id="section-workout">Workout</h2>
+			{#if !programStore.loaded}
+				<div class="today-page__loading" aria-busy="true" aria-label="Loading workout">
+					<div class="today-page__loading-spinner"></div>
 				</div>
-				<h2 class="today-page__done-title">Workout complete</h2>
-				<p class="today-page__done-subtitle">
-					{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
-				</p>
-				<button class="today-page__edit-btn" onclick={editSession}>Edit session</button>
-			</div>
-		{:else if selectedWorkout && weekWorkouts.length > 0}
-			{#if showSuggestedHint && suggestedWorkout}
-				<p class="today-page__suggested-hint">
-					Suggested: {suggestedWorkout.name}
-				</p>
+			{:else if sessionForDate}
+				<div class="today-page__done" role="status">
+					<div class="today-page__done-icon" aria-hidden="true">
+						<svg
+							viewBox="0 0 40 40"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="3"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<polyline points="8 20 16 28 32 12" />
+						</svg>
+					</div>
+					<h3 class="today-page__done-title">Workout complete</h3>
+					<p class="today-page__done-subtitle">
+						{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
+					</p>
+					<button class="today-page__edit-btn" onclick={editSession}>Edit session</button>
+				</div>
+			{:else if selectedWorkout && weekWorkouts.length > 0}
+				{#if showSuggestedHint && suggestedWorkout}
+					<p class="today-page__suggested-hint">
+						Suggested: {suggestedWorkout.name}
+					</p>
+				{/if}
+				<WorkoutPicker
+					workouts={weekWorkouts}
+					selectedId={selectedWorkout.id}
+					suggestedId={suggestedWorkout?.id}
+					onSelect={(id) => loggingContext.setWorkoutId(id)}
+				/>
+				<TodayWorkout
+					workout={selectedWorkout}
+					exerciseMap={programStore.exerciseMap}
+					onStart={startSession}
+				/>
+			{:else}
+				<div class="today-page__empty">
+					<p>No program active. Head to <a href="/program">Program</a> to get started.</p>
+				</div>
 			{/if}
-			<WorkoutPicker
-				workouts={weekWorkouts}
-				selectedId={selectedWorkout.id}
-				suggestedId={suggestedWorkout?.id}
-				onSelect={(id) => loggingContext.setWorkoutId(id)}
-			/>
-			<TodayWorkout
-				workout={selectedWorkout}
-				exerciseMap={programStore.exerciseMap}
-				onStart={startSession}
-			/>
-		{:else}
-			<div class="today-page__empty">
-				<p>No program active. Head to <a href="/program">Program</a> to get started.</p>
-			</div>
+		</section>
+
+		<!-- Habits section (only when habits are configured) -->
+		{#if habitStore.activeHabits.length > 0}
+			<section class="today-section" aria-labelledby="section-habits">
+				<h2 class="today-section__label" id="section-habits">Habits</h2>
+				<HabitWidgets />
+			</section>
 		{/if}
+
+		<!-- Activity section -->
+		<section class="today-section" aria-labelledby="section-activity">
+			<h2 class="today-section__label" id="section-activity">Activity</h2>
+			<button class="activity-log-btn" onclick={openNewActivity}>
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+					<line x1="12" y1="5" x2="12" y2="19" />
+					<line x1="5" y1="12" x2="19" y2="12" />
+				</svg>
+				Log Activity
+			</button>
+			{#if activityStore.todayActivities.length > 0}
+				<div class="activity-chips" role="list" aria-label="Today's activities">
+					{#each activityStore.todayActivities as activity (activity.id)}
+						<button
+							class="activity-chip"
+							onclick={() => openEditActivity(activity)}
+							aria-label="Edit: {activityChipLabel(activity)}"
+						>
+							{activityChipLabel(activity)}
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</section>
 	</div>
 </div>
+
+{#if showActivitySheet}
+	<ActivityLogSheet
+		editing={editingActivity}
+		onClose={() => { showActivitySheet = false; editingActivity = null; }}
+	/>
+{/if}
 
 <style>
 	.today-page__header {
@@ -397,5 +464,67 @@
 			color: var(--color-accent);
 			font-weight: 500;
 		}
+	}
+
+	/* Dashboard sections */
+	.today-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+
+	.today-section__label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-text-muted);
+	}
+
+	/* Activity section */
+	.activity-log-btn {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding-inline: var(--space-4);
+		block-size: 48px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		align-self: flex-start;
+		transition:
+			border-color var(--duration-fast) var(--ease-out),
+			color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 18px; block-size: 18px; }
+
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
+	}
+
+	.activity-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	.activity-chip {
+		padding-inline: var(--space-3);
+		block-size: 34px;
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-2));
+		border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-primary);
+		white-space: nowrap;
+		transition: border-color var(--duration-fast) var(--ease-out);
+
+		&:hover { border-color: var(--color-accent); }
 	}
 </style>

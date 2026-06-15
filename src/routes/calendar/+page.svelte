@@ -2,8 +2,10 @@
 	import type { SessionLog } from '$lib/db/types';
 	import { goto } from '$app/navigation';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { activityStore } from '$lib/stores/activities.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
+	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 
 	const DAYS_SHORT = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 	const MONTHS = [
@@ -13,6 +15,7 @@
 
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
+	let selectedActivityDate = $state<string | null>(null);
 
 	const today = new Date();
 	const todayStr = today.toISOString().split('T')[0];
@@ -92,8 +95,13 @@
 
 	function handleDayTap(dateStr: string) {
 		const session = getSessionForDay(dateStr);
+		const hasActivity = (activityStore.activitiesByDate.get(dateStr)?.length ?? 0) > 0;
 		if (session) {
 			selectedSession = session;
+			return;
+		}
+		if (hasActivity) {
+			selectedActivityDate = dateStr;
 			return;
 		}
 		if (dateStr <= todayStr) {
@@ -104,6 +112,7 @@
 
 	function isDayTappable(dateStr: string, status: DayStatus): boolean {
 		if (status === 'completed') return true;
+		if ((activityStore.activitiesByDate.get(dateStr)?.length ?? 0) > 0) return true;
 		if (dateStr <= todayStr && status !== 'future') return true;
 		return false;
 	}
@@ -200,6 +209,7 @@
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
 						{@const tappable = isDayTappable(cell.date, status)}
+						{@const hasActivity = (activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
 						<button
 							class="calendar-day"
 							class:calendar-day--completed={status === 'completed'}
@@ -214,7 +224,12 @@
 							disabled={!tappable}
 						>
 							<span class="calendar-day__num" aria-hidden="true">{cell.dayNum}</span>
-							<span class="calendar-day__dot" aria-hidden="true"></span>
+							<span class="calendar-day__dots" aria-hidden="true">
+								<span class="calendar-day__dot"></span>
+								{#if hasActivity}
+									<span class="calendar-day__dot calendar-day__dot--activity"></span>
+								{/if}
+							</span>
 						</button>
 					{:else}
 						<div class="calendar-day calendar-day--empty" role="gridcell" aria-hidden="true"></div>
@@ -240,6 +255,40 @@
 		exerciseMap={programStore.exerciseMap}
 		onClose={() => (selectedSession = null)}
 	/>
+{/if}
+
+{#if selectedActivityDate}
+	{@const acts = activityStore.activitiesByDate.get(selectedActivityDate) ?? []}
+	<div class="activity-detail-backdrop" role="presentation" onclick={() => (selectedActivityDate = null)}></div>
+	<div class="activity-detail" role="dialog" aria-label="Activity details" aria-modal="true">
+		<div class="activity-detail__header">
+			<p class="activity-detail__title">Activities — {selectedActivityDate}</p>
+			<button onclick={() => (selectedActivityDate = null)} aria-label="Close" class="activity-detail__close">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<line x1="18" y1="6" x2="6" y2="18" />
+					<line x1="6" y1="6" x2="18" y2="18" />
+				</svg>
+			</button>
+		</div>
+		{#each acts as act (act.id)}
+			<div class="activity-detail__row">
+				<div class="activity-detail__info">
+					<span class="activity-detail__name">{act.type === 'Other' ? (act.customType || 'Other') : act.type}</span>
+					<span class="activity-detail__meta">{act.durationMinutes} min · {act.intensity}</span>
+				</div>
+				<button
+					class="activity-detail__delete"
+					onclick={async () => { await activityStore.remove(act.id); if (acts.length <= 1) selectedActivityDate = null; }}
+					aria-label="Delete activity"
+				>
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+						<polyline points="3 6 5 6 21 6" />
+						<path d="M19 6l-1 14H6L5 6" />
+					</svg>
+				</button>
+			</div>
+		{/each}
+	</div>
 {/if}
 
 <style>
@@ -462,6 +511,13 @@
 
 	.calendar-day__num { line-height: 1; }
 
+	.calendar-day__dots {
+		display: flex;
+		gap: 3px;
+		align-items: center;
+		justify-content: center;
+	}
+
 	.calendar-day__dot {
 		inline-size: 4px;
 		block-size: 4px;
@@ -471,6 +527,108 @@
 		.calendar-day--today & { background: var(--color-accent); }
 		.calendar-day--scheduled & { background: var(--color-text-muted); opacity: 0.5; }
 		.calendar-day--skipped & { background: var(--color-red); opacity: 0.5; }
+	}
+
+	.calendar-day__dot--activity {
+		background: var(--color-lavender) !important;
+		opacity: 1 !important;
+	}
+
+	/* Activity detail popup */
+	.activity-detail-backdrop {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		z-index: 80;
+	}
+
+	.activity-detail {
+		position: fixed;
+		inset-inline: var(--space-4);
+		inset-block-start: 50%;
+		transform: translateY(-50%);
+		max-inline-size: 400px;
+		margin-inline: auto;
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border-strong);
+		border-radius: var(--r-xl);
+		padding: var(--space-5);
+		z-index: 81;
+		box-shadow: var(--shadow-lg);
+	}
+
+	.activity-detail__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-block-end: var(--space-4);
+	}
+
+	.activity-detail__title {
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 700;
+	}
+
+	.activity-detail__close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		color: var(--color-text-secondary);
+
+		svg { inline-size: 14px; block-size: 14px; }
+	}
+
+	.activity-detail__row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		margin-block-end: var(--space-2);
+
+		&:last-child { margin-block-end: 0; }
+	}
+
+	.activity-detail__info {
+		flex: 1;
+		min-inline-size: 0;
+	}
+
+	.activity-detail__name {
+		display: block;
+		font-size: 0.9375rem;
+		font-weight: 700;
+	}
+
+	.activity-detail__meta {
+		display: block;
+		font-size: 0.75rem;
+		color: var(--color-text-secondary);
+		margin-block-start: 2px;
+	}
+
+	.activity-detail__delete {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--radius-md);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+		transition: color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 14px; block-size: 14px; }
+		&:hover { color: var(--color-red); }
 	}
 
 	/* Legend */

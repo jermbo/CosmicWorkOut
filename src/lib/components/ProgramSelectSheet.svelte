@@ -11,20 +11,6 @@
 		onCreateNew: () => void;
 	} = $props();
 
-	let copying = $state<string | null>(null);
-
-	async function activateOrCopy(program: Program) {
-		if (program.isBuiltIn) {
-			copying = program.id;
-			const copy = await programStore.copyProgram(program);
-			programStore.setActiveProgram(copy.id);
-			copying = null;
-		} else {
-			programStore.setActiveProgram(program.id);
-		}
-		onClose();
-	}
-
 	function switchTo(program: Program) {
 		programStore.setActiveProgram(program.id);
 		onClose();
@@ -60,21 +46,12 @@
 					</div>
 					{#if isActive}
 						<span class="prog-row__active-badge">Active</span>
-					{:else if program.isBuiltIn}
-						<button
-							class="prog-row__action-btn prog-row__action-btn--copy"
-							onclick={() => activateOrCopy(program)}
-							disabled={copying === program.id}
-							aria-busy={copying === program.id}
-						>
-							{copying === program.id ? 'Copying…' : 'Use copy'}
-						</button>
 					{:else}
 						<button
 							class="prog-row__action-btn"
 							onclick={() => switchTo(program)}
 						>
-							Switch
+							Select
 						</button>
 					{/if}
 				</div>
@@ -221,11 +198,6 @@
 			opacity: 0.6;
 			cursor: default;
 		}
-	}
-
-	.prog-row__action-btn--copy {
-		border-color: var(--color-accent);
-		color: var(--color-accent);
 	}
 
 	.prog-sheet__footer {

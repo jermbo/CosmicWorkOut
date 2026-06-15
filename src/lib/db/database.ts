@@ -1,8 +1,8 @@
-import type { Exercise, Program, SessionLog, ExerciseLastUsed } from './types';
+import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog } from './types';
 import { builtInExercises, builtInPrograms } from './seed';
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -32,6 +32,21 @@ function openDB(): Promise<IDBDatabase> {
 
 			if (!db.objectStoreNames.contains('exerciseLastUsed')) {
 				db.createObjectStore('exerciseLastUsed', { keyPath: 'exerciseId' });
+			}
+
+			if (!db.objectStoreNames.contains('activities')) {
+				const actStore = db.createObjectStore('activities', { keyPath: 'id' });
+				actStore.createIndex('by_date', 'date');
+			}
+
+			if (!db.objectStoreNames.contains('habits')) {
+				db.createObjectStore('habits', { keyPath: 'id' });
+			}
+
+			if (!db.objectStoreNames.contains('habitLogs')) {
+				const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
+				hlStore.createIndex('by_date', 'date');
+				hlStore.createIndex('by_habit', 'habitId');
 			}
 		};
 
@@ -151,7 +166,8 @@ export const db = {
 	programs: {
 		getAll: () => getAll<Program>('programs'),
 		getOne: (id: string) => getOne<Program>('programs', id),
-		put: (program: Program) => putRecord('programs', program)
+		put: (program: Program) => putRecord('programs', program),
+		remove: (id: string) => removeRecord('programs', id)
 	},
 
 	sessions: {
@@ -164,5 +180,23 @@ export const db = {
 	exerciseLastUsed: {
 		get: (exerciseId: string) => getOne<ExerciseLastUsed>('exerciseLastUsed', exerciseId),
 		put: (record: ExerciseLastUsed) => putRecord('exerciseLastUsed', record)
+	},
+
+	activities: {
+		getAll: () => getAll<ActivityLog>('activities'),
+		put: (activity: ActivityLog) => putRecord('activities', activity),
+		remove: (id: string) => removeRecord('activities', id)
+	},
+
+	habits: {
+		getAll: () => getAll<Habit>('habits'),
+		put: (habit: Habit) => putRecord('habits', habit),
+		remove: (id: string) => removeRecord('habits', id)
+	},
+
+	habitLogs: {
+		getAll: () => getAll<HabitLog>('habitLogs'),
+		put: (log: HabitLog) => putRecord('habitLogs', log),
+		remove: (id: string) => removeRecord('habitLogs', id)
 	}
 };

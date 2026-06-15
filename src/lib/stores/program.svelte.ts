@@ -357,7 +357,20 @@ class ProgramStore {
 		this.exercises = this.exercises.map((e) => (e.id === exercise.id ? exercise : e));
 	}
 
+	isExerciseInUse(id: string): boolean {
+		return this.programs.some((p) =>
+			p.weeks.some((w) =>
+				w.workouts.some((wo) =>
+					wo.exercises.some((we) => we.exerciseId === id)
+				)
+			)
+		);
+	}
+
 	async deleteExercise(id: string): Promise<void> {
+		if (this.isExerciseInUse(id)) {
+			throw new Error('Exercise is used in one or more programs. Remove it from all workouts first.');
+		}
 		try {
 			await db.exercises.remove(id);
 		} catch (e) {
@@ -365,6 +378,52 @@ class ProgramStore {
 			throw e;
 		}
 		this.exercises = this.exercises.filter((e) => e.id !== id);
+	}
+
+	async removeWorkout(workoutName: string): Promise<void> {
+		if (!this.activeProgram) return;
+
+		const firstWeek = this.activeProgram.weeks[0];
+		if (!firstWeek || firstWeek.workouts.length <= 1) return;
+
+		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
+			...week,
+			workouts: week.workouts.filter((w) => w.name !== workoutName)
+		}));
+
+		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
+		try {
+			await db.programs.put($state.snapshot(this.activeProgram));
+		} catch (e) {
+			console.error('Failed to remove workout:', e);
+			throw e;
+		}
+		this.programs = this.programs.map((p) =>
+			p.id === this.activeProgram!.id ? this.activeProgram! : p
+		);
+	}
+
+	async deleteProgram(id: string): Promise<void> {
+		const program = this.programs.find((p) => p.id === id);
+		if (!program || program.isBuiltIn) return;
+
+		try {
+			await db.programs.remove(id);
+		} catch (e) {
+			console.error('Failed to delete program:', e);
+			throw e;
+		}
+
+		this.programs = this.programs.filter((p) => p.id !== id);
+		if (this.activeProgram?.id === id) {
+			const next = this.programs[0] ?? null;
+			this.activeProgram = next;
+			if (next) {
+				localStorage.setItem(ACTIVE_PROGRAM_KEY, next.id);
+			} else {
+				localStorage.removeItem(ACTIVE_PROGRAM_KEY);
+			}
+		}
 	}
 }
 
