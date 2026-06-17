@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CompletionFeel, Density, Roundness, Habit } from '$lib/db/types';
+	import type { Density, Roundness, Habit } from '$lib/db/types';
 	import { resetWorkoutData } from '$lib/db/database';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
@@ -26,11 +26,6 @@
 		{ value: 'sharp', label: 'Sharp' },
 		{ value: 'default', label: 'Default' },
 		{ value: 'soft', label: 'Soft' },
-	];
-
-	const COMPLETION_FEELS: { value: CompletionFeel; label: string; desc: string }[] = [
-		{ value: 'full', label: 'Full', desc: 'Confetti + full ring animation' },
-		{ value: 'subtle', label: 'Subtle', desc: 'Minimal indicators, no confetti' },
 	];
 
 	let showClearDataConfirm = $state(false);
@@ -148,27 +143,6 @@
 				onchange={(v) => prefsStore.setWeightUnit(v)}
 				ariaLabel="Weight unit"
 			/>
-		</section>
-
-		<section class="settings-section" aria-labelledby="section-feel">
-			<h2 class="settings-section__title" id="section-feel">Completion Feel</h2>
-			<div class="option-list" role="radiogroup" aria-labelledby="section-feel">
-				{#each COMPLETION_FEELS as opt}
-					<button
-						class="option-row"
-						class:option-row--active={prefsStore.completionFeel === opt.value}
-						role="radio"
-						aria-checked={prefsStore.completionFeel === opt.value}
-						onclick={() => prefsStore.setCompletionFeel(opt.value)}
-					>
-						<div class="option-row__info">
-							<span class="option-row__label">{opt.label}</span>
-							<span class="option-row__desc">{opt.desc}</span>
-						</div>
-						<span class="option-row__radio" aria-hidden="true"></span>
-					</button>
-				{/each}
-			</div>
 		</section>
 
 		<section class="settings-section" aria-labelledby="section-density">
@@ -353,70 +327,6 @@
 		letter-spacing: 0.08em;
 		color: var(--color-text-secondary);
 		margin-block-end: var(--space-3);
-	}
-
-	/* Completion feel option rows */
-	.option-list {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.option-row {
-		display: flex;
-		align-items: center;
-		gap: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		padding: var(--space-3) var(--space-4);
-		text-align: start;
-		transition: border-color var(--duration-fast) var(--ease-out);
-	}
-
-	.option-row--active {
-		border-color: var(--color-accent);
-	}
-
-	.option-row__info {
-		flex: 1;
-		min-inline-size: 0;
-	}
-
-	.option-row__label {
-		display: block;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		letter-spacing: -0.01em;
-	}
-
-	.option-row__desc {
-		display: block;
-		font-size: 0.75rem;
-		color: var(--color-text-secondary);
-		margin-block-start: 2px;
-	}
-
-	.option-row__radio {
-		inline-size: 20px;
-		block-size: 20px;
-		border-radius: var(--radius-full);
-		border: 2px solid var(--color-border-strong);
-		flex-shrink: 0;
-		position: relative;
-		transition: border-color var(--duration-fast) var(--ease-out);
-	}
-
-	.option-row--active .option-row__radio {
-		border-color: var(--color-accent);
-
-		&::after {
-			content: '';
-			position: absolute;
-			inset: 3px;
-			background: var(--color-accent);
-			border-radius: var(--radius-full);
-		}
 	}
 
 	/* Habits section */

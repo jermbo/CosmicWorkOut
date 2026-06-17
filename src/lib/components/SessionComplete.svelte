@@ -4,7 +4,6 @@
 	import { formatDuration, formatVolume } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import Confetti from './Confetti.svelte';
 
 	let dialog: HTMLDialogElement;
 
@@ -24,10 +23,6 @@
 	let session = $derived(sessionStore.completedSession);
 	let totalSets = $derived(session?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 </script>
-
-{#if prefsStore.completionFeel !== 'subtle'}
-	<Confetti />
-{/if}
 
 <dialog bind:this={dialog} class="session-complete" aria-labelledby="complete-title" aria-modal="true">
 	<div class="session-complete__inner">

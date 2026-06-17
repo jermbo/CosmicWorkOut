@@ -1,6 +1,5 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type WorkoutColor = 'lime' | 'lavender' | 'red';
-export type CompletionFeel = 'full' | 'subtle';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
 export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
@@ -113,7 +112,6 @@ export interface ExerciseLastUsed {
 
 export interface UserPrefs {
 	accentColor: string;
-	completionFeel: CompletionFeel;
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';

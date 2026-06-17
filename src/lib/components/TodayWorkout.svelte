@@ -274,6 +274,14 @@
 		z-index: 1;
 	}
 
+	@container workout-card (inline-size >= 520px) {
+		.packet-card__exercises {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			column-gap: var(--space-5);
+		}
+	}
+
 	.packet-card__exercise {
 		display: flex;
 		align-items: center;

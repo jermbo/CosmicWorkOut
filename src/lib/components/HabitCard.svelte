@@ -106,11 +106,12 @@
 
 <style>
 	.habit-card {
+		container-type: inline-size;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		gap: var(--space-4);
-		padding: var(--space-5) var(--space-4) var(--space-4);
+		padding: var(--space-5);
 		background: var(--color-surface-2);
 		border: 1.5px solid var(--color-border);
 		border-radius: var(--r-2xl);
@@ -192,6 +193,8 @@
 
 	.habit-card__actions {
 		inline-size: 100%;
+		padding-inline: var(--space-1);
+		box-sizing: border-box;
 	}
 
 	.toggle-label {
@@ -199,6 +202,8 @@
 		align-items: center;
 		justify-content: center;
 		inline-size: 100%;
+		box-sizing: border-box;
+		padding-inline: var(--space-2);
 		block-size: 48px;
 		border-radius: var(--radius-full);
 		border: 1.5px solid var(--color-border);
@@ -235,6 +240,8 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
+		padding-inline: var(--space-2);
+		box-sizing: border-box;
 	}
 
 	.stepper__btn {
@@ -260,6 +267,7 @@
 
 	.stepper__step-label {
 		flex: 1;
+		min-inline-size: 0;
 		block-size: 48px;
 		border-radius: var(--radius-lg);
 		background: color-mix(in srgb, var(--color-accent) 8%, transparent);
@@ -278,6 +286,17 @@
 		&:disabled {
 			opacity: 0.4;
 			cursor: default;
+		}
+	}
+
+	@container (inline-size < 220px) {
+		.stepper__btn {
+			inline-size: 42px;
+			block-size: 42px;
+		}
+
+		.stepper__step-label {
+			font-size: 0.6875rem;
 		}
 	}
 </style>

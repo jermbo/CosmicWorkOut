@@ -1,10 +1,9 @@
-import type { UserPrefs, CompletionFeel, Density, Roundness } from '$lib/db/types';
+import type { UserPrefs, Density, Roundness } from '$lib/db/types';
 
 const PREFS_KEY = 'cwout:prefs';
 
 const DEFAULTS: UserPrefs = {
 	accentColor: '#b2f042',
-	completionFeel: 'full',
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
@@ -12,7 +11,6 @@ const DEFAULTS: UserPrefs = {
 
 class PrefsStore {
 	accentColor = $state(DEFAULTS.accentColor);
-	completionFeel = $state<CompletionFeel>(DEFAULTS.completionFeel);
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
@@ -22,7 +20,6 @@ class PrefsStore {
 		if (stored) {
 			const parsed = JSON.parse(stored) as UserPrefs;
 			this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
-			this.completionFeel = parsed.completionFeel ?? DEFAULTS.completionFeel;
 			this.density = parsed.density ?? DEFAULTS.density;
 			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
@@ -36,7 +33,6 @@ class PrefsStore {
 	private save(): void {
 		const prefs: UserPrefs = {
 			accentColor: this.accentColor,
-			completionFeel: this.completionFeel,
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
@@ -75,11 +71,6 @@ class PrefsStore {
 		this.save();
 	}
 
-	setCompletionFeel(feel: CompletionFeel): void {
-		this.completionFeel = feel;
-		this.save();
-	}
-
 	setDensity(density: Density): void {
 		this.density = density;
 		this.applyDensity();
@@ -99,7 +90,6 @@ class PrefsStore {
 
 	resetToDefaults(): void {
 		this.accentColor = DEFAULTS.accentColor;
-		this.completionFeel = DEFAULTS.completionFeel;
 		this.density = DEFAULTS.density;
 		this.roundness = DEFAULTS.roundness;
 		this.weightUnit = DEFAULTS.weightUnit;

@@ -67,7 +67,7 @@
 	<title>Workout — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="page workout-page">
+<div class="page page--wide workout-page">
 	<header class="workout-page__header">
 		<button class="back-btn" onclick={() => goto('/')} aria-label="Back to today">
 			<svg
@@ -135,18 +135,20 @@
 		</div>
 	{:else if weekWorkouts.length > 0 && selectedWorkout}
 		<!-- Active or ready to start -->
-		{#if showSuggestedHint && suggestedWorkout}
-			<p class="workout-page__hint">Suggested: {suggestedWorkout.name}</p>
-		{/if}
+		<div class="workout-page__body">
+			{#if showSuggestedHint && suggestedWorkout}
+				<p class="workout-page__hint">Suggested: {suggestedWorkout.name}</p>
+			{/if}
 
-		<WorkoutPicker
-			workouts={weekWorkouts}
-			selectedId={selectedWorkout.id}
-			suggestedId={suggestedWorkout?.id}
-			onSelect={(id) => loggingContext.setWorkoutId(id)}
-		/>
+			<WorkoutPicker
+				workouts={weekWorkouts}
+				selectedId={selectedWorkout.id}
+				suggestedId={suggestedWorkout?.id}
+				onSelect={(id) => loggingContext.setWorkoutId(id)}
+			/>
 
-		<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.exerciseMap} onStart={startSession} />
+			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.exerciseMap} onStart={startSession} />
+		</div>
 	{:else}
 		<div class="workout-page__no-program">
 			<p>No workout scheduled for this week.</p>
@@ -184,6 +186,10 @@
 {/if}
 
 <style>
+	.workout-page {
+		inline-size: 100%;
+	}
+
 	.workout-page__header {
 		display: flex;
 		align-items: center;
@@ -318,6 +324,12 @@
 		color: var(--color-text-secondary);
 		text-align: center;
 		margin-block-end: var(--space-2);
+	}
+
+	.workout-page__body {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
 	}
 
 	/* Session done */
