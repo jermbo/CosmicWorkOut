@@ -23,7 +23,7 @@ export type HabitType = 'times' | 'minutes' | 'count' | 'boolean' | 'mood';
 export const MOOD_SCALE = [
 	{ value: 5, label: 'Happy' },
 	{ value: 4, label: 'Excited' },
-	{ value: 3, label: 'Focus' },
+	{ value: 3, label: 'Focused' },
 	{ value: 2, label: 'Energized' },
 	{ value: 1, label: 'Content' },
 	{ value: 0, label: 'Normal' },
