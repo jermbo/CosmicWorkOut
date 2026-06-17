@@ -2,37 +2,26 @@
 // timezone. Using toISOString() here would be a bug: it returns the UTC date,
 // which rolls over to the next day in the evening for negative-offset users.
 
-export const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const fmtShortMonthDay = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+const fmtLongDate = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+const fmtMonthLong = new Intl.DateTimeFormat(undefined, { month: 'long' });
+const fmtMonthDayLong = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric' });
+const fmtMonthYear = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
+const fmtWeekdayShort = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
+const fmtWeekdayShortMonthDay = new Intl.DateTimeFormat(undefined, {
+	weekday: 'short',
+	month: 'short',
+	day: 'numeric',
+});
+const fmtWeekRange = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
-export const MONTHS_SHORT = [
-	'Jan',
-	'Feb',
-	'Mar',
-	'Apr',
-	'May',
-	'Jun',
-	'Jul',
-	'Aug',
-	'Sep',
-	'Oct',
-	'Nov',
-	'Dec',
-] as const;
-
-export const MONTHS = [
-	'January',
-	'February',
-	'March',
-	'April',
-	'May',
-	'June',
-	'July',
-	'August',
-	'September',
-	'October',
-	'November',
-	'December',
-] as const;
+function partValue(
+	fmt: Intl.DateTimeFormat,
+	date: Date,
+	type: Intl.DateTimeFormatPartTypes,
+): string {
+	return fmt.formatToParts(date).find((p) => p.type === type)?.value ?? '';
+}
 
 /** Local calendar date for a Date, formatted YYYY-MM-DD. */
 export function toLocalIso(date: Date): string {
@@ -61,20 +50,46 @@ export function addDays(iso: string, days: number): string {
 
 /** e.g. "Jun 17" */
 export function formatShortDate(iso: string): string {
-	const date = fromIso(iso);
-	return `${MONTHS_SHORT[date.getMonth()]} ${date.getDate()}`;
+	return fmtShortMonthDay.format(fromIso(iso));
 }
 
 /** e.g. "June 17, 2026" */
 export function formatLongDate(iso: string): string {
-	const date = fromIso(iso);
-	return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+	return fmtLongDate.format(fromIso(iso));
+}
+
+/** e.g. "June" */
+export function formatMonthLong(date: Date): string {
+	return fmtMonthLong.format(date);
+}
+
+/** e.g. "June 2026" */
+export function formatMonthYear(date: Date): string {
+	return fmtMonthYear.format(date);
+}
+
+/** e.g. "June 17" — day is the calendar day within date's month/year. */
+export function formatMonthDayLong(date: Date, day: number): string {
+	return fmtMonthDayLong.format(new Date(date.getFullYear(), date.getMonth(), day));
+}
+
+/** e.g. "Tue" */
+export function formatWeekdayShort(date: Date): string {
+	return fmtWeekdayShort.format(date);
+}
+
+/** Two-letter weekday label, e.g. "TU" */
+export function formatWeekdayAbbrev(date: Date): string {
+	return fmtWeekdayShort.format(date).slice(0, 2).toUpperCase();
 }
 
 /** e.g. "Sun, Jun 17" or "Sun · Jun 17" */
 export function formatWeekdayShortDate(iso: string, separator = ', '): string {
 	const date = fromIso(iso);
-	return `${DAYS_SHORT[date.getDay()]}${separator}${MONTHS_SHORT[date.getMonth()]} ${date.getDate()}`;
+	const weekday = partValue(fmtWeekdayShortMonthDay, date, 'weekday');
+	const month = partValue(fmtWeekdayShortMonthDay, date, 'month');
+	const day = partValue(fmtWeekdayShortMonthDay, date, 'day');
+	return `${weekday}${separator}${month} ${day}`;
 }
 
 /** Monday of the week containing iso, as YYYY-MM-DD. */
@@ -90,12 +105,5 @@ export function formatWeekRange(weekStartIso: string): string {
 	const start = fromIso(weekStartIso);
 	const end = fromIso(weekStartIso);
 	end.setDate(end.getDate() + 6);
-
-	const startLabel = `${MONTHS_SHORT[start.getMonth()]} ${start.getDate()}`;
-	const endLabel =
-		start.getMonth() === end.getMonth()
-			? String(end.getDate())
-			: `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`;
-
-	return `${startLabel} – ${endLabel}`;
+	return fmtWeekRange.formatRange(start, end);
 }

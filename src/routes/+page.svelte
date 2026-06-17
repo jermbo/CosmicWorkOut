@@ -6,7 +6,7 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { DAYS_SHORT, todayIso, fromIso, formatShortDate } from '$lib/date';
+	import { todayIso, formatShortDate, formatWeekdayShort, fromIso } from '$lib/date';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
 	const todayStr = todayIso();
@@ -24,7 +24,7 @@
 	let displayDate = $derived.by(() => {
 		const d = fromIso(contextDate);
 		return {
-			dayName: DAYS_SHORT[d.getDay()],
+			dayName: formatWeekdayShort(d),
 			dateStr: formatShortDate(contextDate),
 		};
 	});

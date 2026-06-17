@@ -4,7 +4,7 @@
 	import { MOOD_SCALE } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { DAYS_SHORT, todayIso, fromIso, toLocalIso, addDays, formatWeekdayShortDate } from '$lib/date';
+	import { todayIso, toLocalIso, addDays, formatWeekdayShortDate, formatWeekdayAbbrev } from '$lib/date';
 	import Icon from '$lib/components/Icon.svelte';
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
@@ -27,7 +27,7 @@
 			const str = toLocalIso(d);
 			days.push({
 				str,
-				dayLabel: DAYS_SHORT[d.getDay()].slice(0, 2).toUpperCase(),
+				dayLabel: formatWeekdayAbbrev(d),
 				dayNum: d.getDate(),
 				isFuture: str > todayStr,
 				isToday: str === todayStr,

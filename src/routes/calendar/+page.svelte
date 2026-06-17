@@ -4,7 +4,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { MONTHS, todayIso, formatLongDate } from '$lib/date';
+	import { formatMonthDayLong, formatMonthYear, todayIso, formatLongDate } from '$lib/date';
 	import { formatVolume } from '$lib/format';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
@@ -144,7 +144,7 @@
 	);
 
 	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
-		const base = `${MONTHS[viewDate.getMonth()]} ${dayNum}`;
+		const base = formatMonthDayLong(viewDate, dayNum);
 		const hasSession = sessionsByDate.has(dateStr);
 		const hasActivity = (activityStore.activitiesByDate.get(dateStr)?.length ?? 0) > 0;
 		const hasHabits = habitStore.logsForDate(dateStr).length > 0;
@@ -197,8 +197,7 @@
 			</button>
 
 			<span class="calendar-month__label" aria-live="polite" aria-atomic="true">
-				{MONTHS[viewDate.getMonth()]}
-				{viewDate.getFullYear()}
+				{formatMonthYear(viewDate)}
 			</span>
 
 			<button class="calendar-month__nav-btn" onclick={nextMonth} aria-label="Next month" disabled={isAtCurrentMonth}>
@@ -206,7 +205,7 @@
 			</button>
 		</div>
 
-		<div class="calendar-month__grid" role="grid" aria-label="{MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}">
+		<div class="calendar-month__grid" role="grid" aria-label={formatMonthYear(viewDate)}>
 			<div class="calendar-month__weekdays" role="row">
 				{#each WEEKDAY_HEADERS as day}
 					<div class="calendar-month__weekday" role="columnheader" aria-label={day}>{day}</div>
