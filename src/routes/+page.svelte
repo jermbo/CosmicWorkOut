@@ -112,10 +112,11 @@
 	}
 
 	let isToday = $derived(contextDate === todayStr);
+	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 </script>
 
 <svelte:head>
-	<title>Today — CosmicWorkOut</title>
+	<title>Log — CosmicWorkOut</title>
 </svelte:head>
 
 <div class="page today-page">
@@ -233,9 +234,9 @@
 				</svg>
 				Log Activity
 			</button>
-			{#if activityStore.todayActivities.length > 0}
-				<div class="activity-chips" role="list" aria-label="Today's activities">
-					{#each activityStore.todayActivities as activity (activity.id)}
+			{#if dateActivities.length > 0}
+				<div class="activity-chips" role="list" aria-label="Activities">
+					{#each dateActivities as activity (activity.id)}
 						<button
 							class="activity-chip"
 							onclick={() => openEditActivity(activity)}
@@ -253,6 +254,7 @@
 {#if showActivitySheet}
 	<ActivityLogSheet
 		editing={editingActivity}
+		initialDate={editingActivity ? undefined : contextDate}
 		onClose={() => { showActivitySheet = false; editingActivity = null; }}
 	/>
 {/if}

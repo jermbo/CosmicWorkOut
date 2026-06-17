@@ -13,10 +13,12 @@
 
 	let {
 		editing = null,
+		initialDate,
 		onClose,
 		onSave
 	}: {
 		editing?: ActivityLog | null;
+		initialDate?: string;
 		onClose: () => void;
 		onSave?: () => void;
 	} = $props();
@@ -35,7 +37,7 @@
 		customType = editing?.customType ?? '';
 		durationMinutes = editing?.durationMinutes ?? 30;
 		intensity = editing?.intensity ?? 'Moderate';
-		date = editing?.date ?? todayStr;
+		date = editing?.date ?? initialDate ?? todayStr;
 	});
 
 	async function handleSave() {

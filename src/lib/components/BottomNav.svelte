@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 
 	const navItems = [
-		{ href: '/', label: 'Today', exact: true },
+		{ href: '/', label: 'Log', exact: true },
 		{ href: '/program', label: 'Program', exact: false },
 		{ href: '/calendar', label: 'Calendar', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false }
@@ -26,7 +26,7 @@
 					class:bottom-nav__link--active={isActive(item)}
 					aria-current={isActive(item) ? 'page' : undefined}
 				>
-					{#if item.label === 'Today'}
+					{#if item.label === 'Log'}
 						<svg
 							class="bottom-nav__icon"
 							aria-hidden="true"
