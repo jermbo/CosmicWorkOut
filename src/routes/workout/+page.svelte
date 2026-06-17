@@ -7,16 +7,12 @@
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
-
-	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-	const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+	import { formatWeekdayShortDate } from '$lib/date';
+	import { formatDuration } from '$lib/format';
 
 	let contextDate = $derived(loggingContext.date);
 
-	let displayDate = $derived.by(() => {
-		const d = new Date(contextDate + 'T00:00:00');
-		return `${DAYS_SHORT[d.getDay()]}, ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
-	});
+	let displayDate = $derived(formatWeekdayShortDate(contextDate));
 
 	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
 	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
@@ -29,9 +25,7 @@
 		return suggestedWorkout;
 	});
 
-	let showSuggestedHint = $derived(
-		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id
-	);
+	let showSuggestedHint = $derived(selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id);
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
@@ -51,10 +45,6 @@
 		await sessionStore.editSession(session, workout, programStore.exerciseMap);
 	}
 
-	function formatDuration(seconds: number): string {
-		const m = Math.round(seconds / 60);
-		return `${m} min`;
-	}
 </script>
 
 <svelte:head>
@@ -62,10 +52,16 @@
 </svelte:head>
 
 <div class="page workout-page">
-
 	<header class="workout-page__header">
 		<button class="back-btn" onclick={() => goto('/')} aria-label="Back to today">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				aria-hidden="true"
+			>
 				<polyline points="15 18 9 12 15 6" />
 			</svg>
 		</button>
@@ -79,33 +75,30 @@
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
 			<div class="workout-page__spinner"></div>
 		</div>
-
 	{:else if programStore.isProgramComplete}
 		<div class="workout-complete">
 			<div class="workout-complete__icon" aria-hidden="true">🎉</div>
 			<h2 class="workout-complete__title">{programStore.activeProgram?.name ?? 'Program'} complete!</h2>
 			<p class="workout-complete__body">You finished every session. Time for something new.</p>
-			<button
-				class="workout-complete__cta"
-				onclick={() => (showProgramSelect = true)}
-			>
-				Choose a new program
-			</button>
+			<button class="workout-complete__cta" onclick={() => (showProgramSelect = true)}> Choose a new program </button>
 		</div>
-
 	{:else if !programStore.activeProgram}
 		<div class="workout-page__no-program">
 			<p>No program active.</p>
-			<button class="workout-page__choose-btn" onclick={() => (showProgramSelect = true)}>
-				Choose a program
-			</button>
+			<button class="workout-page__choose-btn" onclick={() => (showProgramSelect = true)}> Choose a program </button>
 		</div>
-
 	{:else if sessionForDate && !sessionStore.isActive}
 		<!-- Session logged for this date, not currently editing -->
 		<div class="session-done">
 			<div class="session-done__icon" aria-hidden="true">
-				<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+				<svg
+					viewBox="0 0 48 48"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
 					<polyline points="10 24 20 34 38 14" />
 				</svg>
 			</div>
@@ -115,15 +108,11 @@
 				</p>
 				<p class="session-done__meta">
 					{formatDuration(sessionForDate.durationSeconds ?? 0)}
-					· {sessionForDate.exercises.length} exercises
-					· {sessionForDate.totalVolume} lb
+					· {sessionForDate.exercises.length} exercises · {sessionForDate.totalVolume} lb
 				</p>
 			</div>
-			<button class="session-done__edit" onclick={editSession}>
-				Edit
-			</button>
+			<button class="session-done__edit" onclick={editSession}> Edit </button>
 		</div>
-
 	{:else if weekWorkouts.length > 0 && selectedWorkout}
 		<!-- Active or ready to start -->
 		{#if showSuggestedHint && suggestedWorkout}
@@ -137,25 +126,22 @@
 			onSelect={(id) => loggingContext.setWorkoutId(id)}
 		/>
 
-		<TodayWorkout
-			workout={selectedWorkout}
-			exerciseMap={programStore.exerciseMap}
-			onStart={startSession}
-		/>
-
+		<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.exerciseMap} onStart={startSession} />
 	{:else}
 		<div class="workout-page__no-program">
 			<p>No workout scheduled for this week.</p>
 			<a href="/program" class="workout-page__program-link">View program</a>
 		</div>
 	{/if}
-
 </div>
 
 {#if showProgramSelect}
 	<ProgramSelectSheet
 		onClose={() => (showProgramSelect = false)}
-		onCreateNew={() => { showProgramSelect = false; showCreateProgram = true; }}
+		onCreateNew={() => {
+			showProgramSelect = false;
+			showCreateProgram = true;
+		}}
 	/>
 {/if}
 
@@ -183,7 +169,10 @@
 		border: 1px solid var(--color-border);
 		color: var(--color-text-secondary);
 
-		svg { inline-size: 20px; block-size: 20px; }
+		svg {
+			inline-size: 20px;
+			block-size: 20px;
+		}
 	}
 
 	.workout-page__title {
@@ -218,7 +207,11 @@
 		animation: spin 700ms linear infinite;
 	}
 
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	/* Program complete */
 	.workout-complete {
@@ -316,10 +309,16 @@
 		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
 		color: var(--color-accent);
 
-		svg { inline-size: 28px; block-size: 28px; }
+		svg {
+			inline-size: 28px;
+			block-size: 28px;
+		}
 	}
 
-	.session-done__info { flex: 1; min-inline-size: 0; }
+	.session-done__info {
+		flex: 1;
+		min-inline-size: 0;
+	}
 
 	.session-done__name {
 		font-size: 1.0625rem;

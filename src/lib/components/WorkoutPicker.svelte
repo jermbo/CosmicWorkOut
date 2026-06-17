@@ -5,7 +5,7 @@
 		workouts,
 		selectedId,
 		suggestedId,
-		onSelect
+		onSelect,
 	}: {
 		workouts: Workout[];
 		selectedId: string;
@@ -16,7 +16,7 @@
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
 		lavender: 'var(--color-lavender)',
-		red: 'var(--color-red)'
+		red: 'var(--color-red)',
 	};
 </script>
 

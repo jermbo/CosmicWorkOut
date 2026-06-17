@@ -6,7 +6,7 @@
 
 	let {
 		workout: initWorkout,
-		onBack
+		onBack,
 	}: {
 		workout: Workout | null;
 		onBack: () => void;
@@ -18,7 +18,7 @@
 		name: initWorkout?.name ?? 'New Workout',
 		letter: initWorkout?.letter ?? 'D',
 		focus: initWorkout?.focus ?? '',
-		exercises: initWorkout?.exercises.map((e, i) => ({ ...e, _key: i })) ?? []
+		exercises: initWorkout?.exercises.map((e, i) => ({ ...e, _key: i })) ?? [],
 	}));
 
 	const isNew = snap.isNew;
@@ -60,8 +60,8 @@
 				exerciseId: ex.id,
 				sets: ex.defaultSets,
 				reps: ex.defaultReps,
-				_key: keyCounter
-			}
+				_key: keyCounter,
+			},
 		];
 		showLibrary = false;
 	}
@@ -85,7 +85,7 @@
 				letter,
 				focus,
 				color: 'lime',
-				exercises: clean
+				exercises: clean,
 			});
 		} else {
 			await programStore.saveWorkout(initWorkout!.name, {
@@ -93,7 +93,7 @@
 				letter,
 				focus,
 				color: initWorkout!.color ?? 'lime',
-				exercises: clean
+				exercises: clean,
 			});
 		}
 
@@ -176,12 +176,7 @@
 						Workout {letter} · {exercises.length} exercise{exercises.length !== 1 ? 's' : ''}
 					</p>
 				</div>
-				<button
-					class="workout-editor__save-btn"
-					onclick={handleSave}
-					disabled={saving}
-					aria-busy={saving}
-				>
+				<button class="workout-editor__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
 					{saving ? 'Saving…' : 'Save'}
 				</button>
 			</div>
@@ -264,11 +259,7 @@
 								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 							</svg>
 						</button>
-						<button
-							class="editor-row__del-btn"
-							onclick={() => removeExercise(i)}
-							aria-label="Remove {exercise?.name}"
-						>
+						<button class="editor-row__del-btn" onclick={() => removeExercise(i)} aria-label="Remove {exercise?.name}">
 							<svg
 								viewBox="0 0 24 24"
 								fill="none"
@@ -296,8 +287,8 @@
 													exercises[i] = { ...exercises[i], sets: ex.sets - 1 };
 												}
 											}}
-											aria-label="Decrease sets"
-										>−</button>
+											aria-label="Decrease sets">−</button
+										>
 										<span id={`sets-${i}`} aria-live="polite">{ex.sets}</span>
 										<button
 											onclick={() => {
@@ -305,8 +296,8 @@
 													exercises[i] = { ...exercises[i], sets: ex.sets + 1 };
 												}
 											}}
-											aria-label="Increase sets"
-										>+</button>
+											aria-label="Increase sets">+</button
+										>
 									</div>
 								</div>
 								<div class="inline-editor__field">

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
 	import { MOOD_SCALE } from '$lib/db/types';
+	import { formatWeekdayShortDate } from '$lib/date';
+	import { formatDuration, formatVolume } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -11,7 +13,7 @@
 		exerciseMap,
 		onClose,
 		onEdit,
-		onDelete
+		onDelete,
 	}: {
 		session: SessionLog;
 		exerciseMap: Map<string, Exercise>;
@@ -47,30 +49,8 @@
 	let workoutName = $derived(
 		programStore.getWorkoutForSession(session)?.name ??
 			programStore.getWorkoutById(session.workoutId)?.name ??
-			'Workout'
+			'Workout',
 	);
-
-	function formatDate(dateStr: string): string {
-		const d = new Date(dateStr + 'T00:00:00');
-		const months = [
-			'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-			'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-		];
-		const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		return `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}`;
-	}
-
-	function formatDuration(seconds: number): string {
-		const m = Math.round(seconds / 60);
-		return `${m} min`;
-	}
-
-	function formatVolume(volume: number): string {
-		if (volume >= 1000) {
-			return `${(volume / 1000).toFixed(1)}k`;
-		}
-		return String(volume);
-	}
 
 	async function handleEdit() {
 		const workout = programStore.getWorkoutForSession(session);
@@ -90,7 +70,7 @@
 <BottomSheet onclose={onClose}>
 	<div class="day-summary">
 		<div class="day-summary__date-badge">
-			{formatDate(session.date)}
+			{formatWeekdayShortDate(session.date, ' · ')}
 		</div>
 
 		<h2 class="day-summary__workout-name">{workoutName}</h2>
@@ -107,7 +87,7 @@
 			</div>
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
 			<div class="day-summary__stat">
-				<span class="day-summary__stat-value">{formatVolume(session.totalVolume)}</span>
+				<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
 				<span class="day-summary__stat-label">lb lifted</span>
 			</div>
 		</div>
@@ -124,7 +104,9 @@
 						{#if loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
 								{#if typeof loggedEx.sets[0].weight === 'number' && loggedEx.sets[0].weight > 0}
-									Top: {Math.max(...loggedEx.sets.filter(s => typeof s.weight === 'number').map(s => s.weight as number))} lb
+									Top: {Math.max(
+										...loggedEx.sets.filter((s) => typeof s.weight === 'number').map((s) => s.weight as number),
+									)} lb
 								{:else if typeof loggedEx.sets[0].weight === 'string'}
 									{loggedEx.sets[0].weight}
 								{:else}
@@ -151,22 +133,12 @@
 
 		<div class="day-summary__actions">
 			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
-			<button
-				class="day-summary__delete-btn"
-				onclick={() => (showDeleteConfirm = true)}
-			>
-				Delete
-			</button>
+			<button class="day-summary__delete-btn" onclick={() => (showDeleteConfirm = true)}> Delete </button>
 		</div>
 	</div>
 
 	{#if showDeleteConfirm}
-		<div
-			class="day-summary__confirm"
-			role="alertdialog"
-			aria-labelledby="delete-title"
-			aria-modal="true"
-		>
+		<div class="day-summary__confirm" role="alertdialog" aria-labelledby="delete-title" aria-modal="true">
 			<p class="day-summary__confirm-title" id="delete-title">Delete this session?</p>
 			<p class="day-summary__confirm-body">This cannot be undone.</p>
 			<div class="day-summary__confirm-actions">
@@ -176,10 +148,7 @@
 				>
 					Cancel
 				</button>
-				<button
-					class="day-summary__confirm-btn day-summary__confirm-btn--delete"
-					onclick={handleDeleteConfirm}
-				>
+				<button class="day-summary__confirm-btn day-summary__confirm-btn--delete" onclick={handleDeleteConfirm}>
 					Delete
 				</button>
 			</div>
@@ -315,7 +284,9 @@
 		padding-block: var(--space-2);
 		border-block-end: 1px dashed var(--color-border);
 
-		&:last-child { border-block-end: none; }
+		&:last-child {
+			border-block-end: none;
+		}
 	}
 
 	.day-summary__habit-name {

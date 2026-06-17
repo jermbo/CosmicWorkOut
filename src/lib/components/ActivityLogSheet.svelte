@@ -1,12 +1,23 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { todayIso } from '$lib/date';
 	import BottomSheet from './BottomSheet.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
-		'Run', 'Walk', 'Bike', 'Swim', 'Hike',
-		'Pickleball', 'Tennis', 'Basketball',
-		'Yoga', 'Stretching', 'Cardio', 'Other'
+		'Run',
+		'Walk',
+		'Bike',
+		'Swim',
+		'Hike',
+		'Pickleball',
+		'Tennis',
+		'Basketball',
+		'Yoga',
+		'Stretching',
+		'Cardio',
+		'Other',
 	];
 
 	const INTENSITIES: ActivityIntensity[] = ['Easy', 'Moderate', 'Hard'];
@@ -15,7 +26,7 @@
 		editing = null,
 		initialDate,
 		onClose,
-		onSave
+		onSave,
 	}: {
 		editing?: ActivityLog | null;
 		initialDate?: string;
@@ -23,13 +34,14 @@
 		onSave?: () => void;
 	} = $props();
 
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = todayIso();
 
-	let selectedType = $state<ActivityType>(editing?.type ?? activityStore.lastUsedType);
-	let customType = $state(editing?.customType ?? '');
-	let durationMinutes = $state(editing?.durationMinutes ?? 30);
-	let intensity = $state<ActivityIntensity>(editing?.intensity ?? 'Moderate');
-	let date = $state(editing?.date ?? initialDate ?? todayStr);
+	// Form is seeded from props once; the sheet is recreated on each open.
+	let selectedType = $state<ActivityType>(untrack(() => editing?.type ?? activityStore.lastUsedType));
+	let customType = $state(untrack(() => editing?.customType ?? ''));
+	let durationMinutes = $state(untrack(() => editing?.durationMinutes ?? 30));
+	let intensity = $state<ActivityIntensity>(untrack(() => editing?.intensity ?? 'Moderate'));
+	let date = $state(untrack(() => editing?.date ?? initialDate ?? todayStr));
 	let saving = $state(false);
 	let confirming = $state(false);
 
@@ -44,7 +56,7 @@
 					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
 					durationMinutes,
 					intensity,
-					date
+					date,
 				});
 			} else {
 				await activityStore.add({
@@ -52,7 +64,7 @@
 					type: selectedType,
 					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
 					durationMinutes,
-					intensity
+					intensity,
 				});
 			}
 			onSave?.();
@@ -68,7 +80,10 @@
 
 	async function handleDelete() {
 		if (!editing) return;
-		if (!confirming) { confirming = true; return; }
+		if (!confirming) {
+			confirming = true;
+			return;
+		}
 		try {
 			await activityStore.remove(editing.id);
 			onClose();
@@ -83,7 +98,14 @@
 		<div class="act-sheet__header">
 			<h2 class="act-sheet__title">{editing ? 'Edit Activity' : 'Log Activity'}</h2>
 			<button class="act-sheet__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
@@ -101,8 +123,10 @@
 							class:act-type-btn--active={selectedType === type}
 							role="radio"
 							aria-checked={selectedType === type}
-							onclick={() => { selectedType = type; }}
-						>{type}</button>
+							onclick={() => {
+								selectedType = type;
+							}}>{type}</button
+						>
 					{/each}
 				</div>
 				{#if selectedType === 'Other'}
@@ -137,8 +161,8 @@
 							class:act-intensity-btn--active={intensity === lvl}
 							role="radio"
 							aria-checked={intensity === lvl}
-							onclick={() => (intensity = lvl)}
-						>{lvl}</button>
+							onclick={() => (intensity = lvl)}>{lvl}</button
+						>
 					{/each}
 				</div>
 			</div>
@@ -146,19 +170,13 @@
 			<!-- Date -->
 			<div class="act-field">
 				<label class="act-field__label" for="act-date">Date</label>
-				<input
-					id="act-date"
-					class="act-date-input"
-					type="date"
-					bind:value={date}
-					max={todayStr}
-				/>
+				<input id="act-date" class="act-date-input" type="date" bind:value={date} max={todayStr} />
 			</div>
 		</div>
 
 		<div class="act-sheet__footer">
 			<button class="act-sheet__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : (editing ? 'Save changes' : 'Log activity')}
+				{saving ? 'Saving…' : editing ? 'Save changes' : 'Log activity'}
 			</button>
 			{#if editing}
 				<button
@@ -206,7 +224,10 @@
 		background: var(--color-surface-3);
 		color: var(--color-text-secondary);
 
-		svg { inline-size: 16px; block-size: 16px; }
+		svg {
+			inline-size: 16px;
+			block-size: 16px;
+		}
 	}
 
 	.act-sheet__body {
@@ -269,8 +290,12 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
 	}
 
 	.act-stepper {
@@ -288,7 +313,9 @@
 			color: var(--color-text-secondary);
 			transition: background-color var(--duration-fast) var(--ease-out);
 
-			&:hover { background: var(--color-surface-3); }
+			&:hover {
+				background: var(--color-surface-3);
+			}
 		}
 	}
 
@@ -347,7 +374,9 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
 	}
 
 	.act-sheet__footer {
@@ -370,7 +399,10 @@
 		font-weight: 700;
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:disabled { opacity: 0.6; cursor: default; }
+		&:disabled {
+			opacity: 0.6;
+			cursor: default;
+		}
 	}
 
 	.act-sheet__delete-btn {

@@ -9,13 +9,13 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 
 1. Habit types
    a. The app shall support the following named habit types, each with its own logging interaction:
-      - **Times** — generic counter, tap to increment (e.g. coffee, supplements)
-      - **Minutes** — numeric duration entry (e.g. meditation)
-      - **Count** — numeric counter with a custom unit label (e.g. glasses of water, pages read, words written)
-      - **Yes/No** — boolean toggle (e.g. alcohol, cold shower)
-      - **Mood** — integer on a fixed -5 to +5 scale with named labels (see mood scale in README)
-   b. The type determines how the habit is logged on the habit log page and how its data is stored for graphing.
-   c. Habit types shall not be changeable after creation — changing type would corrupt historical data.
+   - **Times** — generic counter, tap to increment (e.g. coffee, supplements)
+   - **Minutes** — numeric duration entry (e.g. meditation)
+   - **Count** — numeric counter with a custom unit label (e.g. glasses of water, pages read, words written)
+   - **Yes/No** — boolean toggle (e.g. alcohol, cold shower)
+   - **Mood** — integer on a fixed -5 to +5 scale with named labels (see mood scale in README)
+     b. The type determines how the habit is logged on the habit log page and how its data is stored for graphing.
+     c. Habit types shall not be changeable after creation — changing type would corrupt historical data.
 
 2. Creating a habit
    a. The user shall be able to create a new habit from the Settings page.
@@ -33,14 +33,14 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 
 4. Built-in habit presets
    a. The app shall offer the following presets as starting points when creating a new habit. Selecting a preset pre-fills the name and type; the user may edit before saving:
-      - Meditation (Minutes)
-      - Writing (Count — words)
-      - Reading (Count — pages)
-      - Water (Count — glasses)
-      - Coffee (Times)
-      - Alcohol (Yes/No)
-      - Mood (Mood)
-   b. Presets are suggestions only — the user is not required to use them and may create habits from scratch.
+   - Meditation (Minutes)
+   - Writing (Count — words)
+   - Reading (Count — pages)
+   - Water (Count — glasses)
+   - Coffee (Times)
+   - Alcohol (Yes/No)
+   - Mood (Mood)
+     b. Presets are suggestions only — the user is not required to use them and may create habits from scratch.
 
 ---
 

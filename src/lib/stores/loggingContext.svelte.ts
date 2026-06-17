@@ -1,6 +1,4 @@
-function todayIso(): string {
-	return new Date().toISOString().split('T')[0];
-}
+import { todayIso } from '$lib/date';
 
 class LoggingContextStore {
 	date = $state(todayIso());

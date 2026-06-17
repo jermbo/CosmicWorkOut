@@ -1,5 +1,11 @@
 import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog } from './types';
 import { builtInExercises, builtInPrograms, builtInHabits } from './seed';
+import { toastStore } from '$lib/stores/toast.svelte';
+
+function reportWriteError(error: unknown): void {
+	console.error('IndexedDB write failed:', error);
+	toastStore.error("Couldn't save your changes. Please try again.");
+}
 
 const DB_NAME = 'cosmic-workout';
 const DB_VERSION = 2;
@@ -93,7 +99,10 @@ async function putRecord<T>(storeName: string, value: T): Promise<void> {
 		const request = store.put(value);
 
 		request.onsuccess = () => resolve();
-		request.onerror = () => reject(request.error);
+		request.onerror = () => {
+			reportWriteError(request.error);
+			reject(request.error);
+		};
 	});
 }
 
@@ -103,7 +112,10 @@ async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
 		const tx = db.transaction(storeName, 'readwrite');
 		const store = tx.objectStore(storeName);
 		tx.oncomplete = () => resolve();
-		tx.onerror = () => reject(tx.error);
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
 		for (const value of values) {
 			store.put(value);
 		}
@@ -118,7 +130,10 @@ async function removeRecord(storeName: string, key: string): Promise<void> {
 		const request = store.delete(key);
 
 		request.onsuccess = () => resolve();
-		request.onerror = () => reject(request.error);
+		request.onerror = () => {
+			reportWriteError(request.error);
+			reject(request.error);
+		};
 	});
 }
 
@@ -165,13 +180,14 @@ export async function initDB(): Promise<void> {
 			'habit-writing': 500,
 			'habit-reading': 20,
 			'habit-water': 8,
-			'habit-coffee': 3
+			'habit-coffee': 3,
 		};
-		const toUpdate = habits.filter(
-			(h) => goalMap[h.id] !== undefined && h.dailyGoal === undefined
-		);
+		const toUpdate = habits.filter((h) => goalMap[h.id] !== undefined && h.dailyGoal === undefined);
 		if (toUpdate.length > 0) {
-			await putAllRecords('habits', toUpdate.map((h) => ({ ...h, dailyGoal: goalMap[h.id] })));
+			await putAllRecords(
+				'habits',
+				toUpdate.map((h) => ({ ...h, dailyGoal: goalMap[h.id] })),
+			);
 		}
 	}
 }
@@ -181,43 +197,43 @@ export const db = {
 		getAll: () => getAll<Exercise>('exercises'),
 		getOne: (id: string) => getOne<Exercise>('exercises', id),
 		put: (exercise: Exercise) => putRecord('exercises', exercise),
-		remove: (id: string) => removeRecord('exercises', id)
+		remove: (id: string) => removeRecord('exercises', id),
 	},
 
 	programs: {
 		getAll: () => getAll<Program>('programs'),
 		getOne: (id: string) => getOne<Program>('programs', id),
 		put: (program: Program) => putRecord('programs', program),
-		remove: (id: string) => removeRecord('programs', id)
+		remove: (id: string) => removeRecord('programs', id),
 	},
 
 	sessions: {
 		getAll: () => getAll<SessionLog>('sessions'),
 		getOne: (id: string) => getOne<SessionLog>('sessions', id),
 		put: (session: SessionLog) => putRecord('sessions', session),
-		delete: (id: string) => removeRecord('sessions', id)
+		delete: (id: string) => removeRecord('sessions', id),
 	},
 
 	exerciseLastUsed: {
 		get: (exerciseId: string) => getOne<ExerciseLastUsed>('exerciseLastUsed', exerciseId),
-		put: (record: ExerciseLastUsed) => putRecord('exerciseLastUsed', record)
+		put: (record: ExerciseLastUsed) => putRecord('exerciseLastUsed', record),
 	},
 
 	activities: {
 		getAll: () => getAll<ActivityLog>('activities'),
 		put: (activity: ActivityLog) => putRecord('activities', activity),
-		remove: (id: string) => removeRecord('activities', id)
+		remove: (id: string) => removeRecord('activities', id),
 	},
 
 	habits: {
 		getAll: () => getAll<Habit>('habits'),
 		put: (habit: Habit) => putRecord('habits', habit),
-		remove: (id: string) => removeRecord('habits', id)
+		remove: (id: string) => removeRecord('habits', id),
 	},
 
 	habitLogs: {
 		getAll: () => getAll<HabitLog>('habitLogs'),
 		put: (log: HabitLog) => putRecord('habitLogs', log),
-		remove: (id: string) => removeRecord('habitLogs', id)
-	}
+		remove: (id: string) => removeRecord('habitLogs', id),
+	},
 };

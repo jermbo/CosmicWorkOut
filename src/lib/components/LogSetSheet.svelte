@@ -11,7 +11,7 @@
 		activeSet,
 		setIndex,
 		onSave,
-		onClose
+		onClose,
 	}: {
 		exercise: Exercise;
 		activeSet: ActiveSet;
@@ -38,7 +38,7 @@
 			reps: activeSet.reps,
 			defReps: parsed.n,
 			suffix: parsed.suffix,
-			weightIncrement: exercise.weightIncrement ?? 5
+			weightIncrement: exercise.weightIncrement ?? 5,
 		};
 	});
 
@@ -56,9 +56,7 @@
 	// First time = no previous numeric weight logged
 	const isFirstTime = isLb && (typeof snap.weight !== 'number' || snap.weight <= 0);
 
-	let stepWeight = $state(
-		isLb ? roundWeight(typeof snap.weight === 'number' ? snap.weight : 0) : 0
-	);
+	let stepWeight = $state(isLb ? roundWeight(typeof snap.weight === 'number' ? snap.weight : 0) : 0);
 	let stepBand = $state(isBand ? (typeof snap.weight === 'string' ? snap.weight : 'Med') : 'Med');
 	let stepReps = $state(snap.reps > 0 ? snap.reps : defReps);
 	let manualWeightStr = $state('');
@@ -103,7 +101,7 @@
 	let hasPrevious = $derived(
 		isBand
 			? typeof activeSet.weight === 'string' && Boolean(activeSet.weight)
-			: typeof activeSet.weight === 'number' && activeSet.weight > 0
+			: typeof activeSet.weight === 'number' && activeSet.weight > 0,
 	);
 </script>
 

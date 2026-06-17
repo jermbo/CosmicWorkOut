@@ -6,15 +6,10 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { DAYS_SHORT, todayIso, fromIso, formatShortDate } from '$lib/date';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
-	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-	const MONTHS_SHORT = [
-		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-	];
-
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = todayIso();
 	let dateInputEl: HTMLInputElement | undefined = $state();
 
 	$effect(() => {
@@ -27,10 +22,10 @@
 	let contextDate = $derived(loggingContext.date);
 
 	let displayDate = $derived.by(() => {
-		const d = new Date(contextDate + 'T00:00:00');
+		const d = fromIso(contextDate);
 		return {
 			dayName: DAYS_SHORT[d.getDay()],
-			dateStr: `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`
+			dateStr: formatShortDate(contextDate),
 		};
 	});
 
@@ -124,15 +119,10 @@
 	</header>
 
 	{#if programStore.loaded}
-		<WeekStrip
-			sessions={programStore.sessions.filter(
-				(s) => s.programId === programStore.activeProgram?.id
-			)}
-		/>
+		<WeekStrip sessions={programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id)} />
 	{/if}
 
 	<div class="home-cards">
-
 		<!-- Habits card -->
 		<a
 			href="/habits"
@@ -141,7 +131,15 @@
 		>
 			<div class="home-card__header">
 				<h2 class="home-card__title">Habits</h2>
-				<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					class="home-card__chevron"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<polyline points="9 18 15 12 9 6" />
 				</svg>
 			</div>
@@ -176,7 +174,15 @@
 					{:else if sessionForDate}
 						<span class="home-card__badge home-card__badge--done">Done</span>
 					{/if}
-					<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<svg
+						class="home-card__chevron"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<polyline points="9 18 15 12 9 6" />
 					</svg>
 				</div>
@@ -203,11 +209,21 @@
 		<a
 			href="/log"
 			class="home-card home-card--log"
-			aria-label="Activity log: {dateActivities.length === 0 ? 'No activities yet' : `${dateActivities.length} ${dateActivities.length === 1 ? 'activity' : 'activities'} logged`}"
+			aria-label="Activity log: {dateActivities.length === 0
+				? 'No activities yet'
+				: `${dateActivities.length} ${dateActivities.length === 1 ? 'activity' : 'activities'} logged`}"
 		>
 			<div class="home-card__header">
 				<h2 class="home-card__title">Activity</h2>
-				<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					class="home-card__chevron"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<polyline points="9 18 15 12 9 6" />
 				</svg>
 			</div>
@@ -215,12 +231,13 @@
 				<p class="home-card__empty-note">No activities yet.</p>
 			{:else}
 				<p class="home-card__log-summary">
-					{dateActivities.length} {dateActivities.length === 1 ? 'activity' : 'activities'} logged
+					{dateActivities.length}
+					{dateActivities.length === 1 ? 'activity' : 'activities'} logged
 				</p>
 				<div class="home-card__activity-chips">
 					{#each dateActivities.slice(0, 3) as activity (activity.id)}
 						<span class="home-card__activity-chip">
-							{activity.type === 'Other' ? (activity.customType || 'Other') : activity.type} · {activity.durationMinutes} min
+							{activity.type === 'Other' ? activity.customType || 'Other' : activity.type} · {activity.durationMinutes} min
 						</span>
 					{/each}
 					{#if dateActivities.length > 3}
@@ -240,7 +257,6 @@
 			</div>
 			<p class="home-card__empty-note">Reflect on your day. Coming in a future update.</p>
 		</div>
-
 	</div>
 </div>
 
@@ -322,7 +338,9 @@
 			color: var(--color-accent);
 		}
 
-		strong { color: var(--color-text-primary); }
+		strong {
+			color: var(--color-text-primary);
+		}
 	}
 
 	/* Cards layout */
@@ -410,8 +428,13 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0.6; }
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.6;
+		}
 	}
 
 	.home-card__soon-badge {
@@ -497,7 +520,11 @@
 		animation: spin 700ms linear infinite;
 	}
 
-	@keyframes spin { to { transform: rotate(360deg); } }
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	/* Empty states */
 	.home-card__empty {

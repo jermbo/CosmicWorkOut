@@ -10,11 +10,11 @@ Six Svelte 5 class stores hold all application state. No external state library.
 
 Owns the long-lived workout data — programs, exercises, sessions, and derived schedule logic.
 
-| State | Source | Purpose |
-|-------|--------|---------|
-| `programs` | IndexedDB | All programs |
-| `exercises` | IndexedDB | Exercise library |
-| `sessions` | IndexedDB | Completed session logs |
+| State           | Source                   | Purpose                  |
+| --------------- | ------------------------ | ------------------------ |
+| `programs`      | IndexedDB                | All programs             |
+| `exercises`     | IndexedDB                | Exercise library         |
+| `sessions`      | IndexedDB                | Completed session logs   |
 | `activeProgram` | IndexedDB + localStorage | Currently active program |
 
 **Key derived values:**
@@ -44,12 +44,12 @@ Owns the long-lived workout data — programs, exercises, sessions, and derived 
 
 Owns the ephemeral active session lifecycle.
 
-| State | Storage | Purpose |
-|-------|---------|---------|
-| `active` | localStorage | In-progress session |
-| `isActive` | derived | True when a session is in progress |
-| `isComplete` | memory | Triggers completion overlay |
-| `completedSession` | memory | Stats for completion screen |
+| State              | Storage      | Purpose                            |
+| ------------------ | ------------ | ---------------------------------- |
+| `active`           | localStorage | In-progress session                |
+| `isActive`         | derived      | True when a session is in progress |
+| `isComplete`       | memory       | Triggers completion overlay        |
+| `completedSession` | memory       | Stats for completion screen        |
 
 **Key actions:**
 
@@ -71,14 +71,14 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref | Default | Applied via |
-|------|---------|-------------|
-| `accentColor` | `#b2f042` | `--color-accent` CSS var + ink color |
-| `loggingMode` | `instant` | SessionOverlay tap behavior |
-| `completionFeel` | `full` | Confetti on/off |
-| `density` | `comfortable` | `data-density` on `<html>` |
-| `roundness` | `default` | `data-roundness` on `<html>` |
-| `weightUnit` | `lb` | Display in SetTile, LogSetSheet |
+| Pref             | Default       | Applied via                          |
+| ---------------- | ------------- | ------------------------------------ |
+| `accentColor`    | `#b2f042`     | `--color-accent` CSS var + ink color |
+| `loggingMode`    | `instant`     | SessionOverlay tap behavior          |
+| `completionFeel` | `full`        | Confetti on/off                      |
+| `density`        | `comfortable` | `data-density` on `<html>`           |
+| `roundness`      | `default`     | `data-roundness` on `<html>`         |
+| `weightUnit`     | `lb`          | Display in SetTile, LogSetSheet      |
 
 All settings are editable via `/settings`.
 
@@ -90,10 +90,10 @@ All settings are editable via `/settings`.
 
 Owns habits and their daily logs.
 
-| State | Source | Purpose |
-|-------|--------|---------|
-| `habits` | IndexedDB | All habit definitions |
-| `logs` | IndexedDB | All habit log entries (all time) |
+| State    | Source    | Purpose                          |
+| -------- | --------- | -------------------------------- |
+| `habits` | IndexedDB | All habit definitions            |
+| `logs`   | IndexedDB | All habit log entries (all time) |
 
 **Key derived values:**
 
@@ -120,9 +120,9 @@ Owns habits and their daily logs.
 
 Owns non-workout activity logs (runs, walks, yoga, etc.).
 
-| State | Source | Purpose |
-|-------|--------|---------|
-| `activities` | IndexedDB | All activity log entries |
+| State          | Source       | Purpose                                |
+| -------------- | ------------ | -------------------------------------- |
+| `activities`   | IndexedDB    | All activity log entries               |
 | `lastUsedType` | localStorage | Pre-selects type on new activity sheet |
 
 **Key derived values:**
@@ -145,10 +145,10 @@ Owns non-workout activity logs (runs, walks, yoga, etc.).
 
 Global context shared across pages: the date being logged for and the selected workout.
 
-| State | Default | Purpose |
-|-------|---------|---------|
-| `date` | today's date (ISO) | Which day all pages read/write logs for |
-| `workoutId` | null | Overrides suggested workout on `/workout` |
+| State       | Default            | Purpose                                   |
+| ----------- | ------------------ | ----------------------------------------- |
+| `date`      | today's date (ISO) | Which day all pages read/write logs for   |
+| `workoutId` | null               | Overrides suggested workout on `/workout` |
 
 **Key actions:**
 

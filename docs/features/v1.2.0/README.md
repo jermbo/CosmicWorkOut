@@ -24,31 +24,31 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 ## Mood Scale
 
-| Value | Label    |
-|-------|----------|
-| +5    | Happy    |
-| +4    | Excited  |
-| +3    | Focus    |
-| +2    | Energized|
-| +1    | Content  |
-|  0    | Normal   |
-| -1    | Tired    |
-| -2    | Lonely   |
-| -3    | Sad      |
-| -4    | Angry    |
-| -5    | Stressed |
+| Value | Label     |
+| ----- | --------- |
+| +5    | Happy     |
+| +4    | Excited   |
+| +3    | Focus     |
+| +2    | Energized |
+| +1    | Content   |
+| 0     | Normal    |
+| -1    | Tired     |
+| -2    | Lonely    |
+| -3    | Sad       |
+| -4    | Angry     |
+| -5    | Stressed  |
 
 ---
 
 ## User Stories
 
-| ID                                             | Title                           | Status      |
-| ---------------------------------------------- | ------------------------------- | ----------- |
-| [US-007](./US-007-home-screen-redesign.md)     | Home Screen Redesign            | ✅ Done     |
-| [US-008](./US-008-habit-log-page.md)           | Habit Log Page                  | ✅ Done     |
-| [US-009](./US-009-habit-creation.md)           | Habit Creation & Management     | 🚧 Partial  |
-| [US-010](./US-010-habit-calendar-history.md)   | Habit History in Calendar       | ❌ Not built |
-| [US-011](./US-011-program-complete-state.md)   | Program Completion State        | ✅ Done     |
+| ID                                           | Title                       | Status       |
+| -------------------------------------------- | --------------------------- | ------------ |
+| [US-007](./US-007-home-screen-redesign.md)   | Home Screen Redesign        | ✅ Done      |
+| [US-008](./US-008-habit-log-page.md)         | Habit Log Page              | ✅ Done      |
+| [US-009](./US-009-habit-creation.md)         | Habit Creation & Management | 🚧 Partial   |
+| [US-010](./US-010-habit-calendar-history.md) | Habit History in Calendar   | ❌ Not built |
+| [US-011](./US-011-program-complete-state.md) | Program Completion State    | ✅ Done      |
 
 ### Status notes
 
@@ -60,13 +60,13 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 ## Carried Over from v1.1.0
 
-| Origin        | Requirement                             | Target Story |
-| ------------- | --------------------------------------- | ------------ |
-| US-004 req 4b | Habit history in Calendar view          | US-010       |
-| US-004 req 4b | GitHub-style heat map                   | US-010       |
-| US-004 req 1e | Habit reorder drag UI in Settings       | US-009       |
-| US-004 req 2f | Count habit correction UI on dashboard  | US-008       |
-| US-005 req 2f | Program-complete state on home screen   | US-011       |
+| Origin        | Requirement                            | Target Story |
+| ------------- | -------------------------------------- | ------------ |
+| US-004 req 4b | Habit history in Calendar view         | US-010       |
+| US-004 req 4b | GitHub-style heat map                  | US-010       |
+| US-004 req 1e | Habit reorder drag UI in Settings      | US-009       |
+| US-004 req 2f | Count habit correction UI on dashboard | US-008       |
+| US-005 req 2f | Program-complete state on home screen  | US-011       |
 
 ---
 

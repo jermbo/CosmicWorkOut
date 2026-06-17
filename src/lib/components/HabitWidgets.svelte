@@ -38,7 +38,7 @@
 		if (!durationTarget) return;
 		const val = parseInt(durationInput, 10);
 		if (!isNaN(val) && val >= 0) {
-			await habitStore.setDuration(durationTarget.id, val);
+			await habitStore.setMinutes(durationTarget.id, val);
 		}
 		durationTarget = null;
 	}
@@ -48,9 +48,12 @@
 	<div class="habit-widgets__scroll" role="list" aria-label="Habit widgets">
 		{#each habitStore.activeHabits as habit (habit.id)}
 			{@const done = isComplete(habit)}
-			{@const pct = habit.dailyGoal && habit.type !== 'boolean'
-				? Math.min(100, (getValue(habit) / habit.dailyGoal) * 100)
-				: done ? 100 : 0}
+			{@const pct =
+				habit.dailyGoal && habit.type !== 'boolean'
+					? Math.min(100, (getValue(habit) / habit.dailyGoal) * 100)
+					: done
+						? 100
+						: 0}
 			<button
 				class="hw"
 				class:hw--done={done}
@@ -61,11 +64,7 @@
 					<svg viewBox="0 0 36 36">
 						<circle class="hw__track" cx="18" cy="18" r="15" />
 						{#if pct > 0}
-							<circle
-								class="hw__fill"
-								cx="18" cy="18" r="15"
-								style:stroke-dasharray="{(pct / 100) * 94.25} 94.25"
-							/>
+							<circle class="hw__fill" cx="18" cy="18" r="15" style:stroke-dasharray="{(pct / 100) * 94.25} 94.25" />
 						{/if}
 						{#if done}
 							<polyline class="hw__check" points="12 18 16 22 24 14" />
@@ -115,7 +114,9 @@
 		scrollbar-width: none;
 		padding-block: var(--space-1);
 
-		&::-webkit-scrollbar { display: none; }
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 
 	.hw {
@@ -133,7 +134,9 @@
 			border-color var(--duration-fast) var(--ease-out),
 			background-color var(--duration-fast) var(--ease-out);
 
-		&:active { transform: scale(0.94); }
+		&:active {
+			transform: scale(0.94);
+		}
 	}
 
 	.hw--done {
@@ -145,7 +148,11 @@
 		inline-size: 40px;
 		block-size: 40px;
 
-		svg { inline-size: 100%; block-size: 100%; transform: rotate(-90deg); }
+		svg {
+			inline-size: 100%;
+			block-size: 100%;
+			transform: rotate(-90deg);
+		}
 	}
 
 	.hw__track {
@@ -249,8 +256,14 @@
 		text-align: center;
 		outline: none;
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); font-size: 1rem; font-weight: 400; }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+			font-size: 1rem;
+			font-weight: 400;
+		}
 	}
 
 	.dur-popup__unit {

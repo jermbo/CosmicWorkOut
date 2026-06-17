@@ -12,14 +12,14 @@ Every interaction in this version must be completable with minimal taps and zero
 
 ## User Stories
 
-| ID                                     | Title                       | Status |
-| -------------------------------------- | --------------------------- | ------ |
-| [US-001](./US-001-program-library.md)  | Program Library & Selection | ✅ Shipped |
-| [US-002](./US-002-custom-program.md)   | Custom Program Creation     | ✅ Shipped |
-| [US-003](./US-003-activity-logging.md) | Activity Logging            | ✅ Shipped |
+| ID                                     | Title                       | Status                                                      |
+| -------------------------------------- | --------------------------- | ----------------------------------------------------------- |
+| [US-001](./US-001-program-library.md)  | Program Library & Selection | ✅ Shipped                                                  |
+| [US-002](./US-002-custom-program.md)   | Custom Program Creation     | ✅ Shipped                                                  |
+| [US-003](./US-003-activity-logging.md) | Activity Logging            | ✅ Shipped                                                  |
 | [US-004](./US-004-habit-tracking.md)   | Habit Tracking              | ⚠️ Partial — calendar history & heat map deferred to v1.2.0 |
-| [US-005](./US-005-daily-dashboard.md)  | Daily Dashboard             | ⚠️ Partial — program-complete state deferred to v1.2.0 |
-| [US-006](./US-006-exercise-library.md) | Exercise Library            | ✅ Shipped |
+| [US-005](./US-005-daily-dashboard.md)  | Daily Dashboard             | ⚠️ Partial — program-complete state deferred to v1.2.0      |
+| [US-006](./US-006-exercise-library.md) | Exercise Library            | ✅ Shipped                                                  |
 
 ---
 

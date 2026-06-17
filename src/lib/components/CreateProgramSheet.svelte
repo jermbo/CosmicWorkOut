@@ -34,7 +34,7 @@
 
 		templates = Array.from({ length: daysPerWeek }, (_, i) => ({
 			name: `Workout ${String.fromCharCode(65 + i)}`,
-			focus: ''
+			focus: '',
 		}));
 		step = 'workouts';
 	}
@@ -48,7 +48,7 @@
 			description: description.trim(),
 			durationWeeks,
 			daysPerWeek,
-			workoutTemplates: templates
+			workoutTemplates: templates,
 		});
 
 		programStore.setActiveProgram(program.id);
@@ -64,7 +64,10 @@
 <dialog
 	bind:this={dialog}
 	class="create-overlay"
-	oncancel={(e) => { e.preventDefault(); onClose(); }}
+	oncancel={(e) => {
+		e.preventDefault();
+		onClose();
+	}}
 	aria-labelledby="create-title"
 	aria-modal="true"
 >
@@ -74,13 +77,28 @@
 			<div class="create-overlay__bar">
 				{#if step === 'workouts'}
 					<button class="icon-btn" onclick={() => (step = 'details')} aria-label="Back">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
 							<polyline points="15 18 9 12 15 6" />
 						</svg>
 					</button>
 				{:else}
 					<button class="icon-btn" onclick={onClose} aria-label="Cancel">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
 							<line x1="18" y1="6" x2="6" y2="18" />
 							<line x1="6" y1="6" x2="18" y2="18" />
 						</svg>
@@ -99,9 +117,7 @@
 					</p>
 				</div>
 				{#if step === 'details'}
-					<button class="create-overlay__next-btn" onclick={goToWorkouts}>
-						Next →
-					</button>
+					<button class="create-overlay__next-btn" onclick={goToWorkouts}> Next → </button>
 				{:else}
 					<button class="create-overlay__next-btn" onclick={handleCreate} disabled={saving} aria-busy={saving}>
 						{saving ? 'Creating…' : 'Create'}
@@ -116,21 +132,48 @@
 				<div class="create-form">
 					<div class="form-field" class:form-field--error={errors.name}>
 						<label class="form-field__label" for="prog-name">Program name</label>
-						<input id="prog-name" class="form-field__input" type="text" bind:value={name} placeholder="e.g. My Strength Block" autocomplete="off" />
+						<input
+							id="prog-name"
+							class="form-field__input"
+							type="text"
+							bind:value={name}
+							placeholder="e.g. My Strength Block"
+							autocomplete="off"
+						/>
 						{#if errors.name}<span class="form-field__error">{errors.name}</span>{/if}
 					</div>
 
 					<div class="form-field">
-						<label class="form-field__label" for="prog-desc">Description <span class="form-field__optional">optional</span></label>
-						<textarea id="prog-desc" class="form-field__textarea" bind:value={description} placeholder="What's this program about?" rows="3"></textarea>
+						<label class="form-field__label" for="prog-desc"
+							>Description <span class="form-field__optional">optional</span></label
+						>
+						<textarea
+							id="prog-desc"
+							class="form-field__textarea"
+							bind:value={description}
+							placeholder="What's this program about?"
+							rows="3"
+						></textarea>
 					</div>
 
 					<div class="form-field" class:form-field--error={errors.weeks}>
 						<label class="form-field__label" for="prog-weeks">Duration (weeks)</label>
 						<div class="stepper">
-							<button type="button" onclick={() => { if (durationWeeks > 1) durationWeeks--; }} aria-label="Decrease weeks">−</button>
+							<button
+								type="button"
+								onclick={() => {
+									if (durationWeeks > 1) durationWeeks--;
+								}}
+								aria-label="Decrease weeks">−</button
+							>
 							<span id="prog-weeks">{durationWeeks}</span>
-							<button type="button" onclick={() => { if (durationWeeks < 52) durationWeeks++; }} aria-label="Increase weeks">+</button>
+							<button
+								type="button"
+								onclick={() => {
+									if (durationWeeks < 52) durationWeeks++;
+								}}
+								aria-label="Increase weeks">+</button
+							>
 						</div>
 						{#if errors.weeks}<span class="form-field__error">{errors.weeks}</span>{/if}
 					</div>
@@ -145,8 +188,8 @@
 									class:days-chip--active={daysPerWeek === d}
 									role="radio"
 									aria-checked={daysPerWeek === d}
-									onclick={() => (daysPerWeek = d)}
-								>{d}</button>
+									onclick={() => (daysPerWeek = d)}>{d}</button
+								>
 							{/each}
 						</div>
 						{#if errors.days}<span class="form-field__error">{errors.days}</span>{/if}
@@ -154,9 +197,7 @@
 				</div>
 			{:else}
 				<div class="create-form">
-					<p class="create-form__hint">
-						Give each workout a name. You can add exercises after the program is created.
-					</p>
+					<p class="create-form__hint">Give each workout a name. You can add exercises after the program is created.</p>
 					{#each templates as tmpl, i}
 						<div class="workout-template">
 							<span class="workout-template__letter">{String.fromCharCode(65 + i)}</span>
@@ -246,7 +287,10 @@
 		color: var(--color-text-secondary);
 		flex-shrink: 0;
 
-		svg { inline-size: 20px; block-size: 20px; }
+		svg {
+			inline-size: 20px;
+			block-size: 20px;
+		}
 	}
 
 	.create-overlay__titles {
@@ -278,7 +322,10 @@
 		flex-shrink: 0;
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:disabled { opacity: 0.6; cursor: default; }
+		&:disabled {
+			opacity: 0.6;
+			cursor: default;
+		}
 	}
 
 	.create-overlay__scroll {
@@ -339,11 +386,18 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
 	}
 
-	.form-field__input--sm { block-size: 38px; font-size: 0.875rem; }
+	.form-field__input--sm {
+		block-size: 38px;
+		font-size: 0.875rem;
+	}
 
 	.form-field__textarea {
 		padding: var(--space-3);
@@ -358,8 +412,12 @@
 		line-height: 1.5;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
 	}
 
 	.form-field__error {
@@ -383,7 +441,9 @@
 			color: var(--color-text-secondary);
 			transition: background-color var(--duration-fast) var(--ease-out);
 
-			&:hover { background: var(--color-surface-3); }
+			&:hover {
+				background: var(--color-surface-3);
+			}
 		}
 
 		span {
@@ -414,7 +474,6 @@
 			background-color var(--duration-fast) var(--ease-out),
 			color var(--duration-fast) var(--ease-out),
 			border-color var(--duration-fast) var(--ease-out);
-
 	}
 
 	.days-chip--active {

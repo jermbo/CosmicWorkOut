@@ -10,6 +10,7 @@
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
+	import Toaster from '$lib/components/Toaster.svelte';
 
 	let { children } = $props();
 
@@ -19,11 +20,7 @@
 	onMount(async () => {
 		await initDB();
 		prefsStore.load();
-		await Promise.all([
-			programStore.load(),
-			habitStore.load(),
-			activityStore.load()
-		]);
+		await Promise.all([programStore.load(), habitStore.load(), activityStore.load()]);
 
 		if (sessionStore.checkForRecovery()) {
 			hasRecoverableSession = true;
@@ -44,6 +41,7 @@
 </script>
 
 <div class="app">
+	<Toaster />
 	{#if appReady}
 		<main class="app__main" id="main-content">
 			{@render children()}
@@ -60,12 +58,7 @@
 		{/if}
 
 		{#if hasRecoverableSession}
-			<div
-				class="recovery-banner"
-				role="alertdialog"
-				aria-labelledby="recovery-title"
-				aria-modal="true"
-			>
+			<div class="recovery-banner" role="alertdialog" aria-labelledby="recovery-title" aria-modal="true">
 				<p class="recovery-banner__title" id="recovery-title">Resume session?</p>
 				<p class="recovery-banner__body">You have an unfinished workout to resume.</p>
 				<div class="recovery-banner__actions">
@@ -86,17 +79,3 @@
 		</div>
 	{/if}
 </div>
-
-<style>
-	.sr-only {
-		position: absolute;
-		inline-size: 1px;
-		block-size: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border-width: 0;
-	}
-</style>

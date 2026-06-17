@@ -12,7 +12,7 @@
 		duration: 1400 + Math.random() * 1400,
 		size: 6 + Math.random() * 6,
 		startRotation: Math.floor(Math.random() * 360),
-		isRect: Math.random() > 0.5
+		isRect: Math.random() > 0.5,
 	}));
 </script>
 

@@ -1,6 +1,8 @@
 import type { Habit, HabitLog, HabitType } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
+import { todayIso } from '$lib/date';
+import { isHabitComplete, habitProgressPct } from '$lib/habits';
 
 const TODAY_KEY = 'cwout:habitDay';
 
@@ -9,18 +11,14 @@ class HabitStore {
 	logs = $state<HabitLog[]>([]);
 	loaded = $state(false);
 
-	activeHabits = $derived(
-		[...this.habits]
-			.filter((h) => h.active)
-			.sort((a, b) => a.sortOrder - b.sortOrder)
-	);
+	activeHabits = $derived([...this.habits].filter((h) => h.active).sort((a, b) => a.sortOrder - b.sortOrder));
 
 	todayStr(): string {
-		return new Date().toISOString().split('T')[0];
+		return todayIso();
 	}
 
 	todayLogs = $derived.by(() => {
-		const today = new Date().toISOString().split('T')[0];
+		const today = todayIso();
 		return this.logs.filter((l) => l.date === today);
 	});
 
@@ -33,16 +31,23 @@ class HabitStore {
 		return this.logs.filter((l) => l.date === date);
 	}
 
+	/** The logged value for a habit on a date (0 if none). */
+	valueFor(habit: Habit, date?: string): number {
+		return this.getLog(habit.id, date)?.value ?? 0;
+	}
+
+	/** Whether a habit counts as "done" on a date. */
+	isComplete(habit: Habit, date?: string): boolean {
+		return isHabitComplete(habit, this.getLog(habit.id, date));
+	}
+
+	/** Completion progress for a habit on a date, 0–100. */
+	progressPct(habit: Habit, date?: string): number {
+		return habitProgressPct(habit, this.getLog(habit.id, date));
+	}
+
 	loggedCountForDate(date: string): number {
-		const logs = this.logsForDate(date);
-		return this.activeHabits.filter((h) => {
-			const log = logs.find((l) => l.habitId === h.id);
-			if (!log) return false;
-			if (h.type === 'boolean') return log.value === 1;
-			if (h.type === 'mood') return true;
-			if (h.dailyGoal) return log.value >= h.dailyGoal;
-			return log.value > 0;
-		}).length;
+		return this.activeHabits.filter((h) => this.isComplete(h, date)).length;
 	}
 
 	// For calendar heat map: ratio of completed habits 0–1
@@ -53,13 +58,10 @@ class HabitStore {
 	}
 
 	async load(): Promise<void> {
-		const [habits, logs] = await Promise.all([
-			db.habits.getAll(),
-			db.habitLogs.getAll()
-		]);
+		const [habits, logs] = await Promise.all([db.habits.getAll(), db.habitLogs.getAll()]);
 		// Migrate legacy 'duration' type → 'minutes'
 		const normalized = habits.map((h) =>
-			(h.type as string) === 'duration' ? { ...h, type: 'minutes' as HabitType } : h
+			(h.type as string) === 'duration' ? { ...h, type: 'minutes' as HabitType } : h,
 		);
 		this.habits = normalized.sort((a, b) => a.sortOrder - b.sortOrder);
 		this.logs = logs;
@@ -68,12 +70,7 @@ class HabitStore {
 		localStorage.setItem(TODAY_KEY, this.todayStr());
 	}
 
-	async addHabit(data: {
-		name: string;
-		unit: string;
-		type: HabitType;
-		dailyGoal?: number;
-	}): Promise<Habit> {
+	async addHabit(data: { name: string; unit: string; type: HabitType; dailyGoal?: number }): Promise<Habit> {
 		const maxOrder = this.habits.reduce((m, h) => Math.max(m, h.sortOrder), -1);
 		const habit: Habit = {
 			id: generateId(),
@@ -83,7 +80,7 @@ class HabitStore {
 			dailyGoal: data.dailyGoal,
 			active: true,
 			sortOrder: maxOrder + 1,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
 		};
 		await db.habits.put(habit);
 		this.habits = [...this.habits, habit];
@@ -121,10 +118,7 @@ class HabitStore {
 		const logId = `${habitId}:${d}`;
 		const entry: HabitLog = { id: logId, habitId, date: d, value };
 		await db.habitLogs.put(entry);
-		this.logs = [
-			...this.logs.filter((l) => l.id !== logId),
-			entry
-		];
+		this.logs = [...this.logs.filter((l) => l.id !== logId), entry];
 	}
 
 	async increment(habitId: string, date?: string): Promise<void> {
@@ -139,11 +133,6 @@ class HabitStore {
 
 	async setMinutes(habitId: string, minutes: number, date?: string): Promise<void> {
 		await this.logValue(habitId, minutes, date);
-	}
-
-	// Legacy alias
-	async setDuration(habitId: string, minutes: number): Promise<void> {
-		await this.logValue(habitId, minutes);
 	}
 
 	async correctValue(habitId: string, value: number, date?: string): Promise<void> {

@@ -8,21 +8,21 @@ The core action of the app — recording a completed workout.
 
 ## Implementation Status
 
-| Story | Status | Notes |
-|-------|--------|-------|
-| Start session from Today | ✅ Built | |
-| Smart tap: instant if weight known, sheet if first time | ✅ Built | |
-| First-time weight entry (number input) | ✅ Built | Autofocuses, rounds to nearest 2.5 |
-| Weight carries forward within session | ✅ Built | Cascades to uncompleted sets |
-| Weight remembered across sessions | ✅ Built | Via `exerciseLastUsed` |
-| Tap completed set to adjust | ✅ Built | Sheet reopens; cascades to remaining sets |
-| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on exercise, default 5 |
-| Exercise completion animation + haptics | ✅ Built | |
-| Finish session + completion overlay | ✅ Built | No confirm dialog; saves completed sets only |
-| Abandon session | ✅ Built | Back arrow → confirm; nothing saved |
-| Crash recovery (resume/discard) | ✅ Built | |
-| Set tile shows weight before log | ❌ | Shows "+" only until completed |
-| Haptic on set tap | ❌ | Haptic only on exercise completion |
+| Story                                                   | Status   | Notes                                        |
+| ------------------------------------------------------- | -------- | -------------------------------------------- |
+| Start session from Today                                | ✅ Built |                                              |
+| Smart tap: instant if weight known, sheet if first time | ✅ Built |                                              |
+| First-time weight entry (number input)                  | ✅ Built | Autofocuses, rounds to nearest 2.5           |
+| Weight carries forward within session                   | ✅ Built | Cascades to uncompleted sets                 |
+| Weight remembered across sessions                       | ✅ Built | Via `exerciseLastUsed`                       |
+| Tap completed set to adjust                             | ✅ Built | Sheet reopens; cascades to remaining sets    |
+| Per-exercise weight increment (2.5 / 5 / 10)            | ✅ Built | Set on exercise, default 5                   |
+| Exercise completion animation + haptics                 | ✅ Built |                                              |
+| Finish session + completion overlay                     | ✅ Built | No confirm dialog; saves completed sets only |
+| Abandon session                                         | ✅ Built | Back arrow → confirm; nothing saved          |
+| Crash recovery (resume/discard)                         | ✅ Built |                                              |
+| Set tile shows weight before log                        | ❌       | Shows "+" only until completed               |
+| Haptic on set tap                                       | ❌       | Haptic only on exercise completion           |
 
 ---
 
@@ -87,6 +87,7 @@ flowchart TD
 **Weight cascade:** After any set is logged or adjusted, the new weight propagates forward to all uncompleted sets in that exercise. Completed sets keep their original value.
 
 **Tap animation sequence:**
+
 ```
 tap → scale down (0.93) immediately
   → white flash overlay (opacity 0.4→0, 280ms)
@@ -102,6 +103,7 @@ tap → scale down (0.93) immediately
 > As a user, I want to see a clear signal when I've finished all sets for an exercise, so I know to move on.
 
 When the last set for an exercise is logged:
+
 - Card border pulses accent (ripple animation)
 - Checkmark fades in with spring pop
 - Card background gets a subtle accent tint
@@ -114,12 +116,14 @@ When the last set for an exercise is logged:
 > As a user, I want to finish my session and see a completion moment, so I feel the workout is done.
 
 **Built today:**
+
 - Footer button always visible — label changes to "Finish early · X/Y sets" when incomplete
 - **No confirmation dialog** — tap finishes immediately
 - Only completed sets are saved; unlogged sets are silently dropped
 - SessionLog written to IndexedDB, activeSession cleared, completion overlay shown
 
 **Target (not yet):**
+
 - Confirmation prompt when finishing with unlogged sets
 
 ---

@@ -39,13 +39,13 @@ so that I can quickly check off or record each habit for the active date and mov
 When logging a mood habit, the selector shall display all 11 states as tappable radio buttons in order from most positive to most negative:
 
 | Value | Label     |
-|-------|-----------|
+| ----- | --------- |
 | +5    | Happy     |
 | +4    | Excited   |
 | +3    | Focus     |
 | +2    | Energized |
 | +1    | Content   |
-|  0    | Normal    |
+| 0     | Normal    |
 | -1    | Tired     |
 | -2    | Lonely    |
 | -3    | Sad       |

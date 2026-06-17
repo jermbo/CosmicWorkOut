@@ -7,7 +7,7 @@ const DEFAULTS: UserPrefs = {
 	completionFeel: 'full',
 	density: 'comfortable',
 	roundness: 'default',
-	weightUnit: 'lb'
+	weightUnit: 'lb',
 };
 
 class PrefsStore {
@@ -39,7 +39,7 @@ class PrefsStore {
 			completionFeel: this.completionFeel,
 			density: this.density,
 			roundness: this.roundness,
-			weightUnit: this.weightUnit
+			weightUnit: this.weightUnit,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}

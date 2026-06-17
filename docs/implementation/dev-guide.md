@@ -15,13 +15,13 @@ The dev script includes `--host`, so the server is also accessible on your local
 
 Other scripts:
 
-| Command | Purpose |
-|---------|---------|
-| `npm run build` | Production build |
-| `npm run preview` | Preview production build |
-| `npm run check` | TypeScript + Svelte type checking |
-| `npm run lint` | Prettier + ESLint |
-| `npm run format` | Auto-format with Prettier |
+| Command           | Purpose                           |
+| ----------------- | --------------------------------- |
+| `npm run build`   | Production build                  |
+| `npm run preview` | Preview production build          |
+| `npm run check`   | TypeScript + Svelte type checking |
+| `npm run lint`    | Prettier + ESLint                 |
+| `npm run format`  | Auto-format with Prettier         |
 
 ---
 
@@ -47,14 +47,14 @@ flowchart TB
 
 ## Key Files to Know
 
-| File | Why it matters |
-|------|----------------|
-| `src/routes/+layout.svelte` | App boot, global overlays |
-| `src/lib/db/database.ts` | IndexedDB open, read, write |
-| `src/lib/db/seed.ts` | Built-in exercises and programs |
-| `src/lib/db/types.ts` | All data interfaces |
-| `src/lib/stores/*.svelte.ts` | Application state |
-| `src/app.css` | Design tokens and global styles |
+| File                         | Why it matters                  |
+| ---------------------------- | ------------------------------- |
+| `src/routes/+layout.svelte`  | App boot, global overlays       |
+| `src/lib/db/database.ts`     | IndexedDB open, read, write     |
+| `src/lib/db/seed.ts`         | Built-in exercises and programs |
+| `src/lib/db/types.ts`        | All data interfaces             |
+| `src/lib/stores/*.svelte.ts` | Application state               |
+| `src/app.css`                | Design tokens and global styles |
 
 ---
 

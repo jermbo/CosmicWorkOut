@@ -32,7 +32,7 @@ This means you can train on any day of the week — the app always gives you the
 ## Week Number
 
 ```typescript
-currentWeekNumber = floor(completedSessionCount / daysPerWeek) + 1
+currentWeekNumber = floor(completedSessionCount / daysPerWeek) + 1;
 // capped at durationWeeks
 ```
 
@@ -43,7 +43,7 @@ For a 3-day/week program: sessions 0–2 → week 1, sessions 3–5 → week 2, 
 ## Workout Letter
 
 ```typescript
-currentWorkoutLetter = char(65 + (completedSessionCount % daysPerWeek))
+currentWorkoutLetter = char(65 + (completedSessionCount % daysPerWeek));
 // 0→A, 1→B, 2→C
 ```
 
@@ -72,11 +72,11 @@ The Program page shows **week 1 workout templates** (canonical A/B/C cards), not
 
 Status badges are computed by finding each template's position in the flattened `allWorkouts` array (all 36 workouts) and comparing against `todaysWorkout`'s index:
 
-| Badge | Condition |
-|-------|-----------|
-| **Today** | Template ID matches `todaysWorkout.id` |
-| **Done** | Template's index in `allWorkouts` is before today's index |
-| **Scheduled** | Template's index is after today's index |
+| Badge         | Condition                                                 |
+| ------------- | --------------------------------------------------------- |
+| **Today**     | Template ID matches `todaysWorkout.id`                    |
+| **Done**      | Template's index in `allWorkouts` is before today's index |
+| **Scheduled** | Template's index is after today's index                   |
 
 Workout edits via `saveWorkoutExercises()` propagate to **all weeks** by matching workout **name** (not ID).
 

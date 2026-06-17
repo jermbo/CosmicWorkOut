@@ -3,6 +3,7 @@
 > **Status: ⚠️ Partial**
 >
 > **Shipped:**
+>
 > - Habit definitions in Settings: add, edit, delete, toggle active/inactive
 > - Dashboard widgets: count (tap to increment), boolean (tap to toggle), duration (tap to enter minutes)
 > - Progress rings and goal display on widgets
@@ -10,6 +11,7 @@
 > - Historical log data stored and queryable by date
 >
 > **Deferred to v1.2.0:**
+>
 > - Habit reorder — store method exists (`reorder()`) but no drag UI in Settings
 > - Count correction UI — store method exists (`correctValue()`) but not exposed in the widget
 > - Habit history in Calendar view (req 4b)

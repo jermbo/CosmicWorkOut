@@ -8,17 +8,17 @@ User-configurable behavior and appearance.
 
 ## Implementation Status
 
-| Story | Status |
-|-------|--------|
+| Story                                        | Status   |
+| -------------------------------------------- | -------- | --------------------------------------------- |
 | Preferences store + localStorage persistence | ✅ Built |
-| Settings UI / route (`/settings`) | ✅ Built |
-| Accent color (presets + custom hex) | ✅ Built |
-| Density / roundness via data attributes | ✅ Built |
-| Completion feel toggles confetti | ✅ Built |
-| Weight unit in display/input | ✅ Built |
+| Settings UI / route (`/settings`)            | ✅ Built |
+| Accent color (presets + custom hex)          | ✅ Built |
+| Density / roundness via data attributes      | ✅ Built |
+| Completion feel toggles confetti             | ✅ Built |
+| Weight unit in display/input                 | ✅ Built |
 | Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
-| Clear workout data (settings) | ✅ Built | Wipes IndexedDB + session state; keeps prefs |
-| Reset preferences to defaults (settings) | ✅ Built | Resets `cwout:prefs`; workout data untouched |
+| Clear workout data (settings)                | ✅ Built | Wipes IndexedDB + session state; keeps prefs  |
+| Reset preferences to defaults (settings)     | ✅ Built | Resets `cwout:prefs`; workout data untouched  |
 
 ---
 

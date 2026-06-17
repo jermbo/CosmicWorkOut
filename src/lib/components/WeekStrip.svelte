@@ -1,37 +1,12 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
 	import { goto } from '$app/navigation';
+	import { addDays, formatWeekRange, mondayOf, todayIso, toLocalIso } from '$lib/date';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 
 	let { sessions }: { sessions: SessionLog[] } = $props();
 
-	const MONTHS_SHORT = [
-		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-	];
-
-	const todayDate = new Date();
-	const todayStr = toLocalDateStr(todayDate);
-
-	function toLocalDateStr(d: Date): string {
-		const y = d.getFullYear();
-		const m = String(d.getMonth() + 1).padStart(2, '0');
-		const day = String(d.getDate()).padStart(2, '0');
-		return `${y}-${m}-${day}`;
-	}
-
-	function mondayOf(dateStr: string): string {
-		const d = new Date(dateStr + 'T00:00:00');
-		const day = d.getDay();
-		d.setDate(d.getDate() - ((day + 6) % 7));
-		return toLocalDateStr(d);
-	}
-
-	function addDays(dateStr: string, days: number): string {
-		const d = new Date(dateStr + 'T00:00:00');
-		d.setDate(d.getDate() + days);
-		return toLocalDateStr(d);
-	}
+	const todayStr = todayIso();
 
 	function getWeekDays(weekStartStr: string) {
 		const days: { dow: string; date: number; dateStr: string; status: string }[] = [];
@@ -41,7 +16,7 @@
 		for (let i = 0; i < 7; i++) {
 			const d = new Date(monday);
 			d.setDate(monday.getDate() + i);
-			const dateStr = toLocalDateStr(d);
+			const dateStr = toLocalIso(d);
 
 			let status: string;
 			if (sessions.some((s) => s.date === dateStr)) {
@@ -56,20 +31,6 @@
 		}
 
 		return days;
-	}
-
-	function formatWeekRange(weekStartStr: string): string {
-		const start = new Date(weekStartStr + 'T00:00:00');
-		const end = new Date(weekStartStr + 'T00:00:00');
-		end.setDate(end.getDate() + 6);
-
-		const startLabel = `${MONTHS_SHORT[start.getMonth()]} ${start.getDate()}`;
-		const endLabel =
-			start.getMonth() === end.getMonth()
-				? String(end.getDate())
-				: `${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`;
-
-		return `${startLabel} – ${endLabel}`;
 	}
 
 	let selectedDate = $derived(loggingContext.date);
@@ -126,12 +87,7 @@
 <section class="week-strip" aria-label="{weekLabel} schedule">
 	<div class="week-strip__header">
 		<div class="week-strip__nav-row">
-			<button
-				type="button"
-				class="week-strip__nav-btn"
-				aria-label="Previous week"
-				onclick={() => shiftWeek(-1)}
-			>
+			<button type="button" class="week-strip__nav-btn" aria-label="Previous week" onclick={() => shiftWeek(-1)}>
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 					<polyline points="15 18 9 12 15 6" />
 				</svg>

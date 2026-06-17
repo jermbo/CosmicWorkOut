@@ -96,11 +96,11 @@ Built-in exercises are upserted on every boot (so new fields land on old records
 
 Three class-based stores using Svelte 5 runes:
 
-| Store | File | Responsibility |
-|-------|------|----------------|
+| Store          | File                | Responsibility                                 |
+| -------------- | ------------------- | ---------------------------------------------- |
 | `programStore` | `program.svelte.ts` | Programs, exercises, sessions, today's workout |
-| `sessionStore` | `session.svelte.ts` | Active session, set logging, finish/abandon |
-| `prefsStore` | `prefs.svelte.ts` | User preferences, accent color, density |
+| `sessionStore` | `session.svelte.ts` | Active session, set logging, finish/abandon    |
+| `prefsStore`   | `prefs.svelte.ts`   | User preferences, accent color, density        |
 
 See [State Management](../implementation/state.md).
 

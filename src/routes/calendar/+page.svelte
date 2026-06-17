@@ -4,14 +4,14 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { MONTHS, todayIso, formatLongDate } from '$lib/date';
+	import { formatVolume } from '$lib/format';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
-	const DAYS_SHORT = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-	const MONTHS = [
-		'January', 'February', 'March', 'April', 'May', 'June',
-		'July', 'August', 'September', 'October', 'November', 'December'
-	];
+	// Weekday header is Monday-first and 2-letter, so it stays local.
+	const WEEKDAY_HEADERS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
@@ -19,7 +19,7 @@
 	let logActivityDate = $state<string | null>(null);
 
 	const today = new Date();
-	const todayStr = today.toISOString().split('T')[0];
+	const todayStr = todayIso();
 
 	let sessionsByDate = $derived.by(() => {
 		const map = new Map<string, SessionLog>();
@@ -92,7 +92,8 @@
 				if (!habit) return null;
 				let valueStr = '';
 				if (habit.type === 'boolean') valueStr = log.value === 1 ? 'Yes' : 'No';
-				else if (habit.type === 'mood') valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
+				else if (habit.type === 'mood')
+					valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
 				else if (habit.type === 'minutes') valueStr = `${log.value} min`;
 				else valueStr = `${log.value}${habit.unit ? ' ' + habit.unit : ''}`;
 				return { name: habit.name, valueStr };
@@ -101,7 +102,7 @@
 	});
 
 	let selectedDayActivities = $derived(
-		selectedDayDate ? (activityStore.activitiesByDate.get(selectedDayDate) ?? []) : []
+		selectedDayDate ? (activityStore.activitiesByDate.get(selectedDayDate) ?? []) : [],
 	);
 
 	function handleDayTap(dateStr: string) {
@@ -118,17 +119,11 @@
 		}
 	}
 
-	let monthKey = $derived(
-		`${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}`
-	);
+	let monthKey = $derived(`${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}`);
 
-	let monthSessions = $derived(
-		[...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey))
-	);
+	let monthSessions = $derived([...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey)));
 
-	let monthActivities = $derived(
-		activityStore.activities.filter((a) => a.date.startsWith(monthKey))
-	);
+	let monthActivities = $derived(activityStore.activities.filter((a) => a.date.startsWith(monthKey)));
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));
 
@@ -144,13 +139,8 @@
 		return loggedDays;
 	});
 
-	function formatVolume(v: number): string {
-		if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
-		return v > 0 ? String(v) : '—';
-	}
-
 	let isAtCurrentMonth = $derived(
-		viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth()
+		viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth(),
 	);
 
 	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
@@ -166,8 +156,7 @@
 
 	// Format a date string for display in the day detail
 	function formatDayTitle(dateStr: string): string {
-		const d = new Date(dateStr + 'T00:00:00');
-		return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+		return formatLongDate(dateStr);
 	}
 </script>
 
@@ -204,30 +193,22 @@
 	<div class="calendar-month">
 		<div class="calendar-month__nav">
 			<button class="calendar-month__nav-btn" onclick={prevMonth} aria-label="Previous month">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<polyline points="15 18 9 12 15 6" />
-				</svg>
+				<Icon name="chevron-left" size={20} />
 			</button>
 
 			<span class="calendar-month__label" aria-live="polite" aria-atomic="true">
-				{MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
+				{MONTHS[viewDate.getMonth()]}
+				{viewDate.getFullYear()}
 			</span>
 
-			<button
-				class="calendar-month__nav-btn"
-				onclick={nextMonth}
-				aria-label="Next month"
-				disabled={isAtCurrentMonth}
-			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<polyline points="9 18 15 12 9 6" />
-				</svg>
+			<button class="calendar-month__nav-btn" onclick={nextMonth} aria-label="Next month" disabled={isAtCurrentMonth}>
+				<Icon name="chevron-right" size={20} />
 			</button>
 		</div>
 
 		<div class="calendar-month__grid" role="grid" aria-label="{MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}">
 			<div class="calendar-month__weekdays" role="row">
-				{#each DAYS_SHORT as day}
+				{#each WEEKDAY_HEADERS as day}
 					<div class="calendar-month__weekday" role="columnheader" aria-label={day}>{day}</div>
 				{/each}
 			</div>
@@ -297,14 +278,16 @@
 <!-- Day detail: habits + activities (no session) -->
 {#if selectedDayDate}
 	<div class="overlay-backdrop" role="presentation" onclick={() => (selectedDayDate = null)}></div>
-	<div class="day-detail" role="dialog" aria-label="Day summary for {formatDayTitle(selectedDayDate)}" aria-modal="true">
+	<div
+		class="day-detail"
+		role="dialog"
+		aria-label="Day summary for {formatDayTitle(selectedDayDate)}"
+		aria-modal="true"
+	>
 		<div class="day-detail__header">
 			<p class="day-detail__title">{formatDayTitle(selectedDayDate)}</p>
 			<button onclick={() => (selectedDayDate = null)} aria-label="Close" class="day-detail__close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
+				<Icon name="close" size={14} />
 			</button>
 		</div>
 
@@ -323,7 +306,7 @@
 			{#each selectedDayActivities as act (act.id)}
 				<div class="day-detail__row">
 					<div class="day-detail__row-info">
-						<span class="day-detail__row-name">{act.type === 'Other' ? (act.customType || 'Other') : act.type}</span>
+						<span class="day-detail__row-name">{act.type === 'Other' ? act.customType || 'Other' : act.type}</span>
 						<span class="day-detail__row-meta">{act.durationMinutes} min · {act.intensity}</span>
 					</div>
 				</div>
@@ -355,7 +338,9 @@
 			align-items: start;
 		}
 
-		.calendar-page__header { grid-column: 1 / -1; }
+		.calendar-page__header {
+			grid-column: 1 / -1;
+		}
 
 		.calendar-month {
 			grid-column: 1;
@@ -376,7 +361,9 @@
 			padding-block: var(--space-4);
 		}
 
-		.cal-stat__value { font-size: 1.75rem; }
+		.cal-stat__value {
+			font-size: 1.75rem;
+		}
 
 		.calendar-legend {
 			grid-column: 2;
@@ -392,7 +379,9 @@
 		}
 	}
 
-	.calendar-page__header { margin-block-end: var(--space-5); }
+	.calendar-page__header {
+		margin-block-end: var(--space-5);
+	}
 
 	.calendar-page__title {
 		font-family: var(--font-display);
@@ -463,9 +452,13 @@
 		color: var(--color-text-secondary);
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 20px; block-size: 20px; }
-		&:not(:disabled):hover { color: var(--color-text-primary); }
-		&:disabled { opacity: 0.3; cursor: default; }
+		&:not(:disabled):hover {
+			color: var(--color-text-primary);
+		}
+		&:disabled {
+			opacity: 0.3;
+			cursor: default;
+		}
 	}
 
 	.calendar-month__label {
@@ -474,7 +467,9 @@
 		font-weight: 700;
 	}
 
-	.calendar-month__grid { padding: var(--space-4); }
+	.calendar-month__grid {
+		padding: var(--space-4);
+	}
 
 	.calendar-month__weekdays {
 		display: grid;
@@ -526,7 +521,9 @@
 			border-radius: inherit;
 		}
 
-		&:not(:disabled):active { transform: scale(0.93); }
+		&:not(:disabled):active {
+			transform: scale(0.93);
+		}
 	}
 
 	.calendar-day--today {
@@ -546,9 +543,14 @@
 		cursor: default;
 	}
 
-	.calendar-day--empty { pointer-events: none; }
+	.calendar-day--empty {
+		pointer-events: none;
+	}
 
-	.calendar-day__num { line-height: 1; position: relative; }
+	.calendar-day__num {
+		line-height: 1;
+		position: relative;
+	}
 
 	.calendar-day__dots {
 		display: flex;
@@ -565,11 +567,21 @@
 		border-radius: var(--radius-full);
 	}
 
-	.calendar-day__dot--session { background: var(--color-accent); }
-	.calendar-day__dot--activity { background: var(--color-lavender); }
-	.calendar-day__dot--mood { background: var(--color-text-muted); }
-	.calendar-day__dot--mood-pos { background: #4ade80; }
-	.calendar-day__dot--mood-neg { background: #f87171; }
+	.calendar-day__dot--session {
+		background: var(--color-accent);
+	}
+	.calendar-day__dot--activity {
+		background: var(--color-lavender);
+	}
+	.calendar-day__dot--mood {
+		background: var(--color-text-muted);
+	}
+	.calendar-day__dot--mood-pos {
+		background: #4ade80;
+	}
+	.calendar-day__dot--mood-neg {
+		background: #f87171;
+	}
 
 	/* Overlays */
 	.overlay-backdrop {
@@ -618,8 +630,6 @@
 		border-radius: var(--radius-full);
 		background: var(--color-surface-3);
 		color: var(--color-text-secondary);
-
-		svg { inline-size: 14px; block-size: 14px; }
 	}
 
 	.day-detail__section-label {
@@ -638,10 +648,15 @@
 		padding-block: var(--space-2);
 		border-block-end: 1px dashed var(--color-border);
 
-		&:last-of-type { border-block-end: none; }
+		&:last-of-type {
+			border-block-end: none;
+		}
 	}
 
-	.day-detail__row-info { display: flex; flex-direction: column; }
+	.day-detail__row-info {
+		display: flex;
+		flex-direction: column;
+	}
 
 	.day-detail__row-name {
 		font-size: 0.9375rem;
@@ -686,9 +701,15 @@
 		}
 	}
 
-	.cal-legend-item--session::before { background: var(--color-accent); }
-	.cal-legend-item--activity::before { background: var(--color-lavender); }
-	.cal-legend-item--mood::before { background: #4ade80; }
+	.cal-legend-item--session::before {
+		background: var(--color-accent);
+	}
+	.cal-legend-item--activity::before {
+		background: var(--color-lavender);
+	}
+	.cal-legend-item--mood::before {
+		background: #4ade80;
+	}
 	.cal-legend-item--habits::before {
 		background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 		border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);

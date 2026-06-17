@@ -1,22 +1,21 @@
 import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
+import { todayIso } from '$lib/date';
 
 const LAST_TYPE_KEY = 'cwout:lastActivityType';
 
 class ActivityStore {
 	activities = $state<ActivityLog[]>([]);
 	loaded = $state(false);
-	lastUsedType = $state<ActivityType>(
-		(localStorage.getItem(LAST_TYPE_KEY) as ActivityType | null) ?? 'Run'
-	);
+	lastUsedType = $state<ActivityType>((localStorage.getItem(LAST_TYPE_KEY) as ActivityType | null) ?? 'Run');
 
 	todayStr(): string {
-		return new Date().toISOString().split('T')[0];
+		return todayIso();
 	}
 
 	todayActivities = $derived.by(() => {
-		const today = new Date().toISOString().split('T')[0];
+		const today = todayIso();
 		return this.activities.filter((a) => a.date === today);
 	});
 
@@ -45,7 +44,7 @@ class ActivityStore {
 		const entry: ActivityLog = {
 			id: generateId(),
 			...data,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
 		};
 		await db.activities.put(entry);
 		this.activities = [...this.activities, entry];

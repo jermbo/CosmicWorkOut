@@ -6,15 +6,15 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 
 ## Routes
 
-| Route | File | Purpose |
-|-------|------|---------|
-| `/` | `routes/+page.svelte` | Today — overview dashboard with summary cards |
-| `/habits` | `routes/habits/+page.svelte` | Habit log — progress rings, mood strip, date picker |
-| `/workout` | `routes/workout/+page.svelte` | Workout — full session start/edit UI |
-| `/log` | `routes/log/+page.svelte` | Activity log — list and log non-workout activities |
-| `/program` | `routes/program/+page.svelte` | Program — workout cards, editor entry |
-| `/calendar` | `routes/calendar/+page.svelte` | History — month grid, stats, day summary |
-| `/settings` | `routes/settings/+page.svelte` | Settings — accent, weight unit, density, feel |
+| Route       | File                           | Purpose                                             |
+| ----------- | ------------------------------ | --------------------------------------------------- |
+| `/`         | `routes/+page.svelte`          | Today — overview dashboard with summary cards       |
+| `/habits`   | `routes/habits/+page.svelte`   | Habit log — progress rings, mood strip, date picker |
+| `/workout`  | `routes/workout/+page.svelte`  | Workout — full session start/edit UI                |
+| `/log`      | `routes/log/+page.svelte`      | Activity log — list and log non-workout activities  |
+| `/program`  | `routes/program/+page.svelte`  | Program — workout cards, editor entry               |
+| `/calendar` | `routes/calendar/+page.svelte` | History — month grid, stats, day summary            |
+| `/settings` | `routes/settings/+page.svelte` | Settings — accent, weight unit, density, feel       |
 
 Navigation via `BottomNav` (Today · Habits · Workout · History · Settings). Program is accessible from the Workout page.
 

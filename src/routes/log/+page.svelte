@@ -3,37 +3,29 @@
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
-
-	const MONTHS_SHORT = [
-		'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-	];
-	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	import { formatWeekdayShortDate } from '$lib/date';
 
 	let contextDate = $derived(loggingContext.date);
 
-	let displayDate = $derived.by(() => {
-		const d = new Date(contextDate + 'T00:00:00');
-		return `${DAYS_SHORT[d.getDay()]}, ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
-	});
+	let displayDate = $derived(formatWeekdayShortDate(contextDate));
 
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
 	let showActivitySheet = $state(false);
-	let editingActivity = $state<typeof activityStore.activities[0] | null>(null);
+	let editingActivity = $state<(typeof activityStore.activities)[0] | null>(null);
 
 	function openNew() {
 		editingActivity = null;
 		showActivitySheet = true;
 	}
 
-	function openEdit(activity: typeof activityStore.activities[0]) {
+	function openEdit(activity: (typeof activityStore.activities)[0]) {
 		editingActivity = activity;
 		showActivitySheet = true;
 	}
 
-	function chipLabel(activity: typeof activityStore.activities[0]): string {
-		const name = activity.type === 'Other' ? (activity.customType || 'Other') : activity.type;
+	function chipLabel(activity: (typeof activityStore.activities)[0]): string {
+		const name = activity.type === 'Other' ? activity.customType || 'Other' : activity.type;
 		return `${name} · ${activity.durationMinutes} min · ${activity.intensity}`;
 	}
 </script>
@@ -45,7 +37,14 @@
 <div class="page log-page">
 	<header class="log-page__header">
 		<button class="log-page__back" onclick={() => goto('/')} aria-label="Back to home">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				aria-hidden="true"
+			>
 				<polyline points="15 18 9 12 15 6" />
 			</svg>
 		</button>
@@ -56,7 +55,14 @@
 	</header>
 
 	<button class="log-page__add-btn" onclick={openNew}>
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2.5"
+			stroke-linecap="round"
+			aria-hidden="true"
+		>
 			<line x1="12" y1="5" x2="12" y2="19" />
 			<line x1="5" y1="12" x2="19" y2="12" />
 		</svg>
@@ -71,23 +77,27 @@
 		<ul class="activity-list">
 			{#each dateActivities as activity (activity.id)}
 				<li>
-				<button
-					class="activity-item"
-					onclick={() => openEdit(activity)}
-					aria-label="Edit: {chipLabel(activity)}"
-				>
-					<div class="activity-item__info">
-						<span class="activity-item__name">
-							{activity.type === 'Other' ? (activity.customType || 'Other') : activity.type}
-						</span>
-						<span class="activity-item__meta">
-							{activity.durationMinutes} min · {activity.intensity}
-						</span>
-					</div>
-					<svg class="activity-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-						<polyline points="9 18 15 12 9 6" />
-					</svg>
-				</button>
+					<button class="activity-item" onclick={() => openEdit(activity)} aria-label="Edit: {chipLabel(activity)}">
+						<div class="activity-item__info">
+							<span class="activity-item__name">
+								{activity.type === 'Other' ? activity.customType || 'Other' : activity.type}
+							</span>
+							<span class="activity-item__meta">
+								{activity.durationMinutes} min · {activity.intensity}
+							</span>
+						</div>
+						<svg
+							class="activity-item__chevron"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							aria-hidden="true"
+						>
+							<polyline points="9 18 15 12 9 6" />
+						</svg>
+					</button>
 				</li>
 			{/each}
 		</ul>
@@ -98,7 +108,10 @@
 	<ActivityLogSheet
 		editing={editingActivity}
 		initialDate={editingActivity ? undefined : contextDate}
-		onClose={() => { showActivitySheet = false; editingActivity = null; }}
+		onClose={() => {
+			showActivitySheet = false;
+			editingActivity = null;
+		}}
 	/>
 {/if}
 
@@ -123,10 +136,15 @@
 		flex-shrink: 0;
 		margin-block-start: 4px;
 
-		svg { inline-size: 20px; block-size: 20px; }
+		svg {
+			inline-size: 20px;
+			block-size: 20px;
+		}
 	}
 
-	.log-page__heading { flex: 1; }
+	.log-page__heading {
+		flex: 1;
+	}
 
 	.log-page__date {
 		font-size: 0.8125rem;
@@ -162,8 +180,14 @@
 			border-color var(--duration-fast) var(--ease-out),
 			color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 18px; block-size: 18px; }
-		&:hover { border-color: var(--color-accent); color: var(--color-accent); }
+		svg {
+			inline-size: 18px;
+			block-size: 18px;
+		}
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
 	}
 
 	.log-page__empty {
@@ -181,7 +205,9 @@
 		padding: 0;
 		margin: 0;
 
-		li { display: contents; }
+		li {
+			display: contents;
+		}
 	}
 
 	.activity-item {
@@ -195,10 +221,15 @@
 		text-align: start;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:hover { border-color: var(--color-accent); }
+		&:hover {
+			border-color: var(--color-accent);
+		}
 	}
 
-	.activity-item__info { flex: 1; min-inline-size: 0; }
+	.activity-item__info {
+		flex: 1;
+		min-inline-size: 0;
+	}
 
 	.activity-item__name {
 		display: block;

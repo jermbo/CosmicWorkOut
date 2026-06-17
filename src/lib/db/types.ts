@@ -1,9 +1,22 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
+export type WorkoutColor = 'lime' | 'lavender' | 'red';
 export type CompletionFeel = 'full' | 'subtle';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
 export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
-export type ActivityType = 'Run' | 'Walk' | 'Bike' | 'Swim' | 'Hike' | 'Pickleball' | 'Tennis' | 'Basketball' | 'Yoga' | 'Stretching' | 'Cardio' | 'Other';
+export type ActivityType =
+	| 'Run'
+	| 'Walk'
+	| 'Bike'
+	| 'Swim'
+	| 'Hike'
+	| 'Pickleball'
+	| 'Tennis'
+	| 'Basketball'
+	| 'Yoga'
+	| 'Stretching'
+	| 'Cardio'
+	| 'Other';
 export type ActivityIntensity = 'Easy' | 'Moderate' | 'Hard';
 export type HabitType = 'times' | 'minutes' | 'count' | 'boolean' | 'mood';
 
@@ -46,7 +59,7 @@ export interface Workout {
 	name: string;
 	letter?: string;
 	focus?: string;
-	color?: 'lime' | 'lavender' | 'red';
+	color?: WorkoutColor;
 	estMin?: number;
 	exercises: WorkoutExercise[];
 }
