@@ -8,17 +8,42 @@ Inventory of UI components in `src/lib/components/`. Each is a self-contained Sv
 
 | Component | Used by | Purpose |
 |-----------|---------|---------|
-| `BottomNav` | Layout | Fixed 3-tab nav (Today, Program, Calendar) |
-| `BottomSheet` | Multiple | Reusable slide-up panel with backdrop |
+| `BottomNav` | Layout | Fixed 5-tab nav (Today · Habits · Workout · History · Settings) |
+| `BottomSheet` | Multiple | Reusable slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping |
 
 ---
 
-## Today Page
+## Today Page (`/`)
 
 | Component | Purpose |
 |-----------|---------|
+| `WeekStrip` | 7-day mini calendar showing this week's session activity |
+
+The today page is a summary-only dashboard. No bespoke components — it links to `/habits`, `/workout`, and `/log`.
+
+---
+
+## Habits Page (`/habits`)
+
+| Component | Purpose |
+|-----------|---------|
+| `HabitWidgets` | Compact horizontal scrollable strip of habit mini-cards with progress rings (used in home overview) |
+
+The habits page (`/habits`) is self-contained in its route file. It renders:
+- A date/week strip as `<fieldset>` with radio inputs
+- An inline mood strip as `<fieldset>` with radio inputs (always visible, saves on tap)
+- A responsive CSS grid of habit cards with SVG progress rings, +/− steppers, boolean toggles, and an exact-value `<dialog>` modal
+
+Accessibility: uses semantic `<fieldset>/<legend>/<label>/<input>` patterns throughout; focus trapping via native `<dialog>`.
+
+---
+
+## Workout Page (`/workout`)
+
+| Component | Purpose |
+|-----------|---------|
+| `WorkoutPicker` | Horizontal strip of workout tabs (A/B/C) with suggested indicator |
 | `TodayWorkout` | Workout preview card with exercise list + Start button |
-| `WeekStrip` | 7-day mini calendar showing this week's activity |
 
 ---
 
@@ -36,16 +61,29 @@ Inventory of UI components in `src/lib/components/`. Each is a self-contained Sv
 
 ---
 
-## Program Page
+## Program Page (`/program`)
 
 | Component | Purpose |
 |-----------|---------|
 | `WorkoutEditor` | Full-screen workout editor (name, exercises, sets/reps) |
 | `ExerciseLibrarySheet` | Browse/filter exercise library by category |
+| `ExerciseFormSheet` | Create or edit a custom exercise |
+| `ProgramSelectSheet` | List all programs; choose one to activate (built-ins get copied first) |
+| `CreateProgramSheet` | 2-step full-screen flow — program details then workout names; scaffolds all weeks |
+
+`ProgramSelectSheet` and `CreateProgramSheet` are also used on the `/workout` page for the program-complete state.
 
 ---
 
-## Calendar Page
+## Activity Log Page (`/log`)
+
+| Component | Purpose |
+|-----------|---------|
+| `ActivityLogSheet` | Bottom sheet for adding, editing, and deleting an activity entry |
+
+---
+
+## Calendar Page (`/calendar`)
 
 | Component | Purpose |
 |-----------|---------|
@@ -63,9 +101,38 @@ flowchart TB
         SC[SessionComplete]
     end
 
-    subgraph today ["Today Page"]
-        TW[TodayWorkout]
+    subgraph today ["Today /"]
         WS[WeekStrip]
+    end
+
+    subgraph habits ["/habits"]
+        HW[HabitWidgets]
+    end
+
+    subgraph workout ["/workout"]
+        WP[WorkoutPicker]
+        TW[TodayWorkout]
+        PSS[ProgramSelectSheet]
+        CPS[CreateProgramSheet]
+    end
+
+    subgraph log ["/log"]
+        ALS[ActivityLogSheet]
+        BS1[BottomSheet]
+    end
+
+    subgraph program ["/program"]
+        WE[WorkoutEditor]
+        ELS[ExerciseLibrarySheet]
+        EFS[ExerciseFormSheet]
+        PSS2[ProgramSelectSheet]
+        CPS2[CreateProgramSheet]
+        BS2[BottomSheet]
+    end
+
+    subgraph calendar ["/calendar"]
+        DSS[DaySummarySheet]
+        BS3[BottomSheet]
     end
 
     subgraph session ["Session Overlay"]
@@ -76,34 +143,15 @@ flowchart TB
         CF[Confetti]
     end
 
-    subgraph program ["Program Page"]
-        WE[WorkoutEditor]
-        ELS[ExerciseLibrarySheet]
-        BS[BottomSheet]
-    end
-
-    subgraph calendar ["Calendar Page"]
-        DSS[DaySummarySheet]
-    end
-
     SO --> EC
     EC --> PR & ST
     SO --> LS
     SC --> CF
-    WE --> ELS & BS
-    DSS --> BS
-```
-
-### Session flow detail
-
-```mermaid
-flowchart TB
-    SO[SessionOverlay]
-    SO --> EC1[ExerciseCard]
-    SO --> EC2[ExerciseCard ...]
-    SO --> LS[LogSetSheet]
-    EC1 --> PR[ProgressRing]
-    EC1 --> ST1[SetTile ×N]
+    ALS --> BS1
+    WE --> ELS & EFS & BS2
+    DSS --> BS3
+    PSS --> BS1
+    CPS --> BS1
 ```
 
 ---
@@ -117,6 +165,19 @@ flowchart TB
 | `lb` / `kg` | Numeric weight stepper or numpad |
 | `band` | Light / Med / Heavy selector |
 | `bodyweight` | Reps only (weight shown as BW) |
+
+---
+
+## Habit Input Types
+
+The habits page renders different input controls per `habit.type`:
+
+| Type | Input |
+|------|-------|
+| `count` | +/− stepper buttons; long tap opens exact-value `<dialog>` |
+| `minutes` | +/− stepper (5-min steps); long tap opens exact-value `<dialog>` |
+| `boolean` | Single toggle button (styled checkbox) |
+| `mood` | Inline radio strip with 11 options (-5 to +5), saves on tap |
 
 ---
 

@@ -16,8 +16,9 @@ Every interaction must be completable with minimal taps. The home screen tells y
 - **Each section is its own route** — home cards are summaries; detail and interaction happen on dedicated pages.
 - **No icons on habits (yet)** — clean, text-first. Icons are a future expansion.
 - **Fixed habit order** — habits display in the order set in Settings regardless of completion state. Consistency over smart sorting.
-- **Mood is a first-class habit type** — stored as an integer (-5 to +5) with named labels. Logged via large radio-button tap targets.
+- **Mood is a first-class habit type** — stored as an integer (-5 to +5) with named labels. Logged via large radio-button tap targets inline on the habits page (not in the grid).
 - **No custom unit types** — habits use named presets only: Times, Minutes, Count, Yes/No, Mood.
+- **Workout gets its own route** — `/workout` handles the full session start/edit flow. The home card is a compact summary only.
 
 ---
 
@@ -41,13 +42,19 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 ## User Stories
 
-| ID                                             | Title                           | Status |
-| ---------------------------------------------- | ------------------------------- | ------ |
-| [US-007](./US-007-home-screen-redesign.md)     | Home Screen Redesign            | Draft  |
-| [US-008](./US-008-habit-log-page.md)           | Habit Log Page                  | Draft  |
-| [US-009](./US-009-habit-creation.md)           | Habit Creation & Management     | Draft  |
-| [US-010](./US-010-habit-calendar-history.md)   | Habit History in Calendar       | Draft  |
-| [US-011](./US-011-program-complete-state.md)   | Program Completion State        | Draft  |
+| ID                                             | Title                           | Status      |
+| ---------------------------------------------- | ------------------------------- | ----------- |
+| [US-007](./US-007-home-screen-redesign.md)     | Home Screen Redesign            | ✅ Done     |
+| [US-008](./US-008-habit-log-page.md)           | Habit Log Page                  | ✅ Done     |
+| [US-009](./US-009-habit-creation.md)           | Habit Creation & Management     | 🚧 Partial  |
+| [US-010](./US-010-habit-calendar-history.md)   | Habit History in Calendar       | ❌ Not built |
+| [US-011](./US-011-program-complete-state.md)   | Program Completion State        | ✅ Done     |
+
+### Status notes
+
+**US-009 (Partial):** 7 built-in habits are pre-seeded (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood). The habits page works fully for interacting with these. However, no Settings UI exists yet for adding custom habits, editing existing ones, reordering, or toggling active state.
+
+**US-010 (Not built):** Habit history heatmap/calendar integration has not been started.
 
 ---
 

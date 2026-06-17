@@ -9,11 +9,11 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 ```mermaid
 flowchart TB
     subgraph browser ["Browser"]
-        UI["SvelteKit UI<br/>3 routes + overlays"]
-        Stores["Svelte Stores<br/>program · session · prefs"]
-        IDB[("IndexedDB<br/>exercises · programs · sessions")]
-        LS[("localStorage<br/>prefs · activeSession")]
-        SW["Service Worker<br/>planned — not built"]
+        UI["SvelteKit UI\n8 routes + overlays"]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · loggingContext"]
+        IDB[("IndexedDB\nexercises · programs · sessions\nhabits · habitLogs · activities")]
+        LS[("localStorage\nprefs · activeSession · activeProgramId · lastActivityType")]
+        SW["Service Worker\nplanned — not built"]
     end
 
     UI <--> Stores
@@ -30,15 +30,15 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-Three routes: **Today** (`/`), **Program** (`/program`), **Calendar** (`/calendar`). Global overlays (active session, completion screen, crash recovery) live in the root layout.
+Eight routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
 
-The UI reads and writes through three Svelte stores — no REST, no server state.
+The UI reads and writes through six Svelte stores — no REST, no server state.
 
 See [App Structure](../implementation/app-structure.md) and [Tech Stack](tech-stack.md).
 
 ### Data Layer — IndexedDB + localStorage
 
-Persistent workout data in IndexedDB via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences and in-progress sessions in localStorage for synchronous access.
+Persistent data in IndexedDB (version 2) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, and last-used activity type in localStorage for synchronous access.
 
 See [Data Model](data-model.md) and [State Management](../implementation/state.md).
 
@@ -76,17 +76,37 @@ sequenceDiagram
     participant DB as initDB()
     participant Prefs as prefsStore
     participant Prog as programStore
+    participant Hab as habitStore
+    participant Act as activityStore
     participant Sess as sessionStore
     participant UI as Today view
 
-    Layout->>DB: open IndexedDB, seed data
+    Layout->>DB: open IndexedDB v2, seed data, run migrations
     Layout->>Prefs: load() + apply CSS vars
     Layout->>Prog: load() programs, exercises, sessions
+    Layout->>Hab: load() habits, habit logs
+    Layout->>Act: load() activities
     Layout->>Sess: checkForRecovery()
     alt unfinished session from today
         Sess-->>Layout: show resume banner
     end
     Layout->>UI: appReady = true
+```
+
+### Logging a habit
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant HabitPage as /habits page
+    participant HS as habitStore
+    participant IDB as IndexedDB
+
+    User->>HabitPage: tap +/−, toggle, or mood option
+    HabitPage->>HS: increment() / toggle() / setMood()
+    HS->>IDB: put habitLog (upsert by habitId + date)
+    HS-->>HabitPage: reactive update
+    HabitPage-->>User: ring fills / value updates
 ```
 
 ### Editing a program
@@ -114,7 +134,7 @@ Today's workout is **not calendar-based**. The app advances linearly through the
 ```mermaid
 flowchart LR
     SC["completedSessionCount"] --> IDX["index = count % allWorkouts.length"]
-    IDX --> TW["todaysWorkout"]
+    IDX --> TW["suggestedWorkout"]
     SC --> WK["week = floor(count / daysPerWeek) + 1"]
 ```
 

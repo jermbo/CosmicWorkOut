@@ -20,7 +20,7 @@ type Exercise = {
   unit: "lb" | "kg" | "band" | "bodyweight";
   defaultSets: number;
   defaultReps: string;      // "8-10" or "10 ea" — string for ranges
-  weightIncrement?: number; // stepper step size in lb/kg — default 5, not used for band/bodyweight
+  weightIncrement?: number; // stepper step size in lb/kg — not used for band/bodyweight
   isBuiltIn: boolean;
 };
 ```
@@ -135,6 +135,72 @@ type ExerciseLastUsed = {
 
 ---
 
+### Habit
+
+A trackable daily behaviour.
+
+```typescript
+type HabitType = "times" | "minutes" | "count" | "boolean" | "mood";
+
+type Habit = {
+  id: string;
+  name: string;
+  unit: string;             // display label, e.g. "cups", "pages", ""
+  type: HabitType;
+  dailyGoal?: number;       // undefined for boolean and mood types
+  active: boolean;
+  sortOrder: number;
+  createdAt: string;
+};
+```
+
+Seven built-in habits ship in `src/lib/db/seed.ts`. Seeded on first run only. A boot-time migration patches `dailyGoal` onto any existing built-in records that pre-date the goal fields being added.
+
+---
+
+### HabitLog
+
+A single day's logged value for one habit.
+
+```typescript
+type HabitLog = {
+  id: string;               // composite: "habitId_dateStr"
+  habitId: string;
+  date: string;             // ISO date "2025-06-10"
+  value: number;            // 0/1 for boolean; -5..+5 for mood; count for others
+  loggedAt: string;
+};
+```
+
+One record per (habitId, date) pair. Upserted on every interaction.
+
+---
+
+### ActivityLog
+
+A non-workout physical activity entry.
+
+```typescript
+type ActivityType =
+  | "Run" | "Walk" | "Bike" | "Swim" | "Hike"
+  | "Pickleball" | "Tennis" | "Basketball"
+  | "Yoga" | "Stretching" | "Cardio" | "Other";
+
+type ActivityIntensity = "Easy" | "Moderate" | "Hard";
+
+type ActivityLog = {
+  id: string;
+  date: string;             // ISO date
+  type: ActivityType;
+  customType?: string;      // filled when type === "Other"
+  durationMinutes: number;
+  intensity: ActivityIntensity;
+  createdAt: string;
+};
+```
+
+---
+
 ### UserPrefs
 
 Stored in localStorage (`cwout:prefs`).
@@ -168,36 +234,24 @@ erDiagram
     ActiveExercise ||--|{ ActiveSet : contains
     ActiveSession ||--|| SessionLog : "becomes on finish"
     ExerciseLastUsed }o--|| Exercise : "last weight/reps"
-```
-
-```mermaid
-flowchart TB
-    subgraph idb ["IndexedDB"]
-        E[exercises]
-        P[programs]
-        S[sessions]
-        ELU[exerciseLastUsed]
-    end
-
-    subgraph ls ["localStorage"]
-        PREFS[cwout:prefs]
-        ACTIVE[cwout:activeSession]
-        PROGID[cwout:activeProgramId]
-    end
+    HabitLog }o--|| Habit : "daily value for"
 ```
 
 ---
 
 ## IndexedDB Stores
 
-| Store | Key | Index | Contents |
-|-------|-----|-------|----------|
+DB name: `cosmic-workout`, version: `2`.
+
+| Store | Key | Indexes | Contents |
+|-------|-----|---------|----------|
 | `exercises` | `id` | — | Exercise library |
 | `programs` | `id` | — | All programs |
-| `sessions` | `id` | `by_date` | Completed sessions |
+| `sessions` | `id` | `by_date` | Completed workout sessions |
 | `exerciseLastUsed` | `exerciseId` | — | Last weight/reps per exercise |
-
-DB name: `cosmic-workout`, version: `1`.
+| `activities` | `id` | `by_date` | Activity log entries |
+| `habits` | `id` | — | Habit definitions |
+| `habitLogs` | `id` | `by_date`, `by_habit` | Daily habit log values |
 
 ---
 
@@ -208,6 +262,7 @@ DB name: `cosmic-workout`, version: `1`.
 | `cwout:prefs` | UserPrefs JSON |
 | `cwout:activeSession` | ActiveSession JSON (crash recovery) |
 | `cwout:activeProgramId` | Active program ID |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet) |
 
 ---
 

@@ -8,11 +8,15 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 
 | Route | File | Purpose |
 |-------|------|---------|
-| `/` | `routes/+page.svelte` | Today — workout card, streak, week strip |
+| `/` | `routes/+page.svelte` | Today — overview dashboard with summary cards |
+| `/habits` | `routes/habits/+page.svelte` | Habit log — progress rings, mood strip, date picker |
+| `/workout` | `routes/workout/+page.svelte` | Workout — full session start/edit UI |
+| `/log` | `routes/log/+page.svelte` | Activity log — list and log non-workout activities |
 | `/program` | `routes/program/+page.svelte` | Program — workout cards, editor entry |
 | `/calendar` | `routes/calendar/+page.svelte` | History — month grid, stats, day summary |
+| `/settings` | `routes/settings/+page.svelte` | Settings — accent, weight unit, density, feel |
 
-Navigation via fixed `BottomNav` (Today · Program · Calendar). No settings route yet.
+Navigation via `BottomNav` (Today · Habits · Workout · History · Settings). Program is accessible from the Workout page.
 
 ---
 
@@ -25,13 +29,17 @@ flowchart TB
     Layout["+layout.svelte"]
     Layout --> Main["main — page content"]
     Layout --> Nav[BottomNav]
-    Layout --> Overlay["SessionOverlay<br/>(isActive)"]
-    Layout --> Complete["SessionComplete<br/>(isComplete)"]
-    Layout --> Recovery["Recovery banner<br/>(unfinished session)"]
+    Layout --> Overlay["SessionOverlay (isActive)"]
+    Layout --> Complete["SessionComplete (isComplete)"]
+    Layout --> Recovery["Recovery banner (unfinished session)"]
 
     Main --> Today["/ Today"]
+    Main --> Habits["/habits"]
+    Main --> Workout["/workout"]
+    Main --> Log["/log"]
     Main --> Program["/program"]
     Main --> Calendar["/calendar"]
+    Main --> Settings["/settings"]
 ```
 
 `routes/+layout.ts` sets `ssr = false` — fully client-rendered.
@@ -48,50 +56,59 @@ sequenceDiagram
     participant DB as initDB
     participant P as prefsStore
     participant Prog as programStore
+    participant H as habitStore
+    participant A as activityStore
     participant S as sessionStore
 
-    L->>DB: open IndexedDB, seed if empty
+    L->>DB: open IndexedDB v2, seed if empty, run migrations
     L->>P: load prefs, apply to DOM
     L->>Prog: load programs, exercises, sessions
+    L->>H: load habits, habit logs
+    L->>A: load activities
     L->>S: checkForRecovery()
     L->>L: appReady = true
 ```
 
-1. `initDB()` — open IndexedDB, upsert exercises, seed programs if empty
+1. `initDB()` — open IndexedDB (version 2), upsert exercises, seed programs + habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
 2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
 3. `programStore.load()` — load programs, exercises, sessions; pick active program
-4. `sessionStore.checkForRecovery()` — flag recoverable session if from today
-5. Set `appReady = true` → render app
+4. `habitStore.load()` — load habits and all habit logs
+5. `activityStore.load()` — load all activity logs
+6. `sessionStore.checkForRecovery()` — flag recoverable session if from today
+7. Set `appReady = true` → render app
 
 ---
 
 ## Source Layout
 
-```mermaid
-flowchart TB
-    src[src/]
-    src --> appcss[app.css]
-    src --> apphtml[app.html]
-    src --> routes[routes/]
-    src --> lib[lib/]
-
-    routes --> layout["+layout.svelte / .ts"]
-    routes --> today["+page.svelte (Today)"]
-    routes --> progpage["program/+page.svelte"]
-    routes --> calpage["calendar/+page.svelte"]
-
-    lib --> db[db/]
-    lib --> stores[stores/]
-    lib --> components[components/]
-    lib --> utils[utils.ts]
-
-    db --> types[types.ts]
-    db --> database[database.ts]
-    db --> seed[seed.ts]
-
-    stores --> ps[program.svelte.ts]
-    stores --> ss[session.svelte.ts]
-    stores --> pr[prefs.svelte.ts]
+```
+src/
+├── app.css
+├── app.html
+├── routes/
+│   ├── +layout.svelte / .ts
+│   ├── +page.svelte          (Today)
+│   ├── habits/+page.svelte
+│   ├── workout/+page.svelte
+│   ├── log/+page.svelte
+│   ├── program/+page.svelte
+│   ├── calendar/+page.svelte
+│   └── settings/+page.svelte
+└── lib/
+    ├── db/
+    │   ├── types.ts
+    │   ├── database.ts
+    │   └── seed.ts
+    ├── stores/
+    │   ├── program.svelte.ts
+    │   ├── session.svelte.ts
+    │   ├── prefs.svelte.ts
+    │   ├── habits.svelte.ts
+    │   ├── activities.svelte.ts
+    │   └── loggingContext.svelte.ts
+    ├── components/
+    │   └── *.svelte
+    └── utils.ts
 ```
 
 ---
