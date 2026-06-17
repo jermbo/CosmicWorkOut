@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
+	import { formatCount, formatMinutes, minuteUnitLabel } from '$lib/format';
 	import ProgressRing from './ProgressRing.svelte';
 	import Icon from './Icon.svelte';
 
@@ -27,8 +28,10 @@
 		oneditexact: () => void;
 	} = $props();
 
-	let unitLabel = $derived(habit.type === 'minutes' ? 'min' : habit.unit);
-	let stepLabel = $derived(habit.type === 'minutes' ? `${step} min` : habit.unit ? `${step} ${habit.unit}` : `${step}`);
+	let unitLabel = $derived(habit.type === 'minutes' ? minuteUnitLabel() : habit.unit);
+	let stepLabel = $derived(
+		habit.type === 'minutes' ? formatMinutes(step) : formatCount(step, habit.unit || undefined),
+	);
 </script>
 
 <div class="habit-card" class:habit-card--done={done}>

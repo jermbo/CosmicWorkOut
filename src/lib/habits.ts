@@ -1,4 +1,6 @@
 import type { Habit, HabitLog, HabitType } from '$lib/db/types';
+import { MOOD_SCALE } from '$lib/db/types';
+import { formatCount, formatMinutes } from '$lib/format';
 
 export const HABIT_TYPES: { value: HabitType; label: string; desc: string }[] = [
 	{ value: 'times', label: 'Times', desc: 'Tap to increment — no unit (e.g. coffee, supplements)' },
@@ -20,6 +22,21 @@ export const HABIT_PRESETS: { name: string; type: HabitType; unit: string }[] = 
 
 export function habitTypeLabel(type: HabitType): string {
 	return HABIT_TYPES.find((t) => t.value === type)?.label ?? type;
+}
+
+/** Display string for a habit log value in summaries and history views. */
+export function formatHabitLogValue(habit: Habit, value: number): string {
+	if (habit.type === 'boolean') return value === 1 ? 'Yes' : 'No';
+	if (habit.type === 'mood') {
+		return MOOD_SCALE.find((m) => m.value === value)?.label ?? String(value);
+	}
+	if (habit.type === 'minutes') return formatMinutes(value);
+	return formatCount(value, habit.unit || undefined);
+}
+
+/** Mood label for a numeric mood value. */
+export function formatMoodValue(value: number): string {
+	return MOOD_SCALE.find((m) => m.value === value)?.label ?? '—';
 }
 
 /** Whether a habit counts as "done" given its log — the single source of truth. */

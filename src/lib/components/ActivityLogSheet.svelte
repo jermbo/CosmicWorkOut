@@ -3,6 +3,7 @@
 	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { todayIso } from '$lib/date';
+	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
@@ -146,7 +147,7 @@
 				<span class="act-field__label">Duration</span>
 				<div class="act-stepper" aria-label="Duration in minutes">
 					<button onclick={() => adjustDuration(-5)} aria-label="Decrease 5 minutes">−</button>
-					<span class="act-stepper__val">{durationMinutes}<span class="act-stepper__unit">min</span></span>
+					<span class="act-stepper__val">{formatMinutes(durationMinutes)}</span>
 					<button onclick={() => adjustDuration(5)} aria-label="Increase 5 minutes">+</button>
 				</div>
 			</div>
@@ -329,12 +330,6 @@
 		align-items: baseline;
 		justify-content: center;
 		gap: 4px;
-	}
-
-	.act-stepper__unit {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--color-text-secondary);
 	}
 
 	.act-intensity {

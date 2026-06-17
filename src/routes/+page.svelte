@@ -7,6 +7,7 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { todayIso, formatShortDate, formatWeekdayShort, fromIso } from '$lib/date';
+	import { formatDuration, formatMinutes } from '$lib/format';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
 	const todayStr = todayIso();
@@ -49,11 +50,10 @@
 	});
 	let workoutMeta = $derived.by(() => {
 		if (sessionForDate) {
-			const m = Math.round((sessionForDate.durationSeconds ?? 0) / 60);
-			return `${m} min · ${sessionForDate.exercises.length} exercises`;
+			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${sessionForDate.exercises.length} exercises`;
 		}
 		if (suggestedWorkout) {
-			return `${suggestedWorkout.exercises.length} exercises · ~${suggestedWorkout.estMin} min`;
+			return `${suggestedWorkout.exercises.length} exercises · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
 		}
 		return null;
 	});
@@ -237,7 +237,7 @@
 				<div class="home-card__activity-chips">
 					{#each dateActivities.slice(0, 3) as activity (activity.id)}
 						<span class="home-card__activity-chip">
-							{activity.type === 'Other' ? activity.customType || 'Other' : activity.type} · {activity.durationMinutes} min
+							{activity.type === 'Other' ? activity.customType || 'Other' : activity.type} · {formatMinutes(activity.durationMinutes)}
 						</span>
 					{/each}
 					{#if dateActivities.length > 3}

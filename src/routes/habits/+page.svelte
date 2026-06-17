@@ -5,6 +5,8 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { todayIso, toLocalIso, addDays, formatWeekdayShortDate, formatWeekdayAbbrev } from '$lib/date';
+	import { formatMoodValue } from '$lib/habits';
+	import { minuteUnitLabel } from '$lib/format';
 	import Icon from '$lib/components/Icon.svelte';
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
@@ -58,7 +60,7 @@
 	}
 
 	function getMoodLabel(value: number): string {
-		return MOOD_SCALE.find((m) => m.value === value)?.label ?? '—';
+		return formatMoodValue(value);
 	}
 
 	const MOOD_SCALE_ASC = [...MOOD_SCALE].reverse(); // -5 → +5 for left-to-right display
@@ -241,7 +243,7 @@
 {#if exactTarget}
 	<ValueDialog
 		title={exactTarget.name}
-		unit={exactTarget.type === 'minutes' ? 'min' : exactTarget.unit || ''}
+		unit={exactTarget.type === 'minutes' ? minuteUnitLabel() : exactTarget.unit || ''}
 		initialValue={habitStore.valueFor(exactTarget, contextDate)}
 		onsave={saveExact}
 		onclose={() => (exactTarget = null)}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { formatElapsed } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
@@ -22,9 +23,7 @@
 		clearInterval(timerInterval);
 	});
 
-	let elapsedFormatted = $derived(
-		`${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`,
-	);
+	let elapsedFormatted = $derived(formatElapsed(elapsed));
 
 	let totalSets = $derived(sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 

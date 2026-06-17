@@ -14,6 +14,16 @@ const fmtWeekdayShortMonthDay = new Intl.DateTimeFormat(undefined, {
 	day: 'numeric',
 });
 const fmtWeekRange = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+const fmtWeekdayNarrow = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
+
+// Jan 1 2024 is a Monday — stable reference for Monday-first weekday headers.
+const MONDAY_REF = new Date(2024, 0, 1);
+
+function mondayPlusDays(days: number): Date {
+	const date = new Date(MONDAY_REF);
+	date.setDate(MONDAY_REF.getDate() + days);
+	return date;
+}
 
 function partValue(
 	fmt: Intl.DateTimeFormat,
@@ -81,6 +91,20 @@ export function formatWeekdayShort(date: Date): string {
 /** Two-letter weekday label, e.g. "TU" */
 export function formatWeekdayAbbrev(date: Date): string {
 	return fmtWeekdayShort.format(date).slice(0, 2).toUpperCase();
+}
+
+/** e.g. "T" or "M" */
+export function formatWeekdayNarrow(date: Date): string {
+	return fmtWeekdayNarrow.format(date);
+}
+
+/** Monday-first weekday column headers. chars: 1 = narrow, 2 = two-letter short. */
+export function weekdayHeadersMondayFirst(chars: 1 | 2 = 2): readonly string[] {
+	const fmt = new Intl.DateTimeFormat(undefined, {
+		weekday: chars === 1 ? 'narrow' : 'short',
+	});
+	const labels = Array.from({ length: 7 }, (_, i) => fmt.format(mondayPlusDays(i)));
+	return chars === 2 ? labels.map((label) => label.slice(0, 2)) : labels;
 }
 
 /** e.g. "Sun, Jun 17" or "Sun · Jun 17" */

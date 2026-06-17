@@ -4,14 +4,14 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { formatMonthDayLong, formatMonthYear, todayIso, formatLongDate } from '$lib/date';
-	import { formatVolume } from '$lib/format';
+	import { formatMonthDayLong, formatMonthYear, todayIso, formatLongDate, toLocalIso, weekdayHeadersMondayFirst } from '$lib/date';
+	import { formatVolume, formatMinutes } from '$lib/format';
+	import { formatHabitLogValue } from '$lib/habits';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
-	// Weekday header is Monday-first and 2-letter, so it stays local.
-	const WEEKDAY_HEADERS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
 
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
@@ -39,7 +39,7 @@
 		const cells: Array<{ date: string | null; dayNum: number | null }> = [];
 		for (let i = 0; i < firstDayMon; i++) cells.push({ date: null, dayNum: null });
 		for (let d = 1; d <= daysInMonth; d++) {
-			const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+			const dateStr = toLocalIso(new Date(year, month, d));
 			cells.push({ date: dateStr, dayNum: d });
 		}
 		return cells;
@@ -90,13 +90,7 @@
 			.map((log) => {
 				const habit = habitStore.habits.find((h) => h.id === log.habitId);
 				if (!habit) return null;
-				let valueStr = '';
-				if (habit.type === 'boolean') valueStr = log.value === 1 ? 'Yes' : 'No';
-				else if (habit.type === 'mood')
-					valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
-				else if (habit.type === 'minutes') valueStr = `${log.value} min`;
-				else valueStr = `${log.value}${habit.unit ? ' ' + habit.unit : ''}`;
-				return { name: habit.name, valueStr };
+				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
 			})
 			.filter((e): e is { name: string; valueStr: string } => e !== null);
 	});
@@ -119,7 +113,7 @@
 		}
 	}
 
-	let monthKey = $derived(`${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}`);
+	let monthKey = $derived(toLocalIso(new Date(viewDate.getFullYear(), viewDate.getMonth(), 1)).slice(0, 7));
 
 	let monthSessions = $derived([...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey)));
 
@@ -132,7 +126,7 @@
 		const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
 		let loggedDays = 0;
 		for (let d = 1; d <= daysInMonth; d++) {
-			const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+			const dateStr = toLocalIso(new Date(viewDate.getFullYear(), viewDate.getMonth(), d));
 			if (dateStr > todayStr) break;
 			if (habitStore.loggedCountForDate(dateStr) > 0) loggedDays++;
 		}
@@ -306,7 +300,7 @@
 				<div class="day-detail__row">
 					<div class="day-detail__row-info">
 						<span class="day-detail__row-name">{act.type === 'Other' ? act.customType || 'Other' : act.type}</span>
-						<span class="day-detail__row-meta">{act.durationMinutes} min · {act.intensity}</span>
+						<span class="day-detail__row-meta">{formatMinutes(act.durationMinutes)} · {act.intensity}</span>
 					</div>
 				</div>
 			{/each}

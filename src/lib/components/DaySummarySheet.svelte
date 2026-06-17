@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
-	import { MOOD_SCALE } from '$lib/db/types';
 	import { formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration, formatVolume } from '$lib/format';
+	import { formatHabitLogValue } from '$lib/habits';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -29,17 +29,7 @@
 			.map((log) => {
 				const habit = habitStore.habits.find((h) => h.id === log.habitId);
 				if (!habit) return null;
-				let valueStr = '';
-				if (habit.type === 'boolean') {
-					valueStr = log.value === 1 ? 'Yes' : 'No';
-				} else if (habit.type === 'mood') {
-					valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
-				} else if (habit.type === 'minutes') {
-					valueStr = `${log.value} min`;
-				} else {
-					valueStr = `${log.value}${habit.unit ? ' ' + habit.unit : ''}`;
-				}
-				return { name: habit.name, valueStr };
+				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
 			})
 			.filter((e): e is { name: string; valueStr: string } => e !== null);
 	});

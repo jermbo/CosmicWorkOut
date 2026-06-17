@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { formatCount, minuteUnitLabel } from '$lib/format';
 
 	let durationTarget = $state<Habit | null>(null);
 	let durationInput = $state('');
@@ -19,8 +20,10 @@
 	function progressLabel(habit: Habit): string {
 		const val = getValue(habit);
 		if (habit.type === 'boolean') return val ? 'Done' : habit.unit || 'No';
-		if (habit.dailyGoal) return `${val} / ${habit.dailyGoal}${habit.unit ? ' ' + habit.unit : ''}`;
-		return `${val}${habit.unit ? ' ' + habit.unit : ''}`;
+		if (habit.dailyGoal) {
+			return `${formatCount(val, habit.unit || undefined)} / ${formatCount(habit.dailyGoal, habit.unit || undefined)}`;
+		}
+		return formatCount(val, habit.unit || undefined);
 	}
 
 	async function handleTap(habit: Habit) {
@@ -93,7 +96,7 @@
 				aria-label="Minutes"
 				onkeydown={(e) => e.key === 'Enter' && saveDuration()}
 			/>
-			<span class="dur-popup__unit">min</span>
+			<span class="dur-popup__unit">{minuteUnitLabel()}</span>
 		</div>
 		<div class="dur-popup__actions">
 			<button class="dur-popup__save" onclick={saveDuration}>Save</button>

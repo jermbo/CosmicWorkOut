@@ -1,6 +1,10 @@
 // crypto.randomUUID() requires a secure context (HTTPS/localhost).
 // crypto.getRandomValues() works everywhere, including HTTP on a local network.
 export function generateId(): string {
+	if (typeof crypto.randomUUID === 'function') {
+		return crypto.randomUUID();
+	}
+
 	const bytes = new Uint8Array(16);
 	crypto.getRandomValues(bytes);
 	bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4

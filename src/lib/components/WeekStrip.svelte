@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
 	import { goto } from '$app/navigation';
-	import { addDays, formatWeekRange, mondayOf, todayIso, toLocalIso } from '$lib/date';
+	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
+	import { formatWeeksAgo } from '$lib/format';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 
 	let { sessions }: { sessions: SessionLog[] } = $props();
@@ -10,8 +11,7 @@
 
 	function getWeekDays(weekStartStr: string) {
 		const days: { dow: string; date: number; dateStr: string; status: string }[] = [];
-		const monday = new Date(weekStartStr + 'T00:00:00');
-		const DOW_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+		const monday = fromIso(weekStartStr);
 
 		for (let i = 0; i < 7; i++) {
 			const d = new Date(monday);
@@ -27,7 +27,7 @@
 				status = 'rest';
 			}
 
-			days.push({ dow: DOW_LABELS[i], date: d.getDate(), dateStr, status });
+			days.push({ dow: formatWeekdayNarrow(d), date: d.getDate(), dateStr, status });
 		}
 
 		return days;
@@ -45,16 +45,12 @@
 
 	let weeksAgo = $derived.by(() => {
 		if (isCurrentWeek) return 0;
-		const start = new Date(viewWeekStart + 'T00:00:00');
-		const current = new Date(currentWeekStart + 'T00:00:00');
+		const start = fromIso(viewWeekStart);
+		const current = fromIso(currentWeekStart);
 		return Math.round((current.getTime() - start.getTime()) / (7 * 86400000));
 	});
 
-	let weekOffsetLabel = $derived.by(() => {
-		if (weeksAgo === 1) return 'Last week';
-		if (weeksAgo > 1) return `${weeksAgo} weeks ago`;
-		return '';
-	});
+	let weekOffsetLabel = $derived(formatWeeksAgo(weeksAgo));
 
 	let canGoNextWeek = $derived(viewWeekStart < currentWeekStart);
 	let viewingPastDate = $derived(selectedDate !== todayStr);
