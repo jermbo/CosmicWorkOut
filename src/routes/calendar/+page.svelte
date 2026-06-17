@@ -1,12 +1,22 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
-	import { MOOD_SCALE } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { formatMonthDayLong, formatMonthYear, todayIso, formatLongDate, toLocalIso, weekdayHeadersMondayFirst } from '$lib/date';
-	import { formatVolume, formatMinutes } from '$lib/format';
-	import { formatHabitLogValue } from '$lib/habits';
+	import {
+		formatMonthDayLong,
+		formatMonthYear,
+		todayIso,
+		formatLongDate,
+		toLocalIso,
+		weekdayHeadersMondayFirst,
+		monthCalendarCells,
+		monthIsoKey,
+		daysInMonth,
+	} from '$lib/date';
+	import { formatVolume } from '$lib/format';
+	import { formatActivitySummary } from '$lib/activities';
+	import { formatHabitLogValue, formatMoodValue } from '$lib/habits';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import Icon from '$lib/components/Icon.svelte';
@@ -30,19 +40,7 @@
 	});
 
 	function buildCalendarDays() {
-		const year = viewDate.getFullYear();
-		const month = viewDate.getMonth();
-		const firstDayJS = new Date(year, month, 1).getDay();
-		const firstDayMon = (firstDayJS + 6) % 7;
-		const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-		const cells: Array<{ date: string | null; dayNum: number | null }> = [];
-		for (let i = 0; i < firstDayMon; i++) cells.push({ date: null, dayNum: null });
-		for (let d = 1; d <= daysInMonth; d++) {
-			const dateStr = toLocalIso(new Date(year, month, d));
-			cells.push({ date: dateStr, dayNum: d });
-		}
-		return cells;
+		return monthCalendarCells(viewDate.getFullYear(), viewDate.getMonth());
 	}
 
 	let calendarDays = $derived(buildCalendarDays());
@@ -66,8 +64,8 @@
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
 		if (log === undefined) return null;
-		const entry = MOOD_SCALE.find((m) => m.value === log.value);
-		return entry ? { label: entry.label, value: log.value } : null;
+		const label = formatMoodValue(log.value);
+		return label === '—' ? null : { label, value: log.value };
 	}
 
 	function prevMonth() {
@@ -113,7 +111,7 @@
 		}
 	}
 
-	let monthKey = $derived(toLocalIso(new Date(viewDate.getFullYear(), viewDate.getMonth(), 1)).slice(0, 7));
+	let monthKey = $derived(monthIsoKey(viewDate));
 
 	let monthSessions = $derived([...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey)));
 
@@ -123,9 +121,9 @@
 
 	// Month habit stats
 	let monthHabitDays = $derived.by(() => {
-		const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+		const totalDays = daysInMonth(viewDate);
 		let loggedDays = 0;
-		for (let d = 1; d <= daysInMonth; d++) {
+		for (let d = 1; d <= totalDays; d++) {
 			const dateStr = toLocalIso(new Date(viewDate.getFullYear(), viewDate.getMonth(), d));
 			if (dateStr > todayStr) break;
 			if (habitStore.loggedCountForDate(dateStr) > 0) loggedDays++;
@@ -300,7 +298,7 @@
 				<div class="day-detail__row">
 					<div class="day-detail__row-info">
 						<span class="day-detail__row-name">{act.type === 'Other' ? act.customType || 'Other' : act.type}</span>
-						<span class="day-detail__row-meta">{formatMinutes(act.durationMinutes)} · {act.intensity}</span>
+						<span class="day-detail__row-meta">{formatActivitySummary(act)}</span>
 					</div>
 				</div>
 			{/each}

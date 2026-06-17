@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { formatCount, minuteUnitLabel } from '$lib/format';
+	import { minuteUnitLabel } from '$lib/format';
+	import { formatHabitProgressLabel } from '$lib/habits';
 
 	let durationTarget = $state<Habit | null>(null);
 	let durationInput = $state('');
@@ -18,12 +19,7 @@
 	}
 
 	function progressLabel(habit: Habit): string {
-		const val = getValue(habit);
-		if (habit.type === 'boolean') return val ? 'Done' : habit.unit || 'No';
-		if (habit.dailyGoal) {
-			return `${formatCount(val, habit.unit || undefined)} / ${formatCount(habit.dailyGoal, habit.unit || undefined)}`;
-		}
-		return formatCount(val, habit.unit || undefined);
+		return formatHabitProgressLabel(habit, getValue(habit));
 	}
 
 	async function handleTap(habit: Habit) {

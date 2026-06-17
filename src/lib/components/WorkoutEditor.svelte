@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 	import type { Workout, WorkoutExercise, Exercise } from '$lib/db/types';
+	import { formatCountWithWord } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseLibrarySheet from './ExerciseLibrarySheet.svelte';
 
@@ -173,7 +174,7 @@
 						</button>
 					{/if}
 					<p class="workout-editor__subtitle">
-						Workout {letter} · {exercises.length} exercise{exercises.length !== 1 ? 's' : ''}
+						Workout {letter} · {formatCountWithWord(exercises.length, 'exercise')}
 					</p>
 				</div>
 				<button class="workout-editor__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>

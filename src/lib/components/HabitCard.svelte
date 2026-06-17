@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
 	import { formatCount, formatMinutes, minuteUnitLabel } from '$lib/format';
+	import { formatHabitBooleanValue } from '$lib/habits';
 	import ProgressRing from './ProgressRing.svelte';
 	import Icon from './Icon.svelte';
 
@@ -39,7 +40,7 @@
 		<ProgressRing done={pct} total={100} complete={done} size={120} strokeWidth={7} dimUntilComplete>
 			{#if habit.type === 'boolean'}
 				<span class="habit-card__value habit-card__value--bool" class:habit-card__value--done={done}>
-					{done ? 'Yes' : 'No'}
+					{formatHabitBooleanValue(done ? 1 : 0)}
 				</span>
 			{:else}
 				<button

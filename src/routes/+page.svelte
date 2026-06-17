@@ -6,8 +6,9 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { formatActivityChip } from '$lib/activities';
 	import { todayIso, formatShortDate, formatWeekdayShort, fromIso } from '$lib/date';
-	import { formatDuration, formatMinutes } from '$lib/format';
+	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
 	const todayStr = todayIso();
@@ -50,10 +51,10 @@
 	});
 	let workoutMeta = $derived.by(() => {
 		if (sessionForDate) {
-			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${sessionForDate.exercises.length} exercises`;
+			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${formatCountWithWord(sessionForDate.exercises.length, 'exercise')}`;
 		}
 		if (suggestedWorkout) {
-			return `${suggestedWorkout.exercises.length} exercises · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
+			return `${formatCountWithWord(suggestedWorkout.exercises.length, 'exercise')} · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
 		}
 		return null;
 	});
@@ -231,13 +232,12 @@
 				<p class="home-card__empty-note">No activities yet.</p>
 			{:else}
 				<p class="home-card__log-summary">
-					{dateActivities.length}
-					{dateActivities.length === 1 ? 'activity' : 'activities'} logged
+					{formatCountWithWord(dateActivities.length, 'activity', 'activities')} logged
 				</p>
 				<div class="home-card__activity-chips">
 					{#each dateActivities.slice(0, 3) as activity (activity.id)}
 						<span class="home-card__activity-chip">
-							{activity.type === 'Other' ? activity.customType || 'Other' : activity.type} · {formatMinutes(activity.durationMinutes)}
+							{formatActivityChip(activity)}
 						</span>
 					{/each}
 					{#if dateActivities.length > 3}

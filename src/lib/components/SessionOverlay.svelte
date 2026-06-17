@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { formatElapsed } from '$lib/format';
+	import { formatElapsed, formatCountWithWord } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
+	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	let dialog: HTMLDialogElement;
 	let showAbandonConfirm = $state(false);
@@ -132,7 +133,7 @@
 					</p>
 					<p class="session-overlay__context">
 						{#if isEditing}
-							Editing · {doneSets} sets logged
+							Editing · {formatCountWithWord(doneSets, 'set')} logged
 						{:else}
 							{doneSets}/{totalSets} sets
 						{/if}
@@ -197,27 +198,21 @@
 	</div>
 
 	{#if showAbandonConfirm}
-		<div class="session-overlay__confirm" role="alertdialog" aria-labelledby="confirm-title" aria-modal="true">
-			<p class="session-overlay__confirm-title" id="confirm-title">
-				{isEditing ? 'Discard changes?' : 'End this session?'}
-			</p>
-			<p class="session-overlay__confirm-body">
-				{#if isEditing}
-					Your saved session will be kept. Only unsaved edits are lost.
-				{:else}
-					Your progress will not be saved.
-				{/if}
-			</p>
-			<div class="session-overlay__confirm-actions">
-				<button class="session-overlay__confirm-btn session-overlay__confirm-btn--cancel" onclick={handleAbandonCancel}>
-					Keep going
-				</button>
-				<button class="session-overlay__confirm-btn session-overlay__confirm-btn--end" onclick={handleAbandonConfirm}>
-					{isEditing ? 'Discard' : 'End session'}
-				</button>
-			</div>
-		</div>
-	{/if}
+	<ConfirmDialog
+		title={isEditing ? 'Discard changes?' : 'End this session?'}
+		confirmLabel={isEditing ? 'Discard' : 'End session'}
+		cancelLabel="Keep going"
+		danger
+		onconfirm={handleAbandonConfirm}
+		oncancel={handleAbandonCancel}
+	>
+		{#if isEditing}
+			Your saved session will be kept. Only unsaved edits are lost.
+		{:else}
+			Your progress will not be saved.
+		{/if}
+	</ConfirmDialog>
+{/if}
 </dialog>
 
 {#if sheetTarget && sheetExercise && sheetActiveSet}
@@ -417,56 +412,5 @@
 		color: var(--color-accent-ink);
 		border-color: var(--color-accent);
 		box-shadow: var(--shadow-lime);
-	}
-
-	/* Abandon confirm */
-	.session-overlay__confirm {
-		position: absolute;
-		inset-inline: var(--space-4);
-		inset-block-end: calc(var(--safe-bottom) + var(--space-4));
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-2xl);
-		padding: var(--space-5);
-		z-index: 10;
-		box-shadow: var(--shadow-lg);
-		animation: slide-up var(--duration-normal) var(--ease-spring) both;
-	}
-
-	.session-overlay__confirm-title {
-		font-family: var(--font-display);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		margin-block-end: var(--space-1);
-	}
-
-	.session-overlay__confirm-body {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-4);
-	}
-
-	.session-overlay__confirm-actions {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	.session-overlay__confirm-btn {
-		flex: 1;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		min-block-size: 48px;
-	}
-
-	.session-overlay__confirm-btn--cancel {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.session-overlay__confirm-btn--end {
-		background: var(--color-red);
-		color: #ffffff;
 	}
 </style>

@@ -131,3 +131,28 @@ export function formatWeekRange(weekStartIso: string): string {
 	end.setDate(end.getDate() + 6);
 	return fmtWeekRange.formatRange(start, end);
 }
+
+export type CalendarCell = { date: string | null; dayNum: number | null };
+
+/** YYYY-MM month key for a date's calendar month. */
+export function monthIsoKey(date: Date): string {
+	return toLocalIso(new Date(date.getFullYear(), date.getMonth(), 1)).slice(0, 7);
+}
+
+/** Number of days in date's calendar month. */
+export function daysInMonth(date: Date): number {
+	return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+}
+
+/** Monday-first calendar grid cells for a month, with leading blanks. */
+export function monthCalendarCells(year: number, month: number): CalendarCell[] {
+	const firstDayMon = (new Date(year, month, 1).getDay() + 6) % 7;
+	const totalDays = new Date(year, month + 1, 0).getDate();
+
+	const cells: CalendarCell[] = [];
+	for (let i = 0; i < firstDayMon; i++) cells.push({ date: null, dayNum: null });
+	for (let d = 1; d <= totalDays; d++) {
+		cells.push({ date: toLocalIso(new Date(year, month, d)), dayNum: d });
+	}
+	return cells;
+}

@@ -26,9 +26,22 @@ export function habitTypeLabel(type: HabitType): string {
 
 /** Display string for a habit log value in summaries and history views. */
 export function formatHabitLogValue(habit: Habit, value: number): string {
-	if (habit.type === 'boolean') return value === 1 ? 'Yes' : 'No';
-	if (habit.type === 'mood') {
-		return MOOD_SCALE.find((m) => m.value === value)?.label ?? String(value);
+	if (habit.type === 'boolean') return formatHabitBooleanValue(value);
+	if (habit.type === 'mood') return formatMoodValue(value);
+	if (habit.type === 'minutes') return formatMinutes(value);
+	return formatCount(value, habit.unit || undefined);
+}
+
+/** Yes/No for history summaries and cards. */
+export function formatHabitBooleanValue(value: number): string {
+	return value === 1 ? 'Yes' : 'No';
+}
+
+/** Done/No (or custom unit) for live widget labels. */
+export function formatHabitProgressLabel(habit: Habit, value: number): string {
+	if (habit.type === 'boolean') return value ? 'Done' : habit.unit || 'No';
+	if (habit.dailyGoal) {
+		return `${formatCount(value, habit.unit || undefined)} / ${formatCount(habit.dailyGoal, habit.unit || undefined)}`;
 	}
 	if (habit.type === 'minutes') return formatMinutes(value);
 	return formatCount(value, habit.unit || undefined);

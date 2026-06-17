@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
 	import { formatWeekdayShortDate } from '$lib/date';
-	import { formatDuration, formatVolume } from '$lib/format';
+	import { formatDuration, formatVolume, formatCountWithWord } from '$lib/format';
 	import { formatHabitLogValue } from '$lib/habits';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	let {
 		session,
@@ -89,7 +90,7 @@
 					<div class="day-summary__exercise">
 						<div class="day-summary__exercise-header">
 							<span class="day-summary__exercise-name">{exercise.name}</span>
-							<span class="day-summary__exercise-sets">{loggedEx.sets.length} sets</span>
+							<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
 						</div>
 						{#if loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
@@ -127,23 +128,17 @@
 		</div>
 	</div>
 
-	{#if showDeleteConfirm}
-		<div class="day-summary__confirm" role="alertdialog" aria-labelledby="delete-title" aria-modal="true">
-			<p class="day-summary__confirm-title" id="delete-title">Delete this session?</p>
-			<p class="day-summary__confirm-body">This cannot be undone.</p>
-			<div class="day-summary__confirm-actions">
-				<button
-					class="day-summary__confirm-btn day-summary__confirm-btn--cancel"
-					onclick={() => (showDeleteConfirm = false)}
-				>
-					Cancel
-				</button>
-				<button class="day-summary__confirm-btn day-summary__confirm-btn--delete" onclick={handleDeleteConfirm}>
-					Delete
-				</button>
-			</div>
-		</div>
-	{/if}
+{#if showDeleteConfirm}
+	<ConfirmDialog
+		title="Delete this session?"
+		confirmLabel="Delete"
+		danger
+		onconfirm={handleDeleteConfirm}
+		oncancel={() => (showDeleteConfirm = false)}
+	>
+		This cannot be undone.
+	</ConfirmDialog>
+{/if}
 </BottomSheet>
 
 <style>
@@ -313,54 +308,5 @@
 		background: var(--color-surface-3);
 		color: var(--color-red);
 		border: 1px solid var(--color-border);
-	}
-
-	.day-summary__confirm {
-		position: absolute;
-		inset-inline: var(--space-4);
-		inset-block-end: var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-2xl);
-		padding: var(--space-5);
-		z-index: 10;
-		box-shadow: var(--shadow-lg);
-	}
-
-	.day-summary__confirm-title {
-		font-family: var(--font-display);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		margin-block-end: var(--space-1);
-	}
-
-	.day-summary__confirm-body {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-4);
-	}
-
-	.day-summary__confirm-actions {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	.day-summary__confirm-btn {
-		flex: 1;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		min-block-size: 48px;
-	}
-
-	.day-summary__confirm-btn--cancel {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.day-summary__confirm-btn--delete {
-		background: var(--color-red);
-		color: #ffffff;
 	}
 </style>

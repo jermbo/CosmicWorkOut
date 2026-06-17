@@ -23,6 +23,7 @@ const fmtMinutes = new Intl.NumberFormat(undefined, {
 	unitDisplay: 'short',
 });
 const fmtRelativeWeeks = new Intl.RelativeTimeFormat(undefined, { style: 'long' });
+const pluralRules = new Intl.PluralRules(undefined);
 const fmtDurationLong = DurationFormat ? new DurationFormat(undefined, { style: 'long' }) : null;
 const fmtDurationNarrow = DurationFormat ? new DurationFormat(undefined, { style: 'narrow' }) : null;
 
@@ -70,6 +71,12 @@ export function formatWeeksAgo(weeks: number): string {
 export function formatCount(value: number, unit?: string): string {
 	const n = fmtInteger.format(value);
 	return unit ? `${n} ${unit}` : n;
+}
+
+/** e.g. "1 exercise" / "3 exercises" */
+export function formatCountWithWord(count: number, singular: string, plural = `${singular}s`): string {
+	const word = pluralRules.select(count) === 'one' ? singular : plural;
+	return `${fmtInteger.format(count)} ${word}`;
 }
 
 /** Compact weight volume. zero: "dash" shows "—", "zero" shows "0". */

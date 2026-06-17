@@ -4,7 +4,7 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import { formatWeekdayShortDate } from '$lib/date';
-	import { formatMinutes } from '$lib/format';
+	import { formatActivitySummary } from '$lib/activities';
 
 	let contextDate = $derived(loggingContext.date);
 
@@ -26,8 +26,7 @@
 	}
 
 	function chipLabel(activity: (typeof activityStore.activities)[0]): string {
-		const name = activity.type === 'Other' ? activity.customType || 'Other' : activity.type;
-		return `${name} · ${formatMinutes(activity.durationMinutes)} · ${activity.intensity}`;
+		return formatActivitySummary(activity);
 	}
 </script>
 
@@ -84,7 +83,7 @@
 								{activity.type === 'Other' ? activity.customType || 'Other' : activity.type}
 							</span>
 							<span class="activity-item__meta">
-								{formatMinutes(activity.durationMinutes)} · {activity.intensity}
+								{formatActivitySummary(activity)}
 							</span>
 						</div>
 						<svg
