@@ -26,13 +26,13 @@ Three tabs, always visible: **Today**, **Program**, **Calendar**. Active session
 
 **Today is not a calendar day assignment.** The app doesn't know you train Mon/Wed/Fri. It gives you the **next workout in sequence** based on how many sessions you've already finished.
 
-| You've completed | You see next |
-|------------------|--------------|
-| 0 sessions | Workout A (week 1) |
-| 1 session | Workout B |
-| 2 sessions | Workout C |
-| 3 sessions | Workout A (week 2) |
-| 36 sessions | Wraps back to week 1, workout A |
+| You've completed | You see next                    |
+| ---------------- | ------------------------------- |
+| 0 sessions       | Workout A (week 1)              |
+| 1 session        | Workout B                       |
+| 2 sessions       | Workout C                       |
+| 3 sessions       | Workout A (week 2)              |
+| 36 sessions      | Wraps back to week 1, workout A |
 
 If you already logged a session **today**, the Today tab shows "Workout complete" — you can't start a second session on the same calendar day.
 
@@ -61,6 +61,7 @@ Tap **Start session** on the Today card. A full-screen overlay opens with every 
 ### Logging sets
 
 **Tap an uncompleted set:**
+
 - If a weight is already known (from last session or a previous set this session) → logs instantly, no sheet
 - If no weight yet (first time ever for this exercise) → opens a sheet with a number input; value is rounded to the nearest 2.5 lb
 
@@ -78,10 +79,10 @@ Haptic feedback fires when you **complete an exercise** (all sets done), not on 
 
 These are different:
 
-| Action | How | What gets saved |
-|--------|-----|-----------------|
-| **Finish** | Footer button — says "Finish early · X/Y sets" if incomplete | Only **completed** sets are saved as a SessionLog. Unlogged sets are dropped. No confirmation dialog. |
-| **Abandon** | Back arrow → "End session" confirm | **Nothing** saved. All progress lost. |
+| Action      | How                                                          | What gets saved                                                                                       |
+| ----------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Finish**  | Footer button — says "Finish early · X/Y sets" if incomplete | Only **completed** sets are saved as a SessionLog. Unlogged sets are dropped. No confirmation dialog. |
+| **Abandon** | Back arrow → "End session" confirm                           | **Nothing** saved. All progress lost.                                                                 |
 
 Both clear the in-progress session from local storage.
 
@@ -95,12 +96,12 @@ A completion overlay shows duration, volume, and set count. Confetti appears unl
 
 Shows your **active program** with a week progress bar and workout cards (A, B, C from week 1 as templates).
 
-| What you can do | What you can't do yet |
-|-----------------|----------------------|
+| What you can do                                | What you can't do yet            |
+| ---------------------------------------------- | -------------------------------- |
 | See workout names, focus areas, exercise chips | Browse all 12 weeks individually |
-| Edit a workout's exercises, sets, reps | Switch to a different program |
-| Add a new workout (propagates to all weeks) | Create a brand-new program |
-| See which workout is "today" via badge | Copy a built-in before editing |
+| Edit a workout's exercises, sets, reps         | Switch to a different program    |
+| Add a new workout (propagates to all weeks)    | Create a brand-new program       |
+| See which workout is "today" via badge         | Copy a built-in before editing   |
 
 Edits match workouts **by name** across all 12 weeks — changing "Lower + Lateral Power" updates every week's copy. Historical session logs are not affected.
 
@@ -114,12 +115,12 @@ Monthly grid showing which days you trained. Tap a completed day to see a read-o
 
 **Day colors today:**
 
-| Status | Meaning |
-|--------|---------|
+| Status      | Meaning                                        |
+| ----------- | ---------------------------------------------- |
 | Accent fill | You logged a session that day (active program) |
-| Outlined | Today |
-| Muted | Future dates |
-| Plain | Past dates with no session |
+| Outlined    | Today                                          |
+| Muted       | Future dates                                   |
+| Plain       | Past dates with no session                     |
 
 Scheduled, rest, and skipped days are **not shown** — only actual logged sessions.
 
@@ -127,7 +128,7 @@ Scheduled, rest, and skipped days are **not shown** — only actual logged sessi
 
 - **Sessions** — count this month for active program
 - **Volume** — total lbs this month (numeric weights only)
-- **Day streak** — consecutive days with *any* session going backward from today (up to 90 days), not filtered by program
+- **Day streak** — consecutive days with _any_ session going backward from today (up to 90 days), not filtered by program
 
 ### Today page streak
 
@@ -170,13 +171,13 @@ No service worker yet — offline works after first browser load, but the app is
 
 All preferences are editable via the **Settings tab** (`/settings`). Stored in `cwout:prefs` (localStorage).
 
-| Pref | Default | Effect |
-|------|---------|--------|
-| `accentColor` | `#b2f042` | UI accent + ink color |
-| `completionFeel` | `full` | Confetti on/off |
-| `density` | `comfortable` | Tile height, card gaps |
-| `roundness` | `default` | Border radius scale |
-| `weightUnit` | `lb` | Display label on tiles/sheets |
+| Pref             | Default       | Effect                        |
+| ---------------- | ------------- | ----------------------------- |
+| `accentColor`    | `#b2f042`     | UI accent + ink color         |
+| `completionFeel` | `full`        | Confetti on/off               |
+| `density`        | `comfortable` | Tile height, card gaps        |
+| `roundness`      | `default`     | Border radius scale           |
+| `weightUnit`     | `lb`          | Display label on tiles/sheets |
 
 **Per-exercise weight increment** (2.5 / 5 / 10 lb) is set on the exercise itself, not in global prefs. Defaults to 5.
 

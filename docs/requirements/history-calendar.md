@@ -8,18 +8,18 @@ Viewing past sessions and tracking progress over time.
 
 ## Implementation Status
 
-| Story | Status |
-|-------|--------|
-| Monthly calendar with navigation | ✅ Built |
-| Completed day highlighting | ✅ Built |
-| Day summary sheet (read-only) | ✅ Built |
-| Month stats (sessions, volume, streak) | ✅ Built |
-| Week strip on Today page | ✅ Built |
-| Scheduled/rest/skipped day status | ❌ Not built |
-| Weekly consistency streak | ⚠️ Wrong logic | See "Streak behavior" below |
-| Week strip program filter | ⚠️ Partial | Shows all sessions, not active-program only |
-| Edit past sessions | ✅ Built | Edit + delete from DaySummarySheet |
-| Backfill missed days | ✅ Built | Tap past/skipped days on calendar → Today with date set |
+| Story                                  | Status         |
+| -------------------------------------- | -------------- | ------------------------------------------------------- |
+| Monthly calendar with navigation       | ✅ Built       |
+| Completed day highlighting             | ✅ Built       |
+| Day summary sheet (read-only)          | ✅ Built       |
+| Month stats (sessions, volume, streak) | ✅ Built       |
+| Week strip on Today page               | ✅ Built       |
+| Scheduled/rest/skipped day status      | ❌ Not built   |
+| Weekly consistency streak              | ⚠️ Wrong logic | See "Streak behavior" below                             |
+| Week strip program filter              | ⚠️ Partial     | Shows all sessions, not active-program only             |
+| Edit past sessions                     | ✅ Built       | Edit + delete from DaySummarySheet                      |
+| Backfill missed days                   | ✅ Built       | Tap past/skipped days on calendar → Today with date set |
 
 ---
 
@@ -50,10 +50,10 @@ Scheduled, rest, and skipped statuses are **not yet implemented** — see open q
 
 Two different streak calculations exist — neither matches the target spec:
 
-| Location | What it shows | How it works |
-|----------|---------------|--------------|
-| **Today header** | "X wk streak" | Count of distinct ISO weeks containing any session (all programs, all time) |
-| **Calendar stats** | "Day streak" | Consecutive days with any session, walking backward from today (max 90 days) |
+| Location           | What it shows | How it works                                                                 |
+| ------------------ | ------------- | ---------------------------------------------------------------------------- |
+| **Today header**   | "X wk streak" | Count of distinct ISO weeks containing any session (all programs, all time)  |
+| **Calendar stats** | "Day streak"  | Consecutive days with any session, walking backward from today (max 90 days) |
 
 Target spec: consecutive weeks where all scheduled workouts were completed. Not built.
 

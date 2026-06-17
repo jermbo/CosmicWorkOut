@@ -12,16 +12,16 @@ A single movement — the atomic unit of any workout.
 
 ```typescript
 type Exercise = {
-  id: string;
-  name: string;
-  cue: string;              // coaching note shown during session
-  muscles: string;          // e.g. "Hamstrings · Glutes"
-  cat: ExerciseCat;         // Hinge | Squat | Push | Pull | ...
-  unit: "lb" | "kg" | "band" | "bodyweight";
-  defaultSets: number;
-  defaultReps: string;      // "8-10" or "10 ea" — string for ranges
-  weightIncrement?: number; // stepper step size in lb/kg — default 5, not used for band/bodyweight
-  isBuiltIn: boolean;
+	id: string;
+	name: string;
+	cue: string; // coaching note shown during session
+	muscles: string; // e.g. "Hamstrings · Glutes"
+	cat: ExerciseCat; // Hinge | Squat | Push | Pull | ...
+	unit: 'lb' | 'kg' | 'band' | 'bodyweight';
+	defaultSets: number;
+	defaultReps: string; // "8-10" or "10 ea" — string for ranges
+	weightIncrement?: number; // stepper step size in lb/kg — not used for band/bodyweight
+	isBuiltIn: boolean;
 };
 ```
 
@@ -35,14 +35,14 @@ A multi-week training plan.
 
 ```typescript
 type Program = {
-  id: string;
-  name: string;
-  description: string;
-  durationWeeks: number;
-  daysPerWeek: number;
-  weeks: Week[];
-  createdAt: string;        // ISO datetime
-  isBuiltIn: boolean;
+	id: string;
+	name: string;
+	description: string;
+	durationWeeks: number;
+	daysPerWeek: number;
+	weeks: Week[];
+	createdAt: string; // ISO datetime
+	isBuiltIn: boolean;
 };
 ```
 
@@ -56,20 +56,20 @@ A single training day.
 
 ```typescript
 type Workout = {
-  id: string;
-  name: string;             // "Lower + Lateral Power"
-  letter?: string;          // "A", "B", "C"
-  focus?: string;           // "Legs · Lateral · Rotational"
-  color?: "lime" | "lavender" | "red";
-  estMin?: number;
-  exercises: WorkoutExercise[];
+	id: string;
+	name: string; // "Lower + Lateral Power"
+	letter?: string; // "A", "B", "C"
+	focus?: string; // "Legs · Lateral · Rotational"
+	color?: 'lime' | 'lavender' | 'red';
+	estMin?: number;
+	exercises: WorkoutExercise[];
 };
 
 type WorkoutExercise = {
-  exerciseId: string;
-  sets: number;
-  reps: string;
-  notes?: string;
+	exerciseId: string;
+	sets: number;
+	reps: string;
+	notes?: string;
 };
 ```
 
@@ -81,23 +81,23 @@ A completed workout session. Written on session finish.
 
 ```typescript
 type SessionLog = {
-  id: string;
-  date: string;             // ISO date "2025-06-10"
-  workoutId: string;
-  programId: string;
-  startedAt: string;
-  finishedAt: string;
-  durationSeconds: number;
-  totalVolume: number;      // sum of weight × reps (numeric weights only)
-  totalSets: number;
-  exercises: LoggedExercise[];
+	id: string;
+	date: string; // ISO date "2025-06-10"
+	workoutId: string;
+	programId: string;
+	startedAt: string;
+	finishedAt: string;
+	durationSeconds: number;
+	totalVolume: number; // sum of weight × reps (numeric weights only)
+	totalSets: number;
+	exercises: LoggedExercise[];
 };
 
 type LoggedSet = {
-  setNumber: number;
-  weight: number | string;  // string for band levels
-  reps: number;
-  completedAt: string;
+	setNumber: number;
+	weight: number | string; // string for band levels
+	reps: number;
+	completedAt: string;
 };
 ```
 
@@ -109,13 +109,13 @@ In-progress session for crash recovery. Not an IndexedDB entity.
 
 ```typescript
 type ActiveSession = {
-  id: string;
-  date: string;
-  workoutId: string;
-  workoutName: string;
-  programId: string;
-  startedAt: string;
-  exercises: ActiveExercise[];
+	id: string;
+	date: string;
+	workoutId: string;
+	workoutName: string;
+	programId: string;
+	startedAt: string;
+	exercises: ActiveExercise[];
 };
 ```
 
@@ -127,9 +127,84 @@ Last logged weight and reps per exercise. Pre-fills weight when a new session st
 
 ```typescript
 type ExerciseLastUsed = {
-  exerciseId: string;
-  weight: number | string;
-  reps: number;
+	exerciseId: string;
+	weight: number | string;
+	reps: number;
+};
+```
+
+---
+
+### Habit
+
+A trackable daily behaviour.
+
+```typescript
+type HabitType = 'times' | 'minutes' | 'count' | 'boolean' | 'mood';
+
+type Habit = {
+	id: string;
+	name: string;
+	unit: string; // display label, e.g. "cups", "pages", ""
+	type: HabitType;
+	dailyGoal?: number; // undefined for boolean and mood types
+	active: boolean;
+	sortOrder: number;
+	createdAt: string;
+};
+```
+
+Seven built-in habits ship in `src/lib/db/seed.ts`. Seeded on first run only. A boot-time migration patches `dailyGoal` onto any existing built-in records that pre-date the goal fields being added.
+
+---
+
+### HabitLog
+
+A single day's logged value for one habit.
+
+```typescript
+type HabitLog = {
+	id: string; // composite: "habitId_dateStr"
+	habitId: string;
+	date: string; // ISO date "2025-06-10"
+	value: number; // 0/1 for boolean; -5..+5 for mood; count for others
+	loggedAt: string;
+};
+```
+
+One record per (habitId, date) pair. Upserted on every interaction.
+
+---
+
+### ActivityLog
+
+A non-workout physical activity entry.
+
+```typescript
+type ActivityType =
+	| 'Run'
+	| 'Walk'
+	| 'Bike'
+	| 'Swim'
+	| 'Hike'
+	| 'Pickleball'
+	| 'Tennis'
+	| 'Basketball'
+	| 'Yoga'
+	| 'Stretching'
+	| 'Cardio'
+	| 'Other';
+
+type ActivityIntensity = 'Easy' | 'Moderate' | 'Hard';
+
+type ActivityLog = {
+	id: string;
+	date: string; // ISO date
+	type: ActivityType;
+	customType?: string; // filled when type === "Other"
+	durationMinutes: number;
+	intensity: ActivityIntensity;
+	createdAt: string;
 };
 ```
 
@@ -141,11 +216,11 @@ Stored in localStorage (`cwout:prefs`).
 
 ```typescript
 type UserPrefs = {
-  accentColor: string;      // hex, default "#b2f042"
-  completionFeel: "full" | "subtle";
-  density: "compact" | "comfortable" | "spacious";
-  roundness: "sharp" | "default" | "soft";
-  weightUnit: "lb" | "kg";
+	accentColor: string; // hex, default "#b2f042"
+	completionFeel: 'full' | 'subtle';
+	density: 'compact' | 'comfortable' | 'spacious';
+	roundness: 'sharp' | 'default' | 'soft';
+	weightUnit: 'lb' | 'kg';
 };
 ```
 
@@ -168,46 +243,35 @@ erDiagram
     ActiveExercise ||--|{ ActiveSet : contains
     ActiveSession ||--|| SessionLog : "becomes on finish"
     ExerciseLastUsed }o--|| Exercise : "last weight/reps"
-```
-
-```mermaid
-flowchart TB
-    subgraph idb ["IndexedDB"]
-        E[exercises]
-        P[programs]
-        S[sessions]
-        ELU[exerciseLastUsed]
-    end
-
-    subgraph ls ["localStorage"]
-        PREFS[cwout:prefs]
-        ACTIVE[cwout:activeSession]
-        PROGID[cwout:activeProgramId]
-    end
+    HabitLog }o--|| Habit : "daily value for"
 ```
 
 ---
 
 ## IndexedDB Stores
 
-| Store | Key | Index | Contents |
-|-------|-----|-------|----------|
-| `exercises` | `id` | — | Exercise library |
-| `programs` | `id` | — | All programs |
-| `sessions` | `id` | `by_date` | Completed sessions |
-| `exerciseLastUsed` | `exerciseId` | — | Last weight/reps per exercise |
+DB name: `cosmic-workout`, version: `2`.
 
-DB name: `cosmic-workout`, version: `1`.
+| Store              | Key          | Indexes               | Contents                      |
+| ------------------ | ------------ | --------------------- | ----------------------------- |
+| `exercises`        | `id`         | —                     | Exercise library              |
+| `programs`         | `id`         | —                     | All programs                  |
+| `sessions`         | `id`         | `by_date`             | Completed workout sessions    |
+| `exerciseLastUsed` | `exerciseId` | —                     | Last weight/reps per exercise |
+| `activities`       | `id`         | `by_date`             | Activity log entries          |
+| `habits`           | `id`         | —                     | Habit definitions             |
+| `habitLogs`        | `id`         | `by_date`, `by_habit` | Daily habit log values        |
 
 ---
 
 ## localStorage Keys
 
-| Key | Contents |
-|-----|----------|
-| `cwout:prefs` | UserPrefs JSON |
-| `cwout:activeSession` | ActiveSession JSON (crash recovery) |
-| `cwout:activeProgramId` | Active program ID |
+| Key                      | Contents                                              |
+| ------------------------ | ----------------------------------------------------- |
+| `cwout:prefs`            | UserPrefs JSON                                        |
+| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                   |
+| `cwout:activeProgramId`  | Active program ID                                     |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet) |
 
 ---
 

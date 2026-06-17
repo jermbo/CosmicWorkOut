@@ -7,16 +7,13 @@ import type {
 	Program,
 	Exercise,
 	WorkoutExercise,
-	LoggedExercise
+	LoggedExercise,
 } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
+import { todayIso } from '$lib/date';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
-
-function todayIso(): string {
-	return new Date().toISOString().split('T')[0];
-}
 
 function snapshotLog(log: SessionLog): SessionLog {
 	return $state.snapshot(log) as SessionLog;
@@ -54,10 +51,7 @@ class SessionStore {
 		}
 	}
 
-	private async buildActiveExercises(
-		workout: Workout,
-		exerciseMap: Map<string, Exercise>
-	): Promise<ActiveExercise[]> {
+	private async buildActiveExercises(workout: Workout, exerciseMap: Map<string, Exercise>): Promise<ActiveExercise[]> {
 		const exercises: ActiveExercise[] = [];
 
 		for (const we of workout.exercises) {
@@ -82,14 +76,14 @@ class SessionStore {
 					weight: defaultWeight,
 					reps: defaultReps,
 					completed: false,
-					completedAt: null
+					completedAt: null,
 				});
 			}
 
 			exercises.push({
 				exerciseId: exercise.id,
 				unit: exercise.unit,
-				sets
+				sets,
 			});
 		}
 
@@ -98,19 +92,18 @@ class SessionStore {
 
 	private buildEditExerciseList(
 		workout: Workout,
-		log: SessionLog
+		log: SessionLog,
 	): Array<{ exerciseId: string; template?: WorkoutExercise; logged: LoggedExercise }> {
 		const loggedById = new Map(log.exercises.map((e) => [e.exerciseId, e]));
 		const seen = new Set<string>();
-		const result: Array<{ exerciseId: string; template?: WorkoutExercise; logged: LoggedExercise }> =
-			[];
+		const result: Array<{ exerciseId: string; template?: WorkoutExercise; logged: LoggedExercise }> = [];
 
 		for (const we of workout.exercises) {
 			seen.add(we.exerciseId);
 			result.push({
 				exerciseId: we.exerciseId,
 				template: we,
-				logged: loggedById.get(we.exerciseId) ?? { exerciseId: we.exerciseId, sets: [] }
+				logged: loggedById.get(we.exerciseId) ?? { exerciseId: we.exerciseId, sets: [] },
 			});
 		}
 
@@ -126,7 +119,7 @@ class SessionStore {
 	private hydrateSetFromLog(
 		loggedSet: LoggedExercise['sets'][number],
 		setNumber: number,
-		targetReps: string
+		targetReps: string,
 	): ActiveSet {
 		return {
 			setNumber,
@@ -134,7 +127,7 @@ class SessionStore {
 			weight: loggedSet.weight,
 			reps: loggedSet.reps,
 			completed: true,
-			completedAt: loggedSet.completedAt
+			completedAt: loggedSet.completedAt,
 		};
 	}
 
@@ -142,7 +135,7 @@ class SessionStore {
 		workout: Workout,
 		program: Program,
 		exerciseMap: Map<string, Exercise>,
-		options?: { date?: string }
+		options?: { date?: string },
 	): Promise<void> {
 		const date = options?.date ?? todayIso();
 		const now = new Date().toISOString();
@@ -156,17 +149,13 @@ class SessionStore {
 			programId: program.id,
 			startedAt: now,
 			exercises,
-			isEditing: false
+			isEditing: false,
 		};
 
 		this.persist();
 	}
 
-	async editSession(
-		log: SessionLog,
-		workout: Workout,
-		exerciseMap: Map<string, Exercise>
-	): Promise<void> {
+	async editSession(log: SessionLog, workout: Workout, exerciseMap: Map<string, Exercise>): Promise<void> {
 		const snapshot = snapshotLog(log);
 		const exercises: ActiveExercise[] = [];
 		const editList = this.buildEditExerciseList(workout, snapshot);
@@ -182,8 +171,7 @@ class SessionStore {
 			const sets: ActiveSet[] = [];
 
 			for (let i = 0; i < setCount; i++) {
-				const loggedSet =
-					loggedEx.sets.find((s) => s.setNumber === i + 1) ?? loggedEx.sets[i];
+				const loggedSet = loggedEx.sets.find((s) => s.setNumber === i + 1) ?? loggedEx.sets[i];
 				if (loggedSet) {
 					sets.push(this.hydrateSetFromLog(loggedSet, i + 1, targetReps));
 				} else {
@@ -194,7 +182,7 @@ class SessionStore {
 						weight: lastUsed?.weight ?? 0,
 						reps: lastUsed?.reps ?? (parseInt(targetReps.split('-')[0], 10) || 8),
 						completed: false,
-						completedAt: null
+						completedAt: null,
 					});
 				}
 			}
@@ -202,7 +190,7 @@ class SessionStore {
 			exercises.push({
 				exerciseId: exercise.id,
 				unit: exercise.unit,
-				sets
+				sets,
 			});
 		}
 
@@ -216,7 +204,7 @@ class SessionStore {
 			exercises,
 			isEditing: true,
 			originalFinishedAt: snapshot.finishedAt,
-			originalDurationSeconds: snapshot.durationSeconds
+			originalDurationSeconds: snapshot.durationSeconds,
 		};
 
 		this.persist();
@@ -231,12 +219,7 @@ class SessionStore {
 		await this.logSet(exerciseIndex, setIndex, set.weight, set.reps);
 	}
 
-	async logSet(
-		exerciseIndex: number,
-		setIndex: number,
-		weight: number | string,
-		reps: number
-	): Promise<void> {
+	async logSet(exerciseIndex: number, setIndex: number, weight: number | string, reps: number): Promise<void> {
 		if (!this.active) {
 			return;
 		}
@@ -267,8 +250,8 @@ class SessionStore {
 				$state.snapshot({
 					exerciseId: exercise.exerciseId,
 					weight,
-					reps
-				})
+					reps,
+				}),
 			);
 		} catch (e) {
 			console.error('Failed to save last used weight:', e);
@@ -294,8 +277,8 @@ class SessionStore {
 						setNumber: i + 1,
 						weight: s.weight,
 						reps: s.reps,
-						completedAt: s.completedAt ?? now
-					}))
+						completedAt: s.completedAt ?? now,
+					})),
 			}))
 			.filter((ex) => ex.sets.length > 0);
 
@@ -313,8 +296,7 @@ class SessionStore {
 		const elapsed = isEditing
 			? (this.active.originalDurationSeconds ??
 				Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000))
-			: (durationSeconds ??
-				Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000));
+			: (durationSeconds ?? Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000));
 
 		const sessionLog: SessionLog = {
 			id: this.active.id,
@@ -326,7 +308,7 @@ class SessionStore {
 			durationSeconds: elapsed,
 			totalVolume,
 			totalSets,
-			exercises: loggedExercises
+			exercises: loggedExercises,
 		};
 
 		try {

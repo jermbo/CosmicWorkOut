@@ -1,12 +1,24 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { todayIso } from '$lib/date';
+	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
-		'Run', 'Walk', 'Bike', 'Swim', 'Hike',
-		'Pickleball', 'Tennis', 'Basketball',
-		'Yoga', 'Stretching', 'Cardio', 'Other'
+		'Run',
+		'Walk',
+		'Bike',
+		'Swim',
+		'Hike',
+		'Pickleball',
+		'Tennis',
+		'Basketball',
+		'Yoga',
+		'Stretching',
+		'Cardio',
+		'Other',
 	];
 
 	const INTENSITIES: ActivityIntensity[] = ['Easy', 'Moderate', 'Hard'];
@@ -15,7 +27,7 @@
 		editing = null,
 		initialDate,
 		onClose,
-		onSave
+		onSave,
 	}: {
 		editing?: ActivityLog | null;
 		initialDate?: string;
@@ -23,22 +35,16 @@
 		onSave?: () => void;
 	} = $props();
 
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = todayIso();
 
-	let selectedType = $state<ActivityType>('Run');
-	let customType = $state('');
-	let durationMinutes = $state(30);
-	let intensity = $state<ActivityIntensity>('Moderate');
-	let date = $state(todayStr);
+	// Form is seeded from props once; the sheet is recreated on each open.
+	let selectedType = $state<ActivityType>(untrack(() => editing?.type ?? activityStore.lastUsedType));
+	let customType = $state(untrack(() => editing?.customType ?? ''));
+	let durationMinutes = $state(untrack(() => editing?.durationMinutes ?? 30));
+	let intensity = $state<ActivityIntensity>(untrack(() => editing?.intensity ?? 'Moderate'));
+	let date = $state(untrack(() => editing?.date ?? initialDate ?? todayStr));
 	let saving = $state(false);
-
-	$effect(() => {
-		selectedType = editing?.type ?? activityStore.lastUsedType;
-		customType = editing?.customType ?? '';
-		durationMinutes = editing?.durationMinutes ?? 30;
-		intensity = editing?.intensity ?? 'Moderate';
-		date = editing?.date ?? initialDate ?? todayStr;
-	});
+	let confirming = $state(false);
 
 	async function handleSave() {
 		if (saving) return;
@@ -51,7 +57,7 @@
 					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
 					durationMinutes,
 					intensity,
-					date
+					date,
 				});
 			} else {
 				await activityStore.add({
@@ -59,7 +65,7 @@
 					type: selectedType,
 					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
 					durationMinutes,
-					intensity
+					intensity,
 				});
 			}
 			onSave?.();
@@ -73,11 +79,19 @@
 		durationMinutes = Math.max(1, Math.min(300, durationMinutes + delta));
 	}
 
-	function displayLabel(activity: ActivityLog): string {
-		const name = activity.type === 'Other' ? (activity.customType || 'Other') : activity.type;
-		return `${name} · ${activity.durationMinutes} min · ${activity.intensity}`;
+	async function handleDelete() {
+		if (!editing) return;
+		if (!confirming) {
+			confirming = true;
+			return;
+		}
+		try {
+			await activityStore.remove(editing.id);
+			onClose();
+		} catch {
+			confirming = false;
+		}
 	}
-	void displayLabel;
 </script>
 
 <BottomSheet onclose={onClose} maxHeight="80dvh">
@@ -85,7 +99,14 @@
 		<div class="act-sheet__header">
 			<h2 class="act-sheet__title">{editing ? 'Edit Activity' : 'Log Activity'}</h2>
 			<button class="act-sheet__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
@@ -103,8 +124,10 @@
 							class:act-type-btn--active={selectedType === type}
 							role="radio"
 							aria-checked={selectedType === type}
-							onclick={() => { selectedType = type; }}
-						>{type}</button>
+							onclick={() => {
+								selectedType = type;
+							}}>{type}</button
+						>
 					{/each}
 				</div>
 				{#if selectedType === 'Other'}
@@ -124,7 +147,7 @@
 				<span class="act-field__label">Duration</span>
 				<div class="act-stepper" aria-label="Duration in minutes">
 					<button onclick={() => adjustDuration(-5)} aria-label="Decrease 5 minutes">−</button>
-					<span class="act-stepper__val">{durationMinutes}<span class="act-stepper__unit">min</span></span>
+					<span class="act-stepper__val">{formatMinutes(durationMinutes)}</span>
 					<button onclick={() => adjustDuration(5)} aria-label="Increase 5 minutes">+</button>
 				</div>
 			</div>
@@ -139,8 +162,8 @@
 							class:act-intensity-btn--active={intensity === lvl}
 							role="radio"
 							aria-checked={intensity === lvl}
-							onclick={() => (intensity = lvl)}
-						>{lvl}</button>
+							onclick={() => (intensity = lvl)}>{lvl}</button
+						>
 					{/each}
 				</div>
 			</div>
@@ -148,20 +171,24 @@
 			<!-- Date -->
 			<div class="act-field">
 				<label class="act-field__label" for="act-date">Date</label>
-				<input
-					id="act-date"
-					class="act-date-input"
-					type="date"
-					bind:value={date}
-					max={todayStr}
-				/>
+				<input id="act-date" class="act-date-input" type="date" bind:value={date} max={todayStr} />
 			</div>
 		</div>
 
 		<div class="act-sheet__footer">
 			<button class="act-sheet__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : (editing ? 'Save changes' : 'Log activity')}
+				{saving ? 'Saving…' : editing ? 'Save changes' : 'Log activity'}
 			</button>
+			{#if editing}
+				<button
+					class="act-sheet__delete-btn"
+					class:act-sheet__delete-btn--confirm={confirming}
+					onclick={handleDelete}
+					aria-label={confirming ? 'Tap again to confirm delete' : 'Delete this activity'}
+				>
+					{confirming ? 'Tap to confirm delete' : 'Delete'}
+				</button>
+			{/if}
 		</div>
 	</div>
 </BottomSheet>
@@ -198,7 +225,10 @@
 		background: var(--color-surface-3);
 		color: var(--color-text-secondary);
 
-		svg { inline-size: 16px; block-size: 16px; }
+		svg {
+			inline-size: 16px;
+			block-size: 16px;
+		}
 	}
 
 	.act-sheet__body {
@@ -261,8 +291,12 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
 	}
 
 	.act-stepper {
@@ -280,7 +314,9 @@
 			color: var(--color-text-secondary);
 			transition: background-color var(--duration-fast) var(--ease-out);
 
-			&:hover { background: var(--color-surface-3); }
+			&:hover {
+				background: var(--color-surface-3);
+			}
 		}
 	}
 
@@ -294,12 +330,6 @@
 		align-items: baseline;
 		justify-content: center;
 		gap: 4px;
-	}
-
-	.act-stepper__unit {
-		font-size: 0.875rem;
-		font-weight: 500;
-		color: var(--color-text-secondary);
 	}
 
 	.act-intensity {
@@ -339,7 +369,9 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
 	}
 
 	.act-sheet__footer {
@@ -347,6 +379,9 @@
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
 		border-block-start: 1px solid var(--color-border);
 		margin-block-start: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 	}
 
 	.act-sheet__save-btn {
@@ -359,6 +394,28 @@
 		font-weight: 700;
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:disabled { opacity: 0.6; cursor: default; }
+		&:disabled {
+			opacity: 0.6;
+			cursor: default;
+		}
+	}
+
+	.act-sheet__delete-btn {
+		inline-size: 100%;
+		block-size: 44px;
+		border-radius: var(--radius-full);
+		background: transparent;
+		border: 1px solid color-mix(in srgb, #ef4444 40%, transparent);
+		color: #ef4444;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		transition:
+			background-color var(--duration-fast) var(--ease-out),
+			border-color var(--duration-fast) var(--ease-out);
+	}
+
+	.act-sheet__delete-btn--confirm {
+		background: color-mix(in srgb, #ef4444 12%, transparent);
+		border-color: #ef4444;
 	}
 </style>

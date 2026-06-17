@@ -8,18 +8,18 @@ Defining, selecting, and editing fitness programs.
 
 ## Implementation Status
 
-| Story | Status |
-|-------|--------|
-| View active program + workout cards | ✅ Built |
-| Edit workout exercises | ✅ Built |
-| Add new workout to program | ✅ Built |
-| Week progress bar | ✅ Built |
-| Select/switch programs | ❌ Auto-selects first |
-| Create program from scratch | ❌ Not built |
-| Copy built-in before editing | ❌ Edits in-place |
-| Custom exercise CRUD | ❌ Library is read-only in UI |
-| Browse all weeks | ❌ Week 1 templates only on Program page |
-| Rename existing workout | ⚠️ Title change doesn't persist on save |
+| Story                               | Status                                   |
+| ----------------------------------- | ---------------------------------------- |
+| View active program + workout cards | ✅ Built                                 |
+| Edit workout exercises              | ✅ Built                                 |
+| Add new workout to program          | ✅ Built                                 |
+| Week progress bar                   | ✅ Built                                 |
+| Select/switch programs              | ❌ Auto-selects first                    |
+| Create program from scratch         | ❌ Not built                             |
+| Copy built-in before editing        | ❌ Edits in-place                        |
+| Custom exercise CRUD                | ❌ Library is read-only in UI            |
+| Browse all weeks                    | ❌ Week 1 templates only on Program page |
+| Rename existing workout             | ⚠️ Title change doesn't persist on save  |
 
 ---
 
@@ -50,6 +50,7 @@ flowchart TB
 The app ships with a small set of ready-to-use programs. These act as starting points — users should be able to copy and modify them, not just run them as-is.
 
 Currently shipped:
+
 - **Strength Foundation (12 weeks, 3 days/week)** — workouts A (Lower + Lateral), B (Upper + Reactive), C (Full + Conditioning). Seeded from `src/lib/db/seed.ts`.
 
 Built-in programs are intended to be read-only with copy-to-edit, but today they are editable in-place via the workout editor.
@@ -73,11 +74,13 @@ Built-in programs are intended to be read-only with copy-to-edit, but today they
 > As a user, I want to browse my active program's full schedule, so I understand what's coming up.
 
 **Built today:**
+
 - Week 1 workout templates (A/B/C) shown as cards with exercise chips
 - Week progress bar (derived from session count)
 - Today / done / scheduled badges on workout cards
 
 **Target (not yet):**
+
 - Navigate and browse all weeks individually
 
 ---

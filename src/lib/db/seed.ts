@@ -1,4 +1,77 @@
-import type { Exercise, Program, Week, Workout } from './types';
+import type { Exercise, Program, Week, Workout, Habit } from './types';
+
+export const builtInHabits: Habit[] = [
+	{
+		id: 'habit-meditation',
+		name: 'Meditation',
+		unit: '',
+		type: 'minutes',
+		dailyGoal: 20,
+		active: true,
+		sortOrder: 0,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-writing',
+		name: 'Writing',
+		unit: 'words',
+		type: 'count',
+		dailyGoal: 500,
+		active: true,
+		sortOrder: 1,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-reading',
+		name: 'Reading',
+		unit: 'pages',
+		type: 'count',
+		dailyGoal: 20,
+		active: true,
+		sortOrder: 2,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-water',
+		name: 'Water',
+		unit: 'cups',
+		type: 'count',
+		dailyGoal: 8,
+		active: true,
+		sortOrder: 3,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-coffee',
+		name: 'Coffee',
+		unit: 'cups',
+		type: 'count',
+		dailyGoal: 3,
+		active: true,
+		sortOrder: 4,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-alcohol',
+		name: 'Alcohol',
+		unit: '',
+		type: 'boolean',
+		dailyGoal: undefined,
+		active: true,
+		sortOrder: 5,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'habit-mood',
+		name: 'Mood',
+		unit: '',
+		type: 'mood',
+		dailyGoal: undefined,
+		active: true,
+		sortOrder: 6,
+		createdAt: new Date().toISOString(),
+	},
+];
 
 export const builtInExercises: Exercise[] = [
 	// ── HINGE ──────────────────────────────────────────────────────
@@ -12,7 +85,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '10',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'trap-dl',
@@ -24,7 +97,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '6',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'kb-swing',
@@ -36,7 +109,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '15',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'good-morn',
@@ -48,7 +121,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '12',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── SQUAT ──────────────────────────────────────────────────────
 	{
@@ -61,7 +134,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '8',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'split',
@@ -73,7 +146,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '10 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'box-squat',
@@ -85,7 +158,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '6',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'step-up',
@@ -97,7 +170,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '10 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── PUSH ───────────────────────────────────────────────────────
 	{
@@ -110,7 +183,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '8',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'push-press',
@@ -122,7 +195,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '8',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'landmine',
@@ -134,7 +207,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '10 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'db-ohp',
@@ -146,7 +219,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '10',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── PULL ───────────────────────────────────────────────────────
 	{
@@ -159,7 +232,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '10',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'pull-up',
@@ -170,7 +243,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 3,
 		defaultReps: '6',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'face-pull',
@@ -181,7 +254,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'band',
 		defaultSets: 3,
 		defaultReps: '15',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'band-pull',
@@ -192,7 +265,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'band',
 		defaultSets: 3,
 		defaultReps: '20',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── LATERAL ────────────────────────────────────────────────────
 	{
@@ -204,7 +277,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'band',
 		defaultSets: 3,
 		defaultReps: '15 ea',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'copenhagen',
@@ -215,7 +288,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 3,
 		defaultReps: '30 s',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'side-plank',
@@ -226,7 +299,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 3,
 		defaultReps: '30 s',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'sl-rdl',
@@ -238,7 +311,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '8 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── ROTATIONAL ─────────────────────────────────────────────────
 	{
@@ -251,7 +324,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '6 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'pallof',
@@ -262,7 +335,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'band',
 		defaultSets: 3,
 		defaultReps: '12',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'woodchop',
@@ -274,7 +347,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '12 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'mb-rainbow',
@@ -286,7 +359,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '8 ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── POWER ──────────────────────────────────────────────────────
 	{
@@ -298,7 +371,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 3,
 		defaultReps: '20',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'box-jump',
@@ -309,7 +382,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 4,
 		defaultReps: '5',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'broad-jump',
@@ -320,7 +393,7 @@ export const builtInExercises: Exercise[] = [
 		unit: 'bodyweight',
 		defaultSets: 4,
 		defaultReps: '5',
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'mb-chest',
@@ -332,7 +405,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '8',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	// ── CARRY ──────────────────────────────────────────────────────
 	{
@@ -345,7 +418,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '40m',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'suitcase',
@@ -357,7 +430,7 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 3,
 		defaultReps: '30m ea',
 		weightIncrement: 5,
-		isBuiltIn: true
+		isBuiltIn: true,
 	},
 	{
 		id: 'sled-push',
@@ -369,8 +442,8 @@ export const builtInExercises: Exercise[] = [
 		defaultSets: 4,
 		defaultReps: '20m',
 		weightIncrement: 5,
-		isBuiltIn: true
-	}
+		isBuiltIn: true,
+	},
 ];
 
 function makeWorkoutA(weekNum: number): Workout {
@@ -387,8 +460,8 @@ function makeWorkoutA(weekNum: number): Workout {
 			{ exerciseId: 'split', sets: 3, reps: '10 ea' },
 			{ exerciseId: 'band-walk', sets: 3, reps: '15 ea' },
 			{ exerciseId: 'medball', sets: 3, reps: '6 ea' },
-			{ exerciseId: 'copenhagen', sets: 3, reps: '30 s' }
-		]
+			{ exerciseId: 'copenhagen', sets: 3, reps: '30 s' },
+		],
 	};
 }
 
@@ -406,8 +479,8 @@ function makeWorkoutB(weekNum: number): Workout {
 			{ exerciseId: 'push-press', sets: 3, reps: '8' },
 			{ exerciseId: 'face-pull', sets: 3, reps: '15' },
 			{ exerciseId: 'pogo', sets: 3, reps: '20' },
-			{ exerciseId: 'pallof', sets: 3, reps: '12' }
-		]
+			{ exerciseId: 'pallof', sets: 3, reps: '12' },
+		],
 	};
 }
 
@@ -424,15 +497,15 @@ function makeWorkoutC(weekNum: number): Workout {
 			{ exerciseId: 'push-press', sets: 3, reps: '8' },
 			{ exerciseId: 'sled-push', sets: 4, reps: '20m' },
 			{ exerciseId: 'farmer', sets: 3, reps: '40m' },
-			{ exerciseId: 'woodchop', sets: 3, reps: '12 ea' }
-		]
+			{ exerciseId: 'woodchop', sets: 3, reps: '12 ea' },
+		],
 	};
 }
 
 function makeWeek(weekNum: number): Week {
 	return {
 		weekNumber: weekNum,
-		workouts: [makeWorkoutA(weekNum), makeWorkoutB(weekNum), makeWorkoutC(weekNum)]
+		workouts: [makeWorkoutA(weekNum), makeWorkoutB(weekNum), makeWorkoutC(weekNum)],
 	};
 }
 
@@ -446,6 +519,6 @@ export const builtInPrograms: Program[] = [
 		daysPerWeek: 3,
 		weeks: Array.from({ length: 12 }, (_, i) => makeWeek(i + 1)),
 		createdAt: new Date().toISOString(),
-		isBuiltIn: true
-	}
+		isBuiltIn: true,
+	},
 ];

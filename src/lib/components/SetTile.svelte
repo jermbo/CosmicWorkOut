@@ -4,7 +4,7 @@
 
 	let {
 		set,
-		onTap
+		onTap,
 	}: {
 		set: ActiveSet;
 		onTap: () => void;

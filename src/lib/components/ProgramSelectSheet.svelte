@@ -5,7 +5,7 @@
 
 	let {
 		onClose,
-		onCreateNew
+		onCreateNew,
 	}: {
 		onClose: () => void;
 		onCreateNew: () => void;
@@ -22,7 +22,14 @@
 		<div class="prog-sheet__header">
 			<h2 class="prog-sheet__title">Programs</h2>
 			<button class="prog-sheet__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
@@ -47,12 +54,7 @@
 					{#if isActive}
 						<span class="prog-row__active-badge">Active</span>
 					{:else}
-						<button
-							class="prog-row__action-btn"
-							onclick={() => switchTo(program)}
-						>
-							Select
-						</button>
+						<button class="prog-row__action-btn" onclick={() => switchTo(program)}> Select </button>
 					{/if}
 				</div>
 			{/each}
@@ -60,7 +62,14 @@
 
 		<div class="prog-sheet__footer">
 			<button class="prog-sheet__new-btn" onclick={onCreateNew}>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="12" y1="5" x2="12" y2="19" />
 					<line x1="5" y1="12" x2="19" y2="12" />
 				</svg>

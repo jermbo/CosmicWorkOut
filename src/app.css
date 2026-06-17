@@ -153,6 +153,21 @@ a {
 }
 
 /* ============================================================
+   Visually hidden (screen-reader only)
+   ============================================================ */
+.sr-only {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+/* ============================================================
    Focus styles
    ============================================================ */
 :focus-visible {
@@ -203,7 +218,7 @@ a {
 }
 
 .page--wide {
-	inline-size: min(100%, 900px);
+	inline-size: min(100%, 1120px);
 }
 
 @container app (inline-size >= 720px) {

@@ -10,7 +10,7 @@
 	let {
 		exercise = null,
 		onClose,
-		onSave
+		onSave,
 	}: {
 		exercise?: Exercise | null;
 		onClose: () => void;
@@ -28,7 +28,7 @@
 		unit: exercise?.unit ?? ('lb' as WeightUnit),
 		defaultSets: exercise?.defaultSets ?? 3,
 		defaultReps: exercise?.defaultReps ?? '8-10',
-		weightIncrement: exercise?.weightIncrement ?? 5
+		weightIncrement: exercise?.weightIncrement ?? 5,
 	}));
 
 	let name = $state(snap.name);
@@ -55,9 +55,19 @@
 		saving = true;
 
 		let saved: Exercise;
-		const inc = (unit === 'lb' || unit === 'kg') ? weightIncrement : undefined;
+		const inc = unit === 'lb' || unit === 'kg' ? weightIncrement : undefined;
 		if (exercise) {
-			const updated: Exercise = { ...exercise, name: name.trim(), cue: cue.trim(), muscles: muscles.trim(), cat, unit, defaultSets, defaultReps, weightIncrement: inc };
+			const updated: Exercise = {
+				...exercise,
+				name: name.trim(),
+				cue: cue.trim(),
+				muscles: muscles.trim(),
+				cat,
+				unit,
+				defaultSets,
+				defaultReps,
+				weightIncrement: inc,
+			};
 			await programStore.updateExercise(updated);
 			saved = updated;
 		} else {
@@ -69,7 +79,7 @@
 				unit,
 				defaultSets,
 				defaultReps,
-				weightIncrement: inc
+				weightIncrement: inc,
 			});
 		}
 
@@ -84,28 +94,64 @@
 		<div class="ex-form__header">
 			<h2 class="ex-form__title">{exercise ? 'Edit Exercise' : 'New Exercise'}</h2>
 			<button class="ex-form__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
 			</button>
 		</div>
 
-		<form class="ex-form__body" onsubmit={(e) => { e.preventDefault(); handleSave(); }}>
+		<form
+			class="ex-form__body"
+			onsubmit={(e) => {
+				e.preventDefault();
+				handleSave();
+			}}
+		>
 			<div class="form-field" class:form-field--error={errors.name}>
 				<label class="form-field__label" for="ex-name">Name</label>
-				<input id="ex-name" class="form-field__input" type="text" bind:value={name} placeholder="e.g. Romanian Deadlift" autocomplete="off" />
+				<input
+					id="ex-name"
+					class="form-field__input"
+					type="text"
+					bind:value={name}
+					placeholder="e.g. Romanian Deadlift"
+					autocomplete="off"
+				/>
 				{#if errors.name}<span class="form-field__error">{errors.name}</span>{/if}
 			</div>
 
 			<div class="form-field">
-				<label class="form-field__label" for="ex-cue">Coaching cue <span class="form-field__optional">optional</span></label>
-				<input id="ex-cue" class="form-field__input" type="text" bind:value={cue} placeholder="e.g. Hinge at hips, proud chest" autocomplete="off" />
+				<label class="form-field__label" for="ex-cue"
+					>Coaching cue <span class="form-field__optional">optional</span></label
+				>
+				<input
+					id="ex-cue"
+					class="form-field__input"
+					type="text"
+					bind:value={cue}
+					placeholder="e.g. Hinge at hips, proud chest"
+					autocomplete="off"
+				/>
 			</div>
 
 			<div class="form-field" class:form-field--error={errors.muscles}>
 				<label class="form-field__label" for="ex-muscles">Muscles worked</label>
-				<input id="ex-muscles" class="form-field__input" type="text" bind:value={muscles} placeholder="e.g. Hamstrings, glutes" autocomplete="off" />
+				<input
+					id="ex-muscles"
+					class="form-field__input"
+					type="text"
+					bind:value={muscles}
+					placeholder="e.g. Hamstrings, glutes"
+					autocomplete="off"
+				/>
 				{#if errors.muscles}<span class="form-field__error">{errors.muscles}</span>{/if}
 			</div>
 
@@ -119,8 +165,8 @@
 							class:cat-chip--active={cat === c}
 							role="radio"
 							aria-checked={cat === c}
-							onclick={() => (cat = c)}
-						>{c}</button>
+							onclick={() => (cat = c)}>{c}</button
+						>
 					{/each}
 				</div>
 			</div>
@@ -136,8 +182,8 @@
 								class:seg-control__btn--active={unit === u}
 								role="radio"
 								aria-checked={unit === u}
-								onclick={() => (unit = u)}
-							>{u}</button>
+								onclick={() => (unit = u)}>{u}</button
+							>
 						{/each}
 					</div>
 				</div>
@@ -147,9 +193,21 @@
 				<div class="form-field">
 					<label class="form-field__label" for="ex-sets">Default sets</label>
 					<div class="stepper">
-						<button type="button" onclick={() => { if (defaultSets > 1) defaultSets--; }} aria-label="Decrease sets">−</button>
+						<button
+							type="button"
+							onclick={() => {
+								if (defaultSets > 1) defaultSets--;
+							}}
+							aria-label="Decrease sets">−</button
+						>
 						<span id="ex-sets">{defaultSets}</span>
-						<button type="button" onclick={() => { if (defaultSets < 8) defaultSets++; }} aria-label="Increase sets">+</button>
+						<button
+							type="button"
+							onclick={() => {
+								if (defaultSets < 8) defaultSets++;
+							}}
+							aria-label="Increase sets">+</button
+						>
 					</div>
 				</div>
 				<div class="form-field">
@@ -169,8 +227,8 @@
 								class:seg-control__btn--active={weightIncrement === inc}
 								role="radio"
 								aria-checked={weightIncrement === inc}
-								onclick={() => (weightIncrement = inc)}
-							>{inc}</button>
+								onclick={() => (weightIncrement = inc)}>{inc}</button
+							>
 						{/each}
 					</div>
 				</div>
@@ -214,7 +272,10 @@
 		background: var(--color-surface-3);
 		color: var(--color-text-secondary);
 
-		svg { inline-size: 16px; block-size: 16px; }
+		svg {
+			inline-size: 16px;
+			block-size: 16px;
+		}
 	}
 
 	.ex-form__body {
@@ -262,8 +323,12 @@
 		outline: none;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+		}
 	}
 
 	.form-field__error {
@@ -301,7 +366,9 @@
 		display: flex;
 		gap: var(--space-4);
 
-		.form-field { flex: 1; }
+		.form-field {
+			flex: 1;
+		}
 	}
 
 	.seg-control {
@@ -345,7 +412,9 @@
 			color: var(--color-text-secondary);
 			transition: background-color var(--duration-fast) var(--ease-out);
 
-			&:hover { background: var(--color-surface-2); }
+			&:hover {
+				background: var(--color-surface-2);
+			}
 		}
 
 		span {
@@ -367,6 +436,9 @@
 		margin-block-start: var(--space-2);
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:disabled { opacity: 0.6; cursor: default; }
+		&:disabled {
+			opacity: 0.6;
+			cursor: default;
+		}
 	}
 </style>

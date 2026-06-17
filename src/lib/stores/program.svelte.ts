@@ -1,19 +1,12 @@
-import type { Program, Exercise, Workout, WorkoutExercise, SessionLog, Week, ExerciseCat, WeightUnit } from '$lib/db/types';
+import type { Program, Exercise, Workout, WorkoutExercise, SessionLog, Week, WorkoutColor } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
+import { todayIso } from '$lib/date';
+import { computeWeekStreak } from '$lib/streak';
 
 const ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
-const WORKOUT_COLORS: ('lime' | 'lavender' | 'red')[] = ['lime', 'lavender', 'red'];
-
-function isoWeekKey(d: Date): string {
-	const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-	const day = utc.getUTCDay() || 7;
-	utc.setUTCDate(utc.getUTCDate() + 4 - day);
-	const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-	const week = Math.ceil(((utc.valueOf() - yearStart.valueOf()) / 86400000 + 1) / 7);
-	return `${utc.getUTCFullYear()}-W${week}`;
-}
+const WORKOUT_COLORS: WorkoutColor[] = ['lime', 'lavender', 'red'];
 
 class ProgramStore {
 	programs = $state<Program[]>([]);
@@ -38,36 +31,12 @@ class ProgramStore {
 	});
 
 	weekStreak = $derived.by(() => {
-		if (!this.activeProgram || this.sessions.length === 0) return 0;
+		if (!this.activeProgram) return 0;
 		const programSessions = this.sessions.filter((s) => s.programId === this.activeProgram!.id);
-		if (programSessions.length === 0) return 0;
-		const daysPerWeek = this.activeProgram.daysPerWeek;
-
-		const weekCounts = new Map<string, number>();
-		for (const s of programSessions) {
-			const d = new Date(s.date + 'T00:00:00');
-			const key = isoWeekKey(d);
-			weekCounts.set(key, (weekCounts.get(key) ?? 0) + 1);
-		}
-
-		const today = new Date();
-		let streak = 0;
-		let check = new Date(today);
-
-		// If current week is already complete, count it; then walk back
-		if ((weekCounts.get(isoWeekKey(check)) ?? 0) >= daysPerWeek) {
-			streak++;
-			check.setDate(check.getDate() - 7);
-		} else {
-			check.setDate(check.getDate() - 7);
-		}
-
-		while ((weekCounts.get(isoWeekKey(check)) ?? 0) >= daysPerWeek) {
-			streak++;
-			check.setDate(check.getDate() - 7);
-		}
-
-		return streak;
+		return computeWeekStreak(
+			programSessions.map((s) => s.date),
+			this.activeProgram.daysPerWeek,
+		);
 	});
 
 	completedSessionCount = $derived.by(() => {
@@ -77,11 +46,17 @@ class ProgramStore {
 		return this.sessions.filter((s) => s.programId === this.activeProgram!.id).length;
 	});
 
+	isProgramComplete = $derived.by(() => {
+		if (!this.activeProgram) return false;
+		const total = this.activeProgram.durationWeeks * this.activeProgram.daysPerWeek;
+		return total > 0 && this.completedSessionCount >= total;
+	});
+
 	currentWeekNumber = $derived.by(() => {
 		if (!this.activeProgram) return 1;
 		return Math.min(
 			Math.floor(this.completedSessionCount / this.activeProgram.daysPerWeek) + 1,
-			this.activeProgram.durationWeeks
+			this.activeProgram.durationWeeks,
 		);
 	});
 
@@ -100,8 +75,7 @@ class ProgramStore {
 	});
 
 	todaySession = $derived.by(() => {
-		const today = new Date().toISOString().split('T')[0];
-		return this.sessionForDate(today);
+		return this.sessionForDate(todayIso());
 	});
 
 	workoutsForCurrentWeek = $derived.by(() => {
@@ -133,7 +107,7 @@ class ProgramStore {
 		const [programs, exercises, sessions] = await Promise.all([
 			db.programs.getAll(),
 			db.exercises.getAll(),
-			db.sessions.getAll()
+			db.sessions.getAll(),
 		]).catch((e) => {
 			console.error('Failed to load data from IndexedDB:', e);
 			throw e;
@@ -188,18 +162,14 @@ class ProgramStore {
 			exercises: log.exercises.map((le) => ({
 				exerciseId: le.exerciseId,
 				sets: le.sets.length,
-				reps: String(le.sets[0]?.reps ?? 8)
-			}))
+				reps: String(le.sets[0]?.reps ?? 8),
+			})),
 		};
 	}
 
 	sessionForDate(date: string): SessionLog | null {
 		if (!this.activeProgram) return null;
-		return (
-			this.sessions.find(
-				(s) => s.date === date && s.programId === this.activeProgram!.id
-			) ?? null
-		);
+		return this.sessions.find((s) => s.date === date && s.programId === this.activeProgram!.id) ?? null;
 	}
 
 	async deleteSession(id: string): Promise<void> {
@@ -215,7 +185,7 @@ class ProgramStore {
 	// Save workout metadata + exercises across all weeks (matched by original name)
 	async saveWorkout(
 		originalName: string,
-		updates: { name: string; letter?: string; focus?: string; color?: 'lime' | 'lavender' | 'red'; exercises: WorkoutExercise[] }
+		updates: { name: string; letter?: string; focus?: string; color?: WorkoutColor; exercises: WorkoutExercise[] },
 	): Promise<void> {
 		if (!this.activeProgram) return;
 
@@ -223,9 +193,16 @@ class ProgramStore {
 			...week,
 			workouts: week.workouts.map((w) =>
 				w.name === originalName
-					? { ...w, name: updates.name, letter: updates.letter ?? w.letter, focus: updates.focus ?? w.focus, color: updates.color ?? w.color, exercises: updates.exercises }
-					: w
-			)
+					? {
+							...w,
+							name: updates.name,
+							letter: updates.letter ?? w.letter,
+							focus: updates.focus ?? w.focus,
+							color: updates.color ?? w.color,
+							exercises: updates.exercises,
+						}
+					: w,
+			),
 		}));
 
 		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
@@ -235,9 +212,7 @@ class ProgramStore {
 			console.error('Failed to save workout:', e);
 			throw e;
 		}
-		this.programs = this.programs.map((p) =>
-			p.id === this.activeProgram!.id ? this.activeProgram! : p
-		);
+		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
 	}
 
 	// Add a brand-new workout to all weeks
@@ -246,10 +221,7 @@ class ProgramStore {
 
 		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
 			...week,
-			workouts: [
-				...week.workouts,
-				{ ...workout, id: generateId() }
-			]
+			workouts: [...week.workouts, { ...workout, id: generateId() }],
 		}));
 
 		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
@@ -259,9 +231,7 @@ class ProgramStore {
 			console.error('Failed to add workout:', e);
 			throw e;
 		}
-		this.programs = this.programs.map((p) =>
-			p.id === this.activeProgram!.id ? this.activeProgram! : p
-		);
+		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
 	}
 
 	setActiveProgram(programId: string): void {
@@ -278,11 +248,11 @@ class ProgramStore {
 			id: generateId(),
 			name: `${snap.name} (Copy)`,
 			isBuiltIn: false,
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
 		};
 		copy.weeks = copy.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.map((w) => ({ ...w, id: generateId() }))
+			workouts: week.workouts.map((w) => ({ ...w, id: generateId() })),
 		}));
 		try {
 			await db.programs.put(copy);
@@ -309,8 +279,8 @@ class ProgramStore {
 				letter: String.fromCharCode(65 + i),
 				focus: tmpl.focus,
 				color: WORKOUT_COLORS[i % WORKOUT_COLORS.length],
-				exercises: []
-			}))
+				exercises: [],
+			})),
 		}));
 
 		const program: Program = {
@@ -321,7 +291,7 @@ class ProgramStore {
 			daysPerWeek: data.daysPerWeek,
 			weeks,
 			createdAt: new Date().toISOString(),
-			isBuiltIn: false
+			isBuiltIn: false,
 		};
 
 		try {
@@ -359,11 +329,7 @@ class ProgramStore {
 
 	isExerciseInUse(id: string): boolean {
 		return this.programs.some((p) =>
-			p.weeks.some((w) =>
-				w.workouts.some((wo) =>
-					wo.exercises.some((we) => we.exerciseId === id)
-				)
-			)
+			p.weeks.some((w) => w.workouts.some((wo) => wo.exercises.some((we) => we.exerciseId === id))),
 		);
 	}
 
@@ -388,7 +354,7 @@ class ProgramStore {
 
 		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.filter((w) => w.name !== workoutName)
+			workouts: week.workouts.filter((w) => w.name !== workoutName),
 		}));
 
 		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
@@ -398,9 +364,7 @@ class ProgramStore {
 			console.error('Failed to remove workout:', e);
 			throw e;
 		}
-		this.programs = this.programs.map((p) =>
-			p.id === this.activeProgram!.id ? this.activeProgram! : p
-		);
+		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
 	}
 
 	async deleteProgram(id: string): Promise<void> {

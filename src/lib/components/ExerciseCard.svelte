@@ -8,7 +8,7 @@
 		activeExercise,
 		exercise,
 		exerciseIndex,
-		onSetTap
+		onSetTap,
 	}: {
 		activeExercise: ActiveExercise;
 		exercise: Exercise;

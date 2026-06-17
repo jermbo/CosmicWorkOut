@@ -6,14 +6,14 @@
 
 ## How to read this wiki
 
-Docs are organized by **altitude**. Start high to understand *why*, work down to understand *what*, *how*, and *where in the code*.
+Docs are organized by **altitude**. Start high to understand _why_, work down to understand _what_, _how_, and _where in the code_.
 
-| Level | Folder | Purpose |
-|-------|--------|---------|
-| 30k | [vision/](vision/) | North star — what we're building and why |
-| 15k | [architecture/](architecture/) | System structure, data, tech, offline |
-| 5k | [requirements/](requirements/) | User stories per feature area |
-| Ground | [implementation/](implementation/) | Code map, stores, components, status |
+| Level  | Folder                             | Purpose                                  |
+| ------ | ---------------------------------- | ---------------------------------------- |
+| 30k    | [vision/](vision/)                 | North star — what we're building and why |
+| 15k    | [architecture/](architecture/)     | System structure, data, tech, offline    |
+| 5k     | [requirements/](requirements/)     | User stories per feature area            |
+| Ground | [implementation/](implementation/) | Code map, stores, components, status     |
 
 Each doc is one complete thought — readable in ~60 seconds. Follow links to go deeper. Diagrams use **mermaid** for architecture, flows, entity relationships, and component trees.
 
@@ -102,4 +102,4 @@ flowchart TB
 
 ## Inspiration
 
-The original design reference lives in [_inspiration/](_inspiration/). It's a high-fidelity pickleball-specific prototype — useful for UI and UX patterns, not taken literally as the product spec.
+The original design reference lives in [\_inspiration/](_inspiration/). It's a high-fidelity pickleball-specific prototype — useful for UI and UX patterns, not taken literally as the product spec.

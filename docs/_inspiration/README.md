@@ -30,17 +30,17 @@ Open `packet/Packet.html` in a browser to see the full interactive prototype bef
 
 ## Screens (in order)
 
-| # | Screen | Route / Layer | Entry |
-|---|--------|--------------|-------|
-| 01 | Today View | `/` tab 1 | Default |
-| 02 | Active Session | Full-screen overlay | "Start session" CTA |
-| 03 | Log Set Sheet | Bottom sheet | Set tile tap |
-| 04 | Session Complete | Full-screen overlay | "Finish session" |
-| 05 | Calendar / History | `/calendar` tab 3 | Bottom nav |
-| 06 | Day Summary | Bottom sheet | Completed day tap |
-| 07 | Program View | `/program` tab 2 | Bottom nav |
-| 08 | Workout Editor | Full-screen overlay | "Edit" on workout card |
-| 09 | Exercise Library | Bottom sheet | "Browse library" in editor |
+| #   | Screen             | Route / Layer       | Entry                      |
+| --- | ------------------ | ------------------- | -------------------------- |
+| 01  | Today View         | `/` tab 1           | Default                    |
+| 02  | Active Session     | Full-screen overlay | "Start session" CTA        |
+| 03  | Log Set Sheet      | Bottom sheet        | Set tile tap               |
+| 04  | Session Complete   | Full-screen overlay | "Finish session"           |
+| 05  | Calendar / History | `/calendar` tab 3   | Bottom nav                 |
+| 06  | Day Summary        | Bottom sheet        | Completed day tap          |
+| 07  | Program View       | `/program` tab 2    | Bottom nav                 |
+| 08  | Workout Editor     | Full-screen overlay | "Edit" on workout card     |
+| 09  | Exercise Library   | Bottom sheet        | "Browse library" in editor |
 
 Full spec for each screen: see `Packet Design Handoff.html` § Screens.
 
@@ -58,6 +58,7 @@ Full spec for each screen: see `Packet Design Handoff.html` § Screens.
 ## Key Interactions
 
 ### Set tile tap (instant mode)
+
 ```
 tap → scale(0.93) immediately →
   white flash overlay (opacity 0.4→0, 280ms) →
@@ -67,6 +68,7 @@ tap → scale(0.93) immediately →
 ```
 
 ### Exercise completion
+
 ```
 last set logged →
   card border pulses accent (ripple: scale 1→1.04, opacity 0.8→0, 600ms) →
@@ -76,6 +78,7 @@ last set logged →
 ```
 
 ### Session complete
+
 ```
 "Finish session" tap →
   full-screen overlay fades in (220ms) →
@@ -91,6 +94,7 @@ last set logged →
 See full TypeScript interfaces in `Packet Design Handoff.html` § Data Model.
 
 **Summary:**
+
 - `Exercise` — id, name, cue, sets, reps (string), unit (lb/band/bw)
 - `Workout` — packet/week/letter, exercises[]
 - `SessionLog` — uuid, date, exercises with sets logged, volume
@@ -101,13 +105,13 @@ See full TypeScript interfaces in `Packet Design Handoff.html` § Data Model.
 
 ## Offline & Persistence
 
-| Store | Data | When |
-|-------|------|------|
-| IndexedDB `sessions` | All `SessionLog` records | Write immediately on set confirm |
-| IndexedDB `program` | User's workout definitions | Write on editor save |
-| IndexedDB `exerciseLastUsed` | Last weight/reps per exercise | Write on set confirm |
-| `localStorage:packet:prefs` | `UserPrefs` JSON | Write on every preference change |
-| `localStorage:packet:activeSession` | In-progress session state | Write on every set confirm (crash recovery) |
+| Store                               | Data                          | When                                        |
+| ----------------------------------- | ----------------------------- | ------------------------------------------- |
+| IndexedDB `sessions`                | All `SessionLog` records      | Write immediately on set confirm            |
+| IndexedDB `program`                 | User's workout definitions    | Write on editor save                        |
+| IndexedDB `exerciseLastUsed`        | Last weight/reps per exercise | Write on set confirm                        |
+| `localStorage:packet:prefs`         | `UserPrefs` JSON              | Write on every preference change            |
+| `localStorage:packet:activeSession` | In-progress session state     | Write on every set confirm (crash recovery) |
 
 **Crash recovery:** On app boot, if `activeSession` key exists and date = today, offer to resume. On finish or abandon, clear the key.
 
@@ -119,20 +123,20 @@ No network dependency after initial load. Service worker required for PWA offlin
 
 All tokens are in `packet/tokens.css`. Key values:
 
-| Token | Value |
-|-------|-------|
-| `--color-bg` | `#101010` |
-| `--color-surface-2` | `#1E1E1E` (cards) |
-| `--color-surface-3` | `#252525` (inputs, tiles) |
-| `--color-lime` | `#B2F042` (default accent) |
-| `--color-lavender` | `#B286FD` |
-| `--color-red` | `#E55733` |
-| `--font-display` | Space Grotesk 700 |
-| `--font-body` | Inter |
-| `--font-mono` | JetBrains Mono |
-| `--radius-tile` | 14px (set tiles) |
-| `--ease-spring` | cubic-bezier(0.34,1.56,0.64,1) |
-| `--duration-normal` | 220ms |
+| Token               | Value                          |
+| ------------------- | ------------------------------ |
+| `--color-bg`        | `#101010`                      |
+| `--color-surface-2` | `#1E1E1E` (cards)              |
+| `--color-surface-3` | `#252525` (inputs, tiles)      |
+| `--color-lime`      | `#B2F042` (default accent)     |
+| `--color-lavender`  | `#B286FD`                      |
+| `--color-red`       | `#E55733`                      |
+| `--font-display`    | Space Grotesk 700              |
+| `--font-body`       | Inter                          |
+| `--font-mono`       | JetBrains Mono                 |
+| `--radius-tile`     | 14px (set tiles)               |
+| `--ease-spring`     | cubic-bezier(0.34,1.56,0.64,1) |
+| `--duration-normal` | 220ms                          |
 
 ---
 
@@ -154,17 +158,17 @@ All tokens are in `packet/tokens.css`. Key values:
 
 Nine features are fully designed in `packet/Feature Exploration.html`. Open it in a browser and click any artboard to focus fullscreen. Specs for all 9 are in `Packet Design Handoff.html` § Feature Concepts.
 
-| # | Feature | Priority | Section |
-|---|---------|----------|---------|
-| F1 | Rest Timer | High | In the Gym |
-| F2 | Progressive Overload Nudge | High | In the Gym |
-| F3 | Personal Records (PR badge) | High | In the Gym |
-| F4 | Volume Trend Sparkline | Medium | In the Gym |
-| F5 | Post-Match Logging | Medium | Before You Start |
-| F6 | Readiness Check | Medium | Before You Start |
-| F7 | Streak & Consistency Heatmap | High | Progress & Sharing |
-| F8 | Packet 2 Preview | Medium | Progress & Sharing |
-| F9 | Session Share Card | Low | Progress & Sharing |
+| #   | Feature                      | Priority | Section            |
+| --- | ---------------------------- | -------- | ------------------ |
+| F1  | Rest Timer                   | High     | In the Gym         |
+| F2  | Progressive Overload Nudge   | High     | In the Gym         |
+| F3  | Personal Records (PR badge)  | High     | In the Gym         |
+| F4  | Volume Trend Sparkline       | Medium   | In the Gym         |
+| F5  | Post-Match Logging           | Medium   | Before You Start   |
+| F6  | Readiness Check              | Medium   | Before You Start   |
+| F7  | Streak & Consistency Heatmap | High     | Progress & Sharing |
+| F8  | Packet 2 Preview             | Medium   | Progress & Sharing |
+| F9  | Session Share Card           | Low      | Progress & Sharing |
 
 ### Key data model additions required
 

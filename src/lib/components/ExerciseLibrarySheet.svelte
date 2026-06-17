@@ -12,7 +12,7 @@
 		Lateral: 'var(--color-red)',
 		Rotational: 'var(--color-red)',
 		Power: 'var(--color-lime)',
-		Carry: 'var(--color-lavender)'
+		Carry: 'var(--color-lavender)',
 	};
 
 	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
@@ -20,7 +20,7 @@
 	let {
 		exercises,
 		onAdd,
-		onClose
+		onClose,
 	}: {
 		exercises: Exercise[];
 		onAdd: (exercise: Exercise) => void;
@@ -46,7 +46,7 @@
 				ex.muscles.toLowerCase().includes(q) ||
 				ex.cat.toLowerCase().includes(q);
 			return matchCat && matchQuery;
-		})
+		}),
 	);
 
 	function toggleExpand(id: string) {
@@ -75,14 +75,28 @@
 			<h2 class="lib-sheet__title">Exercise Library</h2>
 			<div class="lib-sheet__header-actions">
 				<button class="lib-sheet__add-btn" onclick={() => (formExercise = null)} aria-label="Add custom exercise">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<line x1="12" y1="5" x2="12" y2="19" />
 						<line x1="5" y1="12" x2="19" y2="12" />
 					</svg>
 					New
 				</button>
 				<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />
 					</svg>
@@ -134,11 +148,7 @@
 				{@const dot = CAT_COLORS[ex.cat] ?? 'var(--color-accent)'}
 				{@const isOpen = expandedId === ex.id}
 				<div class="lib-row" class:lib-row--open={isOpen}>
-					<button
-						class="lib-row__main"
-						onclick={() => toggleExpand(ex.id)}
-						aria-expanded={isOpen}
-					>
+					<button class="lib-row__main" onclick={() => toggleExpand(ex.id)} aria-expanded={isOpen}>
 						<span class="lib-row__dot" style:background={dot} aria-hidden="true"></span>
 						<div class="lib-row__info">
 							<span class="lib-row__name">
@@ -176,21 +186,34 @@
 							<div class="lib-row__actions">
 								<button
 									class="lib-row__add"
-									onclick={() => { onAdd(ex); expandedId = null; }}
+									onclick={() => {
+										onAdd(ex);
+										expandedId = null;
+									}}
 								>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										stroke-linecap="round"
+										aria-hidden="true"
+									>
 										<line x1="12" y1="5" x2="12" y2="19" />
 										<line x1="5" y1="12" x2="19" y2="12" />
 									</svg>
 									Add to workout
 								</button>
 								{#if !ex.isBuiltIn}
-									<button
-										class="lib-row__edit"
-										onclick={() => (formExercise = ex)}
-										aria-label="Edit {ex.name}"
-									>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+									<button class="lib-row__edit" onclick={() => (formExercise = ex)} aria-label="Edit {ex.name}">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											aria-hidden="true"
+										>
 											<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
 											<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 										</svg>
@@ -203,23 +226,29 @@
 										>
 											Sure?
 										</button>
-										<button
-											class="lib-row__delete"
-											onclick={() => (confirmDeleteId = null)}
-											aria-label="Cancel delete"
-										>
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+										<button class="lib-row__delete" onclick={() => (confirmDeleteId = null)} aria-label="Cancel delete">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												aria-hidden="true"
+											>
 												<line x1="18" y1="6" x2="6" y2="18" />
 												<line x1="6" y1="6" x2="18" y2="18" />
 											</svg>
 										</button>
 									{:else}
-										<button
-											class="lib-row__delete"
-											onclick={() => deleteExercise(ex)}
-											aria-label="Delete {ex.name}"
-										>
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+										<button class="lib-row__delete" onclick={() => deleteExercise(ex)} aria-label="Delete {ex.name}">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												aria-hidden="true"
+											>
 												<polyline points="3 6 5 6 21 6" />
 												<path d="M19 6l-1 14H6L5 6" />
 												<path d="M10 11v6M14 11v6" />
@@ -238,10 +267,7 @@
 </BottomSheet>
 
 {#if formExercise !== undefined}
-	<ExerciseFormSheet
-		exercise={formExercise}
-		onClose={() => (formExercise = undefined)}
-	/>
+	<ExerciseFormSheet exercise={formExercise} onClose={() => (formExercise = undefined)} />
 {/if}
 
 <style>
@@ -279,9 +305,14 @@
 		color: var(--color-accent);
 		transition: background-color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 14px; block-size: 14px; }
+		svg {
+			inline-size: 14px;
+			block-size: 14px;
+		}
 
-		&:hover { background: var(--color-surface-2); }
+		&:hover {
+			background: var(--color-surface-2);
+		}
 	}
 
 	.lib-sheet__title {
@@ -529,7 +560,10 @@
 		font-weight: 700;
 		justify-content: center;
 
-		svg { inline-size: 16px; block-size: 16px; }
+		svg {
+			inline-size: 16px;
+			block-size: 16px;
+		}
 	}
 
 	.lib-row__edit,
@@ -546,10 +580,15 @@
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 15px; block-size: 15px; }
+		svg {
+			inline-size: 15px;
+			block-size: 15px;
+		}
 	}
 
-	.lib-row__delete:hover { color: var(--color-red); }
+	.lib-row__delete:hover {
+		color: var(--color-red);
+	}
 
 	.lib-row__delete--confirm {
 		inline-size: auto;

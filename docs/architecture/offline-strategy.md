@@ -30,15 +30,15 @@ flowchart LR
     end
 ```
 
-| Store | Technology | Written When |
-|-------|-----------|-------------|
-| `exercises` | IndexedDB | On boot (upsert built-ins) + workout editor |
-| `programs` | IndexedDB | On workout save in editor |
-| `sessions` | IndexedDB | On session finish |
-| `exerciseLastUsed` | IndexedDB | On each set confirm |
-| `cwout:prefs` | localStorage | On every preference change |
-| `cwout:activeSession` | localStorage | On every set confirm (crash recovery) |
-| `cwout:activeProgramId` | localStorage | On program load (auto-select first) |
+| Store                   | Technology   | Written When                                |
+| ----------------------- | ------------ | ------------------------------------------- |
+| `exercises`             | IndexedDB    | On boot (upsert built-ins) + workout editor |
+| `programs`              | IndexedDB    | On workout save in editor                   |
+| `sessions`              | IndexedDB    | On session finish                           |
+| `exerciseLastUsed`      | IndexedDB    | On each set confirm                         |
+| `cwout:prefs`           | localStorage | On every preference change                  |
+| `cwout:activeSession`   | localStorage | On every set confirm (crash recovery)       |
+| `cwout:activeProgramId` | localStorage | On program load (auto-select first)         |
 
 ---
 

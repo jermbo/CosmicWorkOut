@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type { Workout, Exercise } from '$lib/db/types';
+	import { formatMinutes } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
 
 	let {
 		workout,
 		exerciseMap,
-		onStart
+		onStart,
 	}: {
 		workout: Workout;
 		exerciseMap: Map<string, Exercise>;
@@ -17,7 +18,7 @@
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
 		lavender: 'var(--color-lavender)',
-		red: 'var(--color-red)'
+		red: 'var(--color-red)',
 	};
 
 	let accentColor = $derived(ACCENT_MAP[workout.color ?? 'lime'] ?? 'var(--color-accent)');
@@ -31,15 +32,10 @@
 		starting = false;
 	}
 
-	let focusChips = $derived(
-		workout.focus ? workout.focus.split(' · ') : []
-	);
+	let focusChips = $derived(workout.focus ? workout.focus.split(' · ') : []);
 </script>
 
-<article
-	class="packet-card"
-	style:--workout-accent={accentColor}
->
+<article class="packet-card" style:--workout-accent={accentColor}>
 	<!-- Ruled texture overlay -->
 	<div class="packet-card__ruled" aria-hidden="true"></div>
 
@@ -89,7 +85,7 @@
 					<circle cx="12" cy="12" r="10" />
 					<polyline points="12 6 12 12 16 14" />
 				</svg>
-				~{workout.estMin} min
+				~{formatMinutes(workout.estMin)}
 			</span>
 		{/if}
 	</div>
@@ -109,12 +105,7 @@
 	</ul>
 
 	<!-- Start CTA -->
-	<button
-		class="packet-card__start"
-		onclick={handleStart}
-		disabled={starting}
-		aria-busy={starting}
-	>
+	<button class="packet-card__start" onclick={handleStart} disabled={starting} aria-busy={starting}>
 		{#if starting}
 			<svg
 				class="packet-card__start-spinner"
@@ -281,6 +272,14 @@
 		margin-block-end: var(--space-5);
 		position: relative;
 		z-index: 1;
+	}
+
+	@container workout-card (inline-size >= 520px) {
+		.packet-card__exercises {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			column-gap: var(--space-5);
+		}
 	}
 
 	.packet-card__exercise {

@@ -1,15 +1,21 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
+	import { formatWeekdayShortDate } from '$lib/date';
+	import { formatDuration, formatVolume, formatCountWithWord } from '$lib/format';
+	import { formatHabitLogValue } from '$lib/habits';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	let {
 		session,
 		exerciseMap,
 		onClose,
 		onEdit,
-		onDelete
+		onDelete,
 	}: {
 		session: SessionLog;
 		exerciseMap: Map<string, Exercise>;
@@ -18,35 +24,29 @@
 		onDelete?: () => void;
 	} = $props();
 
+	let habitLogsForDay = $derived(habitStore.logsForDate(session.date));
+
+	let habitEntries = $derived.by(() => {
+		return habitLogsForDay
+			.map((log) => {
+				const habit = habitStore.habits.find((h) => h.id === log.habitId);
+				if (!habit) return null;
+				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
+			})
+			.filter((e): e is { name: string; valueStr: string } => e !== null);
+	});
+
 	let showDeleteConfirm = $state(false);
+
+	$effect(() => {
+		loggingContext.setDate(session.date);
+	});
 
 	let workoutName = $derived(
 		programStore.getWorkoutForSession(session)?.name ??
 			programStore.getWorkoutById(session.workoutId)?.name ??
-			'Workout'
+			'Workout',
 	);
-
-	function formatDate(dateStr: string): string {
-		const d = new Date(dateStr + 'T00:00:00');
-		const months = [
-			'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-			'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-		];
-		const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		return `${days[d.getDay()]} · ${months[d.getMonth()]} ${d.getDate()}`;
-	}
-
-	function formatDuration(seconds: number): string {
-		const m = Math.round(seconds / 60);
-		return `${m} min`;
-	}
-
-	function formatVolume(volume: number): string {
-		if (volume >= 1000) {
-			return `${(volume / 1000).toFixed(1)}k`;
-		}
-		return String(volume);
-	}
 
 	async function handleEdit() {
 		const workout = programStore.getWorkoutForSession(session);
@@ -66,7 +66,7 @@
 <BottomSheet onclose={onClose}>
 	<div class="day-summary">
 		<div class="day-summary__date-badge">
-			{formatDate(session.date)}
+			{formatWeekdayShortDate(session.date, ' · ')}
 		</div>
 
 		<h2 class="day-summary__workout-name">{workoutName}</h2>
@@ -83,7 +83,7 @@
 			</div>
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
 			<div class="day-summary__stat">
-				<span class="day-summary__stat-value">{formatVolume(session.totalVolume)}</span>
+				<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
 				<span class="day-summary__stat-label">lb lifted</span>
 			</div>
 		</div>
@@ -95,12 +95,14 @@
 					<div class="day-summary__exercise">
 						<div class="day-summary__exercise-header">
 							<span class="day-summary__exercise-name">{exercise.name}</span>
-							<span class="day-summary__exercise-sets">{loggedEx.sets.length} sets</span>
+							<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
 						</div>
 						{#if loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
 								{#if typeof loggedEx.sets[0].weight === 'number' && loggedEx.sets[0].weight > 0}
-									Top: {Math.max(...loggedEx.sets.filter(s => typeof s.weight === 'number').map(s => s.weight as number))} lb
+									Top: {Math.max(
+										...loggedEx.sets.filter((s) => typeof s.weight === 'number').map((s) => s.weight as number),
+									)} lb
 								{:else if typeof loggedEx.sets[0].weight === 'string'}
 									{loggedEx.sets[0].weight}
 								{:else}
@@ -113,42 +115,35 @@
 			{/each}
 		</div>
 
+		{#if habitEntries.length > 0}
+			<div class="day-summary__habits">
+				<p class="day-summary__habits-title">Habits</p>
+				{#each habitEntries as entry}
+					<div class="day-summary__habit-row">
+						<span class="day-summary__habit-name">{entry.name}</span>
+						<span class="day-summary__habit-value">{entry.valueStr}</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
+
 		<div class="day-summary__actions">
 			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
-			<button
-				class="day-summary__delete-btn"
-				onclick={() => (showDeleteConfirm = true)}
-			>
-				Delete
-			</button>
+			<button class="day-summary__delete-btn" onclick={() => (showDeleteConfirm = true)}> Delete </button>
 		</div>
 	</div>
 
-	{#if showDeleteConfirm}
-		<div
-			class="day-summary__confirm"
-			role="alertdialog"
-			aria-labelledby="delete-title"
-			aria-modal="true"
-		>
-			<p class="day-summary__confirm-title" id="delete-title">Delete this session?</p>
-			<p class="day-summary__confirm-body">This cannot be undone.</p>
-			<div class="day-summary__confirm-actions">
-				<button
-					class="day-summary__confirm-btn day-summary__confirm-btn--cancel"
-					onclick={() => (showDeleteConfirm = false)}
-				>
-					Cancel
-				</button>
-				<button
-					class="day-summary__confirm-btn day-summary__confirm-btn--delete"
-					onclick={handleDeleteConfirm}
-				>
-					Delete
-				</button>
-			</div>
-		</div>
-	{/if}
+{#if showDeleteConfirm}
+	<ConfirmDialog
+		title="Delete this session?"
+		confirmLabel="Delete"
+		danger
+		onconfirm={handleDeleteConfirm}
+		oncancel={() => (showDeleteConfirm = false)}
+	>
+		This cannot be undone.
+	</ConfirmDialog>
+{/if}
 </BottomSheet>
 
 <style>
@@ -259,6 +254,41 @@
 		margin-block-start: 2px;
 	}
 
+	.day-summary__habits {
+		margin-block-end: var(--space-5);
+	}
+
+	.day-summary__habits-title {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-muted);
+		margin-block-end: var(--space-2);
+	}
+
+	.day-summary__habit-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-block: var(--space-2);
+		border-block-end: 1px dashed var(--color-border);
+
+		&:last-child {
+			border-block-end: none;
+		}
+	}
+
+	.day-summary__habit-name {
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.day-summary__habit-value {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+	}
+
 	.day-summary__actions {
 		display: flex;
 		gap: var(--space-2);
@@ -283,54 +313,5 @@
 		background: var(--color-surface-3);
 		color: var(--color-red);
 		border: 1px solid var(--color-border);
-	}
-
-	.day-summary__confirm {
-		position: absolute;
-		inset-inline: var(--space-4);
-		inset-block-end: var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-2xl);
-		padding: var(--space-5);
-		z-index: 10;
-		box-shadow: var(--shadow-lg);
-	}
-
-	.day-summary__confirm-title {
-		font-family: var(--font-display);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		margin-block-end: var(--space-1);
-	}
-
-	.day-summary__confirm-body {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-4);
-	}
-
-	.day-summary__confirm-actions {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	.day-summary__confirm-btn {
-		flex: 1;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		min-block-size: 48px;
-	}
-
-	.day-summary__confirm-btn--cancel {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.day-summary__confirm-btn--delete {
-		background: var(--color-red);
-		color: #ffffff;
 	}
 </style>

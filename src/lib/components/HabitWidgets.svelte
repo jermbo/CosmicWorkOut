@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { minuteUnitLabel } from '$lib/format';
+	import { formatHabitProgressLabel } from '$lib/habits';
 
 	let durationTarget = $state<Habit | null>(null);
 	let durationInput = $state('');
@@ -17,10 +19,7 @@
 	}
 
 	function progressLabel(habit: Habit): string {
-		const val = getValue(habit);
-		if (habit.type === 'boolean') return val ? 'Done' : habit.unit || 'No';
-		if (habit.dailyGoal) return `${val} / ${habit.dailyGoal}${habit.unit ? ' ' + habit.unit : ''}`;
-		return `${val}${habit.unit ? ' ' + habit.unit : ''}`;
+		return formatHabitProgressLabel(habit, getValue(habit));
 	}
 
 	async function handleTap(habit: Habit) {
@@ -28,7 +27,7 @@
 			await habitStore.increment(habit.id);
 		} else if (habit.type === 'boolean') {
 			await habitStore.toggle(habit.id);
-		} else if (habit.type === 'duration') {
+		} else if (habit.type === 'minutes') {
 			durationInput = String(getValue(habit) || '');
 			durationTarget = habit;
 		}
@@ -38,7 +37,7 @@
 		if (!durationTarget) return;
 		const val = parseInt(durationInput, 10);
 		if (!isNaN(val) && val >= 0) {
-			await habitStore.setDuration(durationTarget.id, val);
+			await habitStore.setMinutes(durationTarget.id, val);
 		}
 		durationTarget = null;
 	}
@@ -48,9 +47,12 @@
 	<div class="habit-widgets__scroll" role="list" aria-label="Habit widgets">
 		{#each habitStore.activeHabits as habit (habit.id)}
 			{@const done = isComplete(habit)}
-			{@const pct = habit.dailyGoal && habit.type !== 'boolean'
-				? Math.min(100, (getValue(habit) / habit.dailyGoal) * 100)
-				: done ? 100 : 0}
+			{@const pct =
+				habit.dailyGoal && habit.type !== 'boolean'
+					? Math.min(100, (getValue(habit) / habit.dailyGoal) * 100)
+					: done
+						? 100
+						: 0}
 			<button
 				class="hw"
 				class:hw--done={done}
@@ -61,11 +63,7 @@
 					<svg viewBox="0 0 36 36">
 						<circle class="hw__track" cx="18" cy="18" r="15" />
 						{#if pct > 0}
-							<circle
-								class="hw__fill"
-								cx="18" cy="18" r="15"
-								style:stroke-dasharray="{(pct / 100) * 94.25} 94.25"
-							/>
+							<circle class="hw__fill" cx="18" cy="18" r="15" style:stroke-dasharray="{(pct / 100) * 94.25} 94.25" />
 						{/if}
 						{#if done}
 							<polyline class="hw__check" points="12 18 16 22 24 14" />
@@ -94,7 +92,7 @@
 				aria-label="Minutes"
 				onkeydown={(e) => e.key === 'Enter' && saveDuration()}
 			/>
-			<span class="dur-popup__unit">min</span>
+			<span class="dur-popup__unit">{minuteUnitLabel()}</span>
 		</div>
 		<div class="dur-popup__actions">
 			<button class="dur-popup__save" onclick={saveDuration}>Save</button>
@@ -115,7 +113,9 @@
 		scrollbar-width: none;
 		padding-block: var(--space-1);
 
-		&::-webkit-scrollbar { display: none; }
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 
 	.hw {
@@ -133,7 +133,9 @@
 			border-color var(--duration-fast) var(--ease-out),
 			background-color var(--duration-fast) var(--ease-out);
 
-		&:active { transform: scale(0.94); }
+		&:active {
+			transform: scale(0.94);
+		}
 	}
 
 	.hw--done {
@@ -145,7 +147,11 @@
 		inline-size: 40px;
 		block-size: 40px;
 
-		svg { inline-size: 100%; block-size: 100%; transform: rotate(-90deg); }
+		svg {
+			inline-size: 100%;
+			block-size: 100%;
+			transform: rotate(-90deg);
+		}
 	}
 
 	.hw__track {
@@ -249,8 +255,14 @@
 		text-align: center;
 		outline: none;
 
-		&:focus { border-color: var(--color-accent); }
-		&::placeholder { color: var(--color-text-muted); font-size: 1rem; font-weight: 400; }
+		&:focus {
+			border-color: var(--color-accent);
+		}
+		&::placeholder {
+			color: var(--color-text-muted);
+			font-size: 1rem;
+			font-weight: 400;
+		}
 	}
 
 	.dur-popup__unit {

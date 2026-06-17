@@ -29,21 +29,21 @@ flowchart LR
     Req --> Impl
 ```
 
-| Start here | What you'll learn |
-|------------|-------------------|
-| [North Star](docs/vision/north-star.md) | What this app is and isn't |
-| [How It Works](docs/implementation/behavior.md) | Mental model — start here to understand the app |
-| [System Overview](docs/architecture/overview.md) | Architecture at a glance |
-| [Implementation Status](docs/implementation/status.md) | What's built vs planned |
-| [Dev Guide](docs/implementation/dev-guide.md) | Running and navigating the code |
+| Start here                                             | What you'll learn                               |
+| ------------------------------------------------------ | ----------------------------------------------- |
+| [North Star](docs/vision/north-star.md)                | What this app is and isn't                      |
+| [How It Works](docs/implementation/behavior.md)        | Mental model — start here to understand the app |
+| [System Overview](docs/architecture/overview.md)       | Architecture at a glance                        |
+| [Implementation Status](docs/implementation/status.md) | What's built vs planned                         |
+| [Dev Guide](docs/implementation/dev-guide.md)          | Running and navigating the code                 |
 
 ---
 
 ## Scripts
 
-| Command | Purpose |
-|---------|---------|
-| `npm run dev` | Dev server (port 5678) |
-| `npm run build` | Production build |
-| `npm run check` | Type checking |
-| `npm run lint` | Lint + format check |
+| Command         | Purpose                |
+| --------------- | ---------------------- |
+| `npm run dev`   | Dev server (port 5678) |
+| `npm run build` | Production build       |
+| `npm run check` | Type checking          |
+| `npm run lint`  | Lint + format check    |

@@ -3,6 +3,8 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 
 	let editingWorkout = $state<Workout | null | undefined>(undefined);
 	let showCreateProgram = $state(false);
@@ -21,22 +23,20 @@
 		}
 	});
 
-	let viewingProgram = $derived(
-		programStore.programs.find((p) => p.id === viewingProgramId)
-	);
+	let viewingProgram = $derived(programStore.programs.find((p) => p.id === viewingProgramId));
 
 	let viewingIsActive = $derived(viewingProgramId === programStore.activeProgram?.id);
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
 		lavender: 'var(--color-lavender)',
-		red: 'var(--color-red)'
+		red: 'var(--color-red)',
 	};
 
 	const SHADOW_MAP: Record<string, string> = {
 		lime: 'var(--shadow-lime)',
 		lavender: 'var(--shadow-lavender)',
-		red: 'none'
+		red: 'none',
 	};
 
 	let weekWorkouts = $derived.by(() => {
@@ -96,15 +96,11 @@
 </svelte:head>
 
 <div class="page page--wide program-page">
-
 	<!-- ── Library ── -->
 	<div class="prog-header">
 		<h1 class="prog-header__title">Programs</h1>
 		<button class="prog-header__new" onclick={() => (showCreateProgram = true)}>
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-				<line x1="12" y1="5" x2="12" y2="19" />
-				<line x1="5" y1="12" x2="19" y2="12" />
-			</svg>
+			<Icon name="plus" size={14} stroke={2.5} />
 			New Program
 		</button>
 	</div>
@@ -148,7 +144,10 @@
 					{#if !isActive}
 						<button
 							class="prog-card__activate-btn"
-							onclick={() => { programStore.setActiveProgram(program.id); viewingProgramId = program.id; }}
+							onclick={() => {
+								programStore.setActiveProgram(program.id);
+								viewingProgramId = program.id;
+							}}
 						>
 							Activate
 						</button>
@@ -156,15 +155,13 @@
 					{#if !program.isBuiltIn}
 						<button
 							class="prog-card__delete-btn"
-							onclick={() => { viewingProgramId = program.id; showDeleteProgramConfirm = true; }}
+							onclick={() => {
+								viewingProgramId = program.id;
+								showDeleteProgramConfirm = true;
+							}}
 							aria-label="Delete {program.name}"
 						>
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-								<polyline points="3 6 5 6 21 6" />
-								<path d="M19 6l-1 14H6L5 6" />
-								<path d="M10 11v6M14 11v6" />
-								<path d="M9 6V4h6v2" />
-							</svg>
+							<Icon name="trash" size={15} />
 						</button>
 					{/if}
 				</div>
@@ -175,16 +172,12 @@
 	<!-- ── Program Schedule ── -->
 	{#if viewingProgram}
 		<section class="schedule" aria-labelledby="schedule-heading">
-
 			<!-- Schedule header -->
 			<div class="schedule__header">
 				<div class="schedule__title-row">
 					<h2 class="schedule__title" id="schedule-heading">{viewingProgram.name}</h2>
 					{#if !viewingIsActive}
-						<button
-							class="schedule__activate-btn"
-							onclick={() => programStore.setActiveProgram(viewingProgram!.id)}
-						>
+						<button class="schedule__activate-btn" onclick={() => programStore.setActiveProgram(viewingProgram!.id)}>
 							Activate this program
 						</button>
 					{/if}
@@ -218,13 +211,13 @@
 			<div class="week-picker" aria-label="Browse weeks">
 				<button
 					class="week-picker__btn"
-					onclick={() => { if (selectedWeek > 1) selectedWeek--; }}
+					onclick={() => {
+						if (selectedWeek > 1) selectedWeek--;
+					}}
 					disabled={selectedWeek <= 1}
 					aria-label="Previous week"
 				>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-						<polyline points="15 18 9 12 15 6" />
-					</svg>
+					<Icon name="chevron-left" size={16} stroke={2.5} />
 				</button>
 				<span class="week-picker__label">
 					Week {selectedWeek}
@@ -234,13 +227,13 @@
 				</span>
 				<button
 					class="week-picker__btn"
-					onclick={() => { if (selectedWeek < totalWeeks) selectedWeek++; }}
+					onclick={() => {
+						if (selectedWeek < totalWeeks) selectedWeek++;
+					}}
 					disabled={selectedWeek >= totalWeeks}
 					aria-label="Next week"
 				>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-						<polyline points="9 18 15 12 9 6" />
-					</svg>
+					<Icon name="chevron-right" size={16} stroke={2.5} />
 				</button>
 			</div>
 
@@ -277,10 +270,7 @@
 									onclick={() => (editingWorkout = workout)}
 									aria-label="Edit {workout.name}"
 								>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-										<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-										<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-									</svg>
+									<Icon name="edit" size={13} />
 									Edit
 								</button>
 								{#if weekWorkouts.length > 1}
@@ -289,10 +279,7 @@
 										onclick={() => (removeWorkoutName = workout.name)}
 										aria-label="Remove {workout.name}"
 									>
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-											<line x1="18" y1="6" x2="6" y2="18" />
-											<line x1="6" y1="6" x2="18" y2="18" />
-										</svg>
+										<Icon name="close" size={13} />
 									</button>
 								{/if}
 							</div>
@@ -312,10 +299,7 @@
 				{/each}
 
 				<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
-					</svg>
+					<Icon name="plus" size={18} stroke={2.5} />
 					Add workout
 				</button>
 			</div>
@@ -325,31 +309,29 @@
 
 <!-- Confirm dialogs -->
 {#if showDeleteProgramConfirm}
-	<div class="confirm-backdrop" role="presentation" onclick={() => !deletingProgram && (showDeleteProgramConfirm = false)}></div>
-	<div class="confirm" role="alertdialog" aria-labelledby="del-prog-title" aria-modal="true">
-		<p class="confirm__title" id="del-prog-title">Delete program?</p>
-		<p class="confirm__body">"{viewingProgram?.name}" will be removed. Workout sessions you've logged are kept.</p>
-		<div class="confirm__actions">
-			<button class="confirm__btn confirm__btn--danger" onclick={handleDeleteProgram} disabled={deletingProgram}>
-				{deletingProgram ? 'Deleting…' : 'Delete'}
-			</button>
-			<button class="confirm__btn confirm__btn--ghost" onclick={() => (showDeleteProgramConfirm = false)} disabled={deletingProgram}>
-				Cancel
-			</button>
-		</div>
-	</div>
+	<ConfirmDialog
+		title="Delete program?"
+		confirmLabel="Delete"
+		confirmBusyLabel="Deleting…"
+		danger
+		busy={deletingProgram}
+		onconfirm={handleDeleteProgram}
+		oncancel={() => (showDeleteProgramConfirm = false)}
+	>
+		"{viewingProgram?.name}" will be removed. Workout sessions you've logged are kept.
+	</ConfirmDialog>
 {/if}
 
 {#if removeWorkoutName}
-	<div class="confirm-backdrop" role="presentation" onclick={() => (removeWorkoutName = null)}></div>
-	<div class="confirm" role="alertdialog" aria-labelledby="rem-workout-title" aria-modal="true">
-		<p class="confirm__title" id="rem-workout-title">Remove workout?</p>
-		<p class="confirm__body">"{removeWorkoutName}" will be removed from all weeks.</p>
-		<div class="confirm__actions">
-			<button class="confirm__btn confirm__btn--danger" onclick={handleRemoveWorkout}>Remove</button>
-			<button class="confirm__btn confirm__btn--ghost" onclick={() => (removeWorkoutName = null)}>Cancel</button>
-		</div>
-	</div>
+	<ConfirmDialog
+		title="Remove workout?"
+		confirmLabel="Remove"
+		danger
+		onconfirm={handleRemoveWorkout}
+		oncancel={() => (removeWorkoutName = null)}
+	>
+		"{removeWorkoutName}" will be removed from all weeks.
+	</ConfirmDialog>
 {/if}
 
 {#if editingWorkout !== undefined}
@@ -396,8 +378,6 @@
 		font-size: 0.875rem;
 		font-weight: 700;
 		flex-shrink: 0;
-
-		svg { inline-size: 14px; block-size: 14px; }
 	}
 
 	/* ── Program cards ── */
@@ -508,7 +488,9 @@
 		white-space: nowrap;
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:hover { opacity: 0.85; }
+		&:hover {
+			opacity: 0.85;
+		}
 	}
 
 	.prog-card__delete-btn {
@@ -522,8 +504,9 @@
 		color: var(--color-text-muted);
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 15px; block-size: 15px; }
-		&:hover { color: var(--color-red); }
+		&:hover {
+			color: var(--color-red);
+		}
 	}
 
 	/* ── Schedule panel ── */
@@ -565,11 +548,17 @@
 		flex-shrink: 0;
 		transition: opacity var(--duration-fast) var(--ease-out);
 
-		&:hover { opacity: 0.85; }
+		&:hover {
+			opacity: 0.85;
+		}
 	}
 
 	/* Progress */
-	.schedule__progress { display: flex; flex-direction: column; gap: var(--space-2); }
+	.schedule__progress {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
 
 	.schedule__progress-labels {
 		display: flex;
@@ -625,9 +614,13 @@
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 16px; block-size: 16px; }
-		&:disabled { opacity: 0.3; cursor: default; }
-		&:not(:disabled):hover { color: var(--color-text-primary); }
+		&:disabled {
+			opacity: 0.3;
+			cursor: default;
+		}
+		&:not(:disabled):hover {
+			color: var(--color-text-primary);
+		}
 	}
 
 	.week-picker__label {
@@ -707,7 +700,10 @@
 		flex-shrink: 0;
 	}
 
-	.workout-card__info { flex: 1; min-inline-size: 0; }
+	.workout-card__info {
+		flex: 1;
+		min-inline-size: 0;
+	}
 
 	.workout-card__name-row {
 		display: flex;
@@ -766,8 +762,9 @@
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 13px; block-size: 13px; }
-		&:hover { color: var(--color-text-primary); }
+		&:hover {
+			color: var(--color-text-primary);
+		}
 	}
 
 	.workout-card__remove-btn {
@@ -783,8 +780,9 @@
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 13px; block-size: 13px; }
-		&:hover { color: var(--color-red); }
+		&:hover {
+			color: var(--color-red);
+		}
 	}
 
 	.workout-card__chips {
@@ -823,61 +821,9 @@
 			border-color var(--duration-fast) var(--ease-out),
 			color var(--duration-fast) var(--ease-out);
 
-		svg { inline-size: 18px; block-size: 18px; }
-		&:hover { border-color: var(--color-accent); color: var(--color-accent); }
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
 	}
-
-	/* Confirm dialogs */
-	.confirm-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
-		z-index: 90;
-	}
-
-	.confirm {
-		position: fixed;
-		inset-inline: var(--space-4);
-		inset-block-start: 50%;
-		transform: translateY(-50%);
-		max-inline-size: 400px;
-		margin-inline: auto;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-xl);
-		padding: var(--space-5);
-		z-index: 91;
-		box-shadow: var(--shadow-lg);
-	}
-
-	.confirm__title {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-2);
-	}
-
-	.confirm__body {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-5);
-		line-height: 1.5;
-	}
-
-	.confirm__actions {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.confirm__btn {
-		block-size: 48px;
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 700;
-		&:disabled { opacity: 0.6; cursor: default; }
-	}
-
-	.confirm__btn--danger { background: var(--color-red); color: #ffffff; }
-	.confirm__btn--ghost { background: var(--color-surface-3); color: var(--color-text-secondary); }
 </style>

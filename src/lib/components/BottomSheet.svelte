@@ -5,7 +5,7 @@
 	let {
 		children,
 		onclose,
-		maxHeight = '90dvh'
+		maxHeight = '90dvh',
 	}: {
 		children: Snippet;
 		onclose: () => void;

@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { formatElapsed, formatCountWithWord } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
+	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	let dialog: HTMLDialogElement;
 	let showAbandonConfirm = $state(false);
@@ -22,19 +24,12 @@
 		clearInterval(timerInterval);
 	});
 
-	let elapsedFormatted = $derived(
-		`${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`
-	);
+	let elapsedFormatted = $derived(formatElapsed(elapsed));
 
-	let totalSets = $derived(
-		sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0
-	);
+	let totalSets = $derived(sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 
 	let doneSets = $derived(
-		sessionStore.active?.exercises.reduce(
-			(sum, ex) => sum + ex.sets.filter((s) => s.completed).length,
-			0
-		) ?? 0
+		sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.filter((s) => s.completed).length, 0) ?? 0,
 	);
 
 	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
@@ -98,16 +93,12 @@
 
 	let sheetExercise = $derived(
 		sheetTarget
-			? programStore.exerciseMap.get(
-					sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.exerciseId ?? ''
-				)
-			: null
+			? programStore.exerciseMap.get(sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.exerciseId ?? '')
+			: null,
 	);
 
 	let sheetActiveSet = $derived(
-		sheetTarget
-			? sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex]
-			: null
+		sheetTarget ? sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex] : null,
 	);
 </script>
 
@@ -122,11 +113,7 @@
 		<!-- Header -->
 		<header class="session-overlay__header">
 			<div class="session-overlay__top-row">
-				<button
-					class="session-overlay__back-btn"
-					onclick={handleAbandonRequest}
-					aria-label="End session"
-				>
+				<button class="session-overlay__back-btn" onclick={handleAbandonRequest} aria-label="End session">
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -146,7 +133,7 @@
 					</p>
 					<p class="session-overlay__context">
 						{#if isEditing}
-							Editing · {doneSets} sets logged
+							Editing · {formatCountWithWord(doneSets, 'set')} logged
 						{:else}
 							{doneSets}/{totalSets} sets
 						{/if}
@@ -167,10 +154,7 @@
 				aria-valuemax={totalSets}
 				aria-label="Session progress"
 			>
-				<div
-					class="session-overlay__progress-fill"
-					style:inline-size="{progressPct}%"
-				></div>
+				<div class="session-overlay__progress-fill" style:inline-size="{progressPct}%"></div>
 			</div>
 		</header>
 
@@ -180,12 +164,7 @@
 				{#each sessionStore.active.exercises as activeExercise, exerciseIndex}
 					{@const exercise = programStore.exerciseMap.get(activeExercise.exerciseId)}
 					{#if exercise}
-						<ExerciseCard
-							{activeExercise}
-							{exercise}
-							{exerciseIndex}
-							onSetTap={handleSetTap}
-						/>
+						<ExerciseCard {activeExercise} {exercise} {exerciseIndex} onSetTap={handleSetTap} />
 					{/if}
 				{/each}
 			{/if}
@@ -193,11 +172,7 @@
 
 		<!-- Finish bar -->
 		<div class="session-overlay__footer">
-			<button
-				class="session-overlay__finish"
-				class:session-overlay__finish--all-done={allDone}
-				onclick={handleFinish}
-			>
+			<button class="session-overlay__finish" class:session-overlay__finish--all-done={allDone} onclick={handleFinish}>
 				{#if isEditing}
 					Save changes
 				{:else if allDone}
@@ -210,7 +185,9 @@
 						stroke-linejoin="round"
 						aria-hidden="true"
 					>
-						<polygon points="14.5 2 18.5 9.5 23 10.9 17.5 16.5 18.8 21.5 14.5 19 10.2 21.5 11.5 16.5 6 10.9 10.5 9.5 14.5 2" />
+						<polygon
+							points="14.5 2 18.5 9.5 23 10.9 17.5 16.5 18.8 21.5 14.5 19 10.2 21.5 11.5 16.5 6 10.9 10.5 9.5 14.5 2"
+						/>
 					</svg>
 					Finish session
 				{:else}
@@ -221,38 +198,21 @@
 	</div>
 
 	{#if showAbandonConfirm}
-		<div
-			class="session-overlay__confirm"
-			role="alertdialog"
-			aria-labelledby="confirm-title"
-			aria-modal="true"
-		>
-			<p class="session-overlay__confirm-title" id="confirm-title">
-				{isEditing ? 'Discard changes?' : 'End this session?'}
-			</p>
-			<p class="session-overlay__confirm-body">
-				{#if isEditing}
-					Your saved session will be kept. Only unsaved edits are lost.
-				{:else}
-					Your progress will not be saved.
-				{/if}
-			</p>
-			<div class="session-overlay__confirm-actions">
-				<button
-					class="session-overlay__confirm-btn session-overlay__confirm-btn--cancel"
-					onclick={handleAbandonCancel}
-				>
-					Keep going
-				</button>
-				<button
-					class="session-overlay__confirm-btn session-overlay__confirm-btn--end"
-					onclick={handleAbandonConfirm}
-				>
-					{isEditing ? 'Discard' : 'End session'}
-				</button>
-			</div>
-		</div>
-	{/if}
+	<ConfirmDialog
+		title={isEditing ? 'Discard changes?' : 'End this session?'}
+		confirmLabel={isEditing ? 'Discard' : 'End session'}
+		cancelLabel="Keep going"
+		danger
+		onconfirm={handleAbandonConfirm}
+		oncancel={handleAbandonCancel}
+	>
+		{#if isEditing}
+			Your saved session will be kept. Only unsaved edits are lost.
+		{:else}
+			Your progress will not be saved.
+		{/if}
+	</ConfirmDialog>
+{/if}
 </dialog>
 
 {#if sheetTarget && sheetExercise && sheetActiveSet}
@@ -452,56 +412,5 @@
 		color: var(--color-accent-ink);
 		border-color: var(--color-accent);
 		box-shadow: var(--shadow-lime);
-	}
-
-	/* Abandon confirm */
-	.session-overlay__confirm {
-		position: absolute;
-		inset-inline: var(--space-4);
-		inset-block-end: calc(var(--safe-bottom) + var(--space-4));
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-2xl);
-		padding: var(--space-5);
-		z-index: 10;
-		box-shadow: var(--shadow-lg);
-		animation: slide-up var(--duration-normal) var(--ease-spring) both;
-	}
-
-	.session-overlay__confirm-title {
-		font-family: var(--font-display);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		margin-block-end: var(--space-1);
-	}
-
-	.session-overlay__confirm-body {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-block-end: var(--space-4);
-	}
-
-	.session-overlay__confirm-actions {
-		display: flex;
-		gap: var(--space-2);
-	}
-
-	.session-overlay__confirm-btn {
-		flex: 1;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		min-block-size: 48px;
-	}
-
-	.session-overlay__confirm-btn--cancel {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.session-overlay__confirm-btn--end {
-		background: var(--color-red);
-		color: #ffffff;
 	}
 </style>

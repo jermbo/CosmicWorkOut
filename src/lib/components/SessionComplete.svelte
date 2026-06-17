@@ -1,27 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { formatDuration, formatVolume } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import Confetti from './Confetti.svelte';
 
 	let dialog: HTMLDialogElement;
 
 	onMount(() => {
 		dialog.showModal();
 	});
-
-	function formatDuration(seconds: number): string {
-		const m = Math.round(seconds / 60);
-		return `${m}m`;
-	}
-
-	function formatVolume(volume: number): string {
-		if (volume >= 1000) {
-			return `${(volume / 1000).toFixed(1)}k`;
-		}
-		return volume > 0 ? String(volume) : '—';
-	}
 
 	function handleBackToToday() {
 		sessionStore.dismissComplete();
@@ -33,21 +21,10 @@
 	}
 
 	let session = $derived(sessionStore.completedSession);
-	let totalSets = $derived(
-		session?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0
-	);
+	let totalSets = $derived(session?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 </script>
 
-{#if prefsStore.completionFeel !== 'subtle'}
-	<Confetti />
-{/if}
-
-<dialog
-	bind:this={dialog}
-	class="session-complete"
-	aria-labelledby="complete-title"
-	aria-modal="true"
->
+<dialog bind:this={dialog} class="session-complete" aria-labelledby="complete-title" aria-modal="true">
 	<div class="session-complete__inner">
 		<!-- Check circle -->
 		<div class="session-complete__graphic" aria-hidden="true">
@@ -82,7 +59,7 @@
 				</div>
 				<div class="session-complete__stat-sep" aria-hidden="true"></div>
 				<div class="session-complete__stat">
-					<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0)}</span>
+					<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
 					<span class="session-complete__stat-label">duration</span>
 				</div>
 				<div class="session-complete__stat-sep" aria-hidden="true"></div>
