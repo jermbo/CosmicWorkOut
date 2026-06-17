@@ -1,5 +1,8 @@
 # US-003 — Activity Logging
 
+> **Status: ✅ Shipped**
+> Full logging flow (type, duration, intensity, date, custom name), last-used type pre-selection, and calendar integration with activity dots all built. Edit is available from the home page activity chips. Minor gap: the calendar day detail shows delete but no edit button (edit is only accessible from the home page).
+
 As an **active user**, I want to log physical activities that are outside my structured workout program
 so that I can track all my movement — not just gym sessions — in one place.
 

@@ -1,5 +1,17 @@
 # US-005 — Daily Dashboard
 
+> **Status: ⚠️ Partial**
+>
+> **Shipped:**
+> - Three-section layout: Workout, Habits, Activity — in priority order
+> - Workout section: active program card, one-tap to start, done state with edit session
+> - Habits section: compact horizontally-scrolling widgets, hidden when no habits configured
+> - Activity section: log button + activity chips showing today's entries, edit/log from chips
+> - All interactions update in real time
+>
+> **Deferred to v1.2.0:**
+> - Program-complete state (req 2f) — when all workouts in the active program are done, a generic "No program active" fallback shows instead of a proper completion prompt
+
 As a **fitness user**, I want a daily dashboard as my home screen
 so that I can log my workout, habits, and activities with the fewest taps possible — then put my phone away.
 
