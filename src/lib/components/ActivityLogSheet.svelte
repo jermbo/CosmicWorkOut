@@ -25,20 +25,13 @@
 
 	const todayStr = new Date().toISOString().split('T')[0];
 
-	let selectedType = $state<ActivityType>('Run');
-	let customType = $state('');
-	let durationMinutes = $state(30);
-	let intensity = $state<ActivityIntensity>('Moderate');
-	let date = $state(todayStr);
+	let selectedType = $state<ActivityType>(editing?.type ?? activityStore.lastUsedType);
+	let customType = $state(editing?.customType ?? '');
+	let durationMinutes = $state(editing?.durationMinutes ?? 30);
+	let intensity = $state<ActivityIntensity>(editing?.intensity ?? 'Moderate');
+	let date = $state(editing?.date ?? initialDate ?? todayStr);
 	let saving = $state(false);
-
-	$effect(() => {
-		selectedType = editing?.type ?? activityStore.lastUsedType;
-		customType = editing?.customType ?? '';
-		durationMinutes = editing?.durationMinutes ?? 30;
-		intensity = editing?.intensity ?? 'Moderate';
-		date = editing?.date ?? initialDate ?? todayStr;
-	});
+	let confirming = $state(false);
 
 	async function handleSave() {
 		if (saving) return;
@@ -73,11 +66,16 @@
 		durationMinutes = Math.max(1, Math.min(300, durationMinutes + delta));
 	}
 
-	function displayLabel(activity: ActivityLog): string {
-		const name = activity.type === 'Other' ? (activity.customType || 'Other') : activity.type;
-		return `${name} · ${activity.durationMinutes} min · ${activity.intensity}`;
+	async function handleDelete() {
+		if (!editing) return;
+		if (!confirming) { confirming = true; return; }
+		try {
+			await activityStore.remove(editing.id);
+			onClose();
+		} catch {
+			confirming = false;
+		}
 	}
-	void displayLabel;
 </script>
 
 <BottomSheet onclose={onClose} maxHeight="80dvh">
@@ -162,6 +160,16 @@
 			<button class="act-sheet__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
 				{saving ? 'Saving…' : (editing ? 'Save changes' : 'Log activity')}
 			</button>
+			{#if editing}
+				<button
+					class="act-sheet__delete-btn"
+					class:act-sheet__delete-btn--confirm={confirming}
+					onclick={handleDelete}
+					aria-label={confirming ? 'Tap again to confirm delete' : 'Delete this activity'}
+				>
+					{confirming ? 'Tap to confirm delete' : 'Delete'}
+				</button>
+			{/if}
 		</div>
 	</div>
 </BottomSheet>
@@ -347,6 +355,9 @@
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
 		border-block-start: 1px solid var(--color-border);
 		margin-block-start: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 	}
 
 	.act-sheet__save-btn {
@@ -360,5 +371,24 @@
 		transition: opacity var(--duration-fast) var(--ease-out);
 
 		&:disabled { opacity: 0.6; cursor: default; }
+	}
+
+	.act-sheet__delete-btn {
+		inline-size: 100%;
+		block-size: 44px;
+		border-radius: var(--radius-full);
+		background: transparent;
+		border: 1px solid color-mix(in srgb, #ef4444 40%, transparent);
+		color: #ef4444;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		transition:
+			background-color var(--duration-fast) var(--ease-out),
+			border-color var(--duration-fast) var(--ease-out);
+	}
+
+	.act-sheet__delete-btn--confirm {
+		background: color-mix(in srgb, #ef4444 12%, transparent);
+		border-color: #ef4444;
 	}
 </style>

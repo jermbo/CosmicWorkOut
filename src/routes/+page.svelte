@@ -6,11 +6,7 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
-	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
-	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
-	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 
 	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const MONTHS_SHORT = [
@@ -40,21 +36,6 @@
 
 	let isToday = $derived(contextDate === todayStr);
 
-	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
-	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
-
-	let selectedWorkout = $derived.by(() => {
-		if (loggingContext.workoutId) {
-			return programStore.getWorkoutById(loggingContext.workoutId) ?? suggestedWorkout;
-		}
-		return suggestedWorkout;
-	});
-
-	let showSuggestedHint = $derived(
-		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id
-	);
-
 	// Habits card
 	let habitsTotal = $derived(habitStore.activeHabits.length);
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
@@ -62,9 +43,25 @@
 	// Activity card
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
-	// Program complete state
-	let showProgramSelect = $state(false);
-	let showCreateProgram = $state(false);
+	// Workout summary
+	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
+	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
+	let workoutName = $derived.by(() => {
+		if (sessionForDate) {
+			return programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged';
+		}
+		return suggestedWorkout?.name ?? null;
+	});
+	let workoutMeta = $derived.by(() => {
+		if (sessionForDate) {
+			const m = Math.round((sessionForDate.durationSeconds ?? 0) / 60);
+			return `${m} min · ${sessionForDate.exercises.length} exercises`;
+		}
+		if (suggestedWorkout) {
+			return `${suggestedWorkout.exercises.length} exercises · ~${suggestedWorkout.estMin} min`;
+		}
+		return null;
+	});
 
 	function handleDateChange(event: Event) {
 		const value = (event.target as HTMLInputElement).value;
@@ -82,28 +79,6 @@
 	function goToToday() {
 		loggingContext.resetToToday();
 		goto('/', { replaceState: true });
-	}
-
-	async function startSession() {
-		const workout = selectedWorkout;
-		const program = programStore.activeProgram;
-		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.exerciseMap, {
-			date: contextDate
-		});
-	}
-
-	async function editSession() {
-		const session = sessionForDate;
-		if (!session) return;
-		const workout = programStore.getWorkoutForSession(session);
-		if (!workout) return;
-		await sessionStore.editSession(session, workout, programStore.exerciseMap);
-	}
-
-	function formatDuration(seconds: number): string {
-		const m = Math.round(seconds / 60);
-		return `${m} min`;
 	}
 </script>
 
@@ -185,10 +160,26 @@
 			{/if}
 		</a>
 
-		<!-- Workout card -->
-		<div class="home-card home-card--workout">
+		<!-- Workout card — compact summary, taps through to /workout -->
+		<a
+			href="/workout"
+			class="home-card home-card--workout"
+			class:home-card--done={!!sessionForDate}
+			class:home-card--active={sessionStore.isActive}
+			aria-label="Workout{workoutName ? ': ' + workoutName : ''}"
+		>
 			<div class="home-card__header">
 				<h2 class="home-card__title">Workout</h2>
+				<div class="home-card__badges">
+					{#if sessionStore.isActive}
+						<span class="home-card__badge home-card__badge--live">Live</span>
+					{:else if sessionForDate}
+						<span class="home-card__badge home-card__badge--done">Done</span>
+					{/if}
+					<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+						<polyline points="9 18 15 12 9 6" />
+					</svg>
+				</div>
 			</div>
 
 			{#if !programStore.loaded}
@@ -196,63 +187,17 @@
 					<div class="home-card__spinner"></div>
 				</div>
 			{:else if programStore.isProgramComplete}
-				<!-- Program complete state (US-011) -->
-				<div class="home-card__program-complete">
-					<div class="home-card__complete-icon" aria-hidden="true">🎉</div>
-					<p class="home-card__complete-title">{programStore.activeProgram?.name ?? 'Program'} complete!</p>
-					<p class="home-card__complete-body">You finished every session. Time for something new.</p>
-					<button
-						class="home-card__complete-cta"
-						onclick={() => (showProgramSelect = true)}
-					>
-						Choose a new program
-					</button>
-				</div>
-			{:else if sessionForDate}
-				<!-- Session already done -->
-				<div class="home-card__done">
-					<div class="home-card__done-icon" aria-hidden="true">
-						<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-							<polyline points="8 20 16 28 32 12" />
-						</svg>
-					</div>
-					<div class="home-card__done-info">
-						<p class="home-card__done-title">
-							{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
-						</p>
-						<p class="home-card__done-meta">
-							{formatDuration(sessionForDate.durationSeconds ?? 0)} · {sessionForDate.exercises.length} exercises · {sessionForDate.totalVolume} lb
-						</p>
-					</div>
-					<button class="home-card__edit-btn" onclick={editSession}>Edit</button>
-				</div>
-			{:else if selectedWorkout && weekWorkouts.length > 0}
-				{#if showSuggestedHint && suggestedWorkout}
-					<p class="home-card__suggested-hint">
-						Suggested: {suggestedWorkout.name}
-					</p>
+				<p class="home-card__workout-name">Program complete!</p>
+				<p class="home-card__workout-meta">Time for something new.</p>
+			{:else if workoutName}
+				<p class="home-card__workout-name">{workoutName}</p>
+				{#if workoutMeta}
+					<p class="home-card__workout-meta">{workoutMeta}</p>
 				{/if}
-				<WorkoutPicker
-					workouts={weekWorkouts}
-					selectedId={selectedWorkout.id}
-					suggestedId={suggestedWorkout?.id}
-					onSelect={(id) => loggingContext.setWorkoutId(id)}
-				/>
-				<TodayWorkout
-					workout={selectedWorkout}
-					exerciseMap={programStore.exerciseMap}
-					onStart={startSession}
-				/>
-			{:else if !programStore.activeProgram}
-				<div class="home-card__empty">
-					<p>No program active. <a href="/program">Choose a program</a> to get started.</p>
-				</div>
 			{:else}
-				<div class="home-card__empty">
-					<p>No workout scheduled. <a href="/program">View program</a>.</p>
-				</div>
+				<p class="home-card__empty">No program active.</p>
 			{/if}
-		</div>
+		</a>
 
 		<!-- Activity / Log card -->
 		<a
@@ -298,19 +243,6 @@
 
 	</div>
 </div>
-
-{#if showProgramSelect}
-	<ProgramSelectSheet
-		onClose={() => (showProgramSelect = false)}
-		onCreateNew={() => { showProgramSelect = false; showCreateProgram = true; }}
-	/>
-{/if}
-
-{#if showCreateProgram}
-	<CreateProgramSheet
-		onClose={() => (showCreateProgram = false)}
-	/>
-{/if}
 
 <style>
 	.home-page__header {
@@ -415,6 +347,16 @@
 		}
 	}
 
+	.home-card--done {
+		border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+		background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface-2));
+	}
+
+	.home-card--active {
+		border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+		background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-2));
+	}
+
 	.home-card--coming-soon {
 		opacity: 0.6;
 	}
@@ -438,6 +380,38 @@
 		inline-size: 18px;
 		block-size: 18px;
 		color: var(--color-text-muted);
+	}
+
+	.home-card__badges {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.home-card__badge {
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		border-radius: var(--radius-full);
+		padding-inline: var(--space-2);
+		padding-block: 2px;
+	}
+
+	.home-card__badge--done {
+		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+		color: var(--color-accent);
+	}
+
+	.home-card__badge--live {
+		background: color-mix(in srgb, #ef4444 15%, transparent);
+		color: #ef4444;
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.6; }
 	}
 
 	.home-card__soon-badge {
@@ -493,33 +467,30 @@
 		margin-block-start: var(--space-1);
 	}
 
-	/* Empty states */
-	.home-card__empty {
-		font-size: 0.9375rem;
+	/* Workout card */
+	.home-card__workout-name {
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+		line-height: 1.2;
+	}
+
+	.home-card__workout-meta {
+		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
-		padding-block: var(--space-4);
-
-		a {
-			color: var(--color-accent);
-			font-weight: 500;
-		}
+		margin-block-start: var(--space-1);
 	}
 
-	.home-card__empty-note {
-		font-size: 0.875rem;
-		color: var(--color-text-muted);
-	}
-
-	/* Workout card states */
+	/* Loading */
 	.home-card__loading {
 		display: flex;
 		justify-content: center;
-		padding-block: var(--space-8);
+		padding-block: var(--space-4);
 	}
 
 	.home-card__spinner {
-		inline-size: 24px;
-		block-size: 24px;
+		inline-size: 22px;
+		block-size: 22px;
 		border: 2px solid var(--color-border);
 		border-top-color: var(--color-accent);
 		border-radius: 50%;
@@ -528,97 +499,15 @@
 
 	@keyframes spin { to { transform: rotate(360deg); } }
 
-	/* Program complete state */
-	.home-card__program-complete {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		gap: var(--space-2);
-		padding-block: var(--space-6);
-	}
-
-	.home-card__complete-icon {
-		font-size: 2.5rem;
-		line-height: 1;
-	}
-
-	.home-card__complete-title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--color-accent);
-	}
-
-	.home-card__complete-body {
+	/* Empty states */
+	.home-card__empty {
 		font-size: 0.9375rem;
 		color: var(--color-text-secondary);
 	}
 
-	.home-card__complete-cta {
-		margin-block-start: var(--space-2);
-		padding-inline: var(--space-5);
-		padding-block: var(--space-3);
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
-		border-radius: var(--radius-full);
-		font-size: 0.9375rem;
-		font-weight: 700;
-		min-block-size: 44px;
-	}
-
-	/* Session done state */
-	.home-card__done {
-		display: flex;
-		align-items: center;
-		gap: var(--space-3);
-	}
-
-	.home-card__done-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		inline-size: 48px;
-		block-size: 48px;
-		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
-
-		svg { inline-size: 24px; block-size: 24px; }
-	}
-
-	.home-card__done-info { flex: 1; min-inline-size: 0; }
-
-	.home-card__done-title {
-		font-size: 1rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-	}
-
-	.home-card__done-meta {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		margin-block-start: 2px;
-	}
-
-	.home-card__edit-btn {
-		flex-shrink: 0;
-		padding-inline: var(--space-4);
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+	.home-card__empty-note {
 		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
-	}
-
-	.home-card__suggested-hint {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		text-align: center;
-		margin-block-end: var(--space-2);
+		color: var(--color-text-muted);
 	}
 
 	/* Activity card */
