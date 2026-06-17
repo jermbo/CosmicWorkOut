@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { SessionLog } from '$lib/db/types';
+	import { MOOD_SCALE } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 
@@ -13,7 +15,7 @@
 
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
-	let selectedActivityDate = $state<string | null>(null);
+	let selectedDayDate = $state<string | null>(null);
 	let logActivityDate = $state<string | null>(null);
 
 	const today = new Date();
@@ -53,6 +55,21 @@
 		return 'future';
 	}
 
+	// Habit heat map: completion ratio for a date (0..1)
+	function habitRatio(dateStr: string): number {
+		return habitStore.completionRatioForDate(dateStr);
+	}
+
+	// Mood for a date (first mood habit log found)
+	function moodForDate(dateStr: string): { label: string; value: number } | null {
+		const moodHabit = habitStore.habits.find((h) => h.type === 'mood');
+		if (!moodHabit) return null;
+		const log = habitStore.getLog(moodHabit.id, dateStr);
+		if (log === undefined) return null;
+		const entry = MOOD_SCALE.find((m) => m.value === log.value);
+		return entry ? { label: entry.label, value: log.value } : null;
+	}
+
 	function prevMonth() {
 		const d = new Date(viewDate);
 		d.setMonth(d.getMonth() - 1);
@@ -65,19 +82,38 @@
 		viewDate = d;
 	}
 
+	// Habit logs for a selected day (for day detail overlay)
+	let selectedDayHabits = $derived.by(() => {
+		if (!selectedDayDate) return [];
+		const logs = habitStore.logsForDate(selectedDayDate);
+		return logs
+			.map((log) => {
+				const habit = habitStore.habits.find((h) => h.id === log.habitId);
+				if (!habit) return null;
+				let valueStr = '';
+				if (habit.type === 'boolean') valueStr = log.value === 1 ? 'Yes' : 'No';
+				else if (habit.type === 'mood') valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
+				else if (habit.type === 'minutes') valueStr = `${log.value} min`;
+				else valueStr = `${log.value}${habit.unit ? ' ' + habit.unit : ''}`;
+				return { name: habit.name, valueStr };
+			})
+			.filter((e): e is { name: string; valueStr: string } => e !== null);
+	});
+
+	let selectedDayActivities = $derived(
+		selectedDayDate ? (activityStore.activitiesByDate.get(selectedDayDate) ?? []) : []
+	);
+
 	function handleDayTap(dateStr: string) {
 		const session = sessionsByDate.get(dateStr);
 		const activities = activityStore.activitiesByDate.get(dateStr) ?? [];
+		const habitLogs = habitStore.logsForDate(dateStr);
 
-		if (session && activities.length > 0) {
-			// Both — show activities (workout can be seen from today's page)
-			selectedActivityDate = dateStr;
-		} else if (session) {
+		if (session) {
 			selectedSession = session;
-		} else if (activities.length > 0) {
-			selectedActivityDate = dateStr;
+		} else if (activities.length > 0 || habitLogs.length > 0) {
+			selectedDayDate = dateStr;
 		} else {
-			// Past/today with nothing — offer to log an activity
 			logActivityDate = dateStr;
 		}
 	}
@@ -96,6 +132,18 @@
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));
 
+	// Month habit stats
+	let monthHabitDays = $derived.by(() => {
+		const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+		let loggedDays = 0;
+		for (let d = 1; d <= daysInMonth; d++) {
+			const dateStr = `${viewDate.getFullYear()}-${String(viewDate.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+			if (dateStr > todayStr) break;
+			if (habitStore.loggedCountForDate(dateStr) > 0) loggedDays++;
+		}
+		return loggedDays;
+	});
+
 	function formatVolume(v: number): string {
 		if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
 		return v > 0 ? String(v) : '—';
@@ -109,10 +157,17 @@
 		const base = `${MONTHS[viewDate.getMonth()]} ${dayNum}`;
 		const hasSession = sessionsByDate.has(dateStr);
 		const hasActivity = (activityStore.activitiesByDate.get(dateStr)?.length ?? 0) > 0;
+		const hasHabits = habitStore.logsForDate(dateStr).length > 0;
 		if (status === 'today') return `${base}, today`;
-		if (hasSession || hasActivity) return `${base} — tap to view`;
+		if (hasSession || hasActivity || hasHabits) return `${base} — tap to view`;
 		if (status === 'past') return `${base} — tap to log activity`;
 		return base;
+	}
+
+	// Format a date string for display in the day detail
+	function formatDayTitle(dateStr: string): string {
+		const d = new Date(dateStr + 'T00:00:00');
+		return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 	}
 </script>
 
@@ -138,6 +193,10 @@
 		<div class="cal-stat">
 			<span class="cal-stat__value">{monthActivities.length}</span>
 			<span class="cal-stat__label">Activities</span>
+		</div>
+		<div class="cal-stat">
+			<span class="cal-stat__value">{monthHabitDays}</span>
+			<span class="cal-stat__label">Habit days</span>
 		</div>
 	</div>
 
@@ -180,11 +239,14 @@
 						{@const hasSession = sessionsByDate.has(cell.date)}
 						{@const hasActivity = (activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
 						{@const tappable = status !== 'future'}
+						{@const ratio = status !== 'future' ? habitRatio(cell.date) : 0}
+						{@const mood = status !== 'future' ? moodForDate(cell.date) : null}
 						<button
 							class="calendar-day"
 							class:calendar-day--today={status === 'today'}
 							class:calendar-day--has-session={hasSession}
 							class:calendar-day--future={status === 'future'}
+							style:--habit-ratio={ratio}
 							role="gridcell"
 							aria-label={ariaLabel(cell.date, status, cell.dayNum)}
 							onclick={() => tappable && handleDayTap(cell.date!)}
@@ -197,6 +259,13 @@
 								{/if}
 								{#if hasActivity}
 									<span class="calendar-day__dot calendar-day__dot--activity"></span>
+								{/if}
+								{#if mood}
+									<span
+										class="calendar-day__dot calendar-day__dot--mood"
+										class:calendar-day__dot--mood-pos={mood.value > 0}
+										class:calendar-day__dot--mood-neg={mood.value < 0}
+									></span>
 								{/if}
 							</span>
 						</button>
@@ -212,6 +281,8 @@
 	<div class="calendar-legend" aria-label="Legend">
 		<span class="cal-legend-item cal-legend-item--session">Workout</span>
 		<span class="cal-legend-item cal-legend-item--activity">Activity</span>
+		<span class="cal-legend-item cal-legend-item--mood">Mood</span>
+		<span class="cal-legend-item cal-legend-item--habits">Habits logged</span>
 	</div>
 </div>
 
@@ -223,37 +294,41 @@
 	/>
 {/if}
 
-{#if selectedActivityDate}
-	{@const acts = activityStore.activitiesByDate.get(selectedActivityDate) ?? []}
-	<div class="overlay-backdrop" role="presentation" onclick={() => (selectedActivityDate = null)}></div>
-	<div class="activity-detail" role="dialog" aria-label="Activities" aria-modal="true">
-		<div class="activity-detail__header">
-			<p class="activity-detail__title">Activities — {selectedActivityDate}</p>
-			<button onclick={() => (selectedActivityDate = null)} aria-label="Close" class="activity-detail__close">
+<!-- Day detail: habits + activities (no session) -->
+{#if selectedDayDate}
+	<div class="overlay-backdrop" role="presentation" onclick={() => (selectedDayDate = null)}></div>
+	<div class="day-detail" role="dialog" aria-label="Day summary for {formatDayTitle(selectedDayDate)}" aria-modal="true">
+		<div class="day-detail__header">
+			<p class="day-detail__title">{formatDayTitle(selectedDayDate)}</p>
+			<button onclick={() => (selectedDayDate = null)} aria-label="Close" class="day-detail__close">
 				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
 			</button>
 		</div>
-		{#each acts as act (act.id)}
-			<div class="activity-detail__row">
-				<div class="activity-detail__info">
-					<span class="activity-detail__name">{act.type === 'Other' ? (act.customType || 'Other') : act.type}</span>
-					<span class="activity-detail__meta">{act.durationMinutes} min · {act.intensity}</span>
+
+		{#if selectedDayHabits.length > 0}
+			<p class="day-detail__section-label">Habits</p>
+			{#each selectedDayHabits as entry}
+				<div class="day-detail__row">
+					<span class="day-detail__row-name">{entry.name}</span>
+					<span class="day-detail__row-value">{entry.valueStr}</span>
 				</div>
-				<button
-					class="activity-detail__delete"
-					onclick={async () => { await activityStore.remove(act.id); if (acts.length <= 1) selectedActivityDate = null; }}
-					aria-label="Delete activity"
-				>
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-						<polyline points="3 6 5 6 21 6" />
-						<path d="M19 6l-1 14H6L5 6" />
-					</svg>
-				</button>
-			</div>
-		{/each}
+			{/each}
+		{/if}
+
+		{#if selectedDayActivities.length > 0}
+			<p class="day-detail__section-label" style="margin-block-start: var(--space-4);">Activities</p>
+			{#each selectedDayActivities as act (act.id)}
+				<div class="day-detail__row">
+					<div class="day-detail__row-info">
+						<span class="day-detail__row-name">{act.type === 'Other' ? (act.customType || 'Other') : act.type}</span>
+						<span class="day-detail__row-meta">{act.durationMinutes} min · {act.intensity}</span>
+					</div>
+				</div>
+			{/each}
+		{/if}
 	</div>
 {/if}
 
@@ -329,7 +404,7 @@
 	/* Stats */
 	.calendar-page__stats {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(4, 1fr);
 		gap: var(--space-2);
 		margin-block-end: var(--space-4);
 	}
@@ -347,14 +422,14 @@
 
 	.cal-stat__value {
 		font-family: var(--font-display);
-		font-size: 1.375rem;
+		font-size: 1.25rem;
 		font-weight: 700;
 		color: var(--color-accent);
 		line-height: 1;
 	}
 
 	.cal-stat__label {
-		font-size: 0.625rem;
+		font-size: 0.5625rem;
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -435,9 +510,21 @@
 		font-weight: 500;
 		color: var(--color-text-secondary);
 		cursor: pointer;
+		position: relative;
+		overflow: hidden;
 		transition:
 			background-color var(--duration-fast) var(--ease-out),
 			transform var(--duration-fast) var(--ease-out);
+
+		/* Habit heat map overlay */
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: color-mix(in srgb, var(--color-accent) calc(var(--habit-ratio, 0) * 18%), transparent);
+			pointer-events: none;
+			border-radius: inherit;
+		}
 
 		&:not(:disabled):active { transform: scale(0.93); }
 	}
@@ -461,7 +548,7 @@
 
 	.calendar-day--empty { pointer-events: none; }
 
-	.calendar-day__num { line-height: 1; }
+	.calendar-day__num { line-height: 1; position: relative; }
 
 	.calendar-day__dots {
 		display: flex;
@@ -469,6 +556,7 @@
 		align-items: center;
 		justify-content: center;
 		min-block-size: 5px;
+		position: relative;
 	}
 
 	.calendar-day__dot {
@@ -479,6 +567,9 @@
 
 	.calendar-day__dot--session { background: var(--color-accent); }
 	.calendar-day__dot--activity { background: var(--color-lavender); }
+	.calendar-day__dot--mood { background: var(--color-text-muted); }
+	.calendar-day__dot--mood-pos { background: #4ade80; }
+	.calendar-day__dot--mood-neg { background: #f87171; }
 
 	/* Overlays */
 	.overlay-backdrop {
@@ -488,12 +579,14 @@
 		z-index: 80;
 	}
 
-	.activity-detail {
+	.day-detail {
 		position: fixed;
 		inset-inline: var(--space-4);
 		inset-block-start: 50%;
 		transform: translateY(-50%);
 		max-inline-size: 400px;
+		max-block-size: 75dvh;
+		overflow-y: auto;
 		margin-inline: auto;
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border-strong);
@@ -503,20 +596,20 @@
 		box-shadow: var(--shadow-lg);
 	}
 
-	.activity-detail__header {
+	.day-detail__header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		margin-block-end: var(--space-4);
 	}
 
-	.activity-detail__title {
+	.day-detail__title {
 		font-family: var(--font-display);
 		font-size: 1rem;
 		font-weight: 700;
 	}
 
-	.activity-detail__close {
+	.day-detail__close {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -529,49 +622,40 @@
 		svg { inline-size: 14px; block-size: 14px; }
 	}
 
-	.activity-detail__row {
+	.day-detail__section-label {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-muted);
+		margin-block-end: var(--space-2);
+	}
+
+	.day-detail__row {
 		display: flex;
 		align-items: center;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		margin-block-end: var(--space-2);
+		justify-content: space-between;
+		padding-block: var(--space-2);
+		border-block-end: 1px dashed var(--color-border);
 
-		&:last-child { margin-block-end: 0; }
+		&:last-of-type { border-block-end: none; }
 	}
 
-	.activity-detail__info { flex: 1; min-inline-size: 0; }
+	.day-detail__row-info { display: flex; flex-direction: column; }
 
-	.activity-detail__name {
-		display: block;
+	.day-detail__row-name {
 		font-size: 0.9375rem;
-		font-weight: 700;
+		font-weight: 600;
 	}
 
-	.activity-detail__meta {
-		display: block;
+	.day-detail__row-meta {
 		font-size: 0.75rem;
 		color: var(--color-text-secondary);
-		margin-block-start: 2px;
 	}
 
-	.activity-detail__delete {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 32px;
-		block-size: 32px;
-		border-radius: var(--radius-md);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-muted);
-		flex-shrink: 0;
-		transition: color var(--duration-fast) var(--ease-out);
-
-		svg { inline-size: 14px; block-size: 14px; }
-		&:hover { color: var(--color-red); }
+	.day-detail__row-value {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
 	}
 
 	/* Legend */
@@ -580,6 +664,7 @@
 		gap: var(--space-4);
 		justify-content: center;
 		margin-block-start: var(--space-4);
+		flex-wrap: wrap;
 	}
 
 	.cal-legend-item {
@@ -603,4 +688,9 @@
 
 	.cal-legend-item--session::before { background: var(--color-accent); }
 	.cal-legend-item--activity::before { background: var(--color-lavender); }
+	.cal-legend-item--mood::before { background: #4ade80; }
+	.cal-legend-item--habits::before {
+		background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+	}
 </style>

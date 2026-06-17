@@ -29,16 +29,42 @@ class HabitStore {
 		return this.logs.find((l) => l.habitId === habitId && l.date === d);
 	}
 
+	logsForDate(date: string): HabitLog[] {
+		return this.logs.filter((l) => l.date === date);
+	}
+
+	loggedCountForDate(date: string): number {
+		const logs = this.logsForDate(date);
+		return this.activeHabits.filter((h) => {
+			const log = logs.find((l) => l.habitId === h.id);
+			if (!log) return false;
+			if (h.type === 'boolean') return log.value === 1;
+			if (h.type === 'mood') return true;
+			if (h.dailyGoal) return log.value >= h.dailyGoal;
+			return log.value > 0;
+		}).length;
+	}
+
+	// For calendar heat map: ratio of completed habits 0–1
+	completionRatioForDate(date: string): number {
+		const total = this.activeHabits.length;
+		if (total === 0) return 0;
+		return this.loggedCountForDate(date) / total;
+	}
+
 	async load(): Promise<void> {
 		const [habits, logs] = await Promise.all([
 			db.habits.getAll(),
 			db.habitLogs.getAll()
 		]);
-		this.habits = habits.sort((a, b) => a.sortOrder - b.sortOrder);
+		// Migrate legacy 'duration' type → 'minutes'
+		const normalized = habits.map((h) =>
+			(h.type as string) === 'duration' ? { ...h, type: 'minutes' as HabitType } : h
+		);
+		this.habits = normalized.sort((a, b) => a.sortOrder - b.sortOrder);
 		this.logs = logs;
 		this.loaded = true;
 
-		// Prune stale today-key if day has changed
 		localStorage.setItem(TODAY_KEY, this.todayStr());
 	}
 
@@ -101,22 +127,32 @@ class HabitStore {
 		];
 	}
 
-	async increment(habitId: string): Promise<void> {
-		const existing = this.getLog(habitId);
-		await this.logValue(habitId, (existing?.value ?? 0) + 1);
+	async increment(habitId: string, date?: string): Promise<void> {
+		const existing = this.getLog(habitId, date);
+		await this.logValue(habitId, (existing?.value ?? 0) + 1, date);
 	}
 
-	async toggle(habitId: string): Promise<void> {
-		const existing = this.getLog(habitId);
-		await this.logValue(habitId, existing?.value ? 0 : 1);
+	async toggle(habitId: string, date?: string): Promise<void> {
+		const existing = this.getLog(habitId, date);
+		await this.logValue(habitId, existing?.value ? 0 : 1, date);
 	}
 
+	async setMinutes(habitId: string, minutes: number, date?: string): Promise<void> {
+		await this.logValue(habitId, minutes, date);
+	}
+
+	// Legacy alias
 	async setDuration(habitId: string, minutes: number): Promise<void> {
 		await this.logValue(habitId, minutes);
 	}
 
-	async correctValue(habitId: string, value: number): Promise<void> {
-		await this.logValue(habitId, Math.max(0, value));
+	async correctValue(habitId: string, value: number, date?: string): Promise<void> {
+		await this.logValue(habitId, Math.max(0, value), date);
+	}
+
+	async logMood(habitId: string, value: number, date?: string): Promise<void> {
+		// Mood value clamped to -5..+5
+		await this.logValue(habitId, Math.max(-5, Math.min(5, value)), date);
 	}
 }
 

@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { SessionLog, Exercise } from '$lib/db/types';
+	import { MOOD_SCALE } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
 	let {
@@ -17,6 +19,28 @@
 		onEdit?: () => void;
 		onDelete?: () => void;
 	} = $props();
+
+	let habitLogsForDay = $derived(habitStore.logsForDate(session.date));
+
+	let habitEntries = $derived.by(() => {
+		return habitLogsForDay
+			.map((log) => {
+				const habit = habitStore.habits.find((h) => h.id === log.habitId);
+				if (!habit) return null;
+				let valueStr = '';
+				if (habit.type === 'boolean') {
+					valueStr = log.value === 1 ? 'Yes' : 'No';
+				} else if (habit.type === 'mood') {
+					valueStr = MOOD_SCALE.find((m) => m.value === log.value)?.label ?? String(log.value);
+				} else if (habit.type === 'minutes') {
+					valueStr = `${log.value} min`;
+				} else {
+					valueStr = `${log.value}${habit.unit ? ' ' + habit.unit : ''}`;
+				}
+				return { name: habit.name, valueStr };
+			})
+			.filter((e): e is { name: string; valueStr: string } => e !== null);
+	});
 
 	let showDeleteConfirm = $state(false);
 
@@ -112,6 +136,18 @@
 				{/if}
 			{/each}
 		</div>
+
+		{#if habitEntries.length > 0}
+			<div class="day-summary__habits">
+				<p class="day-summary__habits-title">Habits</p>
+				{#each habitEntries as entry}
+					<div class="day-summary__habit-row">
+						<span class="day-summary__habit-name">{entry.name}</span>
+						<span class="day-summary__habit-value">{entry.valueStr}</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="day-summary__actions">
 			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
@@ -257,6 +293,39 @@
 		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
 		margin-block-start: 2px;
+	}
+
+	.day-summary__habits {
+		margin-block-end: var(--space-5);
+	}
+
+	.day-summary__habits-title {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-muted);
+		margin-block-end: var(--space-2);
+	}
+
+	.day-summary__habit-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-block: var(--space-2);
+		border-block-end: 1px dashed var(--color-border);
+
+		&:last-child { border-block-end: none; }
+	}
+
+	.day-summary__habit-name {
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.day-summary__habit-value {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
 	}
 
 	.day-summary__actions {

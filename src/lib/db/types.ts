@@ -5,7 +5,21 @@ export type Roundness = 'sharp' | 'default' | 'soft';
 export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
 export type ActivityType = 'Run' | 'Walk' | 'Bike' | 'Swim' | 'Hike' | 'Pickleball' | 'Tennis' | 'Basketball' | 'Yoga' | 'Stretching' | 'Cardio' | 'Other';
 export type ActivityIntensity = 'Easy' | 'Moderate' | 'Hard';
-export type HabitType = 'count' | 'duration' | 'boolean';
+export type HabitType = 'times' | 'minutes' | 'count' | 'boolean' | 'mood';
+
+export const MOOD_SCALE = [
+	{ value: 5, label: 'Happy' },
+	{ value: 4, label: 'Excited' },
+	{ value: 3, label: 'Focus' },
+	{ value: 2, label: 'Energized' },
+	{ value: 1, label: 'Content' },
+	{ value: 0, label: 'Normal' },
+	{ value: -1, label: 'Tired' },
+	{ value: -2, label: 'Lonely' },
+	{ value: -3, label: 'Sad' },
+	{ value: -4, label: 'Angry' },
+	{ value: -5, label: 'Stressed' },
+] as const;
 
 export interface Exercise {
 	id: string;

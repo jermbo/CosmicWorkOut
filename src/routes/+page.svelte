@@ -6,11 +6,11 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
+	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
-	import HabitWidgets from '$lib/components/HabitWidgets.svelte';
-	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
+	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
+	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 
 	const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 	const MONTHS_SHORT = [
@@ -21,7 +21,6 @@
 	const todayStr = new Date().toISOString().split('T')[0];
 	let dateInputEl: HTMLInputElement | undefined = $state();
 
-	// Sync ?date= query param on load / navigation
 	$effect(() => {
 		const param = page.url.searchParams.get('date');
 		if (param && param <= todayStr) {
@@ -39,9 +38,11 @@
 		};
 	});
 
-	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
+	let isToday = $derived(contextDate === todayStr);
 
+	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
 	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
+	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
 
 	let selectedWorkout = $derived.by(() => {
 		if (loggingContext.workoutId) {
@@ -51,12 +52,19 @@
 	});
 
 	let showSuggestedHint = $derived(
-		selectedWorkout &&
-			suggestedWorkout &&
-			selectedWorkout.id !== suggestedWorkout.id
+		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id
 	);
 
-	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
+	// Habits card
+	let habitsTotal = $derived(habitStore.activeHabits.length);
+	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
+
+	// Activity card
+	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
+
+	// Program complete state
+	let showProgramSelect = $state(false);
+	let showCreateProgram = $state(false);
 
 	function handleDateChange(event: Event) {
 		const value = (event.target as HTMLInputElement).value;
@@ -93,38 +101,22 @@
 		await sessionStore.editSession(session, workout, programStore.exerciseMap);
 	}
 
-	let showActivitySheet = $state(false);
-	let editingActivity = $state<typeof activityStore.activities[0] | null>(null);
-
-	function openNewActivity() {
-		editingActivity = null;
-		showActivitySheet = true;
+	function formatDuration(seconds: number): string {
+		const m = Math.round(seconds / 60);
+		return `${m} min`;
 	}
-
-	function openEditActivity(activity: typeof activityStore.activities[0]) {
-		editingActivity = activity;
-		showActivitySheet = true;
-	}
-
-	function activityChipLabel(activity: typeof activityStore.activities[0]): string {
-		const name = activity.type === 'Other' ? (activity.customType || 'Other') : activity.type;
-		return `${name} · ${activity.durationMinutes} min · ${activity.intensity}`;
-	}
-
-	let isToday = $derived(contextDate === todayStr);
-	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 </script>
 
 <svelte:head>
-	<title>Log — CosmicWorkOut</title>
+	<title>Today — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="page today-page">
-	<header class="today-page__header">
-		<div class="today-page__header-row">
+<div class="home-page">
+	<header class="home-page__header">
+		<div class="home-page__header-row">
 			<div>
-				<button class="today-page__date-btn" onclick={openDatePicker} aria-label="Change logging date">
-					<p class="today-page__eyebrow">
+				<button class="home-page__date-btn" onclick={openDatePicker} aria-label="Change logging date">
+					<p class="home-page__eyebrow">
 						{displayDate.dayName} · {displayDate.dateStr}
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 							<polyline points="6 9 12 15 18 9" />
@@ -134,19 +126,19 @@
 				<input
 					bind:this={dateInputEl}
 					type="date"
-					class="today-page__date-input"
+					class="home-page__date-input"
 					max={todayStr}
 					value={contextDate}
 					onchange={handleDateChange}
 					aria-label="Logging date"
 				/>
-				<h1 class="today-page__title">{isToday ? 'Today' : 'Log workout'}</h1>
+				<h1 class="home-page__title">{isToday ? 'Today' : 'Past Day'}</h1>
 				{#if !isToday}
-					<button class="today-page__back-today" onclick={goToToday}>Back to today</button>
+					<button class="home-page__back-today" onclick={goToToday}>Back to today</button>
 				{/if}
 			</div>
 			{#if programStore.weekStreak > 0}
-				<div class="today-page__streak" aria-label="{programStore.weekStreak} week streak">
+				<div class="home-page__streak" aria-label="{programStore.weekStreak} week streak">
 					<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 						<path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" />
 					</svg>
@@ -164,37 +156,79 @@
 		/>
 	{/if}
 
-	<div class="today-page__body">
-		<!-- Workout section -->
-		<section class="today-section" aria-labelledby="section-workout">
-			<h2 class="today-section__label" id="section-workout">Workout</h2>
+	<div class="home-cards">
+
+		<!-- Habits card -->
+		<a
+			href="/habits"
+			class="home-card home-card--habits"
+			aria-label="Habits: {habitsTotal === 0 ? 'Add habits' : `${habitsLogged} of ${habitsTotal} logged`}"
+		>
+			<div class="home-card__header">
+				<h2 class="home-card__title">Habits</h2>
+				<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<polyline points="9 18 15 12 9 6" />
+				</svg>
+			</div>
+			{#if habitsTotal === 0}
+				<p class="home-card__empty">Add habits in Settings to get started.</p>
+			{:else}
+				<div class="home-card__habits-summary">
+					<span class="home-card__habits-count">{habitsLogged}</span>
+					<span class="home-card__habits-sep">/</span>
+					<span class="home-card__habits-total">{habitsTotal}</span>
+					<span class="home-card__habits-label">habits logged</span>
+				</div>
+				{#if habitsLogged === habitsTotal && habitsTotal > 0}
+					<p class="home-card__done-note">All done today!</p>
+				{/if}
+			{/if}
+		</a>
+
+		<!-- Workout card -->
+		<div class="home-card home-card--workout">
+			<div class="home-card__header">
+				<h2 class="home-card__title">Workout</h2>
+			</div>
+
 			{#if !programStore.loaded}
-				<div class="today-page__loading" aria-busy="true" aria-label="Loading workout">
-					<div class="today-page__loading-spinner"></div>
+				<div class="home-card__loading" aria-busy="true">
+					<div class="home-card__spinner"></div>
+				</div>
+			{:else if programStore.isProgramComplete}
+				<!-- Program complete state (US-011) -->
+				<div class="home-card__program-complete">
+					<div class="home-card__complete-icon" aria-hidden="true">🎉</div>
+					<p class="home-card__complete-title">{programStore.activeProgram?.name ?? 'Program'} complete!</p>
+					<p class="home-card__complete-body">You finished every session. Time for something new.</p>
+					<button
+						class="home-card__complete-cta"
+						onclick={() => (showProgramSelect = true)}
+					>
+						Choose a new program
+					</button>
 				</div>
 			{:else if sessionForDate}
-				<div class="today-page__done" role="status">
-					<div class="today-page__done-icon" aria-hidden="true">
-						<svg
-							viewBox="0 0 40 40"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="3"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
+				<!-- Session already done -->
+				<div class="home-card__done">
+					<div class="home-card__done-icon" aria-hidden="true">
+						<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
 							<polyline points="8 20 16 28 32 12" />
 						</svg>
 					</div>
-					<h3 class="today-page__done-title">Workout complete</h3>
-					<p class="today-page__done-subtitle">
-						{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
-					</p>
-					<button class="today-page__edit-btn" onclick={editSession}>Edit session</button>
+					<div class="home-card__done-info">
+						<p class="home-card__done-title">
+							{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
+						</p>
+						<p class="home-card__done-meta">
+							{formatDuration(sessionForDate.durationSeconds ?? 0)} · {sessionForDate.exercises.length} exercises · {sessionForDate.totalVolume} lb
+						</p>
+					</div>
+					<button class="home-card__edit-btn" onclick={editSession}>Edit</button>
 				</div>
 			{:else if selectedWorkout && weekWorkouts.length > 0}
 				{#if showSuggestedHint && suggestedWorkout}
-					<p class="today-page__suggested-hint">
+					<p class="home-card__suggested-hint">
 						Suggested: {suggestedWorkout.name}
 					</p>
 				{/if}
@@ -209,74 +243,93 @@
 					exerciseMap={programStore.exerciseMap}
 					onStart={startSession}
 				/>
+			{:else if !programStore.activeProgram}
+				<div class="home-card__empty">
+					<p>No program active. <a href="/program">Choose a program</a> to get started.</p>
+				</div>
 			{:else}
-				<div class="today-page__empty">
-					<p>No program active. Head to <a href="/program">Program</a> to get started.</p>
+				<div class="home-card__empty">
+					<p>No workout scheduled. <a href="/program">View program</a>.</p>
 				</div>
 			{/if}
-		</section>
+		</div>
 
-		<!-- Habits section (only when habits are configured) -->
-		{#if habitStore.activeHabits.length > 0}
-			<section class="today-section" aria-labelledby="section-habits">
-				<h2 class="today-section__label" id="section-habits">Habits</h2>
-				<HabitWidgets />
-			</section>
-		{/if}
-
-		<!-- Activity section -->
-		<section class="today-section" aria-labelledby="section-activity">
-			<h2 class="today-section__label" id="section-activity">Activity</h2>
-			<button class="activity-log-btn" onclick={openNewActivity}>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-					<line x1="12" y1="5" x2="12" y2="19" />
-					<line x1="5" y1="12" x2="19" y2="12" />
+		<!-- Activity / Log card -->
+		<a
+			href="/log"
+			class="home-card home-card--log"
+			aria-label="Activity log: {dateActivities.length === 0 ? 'No activities yet' : `${dateActivities.length} ${dateActivities.length === 1 ? 'activity' : 'activities'} logged`}"
+		>
+			<div class="home-card__header">
+				<h2 class="home-card__title">Activity</h2>
+				<svg class="home-card__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<polyline points="9 18 15 12 9 6" />
 				</svg>
-				Log Activity
-			</button>
-			{#if dateActivities.length > 0}
-				<div class="activity-chips" role="list" aria-label="Activities">
-					{#each dateActivities as activity (activity.id)}
-						<button
-							class="activity-chip"
-							onclick={() => openEditActivity(activity)}
-							aria-label="Edit: {activityChipLabel(activity)}"
-						>
-							{activityChipLabel(activity)}
-						</button>
+			</div>
+			{#if dateActivities.length === 0}
+				<p class="home-card__empty-note">No activities yet.</p>
+			{:else}
+				<p class="home-card__log-summary">
+					{dateActivities.length} {dateActivities.length === 1 ? 'activity' : 'activities'} logged
+				</p>
+				<div class="home-card__activity-chips">
+					{#each dateActivities.slice(0, 3) as activity (activity.id)}
+						<span class="home-card__activity-chip">
+							{activity.type === 'Other' ? (activity.customType || 'Other') : activity.type} · {activity.durationMinutes} min
+						</span>
 					{/each}
+					{#if dateActivities.length > 3}
+						<span class="home-card__activity-chip home-card__activity-chip--more">
+							+{dateActivities.length - 3} more
+						</span>
+					{/if}
 				</div>
 			{/if}
-		</section>
+		</a>
+
+		<!-- Journal card — coming soon -->
+		<div class="home-card home-card--journal home-card--coming-soon" aria-label="Journal — coming soon">
+			<div class="home-card__header">
+				<h2 class="home-card__title">Journal</h2>
+				<span class="home-card__soon-badge">Coming soon</span>
+			</div>
+			<p class="home-card__empty-note">Reflect on your day. Coming in a future update.</p>
+		</div>
+
 	</div>
 </div>
 
-{#if showActivitySheet}
-	<ActivityLogSheet
-		editing={editingActivity}
-		initialDate={editingActivity ? undefined : contextDate}
-		onClose={() => { showActivitySheet = false; editingActivity = null; }}
+{#if showProgramSelect}
+	<ProgramSelectSheet
+		onClose={() => (showProgramSelect = false)}
+		onCreateNew={() => { showProgramSelect = false; showCreateProgram = true; }}
+	/>
+{/if}
+
+{#if showCreateProgram}
+	<CreateProgramSheet
+		onClose={() => (showCreateProgram = false)}
 	/>
 {/if}
 
 <style>
-	.today-page__header {
-		margin-block-end: var(--space-5);
+	.home-page__header {
+		margin-block-end: var(--space-4);
 	}
 
-	.today-page__header-row {
+	.home-page__header-row {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: var(--space-3);
 	}
 
-	.today-page__date-btn {
+	.home-page__date-btn {
 		display: block;
 		text-align: start;
 	}
 
-	.today-page__date-input {
+	.home-page__date-input {
 		position: absolute;
 		inline-size: 1px;
 		block-size: 1px;
@@ -284,7 +337,7 @@
 		pointer-events: none;
 	}
 
-	.today-page__eyebrow {
+	.home-page__eyebrow {
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
@@ -302,14 +355,7 @@
 		}
 	}
 
-	.today-page__back-today {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-accent);
-		margin-block-start: var(--space-1);
-	}
-
-	.today-page__title {
+	.home-page__title {
 		font-family: var(--font-display);
 		font-size: 2.25rem;
 		font-weight: 700;
@@ -317,7 +363,14 @@
 		letter-spacing: -0.02em;
 	}
 
-	.today-page__streak {
+	.home-page__back-today {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		margin-block-start: var(--space-1);
+	}
+
+	.home-page__streak {
 		display: flex;
 		align-items: center;
 		gap: 5px;
@@ -337,145 +390,43 @@
 			color: var(--color-accent);
 		}
 
-		strong {
-			color: var(--color-text-primary);
-		}
+		strong { color: var(--color-text-primary); }
 	}
 
-	.today-page__suggested-hint {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		text-align: center;
-		margin-block-end: var(--space-2);
-	}
-
-	.today-page__body {
+	/* Cards layout */
+	.home-cards {
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
-		inline-size: 100%;
 	}
 
-	@container main (inline-size >= 900px) {
-		.today-page {
-			inline-size: min(100%, 860px);
-		}
-
-		.today-page {
-			display: grid;
-			grid-template-columns: 1fr 240px;
-			grid-template-rows: auto auto 1fr;
-			column-gap: var(--space-6);
-			align-items: start;
-		}
-
-		.today-page__header {
-			grid-column: 1 / -1;
-		}
-
-		.today-page :global(.week-strip) {
-			grid-column: 2;
-			grid-row: 2 / 4;
-			position: sticky;
-			top: var(--space-6);
-			margin-block-end: 0;
-		}
-
-		.today-page__body {
-			grid-column: 1;
-			grid-row: 2 / 4;
-		}
-	}
-
-	.today-page__loading {
-		display: flex;
-		justify-content: center;
-		padding-block: var(--space-12);
-	}
-
-	.today-page__loading-spinner {
-		inline-size: 28px;
-		block-size: 28px;
-		border: 2px solid var(--color-border);
-		border-top-color: var(--color-accent);
-		border-radius: 50%;
-		animation: spin 700ms linear infinite;
-	}
-
-	@keyframes spin {
-		to { transform: rotate(360deg); }
-	}
-
-	.today-page__done {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-3);
-		padding-block: var(--space-12);
-		text-align: center;
-		animation: fade-in var(--duration-normal) var(--ease-out) both;
-	}
-
-	.today-page__done-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 64px;
-		block-size: 64px;
-		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
-
-		svg {
-			inline-size: 28px;
-			block-size: 28px;
-		}
-	}
-
-	.today-page__done-title {
-		font-family: var(--font-display);
-		font-size: 1.375rem;
-		font-weight: 700;
-	}
-
-	.today-page__done-subtitle {
-		font-size: 0.9375rem;
-		color: var(--color-text-secondary);
-	}
-
-	.today-page__edit-btn {
-		margin-block-start: var(--space-2);
-		padding-inline: var(--space-5);
-		padding-block: var(--space-3);
+	.home-card {
+		display: block;
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
-		border-radius: var(--radius-full);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
-		min-block-size: 44px;
-	}
+		border-radius: var(--r-xl);
+		padding: var(--space-4) var(--space-5);
+		text-decoration: none;
+		color: inherit;
+		transition: border-color var(--duration-fast) var(--ease-out);
 
-	.today-page__empty {
-		padding-block: var(--space-12);
-		text-align: center;
-		color: var(--color-text-secondary);
-		font-size: 0.9375rem;
-
-		a {
-			color: var(--color-accent);
-			font-weight: 500;
+		&:is(a):hover {
+			border-color: var(--color-accent);
 		}
 	}
 
-	/* Dashboard sections */
-	.today-section {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
+	.home-card--coming-soon {
+		opacity: 0.6;
 	}
 
-	.today-section__label {
+	.home-card__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-block-end: var(--space-3);
+	}
+
+	.home-card__title {
 		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
@@ -483,50 +434,252 @@
 		color: var(--color-text-muted);
 	}
 
-	/* Activity section */
-	.activity-log-btn {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding-inline: var(--space-4);
-		block-size: 48px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
+	.home-card__chevron {
+		inline-size: 18px;
+		block-size: 18px;
+		color: var(--color-text-muted);
+	}
+
+	.home-card__soon-badge {
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
+		background: var(--color-surface-3);
 		border: 1px solid var(--color-border);
-		font-size: 0.9375rem;
-		font-weight: 600;
+		border-radius: var(--radius-full);
+		padding-inline: var(--space-2);
+		padding-block: 2px;
+	}
+
+	/* Habits card */
+	.home-card__habits-summary {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-1);
+	}
+
+	.home-card__habits-count {
+		font-family: var(--font-display);
+		font-size: 2rem;
+		font-weight: 700;
+		color: var(--color-accent);
+		line-height: 1;
+	}
+
+	.home-card__habits-sep {
+		font-size: 1.25rem;
+		color: var(--color-text-muted);
+	}
+
+	.home-card__habits-total {
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		font-weight: 700;
 		color: var(--color-text-secondary);
-		align-self: flex-start;
-		transition:
-			border-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
+	}
 
-		svg { inline-size: 18px; block-size: 18px; }
+	.home-card__habits-label {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+		margin-inline-start: var(--space-1);
+	}
 
-		&:hover {
-			border-color: var(--color-accent);
+	.home-card__done-note {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		margin-block-start: var(--space-1);
+	}
+
+	/* Empty states */
+	.home-card__empty {
+		font-size: 0.9375rem;
+		color: var(--color-text-secondary);
+		padding-block: var(--space-4);
+
+		a {
 			color: var(--color-accent);
+			font-weight: 500;
 		}
 	}
 
-	.activity-chips {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--space-2);
+	.home-card__empty-note {
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
 	}
 
-	.activity-chip {
-		padding-inline: var(--space-3);
-		block-size: 34px;
+	/* Workout card states */
+	.home-card__loading {
+		display: flex;
+		justify-content: center;
+		padding-block: var(--space-8);
+	}
+
+	.home-card__spinner {
+		inline-size: 24px;
+		block-size: 24px;
+		border: 2px solid var(--color-border);
+		border-top-color: var(--color-accent);
+		border-radius: 50%;
+		animation: spin 700ms linear infinite;
+	}
+
+	@keyframes spin { to { transform: rotate(360deg); } }
+
+	/* Program complete state */
+	.home-card__program-complete {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: var(--space-2);
+		padding-block: var(--space-6);
+	}
+
+	.home-card__complete-icon {
+		font-size: 2.5rem;
+		line-height: 1;
+	}
+
+	.home-card__complete-title {
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--color-accent);
+	}
+
+	.home-card__complete-body {
+		font-size: 0.9375rem;
+		color: var(--color-text-secondary);
+	}
+
+	.home-card__complete-cta {
+		margin-block-start: var(--space-2);
+		padding-inline: var(--space-5);
+		padding-block: var(--space-3);
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
 		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-2));
-		border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+		font-size: 0.9375rem;
+		font-weight: 700;
+		min-block-size: 44px;
+	}
+
+	/* Session done state */
+	.home-card__done {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.home-card__done-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		inline-size: 48px;
+		block-size: 48px;
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+		color: var(--color-accent);
+
+		svg { inline-size: 24px; block-size: 24px; }
+	}
+
+	.home-card__done-info { flex: 1; min-inline-size: 0; }
+
+	.home-card__done-title {
+		font-size: 1rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+	}
+
+	.home-card__done-meta {
 		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
+		margin-block-start: 2px;
+	}
+
+	.home-card__edit-btn {
+		flex-shrink: 0;
+		padding-inline: var(--space-4);
+		block-size: 36px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.875rem;
 		font-weight: 600;
 		color: var(--color-text-primary);
-		white-space: nowrap;
-		transition: border-color var(--duration-fast) var(--ease-out);
+	}
 
-		&:hover { border-color: var(--color-accent); }
+	.home-card__suggested-hint {
+		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
+		text-align: center;
+		margin-block-end: var(--space-2);
+	}
+
+	/* Activity card */
+	.home-card__log-summary {
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--color-text-primary);
+		margin-block-end: var(--space-2);
+	}
+
+	.home-card__activity-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1);
+	}
+
+	.home-card__activity-chip {
+		padding-inline: var(--space-2);
+		block-size: 28px;
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-3));
+		border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		display: inline-flex;
+		align-items: center;
+		white-space: nowrap;
+	}
+
+	.home-card__activity-chip--more {
+		background: var(--color-surface-3);
+		border-color: var(--color-border);
+	}
+
+	/* Wide layout */
+	@container main (inline-size >= 900px) {
+		.home-page {
+			inline-size: min(100%, 860px);
+			display: grid;
+			grid-template-columns: 1fr 240px;
+			grid-template-rows: auto auto 1fr;
+			column-gap: var(--space-6);
+			align-items: start;
+		}
+
+		.home-page__header {
+			grid-column: 1 / -1;
+		}
+
+		.home-page :global(.week-strip) {
+			grid-column: 2;
+			grid-row: 2 / 4;
+			position: sticky;
+			top: var(--space-6);
+			margin-block-end: 0;
+		}
+
+		.home-cards {
+			grid-column: 1;
+			grid-row: 2 / 4;
+		}
 	}
 </style>

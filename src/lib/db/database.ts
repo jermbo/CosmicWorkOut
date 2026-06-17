@@ -1,5 +1,5 @@
 import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog } from './types';
-import { builtInExercises, builtInPrograms } from './seed';
+import { builtInExercises, builtInPrograms, builtInHabits } from './seed';
 
 const DB_NAME = 'cosmic-workout';
 const DB_VERSION = 2;
@@ -152,6 +152,27 @@ export async function initDB(): Promise<void> {
 	const programs = await getAll<Program>('programs');
 	if (programs.length === 0) {
 		await putAllRecords('programs', builtInPrograms);
+	}
+
+	// Only seed habits on first run
+	const habits = await getAll<Habit>('habits');
+	if (habits.length === 0) {
+		await putAllRecords('habits', builtInHabits);
+	} else {
+		// Migrate: apply default goals to built-in habits that are missing them
+		const goalMap: Record<string, number> = {
+			'habit-meditation': 20,
+			'habit-writing': 500,
+			'habit-reading': 20,
+			'habit-water': 8,
+			'habit-coffee': 3
+		};
+		const toUpdate = habits.filter(
+			(h) => goalMap[h.id] !== undefined && h.dailyGoal === undefined
+		);
+		if (toUpdate.length > 0) {
+			await putAllRecords('habits', toUpdate.map((h) => ({ ...h, dailyGoal: goalMap[h.id] })));
+		}
 	}
 }
 

@@ -28,7 +28,7 @@
 			await habitStore.increment(habit.id);
 		} else if (habit.type === 'boolean') {
 			await habitStore.toggle(habit.id);
-		} else if (habit.type === 'duration') {
+		} else if (habit.type === 'minutes') {
 			durationInput = String(getValue(habit) || '');
 			durationTarget = habit;
 		}

@@ -77,6 +77,12 @@ class ProgramStore {
 		return this.sessions.filter((s) => s.programId === this.activeProgram!.id).length;
 	});
 
+	isProgramComplete = $derived.by(() => {
+		if (!this.activeProgram) return false;
+		const total = this.activeProgram.durationWeeks * this.activeProgram.daysPerWeek;
+		return total > 0 && this.completedSessionCount >= total;
+	});
+
 	currentWeekNumber = $derived.by(() => {
 		if (!this.activeProgram) return 1;
 		return Math.min(
