@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { programStore } from '$lib/stores/program.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
+	import WeekStrip from '$lib/components/WeekStrip.svelte';
 	import { formatWeekdayShortDate } from '$lib/date';
 	import { formatActivitySummary } from '$lib/activities';
 
 	let contextDate = $derived(loggingContext.date);
 
 	let displayDate = $derived(formatWeekdayShortDate(contextDate));
+
+	let activeSessions = $derived(
+		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
+	);
 
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
@@ -53,6 +59,10 @@
 			<h1 class="log-page__title">Activity</h1>
 		</div>
 	</header>
+
+	{#if programStore.loaded}
+		<WeekStrip sessions={activeSessions} stayOnPage />
+	{/if}
 
 	<button class="log-page__add-btn" onclick={openNew}>
 		<svg

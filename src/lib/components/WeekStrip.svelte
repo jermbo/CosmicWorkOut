@@ -4,8 +4,19 @@
 	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
 	import { formatWeeksAgo } from '$lib/format';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
 
-	let { sessions }: { sessions: SessionLog[] } = $props();
+	let {
+		sessions,
+		stayOnPage = false,
+		showMoodDots = false,
+	}: {
+		sessions: SessionLog[];
+		/** When true, date changes update context without navigating home. */
+		stayOnPage?: boolean;
+		/** Show mood-colored dots instead of workout-completion dots. */
+		showMoodDots?: boolean;
+	} = $props();
 
 	const todayStr = todayIso();
 
@@ -63,9 +74,19 @@
 		return parts.join(', ');
 	}
 
+	function moodForDay(dateStr: string): number | null {
+		if (!showMoodDots) return null;
+		const moodHabit = habitStore.habits.find((h) => h.type === 'mood' && h.active);
+		if (!moodHabit) return null;
+		const log = habitStore.getLog(moodHabit.id, dateStr);
+		return log !== undefined ? log.value : null;
+	}
+
 	function navigateToDate(dateStr: string) {
 		loggingContext.setDate(dateStr);
-		goto(dateStr === todayStr ? '/' : `/?date=${dateStr}`);
+		if (!stayOnPage) {
+			goto(dateStr === todayStr ? '/' : `/?date=${dateStr}`);
+		}
 	}
 
 	function handleDayTap(dateStr: string) {
@@ -109,7 +130,15 @@
 			</button>
 		</div>
 
-		<span class="week-strip__count">{doneDays} done</span>
+		<span class="week-strip__count">
+			{#if viewingPastDate}
+				<button type="button" class="week-strip__back-today" onclick={() => navigateToDate(todayStr)}>
+					Back to today
+				</button>
+			{:else}
+				{doneDays} done
+			{/if}
+		</span>
 	</div>
 
 	<div class="week-strip__days" aria-label="Days in {weekLabel}">
@@ -129,17 +158,31 @@
 			>
 				<span class="week-day__dow">{day.dow}</span>
 				<span class="week-day__date">{day.date}</span>
-				<span class="week-day__indicator" aria-hidden="true"></span>
+				{#if showMoodDots}
+					{@const mood = moodForDay(day.dateStr)}
+					<span
+						class="week-day__indicator"
+						class:week-day__indicator--mood-pos={mood !== null && mood > 0}
+						class:week-day__indicator--mood-neg={mood !== null && mood < 0}
+						class:week-day__indicator--mood-neutral={mood === 0}
+						class:week-day__indicator--mood-empty={mood === null}
+						aria-hidden="true"
+					></span>
+				{:else}
+					<span class="week-day__indicator" aria-hidden="true"></span>
+				{/if}
 			</button>
 		{/each}
 	</div>
 
-	{#if viewingPastDate || !isCurrentWeek}
-		<p class="week-strip__legend" aria-hidden="true">
-			<span class="week-strip__legend-item week-strip__legend-item--selected">Selected</span>
+	{#if stayOnPage || viewingPastDate || !isCurrentWeek}
+		<p class="week-strip__legend" class:week-strip__legend--compact={stayOnPage && isCurrentWeek && !viewingPastDate}>
+			{#if viewingPastDate}
+				<span class="week-strip__legend-item week-strip__legend-item--selected">Selected</span>
+			{/if}
 			{#if !isCurrentWeek}
 				<span class="week-strip__legend-item week-strip__legend-item--current-week">This week</span>
-			{:else}
+			{:else if stayOnPage || viewingPastDate}
 				<span class="week-strip__legend-item week-strip__legend-item--today">Today</span>
 			{/if}
 		</p>
@@ -329,6 +372,12 @@
 		justify-content: center;
 		gap: var(--space-4);
 		margin-block-start: var(--space-2);
+		min-block-size: 18px;
+	}
+
+	.week-strip__legend--compact {
+		/* Keeps legend row height stable on sub-pages when viewing today */
+		visibility: hidden;
 	}
 
 	.week-strip__legend-item {
@@ -361,5 +410,25 @@
 		background: transparent;
 		border-color: var(--color-accent);
 		box-shadow: inset 0 0 0 1px var(--color-accent);
+	}
+
+	.week-day__indicator--mood-pos {
+		background: #4ade80;
+	}
+	.week-day__indicator--mood-neg {
+		background: #f87171;
+	}
+	.week-day__indicator--mood-neutral {
+		background: var(--color-text-muted);
+	}
+	.week-day__indicator--mood-empty {
+		background: color-mix(in srgb, var(--color-border) 60%, transparent);
+	}
+
+	.week-strip__back-today {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-accent);
+		white-space: nowrap;
 	}
 </style>

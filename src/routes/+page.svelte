@@ -71,18 +71,13 @@
 		dateInputEl?.showPicker?.();
 		dateInputEl?.click();
 	}
-
-	function goToToday() {
-		loggingContext.resetToToday();
-		goto('/', { replaceState: true });
-	}
 </script>
 
 <svelte:head>
 	<title>Today — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="home-page">
+<div class="page page--wide home-page">
 	<header class="home-page__header">
 		<div class="home-page__header-row">
 			<div>
@@ -104,9 +99,6 @@
 					aria-label="Logging date"
 				/>
 				<h1 class="home-page__title">{isToday ? 'Today' : 'Past Day'}</h1>
-				{#if !isToday}
-					<button class="home-page__back-today" onclick={goToToday}>Back to today</button>
-				{/if}
 			</div>
 			{#if programStore.weekStreak > 0}
 				<div class="home-page__streak" aria-label="{programStore.weekStreak} week streak">
@@ -261,6 +253,10 @@
 </div>
 
 <style>
+	.home-page {
+		inline-size: 100%;
+	}
+
 	.home-page__header {
 		margin-block-end: var(--space-4);
 	}
@@ -311,13 +307,6 @@
 		letter-spacing: -0.02em;
 	}
 
-	.home-page__back-today {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-accent);
-		margin-block-start: var(--space-1);
-	}
-
 	.home-page__streak {
 		display: flex;
 		align-items: center;
@@ -348,6 +337,17 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
+	}
+
+	@container page (inline-size >= 520px) {
+		.home-cards {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.home-card--journal {
+			grid-column: 1 / -1;
+		}
 	}
 
 	.home-card {
@@ -568,34 +568,5 @@
 	.home-card__activity-chip--more {
 		background: var(--color-surface-3);
 		border-color: var(--color-border);
-	}
-
-	/* Wide layout */
-	@container main (inline-size >= 900px) {
-		.home-page {
-			inline-size: min(100%, 860px);
-			display: grid;
-			grid-template-columns: 1fr 240px;
-			grid-template-rows: auto auto 1fr;
-			column-gap: var(--space-6);
-			align-items: start;
-		}
-
-		.home-page__header {
-			grid-column: 1 / -1;
-		}
-
-		.home-page :global(.week-strip) {
-			grid-column: 2;
-			grid-row: 2 / 4;
-			position: sticky;
-			top: var(--space-6);
-			margin-block-end: 0;
-		}
-
-		.home-cards {
-			grid-column: 1;
-			grid-row: 2 / 4;
-		}
 	}
 </style>

@@ -6,6 +6,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
@@ -36,6 +37,10 @@
 	});
 
 	let showDeleteConfirm = $state(false);
+
+	$effect(() => {
+		loggingContext.setDate(session.date);
+	});
 
 	let workoutName = $derived(
 		programStore.getWorkoutForSession(session)?.name ??

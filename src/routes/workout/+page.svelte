@@ -7,14 +7,21 @@
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
-	import { formatWeekdayShortDate } from '$lib/date';
+	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
+	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
+
+	const todayStr = todayIso();
 
 	let contextDate = $derived(loggingContext.date);
 
 	let displayDate = $derived(formatWeekdayShortDate(contextDate));
 
 	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
+	let activeSessions = $derived(
+		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
+	);
 	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
 	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
 
@@ -29,12 +36,21 @@
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
+	let showStartConfirm = $state(false);
 
-	async function startSession() {
+	async function doStartSession() {
 		const workout = selectedWorkout;
 		const program = programStore.activeProgram;
 		if (!workout || !program) return;
 		await sessionStore.start(workout, program, programStore.exerciseMap, { date: contextDate });
+	}
+
+	async function startSession() {
+		if (contextDate !== todayStr) {
+			showStartConfirm = true;
+			return;
+		}
+		await doStartSession();
 	}
 
 	async function editSession() {
@@ -70,6 +86,10 @@
 			<p class="workout-page__date">{displayDate}</p>
 		</div>
 	</header>
+
+	{#if programStore.loaded}
+		<WeekStrip sessions={activeSessions} stayOnPage />
+	{/if}
 
 	{#if !programStore.loaded}
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
@@ -147,6 +167,20 @@
 
 {#if showCreateProgram}
 	<CreateProgramSheet onClose={() => (showCreateProgram = false)} />
+{/if}
+
+{#if showStartConfirm}
+	<ConfirmDialog
+		title="Log workout for {formatWeekdayShortDate(contextDate)}?"
+		confirmLabel="Start session"
+		onconfirm={async () => {
+			showStartConfirm = false;
+			await doStartSession();
+		}}
+		oncancel={() => (showStartConfirm = false)}
+	>
+		This session will be saved for a past date, not today.
+	</ConfirmDialog>
 {/if}
 
 <style>

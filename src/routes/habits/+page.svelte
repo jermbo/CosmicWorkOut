@@ -3,53 +3,25 @@
 	import type { Habit } from '$lib/db/types';
 	import { MOOD_SCALE } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { programStore } from '$lib/stores/program.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { todayIso, toLocalIso, addDays, formatWeekdayShortDate, formatWeekdayAbbrev } from '$lib/date';
+	import { formatWeekdayShortDate } from '$lib/date';
 	import { formatMoodValue } from '$lib/habits';
 	import { minuteUnitLabel } from '$lib/format';
 	import Icon from '$lib/components/Icon.svelte';
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
+	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
 	const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
-
-	const todayStr = todayIso();
 
 	let contextDate = $derived(loggingContext.date);
 
 	let displayDate = $derived(formatWeekdayShortDate(contextDate));
 
-	let isReadOnly = $derived(contextDate < addDays(todayStr, -1));
-
-	let weekDays = $derived.by(() => {
-		const days = [];
-		for (let offset = -3; offset <= 3; offset++) {
-			const d = new Date();
-			d.setDate(d.getDate() + offset);
-			const str = toLocalIso(d);
-			days.push({
-				str,
-				dayLabel: formatWeekdayAbbrev(d),
-				dayNum: d.getDate(),
-				isFuture: str > todayStr,
-				isToday: str === todayStr,
-				isSelected: str === contextDate,
-			});
-		}
-		return days;
-	});
-
-	function selectDay(dateStr: string) {
-		if (dateStr > todayStr) return;
-		loggingContext.setDate(dateStr);
-	}
-
-	function moodForDay(dateStr: string): number | null {
-		const moodHabit = habitStore.habits.find((h) => h.type === 'mood' && h.active);
-		if (!moodHabit) return null;
-		const log = habitStore.getLog(moodHabit.id, dateStr);
-		return log !== undefined ? log.value : null;
-	}
+	let activeSessions = $derived(
+		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
+	);
 
 	// Smart step: minutes always 5; count uses goal/10 rounded to a nice number
 	function getStep(habit: Habit): number {
@@ -74,7 +46,7 @@
 	});
 
 	async function setMoodDirect(value: number) {
-		if (isReadOnly || !moodHabit) return;
+		if (!moodHabit) return;
 		if (currentMoodValue === value) {
 			await habitStore.correctValue(moodHabit.id, 0, contextDate);
 		} else {
@@ -85,19 +57,16 @@
 	let gridHabits = $derived(habitStore.activeHabits.filter((h) => h.type !== 'mood'));
 
 	async function handleAdd(habit: Habit) {
-		if (isReadOnly) return;
 		const current = habitStore.valueFor(habit, contextDate);
 		await habitStore.correctValue(habit.id, current + getStep(habit), contextDate);
 	}
 
 	async function handleSubtract(habit: Habit) {
-		if (isReadOnly) return;
 		const current = habitStore.valueFor(habit, contextDate);
 		await habitStore.correctValue(habit.id, Math.max(0, current - getStep(habit)), contextDate);
 	}
 
 	async function handleToggle(habit: Habit) {
-		if (isReadOnly) return;
 		await habitStore.toggle(habit.id, contextDate);
 	}
 
@@ -105,7 +74,6 @@
 	let exactTarget = $state<Habit | null>(null);
 
 	function openExact(habit: Habit) {
-		if (isReadOnly) return;
 		exactTarget = habit;
 	}
 
@@ -134,39 +102,8 @@
 		</div>
 	</header>
 
-	<fieldset class="week-strip">
-		<legend class="sr-only">Select date</legend>
-		{#each weekDays as day}
-			<label class="week-day" class:week-day--selected={day.isSelected} class:week-day--future={day.isFuture}>
-				<input
-					class="sr-only"
-					type="radio"
-					name="habits-date"
-					value={day.str}
-					checked={day.isSelected}
-					disabled={day.isFuture}
-					onchange={() => selectDay(day.str)}
-					aria-label="{day.dayLabel} {day.dayNum}{day.isToday ? ', today' : ''}"
-				/>
-				<span class="week-day__label" aria-hidden="true">{day.dayLabel}</span>
-				<span class="week-day__num" aria-hidden="true">{day.dayNum}</span>
-				<span class="week-day__mood" aria-hidden="true">
-					{#if moodForDay(day.str) !== null}
-						<span
-							class="week-day__mood-dot"
-							class:week-day__mood-dot--pos={(moodForDay(day.str) ?? 0) > 0}
-							class:week-day__mood-dot--neg={(moodForDay(day.str) ?? 0) < 0}
-						></span>
-					{:else}
-						<span class="week-day__mood-dot week-day__mood-dot--empty"></span>
-					{/if}
-				</span>
-			</label>
-		{/each}
-	</fieldset>
-
-	{#if isReadOnly}
-		<div class="readonly-banner" role="status">Past date — viewing only</div>
+	{#if programStore.loaded}
+		<WeekStrip sessions={activeSessions} stayOnPage showMoodDots />
 	{/if}
 
 	{#if moodHabit}
@@ -184,12 +121,11 @@
 						<span class="mood-section__score">{currentMoodValue > 0 ? '+' : ''}{currentMoodValue}</span>
 					</span>
 				{:else}
-					<span class="mood-section__empty" aria-live="polite">{isReadOnly ? 'Not recorded' : 'Select below'}</span>
+					<span class="mood-section__empty" aria-live="polite">Select below</span>
 				{/if}
 			</div>
 			<fieldset class="mood-scale" aria-labelledby="mood-label">
-				<legend class="sr-only">How are you feeling? ({isReadOnly ? 'read only' : 'use arrow keys to navigate'})</legend
-				>
+				<legend class="sr-only">How are you feeling? (use arrow keys to navigate)</legend>
 				{#each MOOD_SCALE_ASC as item}
 					<label
 						class="mood-scale__item"
@@ -204,7 +140,6 @@
 							name="mood"
 							value={item.value}
 							checked={currentMoodValue === item.value}
-							disabled={isReadOnly}
 							onchange={() => setMoodDirect(item.value)}
 							aria-label="{item.label} ({item.value > 0 ? '+' : ''}{item.value})"
 						/>
@@ -229,7 +164,6 @@
 					pct={habitStore.progressPct(habit, contextDate)}
 					done={habitStore.isComplete(habit, contextDate)}
 					step={getStep(habit)}
-					readOnly={isReadOnly}
 					onadd={() => handleAdd(habit)}
 					onsubtract={() => handleSubtract(habit)}
 					ontoggle={() => handleToggle(habit)}
@@ -286,108 +220,6 @@
 		color: var(--color-accent);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
-	}
-
-	/* ── Week strip ── */
-	.week-strip {
-		display: flex;
-		justify-content: space-between;
-		gap: var(--space-1);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-2);
-		margin-block-end: var(--space-5);
-		min-inline-size: 0;
-	}
-
-	.week-day {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 3px;
-		flex: 1;
-		padding-block: var(--space-2);
-		border-radius: var(--radius-lg);
-		cursor: pointer;
-		transition: background var(--duration-fast) var(--ease-out);
-	}
-
-	.week-day--selected {
-		background: var(--color-accent);
-	}
-	.week-day--future {
-		opacity: 0.3;
-		pointer-events: none;
-	}
-
-	.week-day:has(input:focus-visible) {
-		outline: 2px solid var(--color-accent);
-		outline-offset: 2px;
-	}
-
-	.week-day__label {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--color-text-muted);
-		user-select: none;
-
-		.week-day--selected & {
-			color: var(--color-accent-ink);
-		}
-	}
-
-	.week-day__num {
-		font-family: var(--font-display);
-		font-size: 1.0625rem;
-		font-weight: 700;
-		color: var(--color-text-secondary);
-		line-height: 1;
-		user-select: none;
-
-		.week-day--selected & {
-			color: var(--color-accent-ink);
-		}
-	}
-
-	.week-day__mood {
-		block-size: 6px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.week-day__mood-dot {
-		display: block;
-		inline-size: 5px;
-		block-size: 5px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-	}
-
-	.week-day__mood-dot--pos {
-		background: #4ade80;
-	}
-	.week-day__mood-dot--neg {
-		background: #f87171;
-	}
-	.week-day__mood-dot--empty {
-		background: color-mix(in srgb, var(--color-border) 60%, transparent);
-	}
-
-	/* ── Read-only banner ── */
-	.readonly-banner {
-		margin-block-end: var(--space-4);
-		padding: var(--space-3) var(--space-4);
-		background: color-mix(in srgb, var(--color-text-muted) 8%, transparent);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
-		text-align: center;
 	}
 
 	/* ── Empty state ── */
@@ -528,11 +360,7 @@
 			outline-offset: 2px;
 		}
 
-		&:has(input:disabled) {
-			opacity: 0.5;
-			cursor: default;
-		}
-		&:not(:has(input:disabled)):hover {
+		&:hover {
 			filter: brightness(1.2);
 		}
 	}

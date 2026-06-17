@@ -3,11 +3,11 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import {
 		formatMonthDayLong,
 		formatMonthYear,
 		todayIso,
-		formatLongDate,
 		toLocalIso,
 		weekdayHeadersMondayFirst,
 		monthCalendarCells,
@@ -15,18 +15,16 @@
 		daysInMonth,
 	} from '$lib/date';
 	import { formatVolume } from '$lib/format';
-	import { formatActivitySummary } from '$lib/activities';
-	import { formatHabitLogValue, formatMoodValue } from '$lib/habits';
+	import { formatMoodValue } from '$lib/habits';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
-	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
+	import DayActionsSheet from '$lib/components/DayActionsSheet.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
 	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
 
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
-	let selectedDayDate = $state<string | null>(null);
-	let logActivityDate = $state<string | null>(null);
+	let dayActionsDate = $state<string | null>(null);
 
 	const today = new Date();
 	const todayStr = todayIso();
@@ -80,35 +78,25 @@
 		viewDate = d;
 	}
 
-	// Habit logs for a selected day (for day detail overlay)
-	let selectedDayHabits = $derived.by(() => {
-		if (!selectedDayDate) return [];
-		const logs = habitStore.logsForDate(selectedDayDate);
-		return logs
-			.map((log) => {
-				const habit = habitStore.habits.find((h) => h.id === log.habitId);
-				if (!habit) return null;
-				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
-			})
-			.filter((e): e is { name: string; valueStr: string } => e !== null);
-	});
+	let dayActionsSession = $derived(dayActionsDate ? (sessionsByDate.get(dayActionsDate) ?? null) : null);
 
-	let selectedDayActivities = $derived(
-		selectedDayDate ? (activityStore.activitiesByDate.get(selectedDayDate) ?? []) : [],
+	let dayActionsHasHabits = $derived(
+		dayActionsDate ? habitStore.logsForDate(dayActionsDate).length > 0 : false,
+	);
+
+	let dayActionsHasActivities = $derived(
+		dayActionsDate ? (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0 : false,
 	);
 
 	function handleDayTap(dateStr: string) {
-		const session = sessionsByDate.get(dateStr);
-		const activities = activityStore.activitiesByDate.get(dateStr) ?? [];
-		const habitLogs = habitStore.logsForDate(dateStr);
+		loggingContext.setDate(dateStr);
+		dayActionsDate = dateStr;
+	}
 
-		if (session) {
-			selectedSession = session;
-		} else if (activities.length > 0 || habitLogs.length > 0) {
-			selectedDayDate = dateStr;
-		} else {
-			logActivityDate = dateStr;
-		}
+	function openSessionDetails() {
+		if (!dayActionsSession) return;
+		selectedSession = dayActionsSession;
+		dayActionsDate = null;
 	}
 
 	let monthKey = $derived(monthIsoKey(viewDate));
@@ -137,18 +125,9 @@
 
 	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
 		const base = formatMonthDayLong(viewDate, dayNum);
-		const hasSession = sessionsByDate.has(dateStr);
-		const hasActivity = (activityStore.activitiesByDate.get(dateStr)?.length ?? 0) > 0;
-		const hasHabits = habitStore.logsForDate(dateStr).length > 0;
-		if (status === 'today') return `${base}, today`;
-		if (hasSession || hasActivity || hasHabits) return `${base} — tap to view`;
-		if (status === 'past') return `${base} — tap to log activity`;
+		if (status === 'today') return `${base}, today — tap to edit`;
+		if (status === 'past') return `${base} — tap to edit`;
 		return base;
-	}
-
-	// Format a date string for display in the day detail
-	function formatDayTitle(dateStr: string): string {
-		return formatLongDate(dateStr);
 	}
 </script>
 
@@ -266,52 +245,14 @@
 	/>
 {/if}
 
-<!-- Day detail: habits + activities (no session) -->
-{#if selectedDayDate}
-	<div class="overlay-backdrop" role="presentation" onclick={() => (selectedDayDate = null)}></div>
-	<div
-		class="day-detail"
-		role="dialog"
-		aria-label="Day summary for {formatDayTitle(selectedDayDate)}"
-		aria-modal="true"
-	>
-		<div class="day-detail__header">
-			<p class="day-detail__title">{formatDayTitle(selectedDayDate)}</p>
-			<button onclick={() => (selectedDayDate = null)} aria-label="Close" class="day-detail__close">
-				<Icon name="close" size={14} />
-			</button>
-		</div>
-
-		{#if selectedDayHabits.length > 0}
-			<p class="day-detail__section-label">Habits</p>
-			{#each selectedDayHabits as entry}
-				<div class="day-detail__row">
-					<span class="day-detail__row-name">{entry.name}</span>
-					<span class="day-detail__row-value">{entry.valueStr}</span>
-				</div>
-			{/each}
-		{/if}
-
-		{#if selectedDayActivities.length > 0}
-			<p class="day-detail__section-label" style="margin-block-start: var(--space-4);">Activities</p>
-			{#each selectedDayActivities as act (act.id)}
-				<div class="day-detail__row">
-					<div class="day-detail__row-info">
-						<span class="day-detail__row-name">{act.type === 'Other' ? act.customType || 'Other' : act.type}</span>
-						<span class="day-detail__row-meta">{formatActivitySummary(act)}</span>
-					</div>
-				</div>
-			{/each}
-		{/if}
-	</div>
-{/if}
-
-{#if logActivityDate}
-	<ActivityLogSheet
-		editing={null}
-		initialDate={logActivityDate}
-		onClose={() => (logActivityDate = null)}
-		onSave={() => (logActivityDate = null)}
+{#if dayActionsDate}
+	<DayActionsSheet
+		date={dayActionsDate}
+		session={dayActionsSession}
+		hasHabits={dayActionsHasHabits}
+		hasActivities={dayActionsHasActivities}
+		onClose={() => (dayActionsDate = null)}
+		onViewSession={dayActionsSession ? openSessionDetails : undefined}
 	/>
 {/if}
 
@@ -572,96 +513,6 @@
 	}
 	.calendar-day__dot--mood-neg {
 		background: #f87171;
-	}
-
-	/* Overlays */
-	.overlay-backdrop {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
-		z-index: 80;
-	}
-
-	.day-detail {
-		position: fixed;
-		inset-inline: var(--space-4);
-		inset-block-start: 50%;
-		transform: translateY(-50%);
-		max-inline-size: 400px;
-		max-block-size: 75dvh;
-		overflow-y: auto;
-		margin-inline: auto;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-xl);
-		padding: var(--space-5);
-		z-index: 81;
-		box-shadow: var(--shadow-lg);
-	}
-
-	.day-detail__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-block-end: var(--space-4);
-	}
-
-	.day-detail__title {
-		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 700;
-	}
-
-	.day-detail__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 32px;
-		block-size: 32px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-	}
-
-	.day-detail__section-label {
-		font-size: 0.6875rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-muted);
-		margin-block-end: var(--space-2);
-	}
-
-	.day-detail__row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-block: var(--space-2);
-		border-block-end: 1px dashed var(--color-border);
-
-		&:last-of-type {
-			border-block-end: none;
-		}
-	}
-
-	.day-detail__row-info {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.day-detail__row-name {
-		font-size: 0.9375rem;
-		font-weight: 600;
-	}
-
-	.day-detail__row-meta {
-		font-size: 0.75rem;
-		color: var(--color-text-secondary);
-	}
-
-	.day-detail__row-value {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
 	}
 
 	/* Legend */
