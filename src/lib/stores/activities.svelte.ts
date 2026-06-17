@@ -1,0 +1,68 @@
+import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
+import { db } from '$lib/db/database';
+import { generateId } from '$lib/utils';
+
+const LAST_TYPE_KEY = 'cwout:lastActivityType';
+
+class ActivityStore {
+	activities = $state<ActivityLog[]>([]);
+	loaded = $state(false);
+	lastUsedType = $state<ActivityType>(
+		(localStorage.getItem(LAST_TYPE_KEY) as ActivityType | null) ?? 'Run'
+	);
+
+	todayStr(): string {
+		return new Date().toISOString().split('T')[0];
+	}
+
+	todayActivities = $derived.by(() => {
+		const today = new Date().toISOString().split('T')[0];
+		return this.activities.filter((a) => a.date === today);
+	});
+
+	activitiesByDate = $derived.by(() => {
+		const map = new Map<string, ActivityLog[]>();
+		for (const a of this.activities) {
+			const list = map.get(a.date) ?? [];
+			list.push(a);
+			map.set(a.date, list);
+		}
+		return map;
+	});
+
+	async load(): Promise<void> {
+		this.activities = await db.activities.getAll();
+		this.loaded = true;
+	}
+
+	async add(data: {
+		date: string;
+		type: ActivityType;
+		customType?: string;
+		durationMinutes: number;
+		intensity: ActivityIntensity;
+	}): Promise<ActivityLog> {
+		const entry: ActivityLog = {
+			id: generateId(),
+			...data,
+			createdAt: new Date().toISOString()
+		};
+		await db.activities.put(entry);
+		this.activities = [...this.activities, entry];
+		this.lastUsedType = data.type;
+		localStorage.setItem(LAST_TYPE_KEY, data.type);
+		return entry;
+	}
+
+	async update(activity: ActivityLog): Promise<void> {
+		await db.activities.put(activity);
+		this.activities = this.activities.map((a) => (a.id === activity.id ? activity : a));
+	}
+
+	async remove(id: string): Promise<void> {
+		await db.activities.remove(id);
+		this.activities = this.activities.filter((a) => a.id !== id);
+	}
+}
+
+export const activityStore = new ActivityStore();

@@ -33,6 +33,7 @@
 	let formExercise = $state<Exercise | null | undefined>(undefined);
 	// undefined = closed, null = new, Exercise = editing
 	let confirmDeleteId = $state<string | null>(null);
+	let deleteError = $state<string | null>(null);
 
 	let filtered = $derived(
 		exercises.filter((ex) => {
@@ -54,12 +55,17 @@
 
 	async function deleteExercise(ex: Exercise) {
 		if (confirmDeleteId !== ex.id) {
+			deleteError = null;
 			confirmDeleteId = ex.id;
 			return;
 		}
 		confirmDeleteId = null;
-		await programStore.deleteExercise(ex.id);
-		if (expandedId === ex.id) expandedId = null;
+		try {
+			await programStore.deleteExercise(ex.id);
+			if (expandedId === ex.id) expandedId = null;
+		} catch (e) {
+			deleteError = e instanceof Error ? e.message : 'Could not delete exercise.';
+		}
 	}
 </script>
 
@@ -135,7 +141,12 @@
 					>
 						<span class="lib-row__dot" style:background={dot} aria-hidden="true"></span>
 						<div class="lib-row__info">
-							<span class="lib-row__name">{ex.name}</span>
+							<span class="lib-row__name">
+								{ex.name}
+								{#if !ex.isBuiltIn}
+									<span class="lib-row__custom-badge">Custom</span>
+								{/if}
+							</span>
 							<span class="lib-row__muscles">{ex.muscles}</span>
 						</div>
 						<span class="lib-row__cat" style:--dot-color={dot}>{ex.cat}</span>
@@ -158,6 +169,9 @@
 						<div class="lib-row__detail">
 							{#if ex.cue}
 								<p class="lib-row__cue">"{ex.cue}"</p>
+							{/if}
+							{#if deleteError && expandedId === ex.id}
+								<p class="lib-row__error">{deleteError}</p>
 							{/if}
 							<div class="lib-row__actions">
 								<button
@@ -408,13 +422,37 @@
 	}
 
 	.lib-row__name {
-		display: block;
+		display: flex;
+		align-items: center;
+		gap: 5px;
 		font-size: 0.875rem;
 		font-weight: 600;
 		letter-spacing: -0.01em;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.lib-row__custom-badge {
+		flex-shrink: 0;
+		font-size: 0.5625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		padding-inline: 5px;
+		block-size: 16px;
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+		color: var(--color-accent);
+		display: inline-flex;
+		align-items: center;
+	}
+
+	.lib-row__error {
+		font-size: 0.75rem;
+		color: var(--color-red);
+		padding-block-end: var(--space-2);
+		line-height: 1.4;
 	}
 
 	.lib-row__muscles {

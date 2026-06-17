@@ -1,8 +1,9 @@
 <script lang="ts">
-	import type { CompletionFeel, Density, Roundness } from '$lib/db/types';
+	import type { CompletionFeel, Density, Roundness, HabitType } from '$lib/db/types';
 	import { resetWorkoutData } from '$lib/db/database';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
+	import { habitStore } from '$lib/stores/habits.svelte';
 
 	const ACCENT_PRESETS = [
 		{ label: 'Lime', value: '#b2f042' },
@@ -31,6 +32,75 @@
 	let showResetPrefsConfirm = $state(false);
 	let clearDataError = $state<string | null>(null);
 	let clearingData = $state(false);
+
+	// Habit management
+	let showHabitForm = $state(false);
+	let editingHabit = $state<typeof habitStore.habits[0] | null>(null);
+	let habitName = $state('');
+	let habitUnit = $state('');
+	let habitType = $state<HabitType>('count');
+	let habitGoal = $state<number | undefined>(undefined);
+	let habitSaving = $state(false);
+	let confirmDeleteHabitId = $state<string | null>(null);
+
+	const HABIT_TYPES: { value: HabitType; label: string; desc: string }[] = [
+		{ value: 'count', label: 'Count', desc: 'Tap to increment (e.g. glasses of water)' },
+		{ value: 'duration', label: 'Duration', desc: 'Minutes per day (e.g. meditation)' },
+		{ value: 'boolean', label: 'Toggle', desc: 'Yes / No (e.g. took vitamins)' }
+	];
+
+	function openNewHabit() {
+		editingHabit = null;
+		habitName = '';
+		habitUnit = '';
+		habitType = 'count';
+		habitGoal = undefined;
+		showHabitForm = true;
+	}
+
+	function openEditHabit(habit: typeof habitStore.habits[0]) {
+		editingHabit = habit;
+		habitName = habit.name;
+		habitUnit = habit.unit;
+		habitType = habit.type;
+		habitGoal = habit.dailyGoal;
+		showHabitForm = true;
+	}
+
+	async function saveHabit() {
+		if (!habitName.trim() || habitSaving) return;
+		habitSaving = true;
+		try {
+			if (editingHabit) {
+				await habitStore.updateHabit({
+					...editingHabit,
+					name: habitName.trim(),
+					unit: habitUnit.trim(),
+					type: habitType,
+					dailyGoal: habitGoal && habitGoal > 0 ? habitGoal : undefined
+				});
+			} else {
+				await habitStore.addHabit({
+					name: habitName.trim(),
+					unit: habitUnit.trim(),
+					type: habitType,
+					dailyGoal: habitGoal && habitGoal > 0 ? habitGoal : undefined
+				});
+			}
+			showHabitForm = false;
+		} finally {
+			habitSaving = false;
+		}
+	}
+
+	async function deleteHabit(id: string) {
+		if (confirmDeleteHabitId !== id) {
+			confirmDeleteHabitId = id;
+			return;
+		}
+		confirmDeleteHabitId = null;
+		await habitStore.deleteHabit(id);
+	}
 
 	function applyCustomHex() {
 		const val = customHex.trim();
@@ -194,6 +264,77 @@
 			</div>
 		</section>
 
+		<!-- Habits -->
+		<section class="settings-section settings-section--habits" aria-labelledby="section-habits">
+			<div class="settings-section__title-row">
+				<h2 class="settings-section__title" id="section-habits">Habits</h2>
+				<button class="habits-add-btn" onclick={openNewHabit} aria-label="Add habit">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+						<line x1="12" y1="5" x2="12" y2="19" />
+						<line x1="5" y1="12" x2="19" y2="12" />
+					</svg>
+					Add
+				</button>
+			</div>
+
+			{#if habitStore.habits.length === 0}
+				<p class="habits-empty">No habits yet. Tap Add to create your first.</p>
+			{:else}
+				<div class="habits-list">
+					{#each habitStore.habits as habit (habit.id)}
+						<div class="habit-row">
+							<div class="habit-row__info">
+								<span class="habit-row__name">{habit.name}</span>
+								<span class="habit-row__meta">
+									{habit.type}{habit.dailyGoal ? ` · goal ${habit.dailyGoal}${habit.unit ? ' ' + habit.unit : ''}` : ''}
+								</span>
+							</div>
+							<div class="habit-row__actions">
+								<button
+									class="habit-row__toggle"
+									class:habit-row__toggle--active={habit.active}
+									onclick={() => habitStore.toggleActive(habit.id)}
+									aria-label="{habit.active ? 'Deactivate' : 'Activate'} {habit.name}"
+									role="switch"
+									aria-checked={habit.active}
+								>
+									<span class="habit-row__toggle-thumb"></span>
+								</button>
+								<button
+									class="habit-row__edit"
+									onclick={() => openEditHabit(habit)}
+									aria-label="Edit {habit.name}"
+								>
+									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+										<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+										<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+									</svg>
+								</button>
+								{#if confirmDeleteHabitId === habit.id}
+									<button class="habit-row__delete habit-row__delete--confirm" onclick={() => deleteHabit(habit.id)}>Sure?</button>
+									<button class="habit-row__delete" onclick={() => (confirmDeleteHabitId = null)} aria-label="Cancel">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+											<line x1="18" y1="6" x2="6" y2="18" />
+											<line x1="6" y1="6" x2="18" y2="18" />
+										</svg>
+									</button>
+								{:else}
+									<button class="habit-row__delete" onclick={() => deleteHabit(habit.id)} aria-label="Delete {habit.name}">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+											<polyline points="3 6 5 6 21 6" />
+											<path d="M19 6l-1 14H6L5 6" />
+											<path d="M10 11v6M14 11v6" />
+											<path d="M9 6V4h6v2" />
+										</svg>
+									</button>
+								{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		</section>
+
 		<section class="settings-section settings-section--data" aria-labelledby="section-data">
 			<h2 class="settings-section__title" id="section-data">Data</h2>
 
@@ -228,6 +369,54 @@
 		</section>
 	</div>
 </div>
+
+{#if showHabitForm}
+	<div class="settings-confirm-backdrop" role="presentation" onclick={() => !habitSaving && (showHabitForm = false)}></div>
+	<div class="settings-confirm habit-form" role="dialog" aria-labelledby="habit-form-title" aria-modal="true">
+		<p class="settings-confirm__title" id="habit-form-title">{editingHabit ? 'Edit Habit' : 'New Habit'}</p>
+
+		<div class="hf-field">
+			<label class="hf-label" for="habit-name">Name</label>
+			<input id="habit-name" class="hf-input" type="text" bind:value={habitName} placeholder="e.g. Water" maxlength={40} />
+		</div>
+
+		<div class="hf-field">
+			<label class="hf-label" for="habit-unit">Unit <span class="hf-optional">optional</span></label>
+			<input id="habit-unit" class="hf-input" type="text" bind:value={habitUnit} placeholder="e.g. glasses, min" maxlength={20} />
+		</div>
+
+		<div class="hf-field">
+			<span class="hf-label">Type</span>
+			<div class="hf-types">
+				{#each HABIT_TYPES as ht}
+					<button
+						class="hf-type-btn"
+						class:hf-type-btn--active={habitType === ht.value}
+						onclick={() => (habitType = ht.value)}
+						aria-pressed={habitType === ht.value}
+					>
+						<span class="hf-type-btn__label">{ht.label}</span>
+						<span class="hf-type-btn__desc">{ht.desc}</span>
+					</button>
+				{/each}
+			</div>
+		</div>
+
+		{#if habitType !== 'boolean'}
+			<div class="hf-field">
+				<label class="hf-label" for="habit-goal">Daily goal <span class="hf-optional">optional</span></label>
+				<input id="habit-goal" class="hf-input" type="number" bind:value={habitGoal} placeholder="e.g. 8" min="1" />
+			</div>
+		{/if}
+
+		<div class="settings-confirm__actions" style="margin-block-start: var(--space-4);">
+			<button class="settings-confirm__btn settings-confirm__btn--cancel" onclick={() => (showHabitForm = false)} disabled={habitSaving}>Cancel</button>
+			<button class="settings-confirm__btn settings-confirm__btn--danger" style="background: var(--color-accent); color: var(--color-accent-ink);" onclick={saveHabit} disabled={!habitName.trim() || habitSaving}>
+				{habitSaving ? 'Saving…' : 'Save'}
+			</button>
+		</div>
+	</div>
+{/if}
 
 {#if showClearDataConfirm}
 	<div
@@ -322,6 +511,10 @@
 		}
 
 		.settings-section--accent {
+			grid-column: 1 / -1;
+		}
+
+		.settings-section--habits {
 			grid-column: 1 / -1;
 		}
 
@@ -535,6 +728,214 @@
 	.seg-control__btn--active {
 		background: var(--color-surface-3);
 		color: var(--color-text-primary);
+	}
+
+	/* Habits section */
+	.settings-section__title-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-block-end: var(--space-3);
+
+		.settings-section__title { margin-block-end: 0; }
+	}
+
+	.habits-add-btn {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding-inline: var(--space-3);
+		block-size: 32px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-accent);
+
+		svg { inline-size: 13px; block-size: 13px; }
+	}
+
+	.habits-empty {
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
+	}
+
+	.habits-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.habit-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+	}
+
+	.habit-row__info {
+		flex: 1;
+		min-inline-size: 0;
+	}
+
+	.habit-row__name {
+		display: block;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.habit-row__meta {
+		display: block;
+		font-size: 0.75rem;
+		color: var(--color-text-secondary);
+		margin-block-start: 2px;
+		text-transform: capitalize;
+	}
+
+	.habit-row__actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+		flex-shrink: 0;
+	}
+
+	.habit-row__toggle {
+		position: relative;
+		inline-size: 40px;
+		block-size: 24px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		transition: background-color var(--duration-fast) var(--ease-out);
+	}
+
+	.habit-row__toggle--active {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+	}
+
+	.habit-row__toggle-thumb {
+		position: absolute;
+		inset-block: 2px;
+		inset-inline-start: 2px;
+		inline-size: 18px;
+		block-size: 18px;
+		border-radius: var(--radius-full);
+		background: white;
+		transition: transform var(--duration-fast) var(--ease-out);
+
+		.habit-row__toggle--active & {
+			transform: translateX(16px);
+		}
+	}
+
+	.habit-row__edit,
+	.habit-row__delete {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--radius-md);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		color: var(--color-text-muted);
+		transition: color var(--duration-fast) var(--ease-out);
+
+		svg { inline-size: 14px; block-size: 14px; }
+		&:hover { color: var(--color-text-secondary); }
+	}
+
+	.habit-row__delete:hover { color: var(--color-red); }
+
+	.habit-row__delete--confirm {
+		inline-size: auto;
+		padding-inline: var(--space-2);
+		background: var(--color-red);
+		color: #ffffff;
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
+
+	/* Habit form */
+	.habit-form {
+		max-block-size: 80dvh;
+		overflow-y: auto;
+	}
+
+	.hf-field {
+		margin-block-end: var(--space-4);
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.hf-label {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-text-secondary);
+	}
+
+	.hf-optional {
+		font-weight: 400;
+		text-transform: none;
+		letter-spacing: 0;
+		color: var(--color-text-muted);
+	}
+
+	.hf-input {
+		block-size: 44px;
+		padding-inline: var(--space-3);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		font: inherit;
+		font-size: 0.9375rem;
+		color: var(--color-text-primary);
+		outline: none;
+		transition: border-color var(--duration-fast) var(--ease-out);
+
+		&:focus { border-color: var(--color-accent); }
+		&::placeholder { color: var(--color-text-muted); }
+	}
+
+	.hf-types {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.hf-type-btn {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		text-align: start;
+		transition: border-color var(--duration-fast) var(--ease-out);
+	}
+
+	.hf-type-btn--active { border-color: var(--color-accent); }
+
+	.hf-type-btn__label {
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--color-text-primary);
+	}
+
+	.hf-type-btn__desc {
+		font-size: 0.75rem;
+		color: var(--color-text-secondary);
+		margin-block-start: 2px;
 	}
 
 	/* Data actions */

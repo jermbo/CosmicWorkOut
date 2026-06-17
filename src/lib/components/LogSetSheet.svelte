@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import type { Exercise, ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
@@ -62,6 +62,14 @@
 	let stepBand = $state(isBand ? (typeof snap.weight === 'string' ? snap.weight : 'Med') : 'Med');
 	let stepReps = $state(snap.reps > 0 ? snap.reps : defReps);
 	let manualWeightStr = $state('');
+	let manualWeightInput = $state<HTMLInputElement | null>(null);
+
+	onMount(async () => {
+		if (isFirstTime) {
+			await tick();
+			manualWeightInput?.focus();
+		}
+	});
 
 	const repStep = suffix === 's' ? 5 : 1;
 
@@ -124,12 +132,12 @@
 					{#if isFirstTime}
 						<div class="stepper__first-time">
 							<input
+								bind:this={manualWeightInput}
 								class="stepper__manual-input"
 								type="number"
 								inputmode="decimal"
 								placeholder="0"
 								bind:value={manualWeightStr}
-								autofocus
 								aria-label="Enter weight in {prefsStore.weightUnit}"
 							/>
 							<span class="stepper__u">{prefsStore.weightUnit}</span>
