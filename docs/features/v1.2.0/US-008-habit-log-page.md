@@ -86,6 +86,6 @@ Each option shall be large enough to tap comfortably with a finger. The currentl
 ## Related Docs
 
 - [US-007 — Home Screen Redesign](./US-007-home-screen-redesign.md)
-- [US-009 — Habit Creation & Management](./US-009-habit-creation.md)
+- [US-009 — Habit Creation & Management](../v1.3.0/US-009-habit-creation.md)
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
 - [Data Model](../../architecture/data-model.md)

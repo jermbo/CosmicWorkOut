@@ -35,31 +35,37 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## v1.2.0 — Daily Dashboard & Habits
 
-| Feature                             | Status       | Notes                                                                                                                  |
-| ----------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Home screen as overview dashboard   | ✅ Built     | 4 summary cards: Habits, Workout, Activity, Journal (placeholder)                                                      |
-| Global date context                 | ✅ Built     | `loggingContext` store; date picker on home taps to any past day                                                       |
-| Activity log page (`/log`)          | ✅ Built     | List, add, edit, delete activities; date-filtered                                                                      |
-| Dedicated workout page (`/workout`) | ✅ Built     | Full session UI moved from home; back button to home                                                                   |
-| Habit log page (`/habits`)          | ✅ Built     | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal                                                 |
-| Mood tracking                       | ✅ Built     | Inline always-visible mood strip on `/habits`; separate from habit grid                                                |
-| Habit progress rings                | ✅ Built     | SVG rings fill based on logged / goal; smart step increments                                                           |
-| Pre-seeded habits                   | ✅ Built     | Meditation (20 min), Writing (500 words), Reading (20 pages), Water (8 cups), Coffee (3 cups), Alcohol (boolean), Mood |
-| DB migration for existing habits    | ✅ Built     | `initDB()` patches `dailyGoal` onto pre-existing records missing it                                                    |
-| Program complete state              | ✅ Built     | Shown on `/workout` page with CTA to choose new program                                                                |
-| Habit creation / management         | 🚧 Partial   | Built-in habits work; no Settings UI to add/edit/delete/reorder custom habits                                          |
-| Habit history in calendar           | ❌ Not built | Heatmap integration not started                                                                                        |
+| Feature                             | Status   | Notes                                                                               |
+| ----------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| Home screen as overview dashboard   | ✅ Built | 4 summary cards: Habits, Workout, Activity, Journal (placeholder)                   |
+| Global date context                 | ✅ Built | `loggingContext` store; date picker on home taps to any past day                      |
+| Activity log page (`/log`)          | ✅ Built | List, add, edit, delete activities; date-filtered                                   |
+| Dedicated workout page (`/workout`) | ✅ Built | Full session UI moved from home; back button to home                                |
+| Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal              |
+| Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid             |
+| Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal; smart step increments                        |
+| Pre-seeded habits                   | ✅ Built | Meditation (20 min), Writing (500 words), Reading (20 pages), Water (8 cups), Coffee (3 cups), Alcohol (boolean), Mood |
+| DB migration for existing habits    | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing records missing it                 |
+| Program complete state              | ✅ Built | Shown on `/workout` page with CTA to choose new program                              |
 
 ---
 
-## Not Built Yet
+## v1.3.0 — Habit Management, Calendar History & Journal
 
-| Feature                           | Status       | Doc reference                                           |
-| --------------------------------- | ------------ | ------------------------------------------------------- |
-| Service worker / PWA              | ❌ Not built | [Offline Strategy](../architecture/offline-strategy.md) |
-| Custom habit CRUD in Settings     | ❌ Not built | US-009                                                  |
-| Habit history heatmap on Calendar | ❌ Not built | US-010                                                  |
-| Journal page                      | ❌ Not built | Home card shows "Coming soon"                           |
+| Feature                           | Status     | Doc reference |
+| --------------------------------- | ---------- | ------------- |
+| Custom habit CRUD in Settings     | 🚧 Partial | US-009        |
+| Habit history heatmap on Calendar | ❌ Planned | US-010        |
+| Journal page                      | ❌ Planned | US-012        |
+| Activity edit from calendar       | ❌ Planned | US-013        |
+
+---
+
+## Not Built Yet (infrastructure)
+
+| Feature              | Status     | Doc reference                                           |
+| -------------------- | ---------- | ------------------------------------------------------- |
+| Service worker / PWA | ❌ Planned | [Offline Strategy](../architecture/offline-strategy.md) |
 
 ---
 
@@ -77,4 +83,5 @@ What's built today vs. what's still requirements-only. Updated to match the code
 - [How It Works](behavior.md) — Full behavioral mental model
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.2.0 Features](../features/v1.2.0/README.md) — Current sprint stories
+- [v1.3.0 Features](../features/v1.3.0/README.md) — Current sprint stories
+- [v1.2.0 Features](../features/v1.2.0/README.md) — Previous sprint (shipped)
