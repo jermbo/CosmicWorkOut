@@ -16,7 +16,8 @@ const DB_NAME = 'cosmic-workout';
 // recreates a clean set; initDB() then re-seeds both Disciplines.
 // v5 (v1.4.0): belly dance content lands — Belly Dance items + program seed
 // (US-016/US-017). Same wipe-and-reseed policy; bump forces the new seed in.
-const DB_VERSION = 5;
+// v6: full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).
+const DB_VERSION = 6;
 
 let dbInstance: IDBDatabase | null = null;
 

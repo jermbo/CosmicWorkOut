@@ -1,5 +1,7 @@
-import type { Item, Program, Week, Routine, RoutineSection, Habit } from './types';
-import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID, singleSection } from '$lib/discipline';
+import type { Item, Program, Week, Routine, Habit } from './types';
+import { STRENGTH_DISCIPLINE_ID, singleSection } from '$lib/discipline';
+import { bellyDanceItems } from './seeds/bellydance-items';
+import { bellyDancePrograms } from './seeds/bellydance-programs';
 
 export const builtInHabits: Habit[] = [
 	{
@@ -457,47 +459,6 @@ const strengthItems: Item[] = strengthExercises.map((e) => ({
 	metric: 'setsReps',
 }));
 
-// ── Belly Dance starter catalog (US-016) ─────────────────────────
-// Minimal seed (~12) covering all four sections. Metric follows the section:
-// warm-up / cool-down → check (done/not-done); conditioning / moves → measure
-// (duration or reps, entered at session time). Built from the section/focus tags.
-const bellyDanceSeed: Array<{
-	id: string;
-	name: string;
-	cue: string;
-	section: string;
-	focus: string[];
-}> = [
-	// ── WARM-UP (check) ──────────────────────────────────────────────
-	{ id: 'bd-neck-rolls', name: 'Neck & Shoulder Rolls', cue: 'Slow, loosen the upper body', section: 'warm-up', focus: ['shoulders', 'posture'] },
-	{ id: 'bd-hip-circles', name: 'Hip Circles', cue: 'Big, smooth circles from the hips', section: 'warm-up', focus: ['hips'] },
-	{ id: 'bd-rib-slides', name: 'Rib Cage Slides', cue: 'Isolate the ribs side to side', section: 'warm-up', focus: ['core', 'posture'] },
-	// ── CONDITIONING (measure) ───────────────────────────────────────
-	{ id: 'bd-hip-drops', name: 'Hip Drops', cue: 'Sharp drop, controlled lift', section: 'conditioning', focus: ['hips'] },
-	{ id: 'bd-core-hold', name: 'Dancer Core Hold', cue: 'Long spine, engaged center', section: 'conditioning', focus: ['core'] },
-	{ id: 'bd-releve', name: 'Relevé Holds', cue: 'Rise tall, steady balance', section: 'conditioning', focus: ['legs', 'posture'] },
-	// ── MOVES (measure) ──────────────────────────────────────────────
-	{ id: 'bd-hip-shimmy', name: 'Hip Shimmy', cue: 'Relax the knees, let it travel', section: 'moves', focus: ['hips'] },
-	{ id: 'bd-shoulder-shimmy', name: 'Shoulder Shimmy', cue: 'Loose shoulders, quiet head', section: 'moves', focus: ['shoulders'] },
-	{ id: 'bd-figure-eight', name: 'Hip Figure Eight', cue: 'Trace a smooth horizontal 8', section: 'moves', focus: ['hips'] },
-	{ id: 'bd-snake-arms', name: 'Snake Arms', cue: 'Lead with the elbow, then wrist', section: 'moves', focus: ['arms'] },
-	{ id: 'bd-undulation', name: 'Body Undulation', cue: 'Roll through chest, ribs, hips', section: 'moves', focus: ['core', 'full-body'] },
-	// ── COOL-DOWN (check) ────────────────────────────────────────────
-	{ id: 'bd-side-stretch', name: 'Side Body Stretch', cue: 'Lengthen one side, then the other', section: 'cool-down', focus: ['full-body'] },
-	{ id: 'bd-breath', name: 'Deep Breathing', cue: 'Slow breaths, soften the shoulders', section: 'cool-down', focus: ['posture'] },
-];
-
-const bellyDanceItems: Item[] = bellyDanceSeed.map((b) => ({
-	id: b.id,
-	disciplineId: BELLYDANCE_DISCIPLINE_ID,
-	name: b.name,
-	cue: b.cue,
-	section: b.section,
-	metric: b.section === 'warm-up' || b.section === 'cool-down' ? 'check' : 'measure',
-	focus: b.focus,
-	isBuiltIn: true,
-}));
-
 export const builtInItems: Item[] = [...strengthItems, ...bellyDanceItems];
 
 function makeRoutineA(weekNum: number): Routine {
@@ -566,78 +527,6 @@ function makeWeek(weekNum: number): Week {
 	};
 }
 
-// ── Belly Dance Foundations program (US-017) ─────────────────────
-// 3 rotating routines, each with four sections. Routine A defines the canonical
-// warm-up + cool-down; B and C leave their bookend sections empty and inherit A
-// (no `overridesBookends` flag). Routine items carry no upfront targets.
-function refs(itemIds: string[]): { itemId: string }[] {
-	return itemIds.map((itemId) => ({ itemId }));
-}
-
-function makeDanceRoutineA(weekNum: number): Routine {
-	const sections: RoutineSection[] = [
-		{ key: 'warm-up', items: refs(['bd-neck-rolls', 'bd-hip-circles', 'bd-rib-slides']) },
-		{ key: 'conditioning', items: refs(['bd-hip-drops', 'bd-core-hold']) },
-		{ key: 'moves', items: refs(['bd-hip-shimmy', 'bd-figure-eight', 'bd-snake-arms']) },
-		{ key: 'cool-down', items: refs(['bd-side-stretch', 'bd-breath']) },
-	];
-	return {
-		id: `bd-w${weekNum}-a`,
-		disciplineId: BELLYDANCE_DISCIPLINE_ID,
-		name: 'Hips & Isolations',
-		letter: 'A',
-		focus: 'Hip isolations & shimmies',
-		color: 'lavender',
-		estMin: 30,
-		sections,
-	};
-}
-
-function makeDanceRoutineB(weekNum: number): Routine {
-	const sections: RoutineSection[] = [
-		{ key: 'warm-up', items: [] }, // inherits Routine A
-		{ key: 'conditioning', items: refs(['bd-releve', 'bd-core-hold']) },
-		{ key: 'moves', items: refs(['bd-shoulder-shimmy', 'bd-undulation', 'bd-snake-arms']) },
-		{ key: 'cool-down', items: [] }, // inherits Routine A
-	];
-	return {
-		id: `bd-w${weekNum}-b`,
-		disciplineId: BELLYDANCE_DISCIPLINE_ID,
-		name: 'Arms & Upper Body',
-		letter: 'B',
-		focus: 'Shoulders, arms & undulations',
-		color: 'lime',
-		estMin: 30,
-		sections,
-	};
-}
-
-function makeDanceRoutineC(weekNum: number): Routine {
-	const sections: RoutineSection[] = [
-		{ key: 'warm-up', items: [] }, // inherits Routine A
-		{ key: 'conditioning', items: refs(['bd-hip-drops', 'bd-releve']) },
-		{ key: 'moves', items: refs(['bd-hip-shimmy', 'bd-figure-eight', 'bd-undulation']) },
-		{ key: 'cool-down', items: [] }, // inherits Routine A
-	];
-	return {
-		id: `bd-w${weekNum}-c`,
-		disciplineId: BELLYDANCE_DISCIPLINE_ID,
-		name: 'Flow & Combinations',
-		letter: 'C',
-		focus: 'Travelling steps & combinations',
-		color: 'red',
-		estMin: 35,
-		sections,
-	};
-}
-
-function makeDanceWeek(weekNum: number): Week {
-	return {
-		weekNumber: weekNum,
-		routines: [makeDanceRoutineA(weekNum), makeDanceRoutineB(weekNum), makeDanceRoutineC(weekNum)],
-	};
-}
-
 export const builtInPrograms: Program[] = [
 	{
 		id: 'strength-foundation',
@@ -651,16 +540,5 @@ export const builtInPrograms: Program[] = [
 		createdAt: new Date().toISOString(),
 		isBuiltIn: true,
 	},
-	{
-		id: 'bellydance-foundations',
-		disciplineId: BELLYDANCE_DISCIPLINE_ID,
-		name: 'Belly Dance Foundations',
-		description:
-			'A 12-week introduction to belly dance. Three rotating practices share a warm-up and cool-down while building hip, arm, and flow vocabulary across 3 days per week.',
-		durationWeeks: 12,
-		daysPerWeek: 3,
-		weeks: Array.from({ length: 12 }, (_, i) => makeDanceWeek(i + 1)),
-		createdAt: new Date().toISOString(),
-		isBuiltIn: true,
-	},
+	...bellyDancePrograms,
 ];
