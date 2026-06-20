@@ -52,12 +52,13 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## v1.3.0 — Habit Management, Calendar History & Journal
 
-| Feature                           | Status   | Doc reference |
-| --------------------------------- | -------- | ------------- |
-| Custom habit CRUD in Settings     | ✅ Built | US-009        |
-| Habit history heatmap on Calendar | ✅ Built | US-010        |
-| Journal page                      | ✅ Built | US-012        |
-| Activity edit from calendar       | ✅ Built | US-013        |
+| Feature                           | Status     | Doc reference |
+| --------------------------------- | ---------- | ------------- |
+| Custom habit CRUD in Settings     | ✅ Built   | US-009        |
+| Habit history heatmap on Calendar | ✅ Built   | US-010        |
+| Journal page                      | ✅ Built   | US-012        |
+| Activity edit from calendar       | ✅ Built   | US-013        |
+| Journal speech input & auto-save  | ✅ Built   | US-014        |
 
 ---
 
