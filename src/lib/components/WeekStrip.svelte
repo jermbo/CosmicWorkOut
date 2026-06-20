@@ -12,8 +12,8 @@
 		stayOnPage?: boolean;
 		/** Show mood-colored dots instead of workout-completion dots. */
 		showMoodDots?: boolean;
-		/** Optional multi-indicator dots keyed by ISO date, e.g. habits/workout/activity/journal. */
-		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'>>;
+		/** Optional multi-indicator dots keyed by ISO date, e.g. habits/workout/activity. */
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>>;
 	};
 
 	let { sessions, stayOnPage = false, showMoodDots = false, dayIndicators = {} }: Props = $props();
@@ -81,7 +81,7 @@
 		return log !== undefined ? log.value : null;
 	}
 
-	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'> {
+	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'dance' | 'activity'> {
 		return dayIndicators[dateStr] ?? [];
 	}
 
@@ -395,10 +395,6 @@
 
 	.week-day__indicator-dot--activity {
 		background: var(--color-lavender);
-	}
-
-	.week-day__indicator-dot--journal {
-		background: var(--color-text-secondary);
 	}
 
 	.week-day--selected .week-day__indicator-dot {

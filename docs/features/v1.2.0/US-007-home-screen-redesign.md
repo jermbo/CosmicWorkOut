@@ -8,7 +8,7 @@ so that I can immediately see what still needs to be done and tap into the right
 ## Requirements
 
 1. Layout
-   a. The home screen shall display a date selector at the top followed by a vertical stack of overview cards: Habits, Workout, Log, and Journal.
+   a. The home screen shall display a date selector at the top followed by a vertical stack of overview cards: Habits, Workout, and Log.
    b. Each card shall act as an entry point to its respective page — tapping the card (or its CTA) navigates to that route.
    c. The layout shall be usable one-handed in portrait orientation with no horizontal scrolling.
 
@@ -34,16 +34,10 @@ so that I can immediately see what still needs to be done and tap into the right
    a. The Log card shall show a summary of activities logged for the selected date (e.g., "2 activities logged" or "No activities yet").
    b. Tapping the card shall navigate to `/log` for the selected date.
 
-6. Journal card
-   a. The Journal card shall be present but marked as coming soon. No logging interaction is required in this version.
-   b. Full journal page is tracked in [v1.3.0 US-012](../v1.3.0/US-012-journal-page.md).
-
----
-
 ## Acceptance Criteria
 
 1. Layout
-   a. Given the user opens the app, when the home screen loads, then the date selector and all four cards are visible without scrolling on a standard phone screen.
+   a. Given the user opens the app, when the home screen loads, then the date selector and the three overview cards are visible without scrolling on a standard phone screen.
    b. Given the user taps any card, when the navigation occurs, then the correct page opens.
 
 2. Date selector
@@ -65,9 +59,6 @@ so that I can immediately see what still needs to be done and tap into the right
 5. Log card
    a. Given the user has logged 2 activities today, when the home screen loads, then the Log card shows "2 activities logged".
    b. Given no activities are logged, when the home screen loads, then the Log card shows "No activities yet".
-
-6. Journal card
-   a. Given the home screen loads, when the user views the Journal card, then it is visible but indicates it is not yet available.
 
 ---
 

@@ -13,7 +13,7 @@
 		showMoodDots?: boolean;
 	dayIndicators?: Record<
 		string,
-		Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'>
+		Array<'habits' | 'strength' | 'dance' | 'activity'>
 	>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;

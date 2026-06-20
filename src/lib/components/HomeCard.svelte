@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
 
-	type CardVariant = 'habits' | 'workout' | 'dance' | 'log' | 'journal';
+	type CardVariant = 'habits' | 'workout' | 'dance' | 'log';
 
 	type Props = {
 		href: string;
@@ -34,7 +34,6 @@
 	class:home-card--workout={variant === 'workout'}
 	class:home-card--dance={variant === 'dance'}
 	class:home-card--log={variant === 'log'}
-	class:home-card--journal={variant === 'journal'}
 	class:home-card--done={done}
 	class:home-card--active={active}
 	aria-label={ariaLabel}

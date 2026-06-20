@@ -1,4 +1,4 @@
-import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, JournalEntry } from './types';
+import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog } from './types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { toastStore } from '$lib/stores/toast.svelte';
 
@@ -54,8 +54,6 @@ function openDB(): Promise<IDBDatabase> {
 			hlStore.createIndex('by_date', 'date');
 			hlStore.createIndex('by_habit', 'habitId');
 
-			const jStore = db.createObjectStore('journals', { keyPath: 'id' });
-			jStore.createIndex('by_date', 'date', { unique: true });
 		};
 
 		request.onsuccess = (event) => {
@@ -245,10 +243,4 @@ export const db = {
 		remove: (id: string) => removeRecord('habitLogs', id),
 	},
 
-	journals: {
-		getAll: () => getAll<JournalEntry>('journals'),
-		getOne: (id: string) => getOne<JournalEntry>('journals', id),
-		put: (entry: JournalEntry) => putRecord('journals', entry),
-		remove: (id: string) => removeRecord('journals', id),
-	},
 };

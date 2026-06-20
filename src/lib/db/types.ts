@@ -244,11 +244,3 @@ export interface HabitLog {
 	date: string;
 	value: number;
 }
-
-export interface JournalEntry {
-	id: string;
-	date: string;
-	content: string;
-	createdAt: string;
-	updatedAt: string;
-}

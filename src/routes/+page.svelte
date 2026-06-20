@@ -6,7 +6,6 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { journalStore } from '$lib/stores/journal.svelte';
 	import { todayIso } from '$lib/date';
 	import { flattenItems, effectiveSections, BELLYDANCE_DISCIPLINE_ID, STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
@@ -16,7 +15,6 @@
 	import HomeWorkoutCard from '$lib/components/HomeWorkoutCard.svelte';
 	import HomeDanceCard from '$lib/components/HomeDanceCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
-	import HomeJournalCard from '$lib/components/HomeJournalCard.svelte';
 
 	const todayStr = todayIso();
 
@@ -33,7 +31,6 @@
 	let habitsTotal = $derived(habitStore.activeHabits.length);
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
-	let journalEntry = $derived(journalStore.entryForDate(contextDate));
 
 	let strengthSession = $derived(programStore.sessionForDisciplineDate(STRENGTH_DISCIPLINE_ID, contextDate));
 	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeekFor(STRENGTH_DISCIPLINE_ID));
@@ -83,10 +80,10 @@
 let weekIndicators = $derived.by(() => {
 	const indicators: Record<
 		string,
-		Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'>
+		Array<'habits' | 'strength' | 'dance' | 'activity'>
 	> = {};
 
-	function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'journal') {
+	function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity') {
 		if (!indicators[date]) indicators[date] = [];
 		if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
 	}
@@ -102,10 +99,6 @@ let weekIndicators = $derived.by(() => {
 	const activeHabitIds = new Set(habitStore.activeHabits.map((habit) => habit.id));
 	for (const log of habitStore.logs) {
 		if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
-	}
-
-	for (const entry of journalStore.entries) {
-		add(entry.date, 'journal');
 	}
 
 	return indicators;
@@ -148,7 +141,6 @@ let weekIndicators = $derived.by(() => {
 			/>
 		{/if}
 		<HomeActivityCard activities={dateActivities} />
-		<HomeJournalCard entry={journalEntry} />
 	</div>
 </div>
 
@@ -167,10 +159,6 @@ let weekIndicators = $derived.by(() => {
 		.home-cards {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.home-cards :global(.home-card--journal) {
-			grid-column: 1 / -1;
 		}
 	}
 </style>
