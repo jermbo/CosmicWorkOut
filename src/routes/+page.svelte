@@ -79,6 +79,37 @@
 	let danceActive = $derived(
 		sessionStore.isActive && sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID,
 	);
+
+let weekIndicators = $derived.by(() => {
+	const indicators: Record<
+		string,
+		Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'>
+	> = {};
+
+	function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'journal') {
+		if (!indicators[date]) indicators[date] = [];
+		if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
+	}
+
+	for (const session of programStore.sessions) {
+		add(session.date, session.disciplineId === BELLYDANCE_DISCIPLINE_ID ? 'dance' : 'strength');
+	}
+
+	for (const activity of activityStore.activities) {
+		add(activity.date, 'activity');
+	}
+
+	const activeHabitIds = new Set(habitStore.activeHabits.map((habit) => habit.id));
+	for (const log of habitStore.logs) {
+		if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+	}
+
+	for (const entry of journalStore.entries) {
+		add(entry.date, 'journal');
+	}
+
+	return indicators;
+});
 </script>
 
 <svelte:head>
@@ -86,7 +117,11 @@
 </svelte:head>
 
 <div class="page page--wide home-page">
-	<PageHeader title={isToday ? 'Today' : 'Past Day'} onDateChange={() => goto('/', { replaceState: true })}>
+	<PageHeader
+		title={isToday ? 'Today' : 'Past Day'}
+		dayIndicators={weekIndicators}
+		onDateChange={() => goto('/', { replaceState: true })}
+	>
 		{#snippet trailing()}
 			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
 		{/snippet}

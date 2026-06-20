@@ -11,11 +11,23 @@
 		showBack?: boolean;
 		backHref?: string;
 		showMoodDots?: boolean;
+	dayIndicators?: Record<
+		string,
+		Array<'habits' | 'strength' | 'dance' | 'activity' | 'journal'>
+	>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
 	};
 
-	let { title, showBack = false, backHref = '/', showMoodDots = false, onDateChange, trailing }: Props = $props();
+let {
+	title,
+	showBack = false,
+	backHref = '/',
+	showMoodDots = false,
+	dayIndicators = {},
+	onDateChange,
+	trailing,
+}: Props = $props();
 
 	const todayStr = todayIso();
 
@@ -85,7 +97,7 @@
 </header>
 
 {#if programStore.loaded}
-	<WeekStrip sessions={activeSessions} stayOnPage={showBack} {showMoodDots} />
+	<WeekStrip sessions={activeSessions} stayOnPage={showBack} {showMoodDots} {dayIndicators} />
 {/if}
 
 <style>
