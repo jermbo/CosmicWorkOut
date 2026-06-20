@@ -61,6 +61,8 @@ flowchart TB
 
 **New here?** Start with [North Star](vision/north-star.md) → [How It Works](implementation/behavior.md) → [System Overview](architecture/overview.md).
 
+**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit — and the rule for where new movement types belong.
+
 ---
 
 ## 30k — Vision
