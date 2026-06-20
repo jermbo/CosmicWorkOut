@@ -16,7 +16,7 @@
 
 	let { disciplineId, item = null, defaultSection, onClose, onSave }: Props = $props();
 
-	const sections = disciplineById(disciplineId)?.sections ?? [];
+	let sections = $derived(disciplineById(disciplineId)?.sections ?? []);
 
 	const snap = untrack(() => ({
 		name: item?.name ?? '',

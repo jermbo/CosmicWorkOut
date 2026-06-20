@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { Item } from '$lib/db/types';
 	import { FOCUS_TAGS } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
@@ -16,9 +17,9 @@
 
 	let { disciplineId, defaultSection, onAdd, onClose }: Props = $props();
 
-	const sections = disciplineById(disciplineId)?.sections ?? [];
+	let sections = $derived(disciplineById(disciplineId)?.sections ?? []);
 
-	let activeSection = $state(defaultSection ?? 'all');
+	let activeSection = $state(untrack(() => defaultSection ?? 'all'));
 	let activeFocus = $state<string | null>(null);
 	let query = $state('');
 	let expandedId = $state<string | null>(null);

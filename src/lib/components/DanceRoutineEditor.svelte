@@ -23,8 +23,7 @@
 		items: EditItem[];
 	};
 
-	const isRoutineA = routine.letter === 'A';
-	const discSections = disciplineById(routine.disciplineId)?.sections ?? [];
+	let isRoutineA = $derived(routine.letter === 'A');
 
 	let keyCounter = 0;
 	function withKeys(items: RoutineItem[]): EditItem[] {
@@ -32,13 +31,15 @@
 	}
 
 	const snap = untrack(() => {
+		const discSections = disciplineById(routine.disciplineId)?.sections ?? [];
 		const routineA = routineALetter(program);
 		return {
 			name: routine.name,
 			focus: routine.focus ?? '',
 			sections: discSections.map((s): EditSection => {
+				const isA = routine.letter === 'A';
 				const own = routine.sections.find((rs) => rs.key === s.key);
-				const inherits = !!s.isBookend && !isRoutineA && own?.overridesBookends !== true;
+				const inherits = !!s.isBookend && !isA && own?.overridesBookends !== true;
 				const items = inherits
 					? routineA?.sections.find((rs) => rs.key === s.key)?.items ?? []
 					: own?.items ?? [];

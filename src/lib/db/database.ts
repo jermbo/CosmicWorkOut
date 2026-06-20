@@ -1,5 +1,6 @@
 import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog } from './types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
+import { generateDebugSeedData } from './debugSeed';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 function reportWriteError(error: unknown): void {
@@ -152,6 +153,14 @@ export async function clearWorkoutData(): Promise<void> {
 	});
 }
 
+export async function loadDebugSeedData(): Promise<void> {
+	const { sessions, activities, habitLogs } = generateDebugSeedData();
+	await putAllRecords('sessions', sessions);
+	await putAllRecords('activities', activities);
+	await putAllRecords('habitLogs', habitLogs);
+	location.reload();
+}
+
 export async function resetWorkoutData(): Promise<void> {
 	await clearWorkoutData();
 	localStorage.removeItem('cwout:activeSession');
@@ -160,20 +169,31 @@ export async function resetWorkoutData(): Promise<void> {
 	location.reload();
 }
 
-export async function initDB(): Promise<void> {
-	// Seed built-in items only on first run (empty store). Re-writing the full
-	// catalog on every boot churns IndexedDB storage without changing the data —
-	// built-in content updates ride the DB version bump (wipe + re-seed) instead.
-	const items = await getAll<Item>('items');
-	if (items.length === 0) {
-		await putAllRecords('items', builtInItems);
+/** Upsert shipped catalog entries without touching user-created records. */
+async function upsertBuiltInRecords<T extends { id: string; isBuiltIn: boolean }>(
+	storeName: string,
+	existing: T[],
+	builtIns: T[],
+): Promise<void> {
+	const byId = new Map(existing.map((r) => [r.id, r]));
+	const toWrite = builtIns.filter((b) => {
+		const cur = byId.get(b.id);
+		return !cur || cur.isBuiltIn;
+	});
+	if (toWrite.length > 0) {
+		await putAllRecords(storeName, toWrite);
 	}
+}
 
-	// Only seed programs on first run
+export async function initDB(): Promise<void> {
+	// Upsert built-in items/programs on every boot: add missing entries (e.g.
+	// bellydance-foundations landing after strength-only data) and refresh
+	// built-in rows when seed content changes. User custom records are untouched.
+	const items = await getAll<Item>('items');
+	await upsertBuiltInRecords('items', items, builtInItems);
+
 	const programs = await getAll<Program>('programs');
-	if (programs.length === 0) {
-		await putAllRecords('programs', builtInPrograms);
-	}
+	await upsertBuiltInRecords('programs', programs, builtInPrograms);
 
 	// Only seed habits on first run
 	const habits = await getAll<Habit>('habits');

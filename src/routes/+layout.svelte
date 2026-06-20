@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import '../app.css';
 	import { initDB } from '$lib/db/database';
@@ -49,7 +50,7 @@
 			{@render children()}
 		</main>
 
-		<BottomNav />
+		<BottomNav pathname={page.url.pathname} />
 
 		{#if sessionStore.isActive}
 			{#if sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID}
