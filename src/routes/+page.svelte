@@ -7,12 +7,11 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { formatActivityChip } from '$lib/activities';
-	import { todayIso, formatShortDate, formatWeekdayShort, fromIso } from '$lib/date';
+	import { todayIso } from '$lib/date';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 
 	const todayStr = todayIso();
-	let dateInputEl: HTMLInputElement | undefined = $state();
 
 	$effect(() => {
 		const param = page.url.searchParams.get('date');
@@ -22,15 +21,6 @@
 	});
 
 	let contextDate = $derived(loggingContext.date);
-
-	let displayDate = $derived.by(() => {
-		const d = fromIso(contextDate);
-		return {
-			dayName: formatWeekdayShort(d),
-			dateStr: formatShortDate(contextDate),
-		};
-	});
-
 	let isToday = $derived(contextDate === todayStr);
 
 	// Habits card
@@ -59,18 +49,7 @@
 		return null;
 	});
 
-	function handleDateChange(event: Event) {
-		const value = (event.target as HTMLInputElement).value;
-		if (value && value <= todayStr) {
-			loggingContext.setDate(value);
-			goto('/', { replaceState: true });
-		}
-	}
 
-	function openDatePicker() {
-		dateInputEl?.showPicker?.();
-		dateInputEl?.click();
-	}
 </script>
 
 <svelte:head>
@@ -78,28 +57,11 @@
 </svelte:head>
 
 <div class="page page--wide home-page">
-	<header class="home-page__header">
-		<div class="home-page__header-row">
-			<div>
-				<button class="home-page__date-btn" onclick={openDatePicker} aria-label="Change logging date">
-					<p class="home-page__eyebrow">
-						{displayDate.dayName} · {displayDate.dateStr}
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<polyline points="6 9 12 15 18 9" />
-						</svg>
-					</p>
-				</button>
-				<input
-					bind:this={dateInputEl}
-					type="date"
-					class="home-page__date-input"
-					max={todayStr}
-					value={contextDate}
-					onchange={handleDateChange}
-					aria-label="Logging date"
-				/>
-				<h1 class="home-page__title">{isToday ? 'Today' : 'Past Day'}</h1>
-			</div>
+	<PageHeader
+		title={isToday ? 'Today' : 'Past Day'}
+		onDateChange={() => goto('/', { replaceState: true })}
+	>
+		{#snippet trailing()}
 			{#if programStore.weekStreak > 0}
 				<div class="home-page__streak" aria-label="{programStore.weekStreak} week streak">
 					<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -108,12 +70,8 @@
 					<span><strong>{programStore.weekStreak}</strong> wk streak</span>
 				</div>
 			{/if}
-		</div>
-	</header>
-
-	{#if programStore.loaded}
-		<WeekStrip sessions={programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id)} />
-	{/if}
+		{/snippet}
+	</PageHeader>
 
 	<div class="home-cards">
 		<!-- Habits card -->
@@ -255,56 +213,6 @@
 <style>
 	.home-page {
 		inline-size: 100%;
-	}
-
-	.home-page__header {
-		margin-block-end: var(--space-4);
-	}
-
-	.home-page__header-row {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: var(--space-3);
-	}
-
-	.home-page__date-btn {
-		display: block;
-		text-align: start;
-	}
-
-	.home-page__date-input {
-		position: absolute;
-		inline-size: 1px;
-		block-size: 1px;
-		opacity: 0;
-		pointer-events: none;
-	}
-
-	.home-page__eyebrow {
-		display: inline-flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-accent);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		margin-block-end: var(--space-1);
-
-		svg {
-			inline-size: 14px;
-			block-size: 14px;
-			opacity: 0.7;
-		}
-	}
-
-	.home-page__title {
-		font-family: var(--font-display);
-		font-size: 2.25rem;
-		font-weight: 700;
-		line-height: 1;
-		letter-spacing: -0.02em;
 	}
 
 	.home-page__streak {

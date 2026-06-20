@@ -1,27 +1,17 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import type { Habit } from '$lib/db/types';
 	import { MOOD_SCALE } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { formatWeekdayShortDate } from '$lib/date';
 	import { formatMoodValue } from '$lib/habits';
 	import { minuteUnitLabel } from '$lib/format';
-	import Icon from '$lib/components/Icon.svelte';
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 
 	const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
 
 	let contextDate = $derived(loggingContext.date);
-
-	let displayDate = $derived(formatWeekdayShortDate(contextDate));
-
-	let activeSessions = $derived(
-		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
-	);
 
 	// Smart step: minutes always 5; count uses goal/10 rounded to a nice number
 	function getStep(habit: Habit): number {
@@ -92,19 +82,7 @@
 </svelte:head>
 
 <div class="page page--wide habits-page">
-	<header class="habits-page__header">
-		<button class="back-btn" onclick={() => goto('/')} aria-label="Back to home">
-			<Icon name="back" size={20} />
-		</button>
-		<div>
-			<h1 class="habits-page__title">Daily check-in</h1>
-			<p class="habits-page__date">{displayDate}</p>
-		</div>
-	</header>
-
-	{#if programStore.loaded}
-		<WeekStrip sessions={activeSessions} stayOnPage showMoodDots />
-	{/if}
+	<PageHeader title="Daily check-in" showBack showMoodDots />
 
 	{#if moodHabit}
 		<section class="mood-section">
@@ -185,43 +163,6 @@
 {/if}
 
 <style>
-	/* ── Header ── */
-	.habits-page__header {
-		display: flex;
-		align-items: center;
-		gap: var(--space-3);
-		margin-block-end: var(--space-5);
-	}
-
-	.back-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		inline-size: 40px;
-		block-size: 40px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-	}
-
-	.habits-page__title {
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.1;
-	}
-
-	.habits-page__date {
-		font-size: 0.8125rem;
-		font-weight: 700;
-		color: var(--color-accent);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-	}
-
 	/* ── Empty state ── */
 	.empty-state {
 		display: flex;
