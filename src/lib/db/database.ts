@@ -13,7 +13,9 @@ const DB_NAME = 'cosmic-workout';
 // record shapes. Pre-beta, so we WIPE and re-seed rather than migrate — see
 // docs/features/v1.4.0/US-015. The upgrade drops every existing store and
 // recreates a clean set; initDB() then re-seeds both Disciplines.
-const DB_VERSION = 4;
+// v5 (v1.4.0): belly dance content lands — Belly Dance items + program seed
+// (US-016/US-017). Same wipe-and-reseed policy; bump forces the new seed in.
+const DB_VERSION = 5;
 
 let dbInstance: IDBDatabase | null = null;
 

@@ -32,6 +32,10 @@ class ProgramStore {
 		return this.itemMap.get(id);
 	}
 
+	itemsForDiscipline(disciplineId: string): Item[] {
+		return this.items.filter((i) => i.disciplineId === disciplineId);
+	}
+
 	// ── Per-Discipline accessors ────────────────────────────────────
 	// These read $state, so they stay reactive when called from $derived or markup.
 
@@ -372,15 +376,19 @@ class ProgramStore {
 		return program;
 	}
 
-	// Item (exercise) management
-	async addItem(item: Omit<Item, 'id' | 'isBuiltIn' | 'disciplineId' | 'section' | 'metric'>): Promise<Item> {
-		// US-015 custom items are strength exercises; US-016 generalizes the form.
+	// Item management. Strength items default to the strength Discipline's single
+	// section + setsReps; dance (and future Disciplines) pass disciplineId, section,
+	// metric, and focus explicitly (US-016).
+	async addItem(
+		item: Omit<Item, 'id' | 'isBuiltIn' | 'disciplineId' | 'section' | 'metric'> &
+			Partial<Pick<Item, 'disciplineId' | 'section' | 'metric'>>,
+	): Promise<Item> {
 		const newItem: Item = {
 			...item,
 			id: generateId(),
-			disciplineId: STRENGTH_DISCIPLINE_ID,
-			section: 'exercises',
-			metric: 'setsReps',
+			disciplineId: item.disciplineId ?? STRENGTH_DISCIPLINE_ID,
+			section: item.section ?? 'exercises',
+			metric: item.metric ?? 'setsReps',
 			isBuiltIn: false,
 		};
 		try {

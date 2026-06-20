@@ -72,26 +72,38 @@ export interface Item {
 	section: string; // section key within the Discipline (strength: "exercises")
 	metric: Metric;
 	focus?: string[]; // generalized focus tags (US-016) — e.g. ["hips", "core"]
-	// setsReps (strength) fields:
-	muscles: string;
-	cat: ItemCat;
-	unit: WeightUnit;
-	defaultSets: number;
-	defaultReps: string;
+	// setsReps (strength) fields — optional now that measure/check Items (e.g. belly
+	// dance) live on the same model and don't carry sets/reps/weight (US-016).
+	muscles?: string;
+	cat?: ItemCat;
+	unit?: WeightUnit;
+	defaultSets?: number;
+	defaultReps?: string;
 	weightIncrement?: number;
 	isBuiltIn: boolean;
 }
 
+// Focus tags an Item can carry (US-016). Belly dance uses body-part focuses; the
+// list is shared across Disciplines and shown as filter chips in the item library.
+export const FOCUS_TAGS = ['hips', 'core', 'arms', 'chest', 'shoulders', 'legs', 'full-body', 'posture'] as const;
+export type FocusTag = (typeof FOCUS_TAGS)[number];
+
 export interface RoutineItem {
 	itemId: string;
-	sets: number;
-	reps: string;
+	// Strength carries upfront sets×reps targets; dance (measure/check) items do
+	// not prescribe targets — values are entered during the session (US-017 §3c).
+	sets?: number;
+	reps?: string;
 	notes?: string;
 }
 
 export interface RoutineSection {
 	key: string; // matches a Discipline Section key
 	items: RoutineItem[];
+	// For bookend sections (warm-up / cool-down) on routines other than A: when
+	// absent/false the section inherits Routine A's items; when true the routine
+	// owns its own bookend list (US-017 §4). Ignored for non-bookend sections.
+	overridesBookends?: boolean;
 }
 
 export interface Routine {
@@ -132,6 +144,12 @@ export interface LoggedSet {
 export interface LoggedItem {
 	itemId: string;
 	sets: LoggedSet[];
+	// Non-strength logging results (US-019). check → checked; measure → value with
+	// its mode. Absent for setsReps Items. skipped marks a measure item with no value.
+	checked?: boolean;
+	value?: number;
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean;
 }
 
 export interface Session {
@@ -174,6 +192,15 @@ export interface ActiveItem {
 	itemId: string;
 	unit: WeightUnit;
 	sets: ActiveSet[];
+	// Metric-aware in-session state (US-019). setsReps uses `sets`; check uses
+	// `checked`; measure uses `value` + `measureMode` (+ `skipped`). `section` is the
+	// routine section key so the session UI can group items.
+	metric?: Metric;
+	section?: string;
+	checked?: boolean;
+	value?: number | null;
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean;
 }
 
 export interface ActiveSession {

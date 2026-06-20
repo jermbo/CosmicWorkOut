@@ -286,8 +286,8 @@
 									<div class="inline-editor__stepper">
 										<button
 											onclick={() => {
-												if (ex.sets > 1) {
-													exercises[i] = { ...exercises[i], sets: ex.sets - 1 };
+												if ((ex.sets ?? 0) > 1) {
+													exercises[i] = { ...exercises[i], sets: (ex.sets ?? 0) - 1 };
 												}
 											}}
 											aria-label="Decrease sets">−</button
@@ -295,8 +295,8 @@
 										<span id={`sets-${i}`} aria-live="polite">{ex.sets}</span>
 										<button
 											onclick={() => {
-												if (ex.sets < 8) {
-													exercises[i] = { ...exercises[i], sets: ex.sets + 1 };
+												if ((ex.sets ?? 0) < 8) {
+													exercises[i] = { ...exercises[i], sets: (ex.sets ?? 0) + 1 };
 												}
 											}}
 											aria-label="Increase sets">+</button

@@ -72,16 +72,18 @@ class SessionStore {
 			const lastUsed = await db.itemLastUsed.get(ri.itemId);
 			const defaultWeight: number | string = lastUsed?.weight ?? 0;
 
-			let defaultReps = parseInt(ri.reps.split('-')[0], 10);
+			const targetReps = ri.reps ?? item.defaultReps ?? '8';
+			let defaultReps = parseInt(targetReps.split('-')[0], 10) || 8;
 			if (lastUsed?.reps) {
 				defaultReps = lastUsed.reps;
 			}
 
+			const setCount = ri.sets ?? item.defaultSets ?? 1;
 			const sets: ActiveSet[] = [];
-			for (let i = 0; i < ri.sets; i++) {
+			for (let i = 0; i < setCount; i++) {
 				sets.push({
 					setNumber: i + 1,
-					targetReps: ri.reps,
+					targetReps,
 					weight: defaultWeight,
 					reps: defaultReps,
 					completed: false,
@@ -91,7 +93,7 @@ class SessionStore {
 
 			activeItems.push({
 				itemId: item.id,
-				unit: item.unit,
+				unit: item.unit ?? 'bodyweight',
 				sets,
 			});
 		}
@@ -190,7 +192,7 @@ class SessionStore {
 
 			items.push({
 				itemId: item.id,
-				unit: item.unit,
+				unit: item.unit ?? 'bodyweight',
 				sets,
 			});
 		}
