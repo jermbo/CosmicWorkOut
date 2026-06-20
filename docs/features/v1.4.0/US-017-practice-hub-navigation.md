@@ -29,7 +29,7 @@ so that I can open the app on a dance day and start the right session without ex
    c. When the user has an active strength program and an active dance program, the practice page shall present both options or default to whichever session is not yet logged for the selected date (dance if workout is done, workout if dance is done, suggested routine if neither is done).
    d. The user shall be able to manually choose strength workout or belly dance from the practice page when both are available.
 
-4. Practice program access
+4. Program access
    a. The practice page shall link to belly dance program management (routine editor, program selection) as a sub-route — not added to main nav.
    b. Program selection for belly dance shall follow the same copy-before-edit rules as strength programs (US-016).
 
@@ -60,7 +60,7 @@ so that I can open the app on a dance day and start the right session without ex
    b. Given neither session is logged today, when the user opens Practice, then both strength and dance options are available with suggested next routines shown.
    c. Given the workout is already logged today but dance is not, when the user opens Practice, then dance is prominently surfaced as the remaining session.
 
-4. Practice program access
+4. Program access
    a. Given the user is on the practice page, when they tap the program link, then the belly dance program page opens with routine list and editor access.
 
 5. Global date context
@@ -78,5 +78,5 @@ so that I can open the app on a dance day and start the right session without ex
 - [v1.4.0 README](./README.md)
 - [App Structure](../../implementation/app-structure.md)
 - [v1.2.0 US-007 — Home Screen Redesign](../v1.2.0/US-007-home-screen-redesign.md)
-- [US-016 — Belly Dance Program & Routines](./US-016-belly-dance-program-routines.md)
+- [US-016 — Belly Dance Discipline, Program & Routines](./US-016-belly-dance-program-routines.md)
 - [US-018 — Dance Session Flow](./US-018-dance-session-flow.md)

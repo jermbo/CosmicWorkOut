@@ -2,7 +2,7 @@
 
 > The shared vocabulary for CosmicWorkOut. When a term here and the code disagree, fix one of them — don't let them drift.
 >
-> **Legend:** ✅ in code today · 🟡 agreed direction, not built yet (v1.4.0) · 💭 proposed name, not ratified
+> **Legend:** ✅ in code today · 🟡 agreed direction, not built yet (v1.4.0)
 
 ---
 
@@ -33,7 +33,7 @@ Pickleball is already an Activity type — it cost zero architecture. That's the
 
 These generalize the strength model so belly dance (and anything after it) reuses one engine. Where a term renames something that exists today, the old name is noted.
 
-### Discipline 🟡 💭
+### Discipline 🟡
 
 A first-class, data-driven definition of a structured movement practice. A Discipline declares everything that makes it *specific* while the engine stays *generic*:
 
@@ -44,7 +44,11 @@ A first-class, data-driven definition of a structured movement practice. A Disci
 
 Strength and Belly Dance are both Disciplines. Adding a third structured practice = authoring a new Discipline config, not forking the engine.
 
-> _Name is provisional — alternatives considered: Modality, Practice Type._
+> **Discipline vs. Practice — don't conflate them.** *Discipline* is the **data-model** term (an entity in code). *Practice* (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
+
+### Practice 🟡
+
+The **UI surface and bottom-nav destination** where you do a guided session — the screen formerly labeled "Workout." It is Discipline-agnostic: on a strength day it opens the strength session, on a dance day the dance session, and when both are available it lets you choose. "Practice" is a *label and a route*, **not** a data entity — there is no `Practice` type. The underlying data is always a Discipline's Program → Routine → Session.
 
 ### Section 🟡
 

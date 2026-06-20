@@ -1,8 +1,8 @@
-# US-016 — Belly Dance Program & Routines
+# US-016 — Belly Dance Discipline, Program & Routines
 
 > **Status: ❌ Planned — v1.4.0**
 >
-> Defines the belly dance program structure, rotating routines, bookend inheritance, and routine editor. Mirrors the strength program model.
+> Defines the **Belly Dance Discipline** and its program structure, rotating routines, bookend inheritance, and routine editor — all on the generalized Discipline engine (US-015). Strength is the other Discipline on the same engine. See the [Glossary](../../glossary.md).
 
 As an **active user**, I want a belly dance program with rotating routines I can customize
 so that I can follow a structured A/B/C rotation with shared warm-up and cool-down but different conditioning and move focus each session.
@@ -11,22 +11,22 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 
 ## Requirements
 
-1. Practice program model
-   a. The app shall support practice programs separate from strength programs.
-   b. Each practice program shall have a name, description, duration in weeks, days per week, and a practice type (belly dance for MVP).
+1. Program model (Discipline-scoped)
+   a. Every program shall belong to a **Discipline**; the engine shall support programs in the Belly Dance Discipline alongside the Strength Discipline on the same model.
+   b. Each program shall have a name, description, duration in weeks, days per week, and a `disciplineId` (belly dance for this story).
    c. The app shall ship one built-in belly dance program (e.g. "Belly Dance Foundations": 12 weeks, 3 days/week).
-   d. Built-in practice programs shall be read-only; editing shall require creating a personal copy (same pattern as strength programs).
-   e. Only one active practice program per practice type may be active at a time.
+   d. Built-in programs shall be read-only; editing shall require creating a personal copy (same pattern as strength programs).
+   e. Only one active program per Discipline may be active at a time.
 
 2. Rotating routines
-   a. Each practice program shall define routines identified by letter (A, B, C) aligned to days per week.
+   a. Each program shall define routines identified by letter (A, B, C) aligned to days per week.
    b. Each routine shall have a name and optional focus description (e.g. "Hip isolations & shimmies").
-   c. The app shall suggest the next routine using linear progression: `completedPracticeSessionCount % routineCount` (same model as strength workouts).
+   c. The app shall suggest the next routine using linear progression: `completedSessionCount % routineCount`, where the count is sessions logged under this program (same model across Disciplines).
    d. Routine position within the week cycle shall be derived from session count modulo days per week.
 
 3. Routine sections
    a. Each routine shall be composed of four ordered sections: warm-up, conditioning, moves, cool-down.
-   b. Each section shall contain an ordered list of practice items from the library (US-015).
+   b. Each section shall contain an ordered list of items from the library (US-015).
    c. Routine items shall not store upfront targets (no prescribed duration or reps at build time).
 
 4. Bookend inheritance
@@ -37,24 +37,24 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
    e. The routine editor shall clearly indicate whether bookends are inherited or overridden.
 
 5. Routine editor
-   a. The user shall be able to view and edit routines from a practice program page (sub-route, not in main nav).
+   a. The user shall be able to view and edit routines from a program page (sub-route, not in main nav).
    b. The editor shall allow adding, removing, and reordering items within each section using the item library picker (US-015).
    c. The picker shall filter by section type when adding items.
    d. The user shall be able to reset overridden bookends on B or C back to inherit from Routine A.
 
 6. Program selection
    a. The user shall be able to select an active belly dance program from a program selection sheet.
-   b. Active practice program selection shall persist across app sessions.
-   c. Switching practice programs shall not delete historical practice session logs.
-   d. Progress in a practice program shall be calculated from sessions logged under that program's ID.
+   b. Active program selection shall persist across app sessions.
+   c. Switching programs shall not delete historical session logs.
+   d. Progress in a program shall be calculated from sessions logged under that program's ID.
 
 ---
 
 ## Acceptance Criteria
 
-1. Practice program model
+1. Program model (Discipline-scoped)
    a. Given the app loads for the first time, when practice seed data runs, then the built-in belly dance program exists with 3 routines (A, B, C).
-   b. Given the user views a built-in practice program, when they attempt to edit a routine, then a copy prompt appears before changes are allowed.
+   b. Given the user views a built-in program, when they attempt to edit a routine, then a copy prompt appears before changes are allowed.
 
 2. Rotating routines
    a. Given the user has completed 0 dance sessions, when they view the suggested routine, then Routine A is suggested.
@@ -85,6 +85,6 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 - [v1.4.0 README](./README.md)
 - [Program Progression](../../implementation/program-progression.md)
 - [Program Management Requirements](../../requirements/program-management.md)
-- [US-015 — Practice Item Library](./US-015-practice-item-library.md)
+- [US-015 — Item Library (Discipline-scoped)](./US-015-practice-item-library.md)
 - [US-001 — Program Library & Selection](../v1.1.0/US-001-program-library.md)
 - [US-017 — Practice Hub & Navigation](./US-017-practice-hub-navigation.md)

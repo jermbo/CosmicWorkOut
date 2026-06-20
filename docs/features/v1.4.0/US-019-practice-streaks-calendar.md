@@ -1,11 +1,11 @@
-# US-019 — Practice Streaks & Calendar History
+# US-019 — Cross-Discipline Streaks & Calendar History
 
 > **Status: ❌ Planned — v1.4.0**
 >
-> Combined practice streak on Today, per-type breakdown in History, dance sessions in calendar day detail.
+> Combined cross-Discipline streak on Today, per-Discipline breakdown in History, dance sessions in calendar day detail. See the [Glossary](../../glossary.md).
 
-As an **active user**, I want my workout and dance consistency reflected in streaks and history
-so that I can see overall practice momentum and drill into each activity type separately.
+As an **active user**, I want my strength and dance consistency reflected in streaks and history
+so that I can see overall momentum across Disciplines and drill into each one separately.
 
 ---
 

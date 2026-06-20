@@ -2,9 +2,54 @@
 
 All data is stored locally. Source of truth: `src/lib/db/types.ts`. See [Offline Strategy](offline-strategy.md) for write timing.
 
+> **🟡 v1.4.0 in flight.** The entities below describe the **current, strength-only** code. v1.4.0 generalizes them into the [Discipline Model](#discipline-model--planned-v140) so strength and belly dance share one engine. Terms are defined in the [Glossary](../glossary.md). Until that lands, the strength-only types here remain the shipped reality.
+
 ---
 
-## Entities
+## Discipline Model — planned (v1.4.0)
+
+A **Discipline** is a data-driven definition of a structured movement practice. It is what makes the engine specific (each Discipline brings its own sections, metrics, and seed) while staying generic (the engine has no belly-dance or strength knowledge baked in). Strength and Belly Dance are the two Disciplines that ship.
+
+```typescript
+// How one item is logged within a session — the core flexibility lever.
+type Metric = 'setsReps' | 'measure' | 'check';
+// setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
+
+type Section = {
+	key: string; // "exercises" | "warm-up" | "conditioning" | "moves" | "cool-down"
+	label: string;
+	metric: Metric;
+	isBookend?: boolean; // warm-up / cool-down inherit from Routine A
+};
+
+type Discipline = {
+	id: string; // "strength" | "bellydance"
+	label: string;
+	color?: string;
+	icon?: string;
+	sections: Section[]; // strength: one section; belly dance: four
+};
+```
+
+Disciplines are seeded and read-only (config, not user data). Programs, Items, Routines, and Sessions all carry a `disciplineId`.
+
+### Naming map (current → generalized)
+
+The existing strength entities are renamed/generalized — not replaced — when the engine lands. Behaviour is preserved; scope widens to "any Discipline."
+
+| Current (below) | Generalized                       | Change                                                         |
+| --------------- | --------------------------------- | -------------------------------------------------------------- |
+| `Exercise`      | `Item`                            | gains `disciplineId`, `section`/type tag, `focus[]`, `metric`  |
+| `Workout`       | `Routine`                         | gains `disciplineId`; sections instead of a flat exercise list |
+| `Program`       | `Program`                         | gains `disciplineId`                                           |
+| `SessionLog`    | `Session`                         | gains `disciplineId`; logged values vary by item metric        |
+| —               | `Discipline`, `Section`, `Metric` | new                                                            |
+
+Because the app is pre-beta with no users, v1.4.0 **wipes IndexedDB and re-seeds** rather than migrating records — see the [v1.4.0 README](../features/v1.4.0/README.md).
+
+---
+
+## Entities (current — strength-only)
 
 ### Exercise
 
