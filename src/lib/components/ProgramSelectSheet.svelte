@@ -6,14 +6,27 @@
 	type Props = {
 		onClose: () => void;
 		onCreateNew: () => void;
+		disciplineId?: string;
 	};
 
-	let { onClose, onCreateNew }: Props = $props();
+	let { onClose, onCreateNew, disciplineId }: Props = $props();
+
+	let programs = $derived(
+		disciplineId
+			? programStore.programs.filter((p) => p.disciplineId === disciplineId)
+			: programStore.programs,
+	);
 
 	function switchTo(program: Program) {
 		programStore.setActiveProgram(program.id);
 		onClose();
 	}
+
+	let activeId = $derived(
+		disciplineId
+			? programStore.activeProgramFor(disciplineId)?.id
+			: programStore.activeProgram?.id,
+	);
 </script>
 
 <BottomSheet onclose={onClose} maxHeight="80dvh">
@@ -36,8 +49,8 @@
 		</div>
 
 		<div class="prog-sheet__list">
-			{#each programStore.programs as program (program.id)}
-				{@const isActive = program.id === programStore.activeProgram?.id}
+			{#each programs as program (program.id)}
+				{@const isActive = program.id === activeId}
 				<div class="prog-row" class:prog-row--active={isActive}>
 					<div class="prog-row__info">
 						<div class="prog-row__name-row">

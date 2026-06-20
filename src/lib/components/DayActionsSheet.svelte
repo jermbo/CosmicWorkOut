@@ -11,35 +11,39 @@
 
 	type Props = {
 		date: string;
-		session?: Session | null;
+		strengthSession?: Session | null;
+		danceSession?: Session | null;
 		hasHabits?: boolean;
 		hasActivities?: boolean;
 		activities?: ActivityLog[];
 		onClose: () => void;
-		onViewSession?: () => void;
+		onViewStrengthSession?: () => void;
+		onViewDanceSession?: () => void;
 		onViewHabits?: () => void;
 		onEditActivity?: (activity: ActivityLog) => void;
 	};
 
 	let {
 		date,
-		session = null,
+		strengthSession = null,
+		danceSession = null,
 		hasHabits = false,
 		hasActivities = false,
 		activities = [],
 		onClose,
-		onViewSession,
+		onViewStrengthSession,
+		onViewDanceSession,
 		onViewHabits,
 		onEditActivity,
 	}: Props = $props();
 
-	let workoutName = $derived(
-		session
-			? (programStore.getRoutineForSession(session)?.name ??
-					programStore.getRoutineById(session.routineId)?.name ??
-					'Workout')
-			: null,
-	);
+	function routineName(session: Session): string {
+		return (
+			programStore.getRoutineForSession(session)?.name ??
+			programStore.getRoutineById(session.routineId)?.name ??
+			'Session'
+		);
+	}
 
 	function navigate(path: string) {
 		onClose();
@@ -51,10 +55,18 @@
 	<div class="day-actions">
 		<p class="day-actions__date">{formatLongDate(date)}</p>
 
-		{#if session && workoutName}
+		{#if strengthSession}
 			<DayActionsWorkoutSummary
-				{workoutName}
-				durationLabel={session.durationSeconds ? formatDuration(session.durationSeconds) : null}
+				workoutName={routineName(strengthSession)}
+				durationLabel={strengthSession.durationSeconds ? formatDuration(strengthSession.durationSeconds) : null}
+			/>
+		{/if}
+
+		{#if danceSession}
+			<DayActionsWorkoutSummary
+				workoutName={routineName(danceSession)}
+				durationLabel={danceSession.durationSeconds ? formatDuration(danceSession.durationSeconds) : null}
+				variant="dance"
 			/>
 		{/if}
 
@@ -78,9 +90,16 @@
 
 			<DayActionItem
 				icon="edit"
-				label={session ? 'Edit workout' : 'Log workout'}
-				description={session ? 'Update sets and exercises' : 'Start or record a session'}
+				label={strengthSession ? 'Edit strength session' : 'Log strength workout'}
+				description={strengthSession ? 'Update sets and exercises' : 'Start or record a session'}
 				onclick={() => navigate('/workout')}
+			/>
+
+			<DayActionItem
+				icon="edit"
+				label={danceSession ? 'Edit dance practice' : 'Log dance practice'}
+				description={danceSession ? 'Update items and duration' : 'Start or record a practice'}
+				onclick={() => navigate('/practice/dance')}
 			/>
 
 			<DayActionItem
@@ -90,13 +109,23 @@
 				onclick={() => navigate('/log')}
 			/>
 
-			{#if session && onViewSession}
+			{#if strengthSession && onViewStrengthSession}
 				<DayActionItem
 					icon="chevron-down"
-					label="View session details"
+					label="View strength details"
 					description="Exercises, sets, and volume"
 					secondary
-					onclick={onViewSession}
+					onclick={onViewStrengthSession}
+				/>
+			{/if}
+
+			{#if danceSession && onViewDanceSession}
+				<DayActionItem
+					icon="chevron-down"
+					label="View dance details"
+					description="Routine, items, and duration"
+					secondary
+					onclick={onViewDanceSession}
 				/>
 			{/if}
 		</div>

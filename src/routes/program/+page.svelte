@@ -1,8 +1,15 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { flattenItems } from '$lib/discipline';
+	import {
+		flattenItems,
+		effectiveSections,
+		STRENGTH_DISCIPLINE_ID,
+		BELLYDANCE_DISCIPLINE_ID,
+	} from '$lib/discipline';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
+	import DanceRoutineEditor from '$lib/components/DanceRoutineEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Icon from '$lib/components/Icon.svelte';
@@ -14,19 +21,32 @@
 	let removeWorkoutName = $state<string | null>(null);
 	let selectedWeek = $state(1);
 
-	// Which program's schedule is shown in the detail panel (defaults to active)
+	let disciplineId = $derived(
+		page.url.searchParams.get('discipline') === BELLYDANCE_DISCIPLINE_ID
+			? BELLYDANCE_DISCIPLINE_ID
+			: STRENGTH_DISCIPLINE_ID,
+	);
+
+	let disciplinePrograms = $derived(programStore.programs.filter((p) => p.disciplineId === disciplineId));
+
+	// Which program's schedule is shown in the detail panel (defaults to active for discipline)
 	let viewingProgramId = $state<string | undefined>(undefined);
 
-	// Sync initial value once programs load
 	$effect(() => {
-		if (viewingProgramId === undefined && programStore.programs.length > 0) {
-			viewingProgramId = programStore.activeProgram?.id ?? programStore.programs[0]?.id;
+		if (viewingProgramId === undefined && disciplinePrograms.length > 0) {
+			viewingProgramId =
+				programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		}
 	});
 
-	let viewingProgram = $derived(programStore.programs.find((p) => p.id === viewingProgramId));
+	$effect(() => {
+		void disciplineId;
+		viewingProgramId = undefined;
+	});
 
-	let viewingIsActive = $derived(viewingProgramId === programStore.activeProgram?.id);
+	let viewingProgram = $derived(disciplinePrograms.find((p) => p.id === viewingProgramId));
+
+	let viewingIsActive = $derived(viewingProgramId === programStore.activeProgramFor(disciplineId)?.id);
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
@@ -60,13 +80,20 @@
 
 	function getWorkoutStatus(workout: Routine): 'today' | 'done' | 'scheduled' {
 		if (!viewingIsActive) return 'scheduled';
-		const todaysId = programStore.todaysRoutine?.id;
+		const todaysId = programStore.todaysRoutineFor(disciplineId)?.id;
 		if (workout.id === todaysId) return 'today';
-		const allIds = programStore.allRoutines.map((w) => w.id);
+		const allIds = programStore.allRoutinesFor(disciplineId).map((w) => w.id);
 		const todayIdx = allIds.indexOf(todaysId ?? '');
 		const thisIdx = allIds.indexOf(workout.id);
 		if (thisIdx < todayIdx) return 'done';
 		return 'scheduled';
+	}
+
+	function displayItemsForRoutine(routine: Routine) {
+		if (!viewingProgram || disciplineId === STRENGTH_DISCIPLINE_ID) {
+			return flattenItems(routine);
+		}
+		return effectiveSections(viewingProgram, routine).flatMap((s) => s.items);
 	}
 
 	async function handleDeleteProgram() {
@@ -74,7 +101,7 @@
 		deletingProgram = true;
 		try {
 			await programStore.deleteProgram(viewingProgram.id);
-			viewingProgramId = programStore.activeProgram?.id ?? programStore.programs[0]?.id;
+			viewingProgramId = programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		} finally {
 			deletingProgram = false;
 			showDeleteProgramConfirm = false;
@@ -107,8 +134,8 @@
 	</div>
 
 	<div class="prog-list" role="list" aria-label="Available programs">
-		{#each programStore.programs as program (program.id)}
-			{@const isActive = program.id === programStore.activeProgram?.id}
+		{#each disciplinePrograms as program (program.id)}
+			{@const isActive = program.id === programStore.activeProgramFor(disciplineId)?.id}
 			{@const isViewing = program.id === viewingProgramId}
 			<div
 				class="prog-card"
@@ -189,19 +216,19 @@
 						<div class="schedule__progress-labels">
 							<span class="schedule__progress-label">Progress</span>
 							<span class="schedule__progress-wk">
-								Week {programStore.currentWeekNumber} of {viewingProgram.durationWeeks}
+								Week {programStore.currentWeekFor(disciplineId)} of {viewingProgram.durationWeeks}
 							</span>
 						</div>
 						<div
 							class="schedule__progress-bar"
 							role="progressbar"
-							aria-valuenow={programStore.currentWeekNumber}
+							aria-valuenow={programStore.currentWeekFor(disciplineId)}
 							aria-valuemin={1}
 							aria-valuemax={viewingProgram.durationWeeks}
 						>
 							<div
 								class="schedule__progress-fill"
-								style:inline-size="{((programStore.currentWeekNumber - 1) / viewingProgram.durationWeeks) * 100}%"
+								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) / viewingProgram.durationWeeks) * 100}%"
 							></div>
 						</div>
 					</div>
@@ -222,7 +249,7 @@
 				</button>
 				<span class="week-picker__label">
 					Week {selectedWeek}
-					{#if viewingIsActive && selectedWeek === programStore.currentWeekNumber}
+					{#if viewingIsActive && selectedWeek === programStore.currentWeekFor(disciplineId)}
 						<span class="week-picker__now">current</span>
 					{/if}
 				</span>
@@ -286,9 +313,9 @@
 							</div>
 						</div>
 
-						{#if flattenItems(workout).length > 0}
-							<div class="workout-card__chips" role="list" aria-label="Exercises in {workout.name}">
-								{#each flattenItems(workout) as we}
+						{#if displayItemsForRoutine(workout).length > 0}
+							<div class="workout-card__chips" role="list" aria-label="Items in {workout.name}">
+								{#each displayItemsForRoutine(workout) as we}
 									{@const ex = programStore.itemMap.get(we.itemId)}
 									{#if ex}
 										<span class="workout-card__chip" role="listitem">{ex.name}</span>
@@ -299,10 +326,12 @@
 					</article>
 				{/each}
 
-				<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
-					<Icon name="plus" size={18} stroke={2.5} />
-					Add workout
-				</button>
+				{#if disciplineId === STRENGTH_DISCIPLINE_ID}
+					<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
+						<Icon name="plus" size={18} stroke={2.5} />
+						Add workout
+					</button>
+				{/if}
 			</div>
 		</section>
 	{/if}
@@ -336,11 +365,19 @@
 {/if}
 
 {#if editingWorkout !== undefined}
-	<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+	{#if disciplineId === BELLYDANCE_DISCIPLINE_ID && editingWorkout && viewingProgram}
+		<DanceRoutineEditor
+			program={viewingProgram}
+			routine={editingWorkout}
+			onBack={() => (editingWorkout = undefined)}
+		/>
+	{:else}
+		<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+	{/if}
 {/if}
 
 {#if showCreateProgram}
-	<CreateProgramSheet onClose={() => (showCreateProgram = false)} />
+	<CreateProgramSheet {disciplineId} onClose={() => (showCreateProgram = false)} />
 {/if}
 
 <style>

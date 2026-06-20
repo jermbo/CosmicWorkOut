@@ -9,12 +9,13 @@
 	type Props = {
 		title: string;
 		showBack?: boolean;
+		backHref?: string;
 		showMoodDots?: boolean;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
 	};
 
-	let { title, showBack = false, showMoodDots = false, onDateChange, trailing }: Props = $props();
+	let { title, showBack = false, backHref = '/', showMoodDots = false, onDateChange, trailing }: Props = $props();
 
 	const todayStr = todayIso();
 
@@ -43,7 +44,7 @@
 		<div class="page-header__text">
 			<div class="page-header__eyebrow-row">
 				{#if showBack}
-					<button class="page-header__back" onclick={() => goto('/')} aria-label="Back to home">
+					<button class="page-header__back" onclick={() => goto(backHref)} aria-label="Back">
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"

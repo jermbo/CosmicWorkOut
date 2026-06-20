@@ -2,9 +2,11 @@
 	import { onMount } from 'svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 
-	type Props = { onClose: () => void };
+	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 
-	let { onClose }: Props = $props();
+	type Props = { onClose: () => void; disciplineId?: string };
+
+	let { onClose, disciplineId = STRENGTH_DISCIPLINE_ID }: Props = $props();
 
 	type Step = 'details' | 'workouts';
 
@@ -51,6 +53,7 @@
 			durationWeeks,
 			daysPerWeek,
 			routineTemplates: templates,
+			disciplineId,
 		});
 
 		programStore.setActiveProgram(program.id);

@@ -7,6 +7,7 @@
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
@@ -34,6 +35,8 @@
 
 	let showDeleteConfirm = $state(false);
 
+	let isDance = $derived(session.disciplineId === BELLYDANCE_DISCIPLINE_ID);
+
 	$effect(() => {
 		loggingContext.setDate(session.date);
 	});
@@ -46,8 +49,9 @@
 
 	async function handleEdit() {
 		const workout = programStore.getRoutineForSession(session);
-		if (!workout) return;
-		await sessionStore.editSession(session, workout, exerciseMap);
+		const program = programStore.programs.find((p) => p.id === session.programId);
+		if (!workout || !program) return;
+		await sessionStore.editSession(session, workout, program, exerciseMap);
 		onEdit?.();
 		onClose();
 	}
@@ -75,13 +79,15 @@
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
 			<div class="day-summary__stat">
 				<span class="day-summary__stat-value">{session.items.length}</span>
-				<span class="day-summary__stat-label">Exercises</span>
+				<span class="day-summary__stat-label">{isDance ? 'Items' : 'Exercises'}</span>
 			</div>
-			<div class="day-summary__stat-sep" aria-hidden="true"></div>
-			<div class="day-summary__stat">
-				<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
-				<span class="day-summary__stat-label">lb lifted</span>
-			</div>
+			{#if !isDance}
+				<div class="day-summary__stat-sep" aria-hidden="true"></div>
+				<div class="day-summary__stat">
+					<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
+					<span class="day-summary__stat-label">lb lifted</span>
+				</div>
+			{/if}
 		</div>
 
 		<div class="day-summary__exercises">
@@ -91,9 +97,21 @@
 					<div class="day-summary__exercise">
 						<div class="day-summary__exercise-header">
 							<span class="day-summary__exercise-name">{exercise.name}</span>
-							<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
+							{#if isDance}
+								<span class="day-summary__exercise-sets">
+									{#if loggedEx.checked}
+										Done
+									{:else if loggedEx.skipped}
+										Skipped
+									{:else if loggedEx.value != null}
+										{loggedEx.value} {loggedEx.measureMode === 'reps' ? 'reps' : 'sec'}
+									{/if}
+								</span>
+							{:else}
+								<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
+							{/if}
 						</div>
-						{#if loggedEx.sets.length > 0}
+						{#if !isDance && loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
 								{#if typeof loggedEx.sets[0].weight === 'number' && loggedEx.sets[0].weight > 0}
 									Top: {Math.max(

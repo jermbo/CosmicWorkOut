@@ -4,12 +4,15 @@
 	const navItems = [
 		{ href: '/', label: 'Today', exact: true },
 		{ href: '/habits', label: 'Habits', exact: false },
-		{ href: '/workout', label: 'Workout', exact: false },
+		{ href: '/practice', label: 'Practice', exact: false },
 		{ href: '/calendar', label: 'History', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
 	];
 
 	function isActive(item: (typeof navItems)[number]): boolean {
+		if (item.href === '/practice') {
+			return page.url.pathname.startsWith('/practice') || page.url.pathname.startsWith('/workout');
+		}
 		if (item.exact) {
 			return page.url.pathname === item.href;
 		}
@@ -54,7 +57,7 @@
 							<path d="M9 11l3 3L22 4" />
 							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
 						</svg>
-					{:else if item.label === 'Workout'}
+					{:else if item.label === 'Practice'}
 						<svg
 							class="bottom-nav__icon"
 							aria-hidden="true"

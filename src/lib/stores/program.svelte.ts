@@ -1,9 +1,9 @@
-import type { Program, Item, Routine, RoutineItem, Session, Week, RoutineColor } from '$lib/db/types';
+import type { Program, Item, Routine, RoutineItem, RoutineSection, Session, Week, RoutineColor } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
-import { computeWeekStreak } from '$lib/streak';
-import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '$lib/discipline';
+import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
+import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
 
 // Per-Discipline active program: disciplineId → programId. Replaces the legacy
 // single 'cwout:activeProgramId' so strength and belly dance can be active at once.
@@ -74,6 +74,19 @@ class ProgramStore {
 		);
 	}
 
+	combinedWeekStreak = $derived(
+		computeCombinedStreak(
+			[STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID].map((id) =>
+				this.sessionsForDiscipline(id).map((s) => s.date),
+			),
+			1,
+		),
+	);
+
+	activeDisciplines = $derived(
+		disciplines.filter((d) => this.activeProgramFor(d.id) !== null),
+	);
+
 	isProgramCompleteFor(disciplineId: string): boolean {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return false;
@@ -127,15 +140,28 @@ class ProgramStore {
 	});
 
 	suggestedRoutineInCurrentWeek = $derived.by(() => {
-		const weekRoutines = this.routinesForCurrentWeek;
-		const suggested = this.todaysRoutine;
-		if (weekRoutines.length === 0) return null as Routine | null;
+		return this.suggestedRoutineInCurrentWeekFor(STRENGTH_DISCIPLINE_ID);
+	});
+
+	suggestedRoutineInCurrentWeekFor(disciplineId: string): Routine | null {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return null;
+		const weekRoutines = program.weeks[this.currentWeekFor(disciplineId) - 1]?.routines ?? [];
+		const suggested = this.todaysRoutineFor(disciplineId);
+		if (weekRoutines.length === 0) return null;
 		if (!suggested) return weekRoutines[0];
 		const byLetter = weekRoutines.find((r) => r.letter === suggested.letter);
 		if (byLetter) return byLetter;
 		const byName = weekRoutines.find((r) => r.name === suggested.name);
 		return byName ?? weekRoutines[0];
-	});
+	}
+
+	routinesForCurrentWeekFor(disciplineId: string): Routine[] {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return [];
+		const week = program.weeks[this.currentWeekFor(disciplineId) - 1];
+		return week?.routines ?? [];
+	}
 
 	// Unique routine templates from week 1 (canonical A/B/C definitions)
 	uniqueRoutines = $derived.by(() => {
@@ -204,23 +230,46 @@ class ProgramStore {
 	}
 
 	getRoutineById(routineId: string): Routine | undefined {
-		return this.allRoutines.find((r) => r.id === routineId);
+		for (const program of this.programs) {
+			for (const week of program.weeks) {
+				const found = week.routines.find((r) => r.id === routineId);
+				if (found) return found;
+			}
+		}
+		return undefined;
+	}
+
+	getProgramForRoutine(routineId: string): Program | undefined {
+		for (const program of this.programs) {
+			for (const week of program.weeks) {
+				if (week.routines.some((r) => r.id === routineId)) return program;
+			}
+		}
+		return undefined;
 	}
 
 	getRoutineForSession(log: Session): Routine | null {
+		const program = this.programs.find((p) => p.id === log.programId);
+		if (program) {
+			for (const week of program.weeks) {
+				const direct = week.routines.find((r) => r.id === log.routineId);
+				if (direct) return direct;
+			}
+
+			const suffix = log.routineId.split('-').slice(1).join('-');
+			if (suffix) {
+				for (const week of program.weeks) {
+					const bySuffix = week.routines.find((r) => r.id.endsWith(`-${suffix}`));
+					if (bySuffix) return bySuffix;
+				}
+			}
+		}
+
 		const direct = this.getRoutineById(log.routineId);
 		if (direct) return direct;
 
-		// Fallback: match by letter suffix (e.g. w5-lower → lower)
-		const suffix = log.routineId.split('-').slice(1).join('-');
-		if (suffix) {
-			const bySuffix = this.allRoutines.find((r) => r.id.endsWith(`-${suffix}`));
-			if (bySuffix) return bySuffix;
-		}
-
 		if (log.items.length === 0) return null;
 
-		// Last resort: build a minimal routine from the logged data
 		return {
 			id: log.routineId,
 			disciplineId: log.disciplineId,
@@ -235,10 +284,18 @@ class ProgramStore {
 		};
 	}
 
-	sessionForDate(date: string): Session | null {
-		const program = this.activeProgram;
+	sessionForDisciplineDate(disciplineId: string, date: string): Session | null {
+		const program = this.activeProgramFor(disciplineId);
 		if (!program) return null;
 		return this.sessions.find((s) => s.date === date && s.programId === program.id) ?? null;
+	}
+
+	sessionsForDate(date: string): Session[] {
+		return this.sessions.filter((s) => s.date === date);
+	}
+
+	sessionForDate(date: string): Session | null {
+		return this.sessionForDisciplineDate(STRENGTH_DISCIPLINE_ID, date);
 	}
 
 	async deleteSession(id: string): Promise<void> {
@@ -271,6 +328,35 @@ class ProgramStore {
 							focus: updates.focus ?? r.focus,
 							color: updates.color ?? r.color,
 							sections: singleSection(updates.items),
+						}
+					: r,
+			),
+		}));
+
+		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
+	}
+
+	// Save a multi-section routine (belly dance) across every week of a program,
+	// matched by the routine's original name. Sections carry their own bookend
+	// override flags (US-017); strength keeps the single-section saveRoutine above.
+	async saveRoutineSections(
+		programId: string,
+		originalName: string,
+		updates: { name: string; focus?: string; color?: RoutineColor; sections: RoutineSection[] },
+	): Promise<void> {
+		const program = this.programs.find((p) => p.id === programId);
+		if (!program) return;
+
+		const updatedWeeks = program.weeks.map((week) => ({
+			...week,
+			routines: week.routines.map((r) =>
+				r.name === originalName
+					? {
+							...r,
+							name: updates.name,
+							focus: updates.focus ?? r.focus,
+							color: updates.color ?? r.color,
+							sections: structuredClone(updates.sections),
 						}
 					: r,
 			),
@@ -341,6 +427,7 @@ class ProgramStore {
 		disciplineId?: string;
 	}): Promise<Program> {
 		const disciplineId = data.disciplineId ?? STRENGTH_DISCIPLINE_ID;
+		const defaultSections = disciplineId === STRENGTH_DISCIPLINE_ID ? singleSection([]) : emptySections(disciplineId);
 		const weeks: Week[] = Array.from({ length: data.durationWeeks }, (_, wi) => ({
 			weekNumber: wi + 1,
 			routines: data.routineTemplates.map((tmpl, i) => ({
@@ -350,7 +437,7 @@ class ProgramStore {
 				letter: String.fromCharCode(65 + i),
 				focus: tmpl.focus,
 				color: ROUTINE_COLORS[i % ROUTINE_COLORS.length],
-				sections: singleSection([]),
+				sections: structuredClone(defaultSections),
 			})),
 		}));
 

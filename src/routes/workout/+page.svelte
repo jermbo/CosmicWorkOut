@@ -10,6 +10,7 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
+	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 
 	const todayStr = todayIso();
 
@@ -31,6 +32,7 @@
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
 	let showStartConfirm = $state(false);
+	let showConflictConfirm = $state(false);
 
 	async function doStartSession() {
 		const workout = selectedWorkout;
@@ -40,6 +42,10 @@
 	}
 
 	async function startSession() {
+		if (sessionStore.isActive && sessionStore.activeDisciplineId !== STRENGTH_DISCIPLINE_ID) {
+			showConflictConfirm = true;
+			return;
+		}
 		if (contextDate !== todayStr) {
 			showStartConfirm = true;
 			return;
@@ -51,8 +57,9 @@
 		const session = sessionForDate;
 		if (!session) return;
 		const workout = programStore.getRoutineForSession(session);
-		if (!workout) return;
-		await sessionStore.editSession(session, workout, programStore.itemMap);
+		const program = programStore.programs.find((p) => p.id === session.programId);
+		if (!workout || !program) return;
+		await sessionStore.editSession(session, workout, program, programStore.itemMap);
 	}
 
 </script>
@@ -159,6 +166,22 @@
 		oncancel={() => (showStartConfirm = false)}
 	>
 		This session will be saved for a past date, not today.
+	</ConfirmDialog>
+{/if}
+
+{#if showConflictConfirm}
+	<ConfirmDialog
+		title="Another session is active"
+		confirmLabel="Switch anyway"
+		danger
+		onconfirm={async () => {
+			showConflictConfirm = false;
+			sessionStore.abandon();
+			await startSession();
+		}}
+		oncancel={() => (showConflictConfirm = false)}
+	>
+		You have an unfinished session in another discipline. Starting this workout will discard it.
 	</ConfirmDialog>
 {/if}
 

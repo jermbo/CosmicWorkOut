@@ -8,12 +8,13 @@
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { journalStore } from '$lib/stores/journal.svelte';
 	import { todayIso } from '$lib/date';
-	import { flattenItems } from '$lib/discipline';
+	import { flattenItems, effectiveSections, BELLYDANCE_DISCIPLINE_ID, STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import WeekStreakBadge from '$lib/components/WeekStreakBadge.svelte';
 	import HomeHabitsCard from '$lib/components/HomeHabitsCard.svelte';
 	import HomeWorkoutCard from '$lib/components/HomeWorkoutCard.svelte';
+	import HomeDanceCard from '$lib/components/HomeDanceCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
 	import HomeJournalCard from '$lib/components/HomeJournalCard.svelte';
 
@@ -34,23 +35,50 @@
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 	let journalEntry = $derived(journalStore.entryForDate(contextDate));
 
-	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeek);
+	let strengthSession = $derived(programStore.sessionForDisciplineDate(STRENGTH_DISCIPLINE_ID, contextDate));
+	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeekFor(STRENGTH_DISCIPLINE_ID));
 	let workoutName = $derived.by(() => {
-		if (sessionForDate) {
-			return programStore.getRoutineById(sessionForDate.routineId)?.name ?? 'Session logged';
+		if (strengthSession) {
+			return programStore.getRoutineById(strengthSession.routineId)?.name ?? 'Session logged';
 		}
 		return suggestedWorkout?.name ?? null;
 	});
 	let workoutMeta = $derived.by(() => {
-		if (sessionForDate) {
-			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${formatCountWithWord(sessionForDate.items.length, 'exercise')}`;
+		if (strengthSession) {
+			return `${formatDuration(strengthSession.durationSeconds ?? 0)} · ${formatCountWithWord(strengthSession.items.length, 'exercise')}`;
 		}
 		if (suggestedWorkout) {
 			return `${formatCountWithWord(flattenItems(suggestedWorkout).length, 'exercise')} · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
 		}
 		return null;
 	});
+
+	let danceSession = $derived(programStore.sessionForDisciplineDate(BELLYDANCE_DISCIPLINE_ID, contextDate));
+	let suggestedDance = $derived(programStore.suggestedRoutineInCurrentWeekFor(BELLYDANCE_DISCIPLINE_ID));
+	let danceProgram = $derived(programStore.activeProgramFor(BELLYDANCE_DISCIPLINE_ID));
+	let danceName = $derived.by(() => {
+		if (danceSession) {
+			return programStore.getRoutineById(danceSession.routineId)?.name ?? 'Practice logged';
+		}
+		return suggestedDance?.name ?? null;
+	});
+	let danceMeta = $derived.by(() => {
+		if (danceSession) {
+			return `${formatDuration(danceSession.durationSeconds ?? 0)} · ${formatCountWithWord(danceSession.items.length, 'item')}`;
+		}
+		if (suggestedDance && danceProgram) {
+			const count = effectiveSections(danceProgram, suggestedDance).reduce((n, s) => n + s.items.length, 0);
+			return `Routine ${suggestedDance.letter ?? '?'} · ${formatCountWithWord(count, 'item')} · ~${formatMinutes(suggestedDance.estMin ?? 0)}`;
+		}
+		return null;
+	});
+
+	let strengthActive = $derived(
+		sessionStore.isActive && sessionStore.activeDisciplineId === STRENGTH_DISCIPLINE_ID,
+	);
+	let danceActive = $derived(
+		sessionStore.isActive && sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID,
+	);
 </script>
 
 <svelte:head>
@@ -60,20 +88,30 @@
 <div class="page page--wide home-page">
 	<PageHeader title={isToday ? 'Today' : 'Past Day'} onDateChange={() => goto('/', { replaceState: true })}>
 		{#snippet trailing()}
-			<WeekStreakBadge streak={programStore.weekStreak} />
+			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
 		{/snippet}
 	</PageHeader>
 
 	<div class="home-cards">
 		<HomeHabitsCard logged={habitsLogged} total={habitsTotal} />
 		<HomeWorkoutCard
-			{workoutName}
-			{workoutMeta}
+			workoutName={workoutName}
+			workoutMeta={workoutMeta}
 			loaded={programStore.loaded}
 			isProgramComplete={programStore.isProgramComplete}
-			hasSession={!!sessionForDate}
-			isActive={sessionStore.isActive}
+			hasSession={!!strengthSession}
+			isActive={strengthActive}
 		/>
+		{#if programStore.activeProgramFor(BELLYDANCE_DISCIPLINE_ID)}
+			<HomeDanceCard
+				routineName={danceName}
+				routineMeta={danceMeta}
+				loaded={programStore.loaded}
+				isProgramComplete={programStore.isProgramCompleteFor(BELLYDANCE_DISCIPLINE_ID)}
+				hasSession={!!danceSession}
+				isActive={danceActive}
+			/>
+		{/if}
 		<HomeActivityCard activities={dateActivities} />
 		<HomeJournalCard entry={journalEntry} />
 	</div>

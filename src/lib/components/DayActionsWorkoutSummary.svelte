@@ -2,13 +2,14 @@
 	type Props = {
 		workoutName: string;
 		durationLabel?: string | null;
+		variant?: 'strength' | 'dance';
 	};
 
-	let { workoutName, durationLabel = null }: Props = $props();
+	let { workoutName, durationLabel = null, variant = 'strength' }: Props = $props();
 </script>
 
-<div class="day-actions-summary">
-	<span class="day-actions-summary__label">Workout logged</span>
+<div class="day-actions-summary" class:day-actions-summary--dance={variant === 'dance'}>
+	<span class="day-actions-summary__label">{variant === 'dance' ? 'Dance logged' : 'Workout logged'}</span>
 	<span class="day-actions-summary__value">{workoutName}</span>
 	{#if durationLabel}
 		<span class="day-actions-summary__meta">{durationLabel}</span>
@@ -39,6 +40,11 @@
 		font-size: 0.9375rem;
 		font-weight: 700;
 		color: var(--color-text-primary);
+	}
+
+	.day-actions-summary--dance {
+		background: color-mix(in srgb, var(--color-lavender) 8%, var(--color-surface-3));
+		border-color: color-mix(in srgb, var(--color-lavender) 25%, var(--color-border));
 	}
 
 	.day-actions-summary__meta {

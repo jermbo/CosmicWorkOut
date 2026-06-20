@@ -64,14 +64,14 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## v1.4.0 — Belly Dance & the Discipline Model
 
-| Feature                                    | Status     | Doc reference |
-| ------------------------------------------ | ---------- | ------------- |
-| Discipline engine foundation               | ❌ Planned | US-015        |
-| Item library (Discipline-scoped)           | ❌ Planned | US-016        |
-| Belly Dance Discipline, program & routines | ❌ Planned | US-017        |
-| Practice hub & navigation                  | ❌ Planned | US-018        |
-| Dance session flow                         | ❌ Planned | US-019        |
-| Cross-Discipline streaks & calendar        | ❌ Planned | US-020        |
+| Feature                                    | Status   | Doc reference |
+| ------------------------------------------ | -------- | ------------- |
+| Discipline engine foundation               | ✅ Built | US-015        |
+| Item library (Discipline-scoped)           | ✅ Built | US-016        |
+| Belly Dance Discipline, program & routines | ✅ Built | US-017        |
+| Practice hub & navigation                  | ✅ Built | US-018        |
+| Dance session flow                         | ✅ Built | US-019        |
+| Cross-Discipline streaks & calendar        | ✅ Built | US-020        |
 
 ---
 
@@ -85,8 +85,9 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## Built-In Content
 
-- **1 program:** Strength Foundation (12 weeks, 3 days/week, workouts A/B/C)
-- **31 exercises** across 8 categories (Hinge, Squat, Push, Pull, Lateral, Rotational, Power, Carry)
+- **2 programs:** Strength Foundation + Belly Dance Foundations (12 weeks each, 3 days/week, routines A/B/C)
+- **31 strength exercises** across 8 categories (Hinge, Squat, Push, Pull, Lateral, Rotational, Power, Carry)
+- **12 belly dance items** across warm-up, conditioning, moves, and cool-down
 - **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood
 - All seeded from `src/lib/db/seed.ts`; items, habits, and programs are seeded only on first run (empty store). Built-in content updates ride the DB version bump (wipe + re-seed), not a per-boot rewrite.
 

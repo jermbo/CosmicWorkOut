@@ -8,16 +8,21 @@ import type {
 	Item,
 	RoutineItem,
 	LoggedItem,
+	Metric,
 } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
-import { flattenItems } from '$lib/discipline';
+import { effectiveSections } from '$lib/discipline';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
 function snapshotLog(log: Session): Session {
 	return $state.snapshot(log) as Session;
+}
+
+function isSetsRepsItem(ai: ActiveItem): boolean {
+	return ai.metric === undefined || ai.metric === 'setsReps';
 }
 
 class SessionStore {
@@ -35,6 +40,10 @@ class SessionStore {
 
 	get activeRoutineName(): string {
 		return this.active?.routineName ?? '';
+	}
+
+	get activeDisciplineId(): string | null {
+		return this.active?.disciplineId ?? null;
 	}
 
 	checkForRecovery(): boolean {
@@ -60,42 +69,83 @@ class SessionStore {
 		}
 	}
 
-	private async buildActiveItems(routine: Routine, itemMap: Map<string, Item>): Promise<ActiveItem[]> {
-		const activeItems: ActiveItem[] = [];
+	private async buildStrengthItem(ri: RoutineItem, item: Item): Promise<ActiveItem> {
+		const lastUsed = await db.itemLastUsed.get(ri.itemId);
+		const defaultWeight: number | string = lastUsed?.weight ?? 0;
 
-		for (const ri of flattenItems(routine)) {
-			const item = itemMap.get(ri.itemId);
-			if (!item) {
-				continue;
-			}
+		const targetReps = ri.reps ?? item.defaultReps ?? '8';
+		let defaultReps = parseInt(targetReps.split('-')[0], 10) || 8;
+		if (lastUsed?.reps) {
+			defaultReps = lastUsed.reps;
+		}
 
-			const lastUsed = await db.itemLastUsed.get(ri.itemId);
-			const defaultWeight: number | string = lastUsed?.weight ?? 0;
-
-			const targetReps = ri.reps ?? item.defaultReps ?? '8';
-			let defaultReps = parseInt(targetReps.split('-')[0], 10) || 8;
-			if (lastUsed?.reps) {
-				defaultReps = lastUsed.reps;
-			}
-
-			const setCount = ri.sets ?? item.defaultSets ?? 1;
-			const sets: ActiveSet[] = [];
-			for (let i = 0; i < setCount; i++) {
-				sets.push({
-					setNumber: i + 1,
-					targetReps,
-					weight: defaultWeight,
-					reps: defaultReps,
-					completed: false,
-					completedAt: null,
-				});
-			}
-
-			activeItems.push({
-				itemId: item.id,
-				unit: item.unit ?? 'bodyweight',
-				sets,
+		const setCount = ri.sets ?? item.defaultSets ?? 1;
+		const sets: ActiveSet[] = [];
+		for (let i = 0; i < setCount; i++) {
+			sets.push({
+				setNumber: i + 1,
+				targetReps,
+				weight: defaultWeight,
+				reps: defaultReps,
+				completed: false,
+				completedAt: null,
 			});
+		}
+
+		return {
+			itemId: item.id,
+			unit: item.unit ?? 'bodyweight',
+			sets,
+			metric: 'setsReps',
+			section: 'exercises',
+		};
+	}
+
+	private buildCheckItem(item: Item, sectionKey: string): ActiveItem {
+		return {
+			itemId: item.id,
+			unit: 'bodyweight',
+			sets: [],
+			metric: 'check',
+			section: sectionKey,
+			checked: false,
+		};
+	}
+
+	private buildMeasureItem(item: Item, sectionKey: string): ActiveItem {
+		return {
+			itemId: item.id,
+			unit: 'bodyweight',
+			sets: [],
+			metric: 'measure',
+			section: sectionKey,
+			value: null,
+			measureMode: 'duration',
+			skipped: false,
+		};
+	}
+
+	private async buildActiveItems(
+		routine: Routine,
+		program: Program,
+		itemMap: Map<string, Item>,
+	): Promise<ActiveItem[]> {
+		const activeItems: ActiveItem[] = [];
+		const sections = effectiveSections(program, routine);
+
+		for (const section of sections) {
+			for (const ri of section.items) {
+				const item = itemMap.get(ri.itemId);
+				if (!item) continue;
+
+				if (section.metric === 'setsReps') {
+					activeItems.push(await this.buildStrengthItem(ri, item));
+				} else if (section.metric === 'check') {
+					activeItems.push(this.buildCheckItem(item, section.key));
+				} else {
+					activeItems.push(this.buildMeasureItem(item, section.key));
+				}
+			}
 		}
 
 		return activeItems;
@@ -103,24 +153,38 @@ class SessionStore {
 
 	private buildEditItemList(
 		routine: Routine,
+		program: Program,
 		log: Session,
-	): Array<{ itemId: string; template?: RoutineItem; logged: LoggedItem }> {
+	): Array<{ itemId: string; template?: RoutineItem; logged: LoggedItem; metric: Metric; section: string }> {
 		const loggedById = new Map(log.items.map((e) => [e.itemId, e]));
 		const seen = new Set<string>();
-		const result: Array<{ itemId: string; template?: RoutineItem; logged: LoggedItem }> = [];
+		const result: Array<{
+			itemId: string;
+			template?: RoutineItem;
+			logged: LoggedItem;
+			metric: Metric;
+			section: string;
+		}> = [];
 
-		for (const ri of flattenItems(routine)) {
-			seen.add(ri.itemId);
-			result.push({
-				itemId: ri.itemId,
-				template: ri,
-				logged: loggedById.get(ri.itemId) ?? { itemId: ri.itemId, sets: [] },
-			});
+		for (const section of effectiveSections(program, routine)) {
+			for (const ri of section.items) {
+				seen.add(ri.itemId);
+				result.push({
+					itemId: ri.itemId,
+					template: ri,
+					logged: loggedById.get(ri.itemId) ?? { itemId: ri.itemId, sets: [] },
+					metric: section.metric,
+					section: section.key,
+				});
+			}
 		}
 
 		for (const logged of log.items) {
 			if (!seen.has(logged.itemId)) {
-				result.push({ itemId: logged.itemId, logged });
+				const item = { itemId: logged.itemId, sets: logged.sets ?? [] };
+				const metric: Metric =
+					logged.checked !== undefined ? 'check' : logged.value !== undefined || logged.skipped ? 'measure' : 'setsReps';
+				result.push({ itemId: logged.itemId, logged: item, metric, section: '' });
 			}
 		}
 
@@ -141,7 +205,7 @@ class SessionStore {
 	async start(routine: Routine, program: Program, itemMap: Map<string, Item>, options?: { date?: string }): Promise<void> {
 		const date = options?.date ?? todayIso();
 		const now = new Date().toISOString();
-		const items = await this.buildActiveItems(routine, itemMap);
+		const items = await this.buildActiveItems(routine, program, itemMap);
 
 		this.active = {
 			id: generateId(),
@@ -158,14 +222,40 @@ class SessionStore {
 		this.persist();
 	}
 
-	async editSession(log: Session, routine: Routine, itemMap: Map<string, Item>): Promise<void> {
+	async editSession(log: Session, routine: Routine, program: Program, itemMap: Map<string, Item>): Promise<void> {
 		const snapshot = snapshotLog(log);
 		const items: ActiveItem[] = [];
-		const editList = this.buildEditItemList(routine, snapshot);
+		const editList = this.buildEditItemList(routine, program, snapshot);
 
 		for (const entry of editList) {
 			const item = itemMap.get(entry.itemId);
 			if (!item) continue;
+
+			if (entry.metric === 'check') {
+				items.push({
+					itemId: item.id,
+					unit: 'bodyweight',
+					sets: [],
+					metric: 'check',
+					section: entry.section,
+					checked: entry.logged.checked ?? false,
+				});
+				continue;
+			}
+
+			if (entry.metric === 'measure') {
+				items.push({
+					itemId: item.id,
+					unit: 'bodyweight',
+					sets: [],
+					metric: 'measure',
+					section: entry.section,
+					value: entry.logged.skipped ? null : (entry.logged.value ?? null),
+					measureMode: entry.logged.measureMode ?? 'duration',
+					skipped: entry.logged.skipped ?? false,
+				});
+				continue;
+			}
 
 			const template = entry.template;
 			const loggedItem = entry.logged;
@@ -194,6 +284,8 @@ class SessionStore {
 				itemId: item.id,
 				unit: item.unit ?? 'bodyweight',
 				sets,
+				metric: 'setsReps',
+				section: entry.section || 'exercises',
 			});
 		}
 
@@ -224,19 +316,13 @@ class SessionStore {
 	}
 
 	async logSet(itemIndex: number, setIndex: number, weight: number | string, reps: number): Promise<void> {
-		if (!this.active) {
-			return;
-		}
+		if (!this.active) return;
 
 		const item = this.active.items[itemIndex];
-		if (!item) {
-			return;
-		}
+		if (!item) return;
 
 		const set = item.sets[setIndex];
-		if (!set) {
-			return;
-		}
+		if (!set) return;
 
 		set.weight = weight;
 		set.reps = reps;
@@ -264,27 +350,74 @@ class SessionStore {
 		this.persist();
 	}
 
-	async finish(durationSeconds?: number): Promise<void> {
-		if (!this.active) {
-			return;
-		}
+	toggleCheck(itemIndex: number): void {
+		if (!this.active) return;
+		const item = this.active.items[itemIndex];
+		if (!item || item.metric !== 'check') return;
+		item.checked = !item.checked;
+		this.persist();
+	}
 
-		const now = new Date().toISOString();
-		const isEditing = this.active.isEditing === true;
+	setMeasure(itemIndex: number, value: number, mode: 'duration' | 'reps'): void {
+		if (!this.active) return;
+		const item = this.active.items[itemIndex];
+		if (!item || item.metric !== 'measure') return;
+		item.value = value;
+		item.measureMode = mode;
+		item.skipped = false;
+		this.persist();
+	}
 
-		const loggedItems = this.active.items
-			.map((ai) => ({
-				itemId: ai.itemId,
-				sets: ai.sets
+	skipItem(itemIndex: number): void {
+		if (!this.active) return;
+		const item = this.active.items[itemIndex];
+		if (!item || item.metric !== 'measure') return;
+		item.skipped = true;
+		item.value = null;
+		this.persist();
+	}
+
+	private serializeLoggedItems(activeItems: ActiveItem[], now: string): LoggedItem[] {
+		const loggedItems: LoggedItem[] = [];
+
+		for (const ai of activeItems) {
+			if (isSetsRepsItem(ai)) {
+				const sets = ai.sets
 					.filter((s) => s.completed)
 					.map((s, i) => ({
 						setNumber: i + 1,
 						weight: s.weight,
 						reps: s.reps,
 						completedAt: s.completedAt ?? now,
-					})),
-			}))
-			.filter((item) => item.sets.length > 0);
+					}));
+				if (sets.length > 0) {
+					loggedItems.push({ itemId: ai.itemId, sets });
+				}
+			} else if (ai.metric === 'check' && ai.checked) {
+				loggedItems.push({ itemId: ai.itemId, sets: [], checked: true });
+			} else if (ai.metric === 'measure') {
+				if (ai.skipped) {
+					loggedItems.push({ itemId: ai.itemId, sets: [], skipped: true });
+				} else if (ai.value != null) {
+					loggedItems.push({
+						itemId: ai.itemId,
+						sets: [],
+						value: ai.value,
+						measureMode: ai.measureMode ?? 'duration',
+					});
+				}
+			}
+		}
+
+		return loggedItems;
+	}
+
+	async finish(durationSeconds?: number): Promise<void> {
+		if (!this.active) return;
+
+		const now = new Date().toISOString();
+		const isEditing = this.active.isEditing === true;
+		const loggedItems = this.serializeLoggedItems(this.active.items, now);
 
 		let totalVolume = 0;
 		let totalSets = 0;
@@ -342,9 +475,7 @@ class SessionStore {
 	}
 
 	private persist(): void {
-		if (!this.active) {
-			return;
-		}
+		if (!this.active) return;
 		localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(this.active));
 	}
 }

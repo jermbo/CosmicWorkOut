@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { formatDuration, formatVolume } from '$lib/format';
+	import { formatDuration, formatVolume, formatCountWithWord } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
 
 	function handleBackToToday() {
@@ -15,7 +16,9 @@
 	}
 
 	let session = $derived(sessionStore.completedSession);
+	let isDance = $derived(session?.disciplineId === BELLYDANCE_DISCIPLINE_ID);
 	let totalSets = $derived(session?.items.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
+	let itemsCompleted = $derived(session?.items.length ?? 0);
 </script>
 
 <BottomSheet onclose={handleBackToToday} maxHeight="100dvh" hideHandle fixedHeight>
@@ -47,26 +50,38 @@
 		<!-- Stats -->
 		{#if session}
 			<div class="session-complete__stats" role="region" aria-label="Session summary">
-				<div class="session-complete__stat">
-					<span class="session-complete__stat-value">{totalSets}</span>
-					<span class="session-complete__stat-label">sets</span>
-				</div>
-				<div class="session-complete__stat-sep" aria-hidden="true"></div>
-				<div class="session-complete__stat">
-					<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
-					<span class="session-complete__stat-label">duration</span>
-				</div>
-				<div class="session-complete__stat-sep" aria-hidden="true"></div>
-				<div class="session-complete__stat">
-					<span class="session-complete__stat-value">{session.items.length}</span>
-					<span class="session-complete__stat-label">exercises</span>
-				</div>
-				{#if session.totalVolume > 0}
+				{#if isDance}
+					<div class="session-complete__stat">
+						<span class="session-complete__stat-value">{itemsCompleted}</span>
+						<span class="session-complete__stat-label">items</span>
+					</div>
 					<div class="session-complete__stat-sep" aria-hidden="true"></div>
 					<div class="session-complete__stat">
-						<span class="session-complete__stat-value">{formatVolume(session.totalVolume)}</span>
-						<span class="session-complete__stat-label">{prefsStore.weightUnit}</span>
+						<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
+						<span class="session-complete__stat-label">duration</span>
 					</div>
+				{:else}
+					<div class="session-complete__stat">
+						<span class="session-complete__stat-value">{totalSets}</span>
+						<span class="session-complete__stat-label">sets</span>
+					</div>
+					<div class="session-complete__stat-sep" aria-hidden="true"></div>
+					<div class="session-complete__stat">
+						<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
+						<span class="session-complete__stat-label">duration</span>
+					</div>
+					<div class="session-complete__stat-sep" aria-hidden="true"></div>
+					<div class="session-complete__stat">
+						<span class="session-complete__stat-value">{itemsCompleted}</span>
+						<span class="session-complete__stat-label">exercises</span>
+					</div>
+					{#if session.totalVolume > 0}
+						<div class="session-complete__stat-sep" aria-hidden="true"></div>
+						<div class="session-complete__stat">
+							<span class="session-complete__stat-value">{formatVolume(session.totalVolume)}</span>
+							<span class="session-complete__stat-label">{prefsStore.weightUnit}</span>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		{/if}
