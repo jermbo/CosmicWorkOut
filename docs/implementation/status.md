@@ -62,6 +62,18 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ---
 
+## v1.4.0 — Belly Dance Practice
+
+| Feature                           | Status     | Doc reference |
+| --------------------------------- | ---------- | ------------- |
+| Practice item library             | ❌ Planned | US-015        |
+| Belly dance program & routines    | ❌ Planned | US-016        |
+| Practice hub & navigation         | ❌ Planned | US-017        |
+| Dance session flow                | ❌ Planned | US-018        |
+| Practice streaks & calendar       | ❌ Planned | US-019        |
+
+---
+
 ## Not Built Yet (infrastructure)
 
 | Feature              | Status     | Doc reference                                           |
@@ -84,5 +96,6 @@ What's built today vs. what's still requirements-only. Updated to match the code
 - [How It Works](behavior.md) — Full behavioral mental model
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.3.0 Features](../features/v1.3.0/README.md) — Current sprint stories
+- [v1.4.0 Features](../features/v1.4.0/README.md) — Current sprint stories
+- [v1.3.0 Features](../features/v1.3.0/README.md) — Previous sprint (shipped)
 - [v1.2.0 Features](../features/v1.2.0/README.md) — Previous sprint (shipped)
