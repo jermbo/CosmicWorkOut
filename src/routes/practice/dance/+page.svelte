@@ -11,6 +11,7 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
+	import { toastStore } from '$lib/stores/toast.svelte';
 
 	const disciplineId = BELLYDANCE_DISCIPLINE_ID;
 	const todayStr = todayIso();
@@ -60,6 +61,15 @@
 		const routine = selectedRoutine;
 		const program = activeProgram;
 		if (!routine || !program) return;
+
+		const itemCount = effectiveSections(program, routine).reduce((n, s) => n + s.items.length, 0);
+		if (itemCount === 0) {
+			toastStore.error(
+				'This routine has no moves yet. Activate “Belly Dance Foundations” or add items in Programs.',
+			);
+			return;
+		}
+
 		await sessionStore.start(routine, program, programStore.itemMap, { date: contextDate });
 	}
 
