@@ -7,27 +7,22 @@
 	import BottomSheet from './BottomSheet.svelte';
 	import Icon from './Icon.svelte';
 
-	let {
-		date,
-		session = null,
-		hasHabits = false,
-		hasActivities = false,
-		onClose,
-		onViewSession,
-	}: {
+	type Props = {
 		date: string;
 		session?: SessionLog | null;
 		hasHabits?: boolean;
 		hasActivities?: boolean;
 		onClose: () => void;
 		onViewSession?: () => void;
-	} = $props();
+	};
+
+	let { date, session = null, hasHabits = false, hasActivities = false, onClose, onViewSession }: Props = $props();
 
 	let workoutName = $derived(
 		session
 			? (programStore.getWorkoutForSession(session)?.name ??
-				programStore.getWorkoutById(session.workoutId)?.name ??
-				'Workout')
+					programStore.getWorkoutById(session.workoutId)?.name ??
+					'Workout')
 			: null,
 	);
 

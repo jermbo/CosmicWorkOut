@@ -6,17 +6,15 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 
-	let {
-		sessions,
-		stayOnPage = false,
-		showMoodDots = false,
-	}: {
+	type Props = {
 		sessions: SessionLog[];
 		/** When true, date changes update context without navigating home. */
 		stayOnPage?: boolean;
 		/** Show mood-colored dots instead of workout-completion dots. */
 		showMoodDots?: boolean;
-	} = $props();
+	};
+
+	let { sessions, stayOnPage = false, showMoodDots = false }: Props = $props();
 
 	const todayStr = todayIso();
 
@@ -128,7 +126,6 @@
 				</svg>
 			</button>
 		</div>
-
 	</div>
 
 	<div class="week-strip__days" aria-label="Days in {weekLabel}">

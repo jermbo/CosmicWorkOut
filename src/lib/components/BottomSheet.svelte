@@ -2,19 +2,21 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 
+	type Props = {
+		children: Snippet;
+		onclose: () => void;
+		maxHeight?: string;
+		hideHandle?: boolean;
+		fixedHeight?: boolean;
+	};
+
 	let {
 		children,
 		onclose,
 		maxHeight = '90dvh',
 		hideHandle = false,
 		fixedHeight = false,
-	}: {
-		children: Snippet;
-		onclose: () => void;
-		maxHeight?: string;
-		hideHandle?: boolean;
-		fixedHeight?: boolean;
-	} = $props();
+	}: Props = $props();
 
 	let dialog: HTMLDialogElement;
 

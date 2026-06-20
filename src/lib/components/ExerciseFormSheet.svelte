@@ -7,15 +7,13 @@
 	const CATS: ExerciseCat[] = ['Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
 	const UNITS: WeightUnit[] = ['lb', 'kg', 'bodyweight', 'band'];
 
-	let {
-		exercise = null,
-		onClose,
-		onSave,
-	}: {
+	type Props = {
 		exercise?: Exercise | null;
 		onClose: () => void;
 		onSave?: (ex: Exercise) => void;
-	} = $props();
+	};
+
+	let { exercise = null, onClose, onSave }: Props = $props();
 
 	const WEIGHT_INCREMENTS = [2.5, 5, 10];
 

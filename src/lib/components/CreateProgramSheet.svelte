@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 
-	let { onClose }: { onClose: () => void } = $props();
+	type Props = { onClose: () => void };
+
+	let { onClose }: Props = $props();
 
 	type Step = 'details' | 'workouts';
 

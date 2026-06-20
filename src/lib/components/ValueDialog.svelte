@@ -1,19 +1,15 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 
-	let {
-		title,
-		unit = '',
-		initialValue,
-		onsave,
-		onclose,
-	}: {
+	type Props = {
 		title: string;
 		unit?: string;
 		initialValue: number;
 		onsave: (value: number) => void;
 		onclose: () => void;
-	} = $props();
+	};
+
+	let { title, unit = '', initialValue, onsave, onclose }: Props = $props();
 
 	let input = $state(untrack(() => (initialValue ? String(initialValue) : '')));
 	let dialog: HTMLDialogElement;

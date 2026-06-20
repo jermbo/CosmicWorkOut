@@ -1,6 +1,16 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 
+	type Props = {
+		done: number;
+		total: number;
+		complete?: boolean;
+		size?: number;
+		strokeWidth?: number;
+		dimUntilComplete?: boolean;
+		children?: Snippet;
+	};
+
 	let {
 		done,
 		total,
@@ -9,15 +19,7 @@
 		strokeWidth = 3,
 		dimUntilComplete = false,
 		children,
-	}: {
-		done: number;
-		total: number;
-		complete?: boolean;
-		size?: number;
-		strokeWidth?: number;
-		dimUntilComplete?: boolean;
-		children?: Snippet;
-	} = $props();
+	}: Props = $props();
 
 	let radius = $derived(size / 2 - strokeWidth - 1);
 	let circumference = $derived(2 * Math.PI * radius);

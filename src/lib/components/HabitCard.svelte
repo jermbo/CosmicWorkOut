@@ -5,18 +5,7 @@
 	import ProgressRing from './ProgressRing.svelte';
 	import Icon from './Icon.svelte';
 
-	let {
-		habit,
-		value,
-		pct,
-		done,
-		step,
-		readOnly = false,
-		onadd,
-		onsubtract,
-		ontoggle,
-		oneditexact,
-	}: {
+	type Props = {
 		habit: Habit;
 		value: number;
 		pct: number;
@@ -27,12 +16,12 @@
 		onsubtract: () => void;
 		ontoggle: () => void;
 		oneditexact: () => void;
-	} = $props();
+	};
+
+	let { habit, value, pct, done, step, readOnly = false, onadd, onsubtract, ontoggle, oneditexact }: Props = $props();
 
 	let unitLabel = $derived(habit.type === 'minutes' ? minuteUnitLabel() : habit.unit);
-	let stepLabel = $derived(
-		habit.type === 'minutes' ? formatMinutes(step) : formatCount(step, habit.unit || undefined),
-	);
+	let stepLabel = $derived(habit.type === 'minutes' ? formatMinutes(step) : formatCount(step, habit.unit || undefined));
 </script>
 
 <div class="habit-card" class:habit-card--done={done}>

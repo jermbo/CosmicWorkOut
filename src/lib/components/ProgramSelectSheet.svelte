@@ -3,13 +3,12 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
-	let {
-		onClose,
-		onCreateNew,
-	}: {
+	type Props = {
 		onClose: () => void;
 		onCreateNew: () => void;
-	} = $props();
+	};
+
+	let { onClose, onCreateNew }: Props = $props();
 
 	function switchTo(program: Program) {
 		programStore.setActiveProgram(program.id);

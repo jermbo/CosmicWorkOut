@@ -1,17 +1,14 @@
 <script lang="ts">
 	import type { Workout } from '$lib/db/types';
 
-	let {
-		workouts,
-		selectedId,
-		suggestedId,
-		onSelect,
-	}: {
+	type Props = {
 		workouts: Workout[];
 		selectedId: string;
 		suggestedId: string | undefined;
 		onSelect: (workoutId: string) => void;
-	} = $props();
+	};
+
+	let { workouts, selectedId, suggestedId, onSelect }: Props = $props();
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',

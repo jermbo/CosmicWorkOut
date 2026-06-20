@@ -17,15 +17,13 @@
 
 	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
 
-	let {
-		exercises,
-		onAdd,
-		onClose,
-	}: {
+	type Props = {
 		exercises: Exercise[];
 		onAdd: (exercise: Exercise) => void;
 		onClose: () => void;
-	} = $props();
+	};
+
+	let { exercises, onAdd, onClose }: Props = $props();
 
 	let activeCat = $state('All');
 	let query = $state('');

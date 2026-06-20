@@ -6,19 +6,15 @@
 	import { formatWeekdayShortDate, todayIso } from '$lib/date';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
-	let {
-		title,
-		showBack = false,
-		showMoodDots = false,
-		onDateChange,
-		trailing,
-	}: {
+	type Props = {
 		title: string;
 		showBack?: boolean;
 		showMoodDots?: boolean;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
-	} = $props();
+	};
+
+	let { title, showBack = false, showMoodDots = false, onDateChange, trailing }: Props = $props();
 
 	const todayStr = todayIso();
 

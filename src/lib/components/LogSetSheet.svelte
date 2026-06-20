@@ -6,19 +6,15 @@
 
 	const BANDS = ['Light', 'Med', 'Heavy'];
 
-	let {
-		exercise,
-		activeSet,
-		setIndex,
-		onSave,
-		onClose,
-	}: {
+	type Props = {
 		exercise: Exercise;
 		activeSet: ActiveSet;
 		setIndex: number;
 		onSave: (weight: number | string, reps: number) => void;
 		onClose: () => void;
-	} = $props();
+	};
+
+	let { exercise, activeSet, setIndex, onSave, onClose }: Props = $props();
 
 	function parseTargetReps(r: string): { n: number; suffix: string } {
 		const m = r.match(/^(\d+)\s*(.*)$/);
