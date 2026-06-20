@@ -1,12 +1,12 @@
-# v1.3.0 — Habit Management, Calendar History & Journal
+# v1.3.0 — Habit Management & Calendar History
 
-This version finishes the habit and calendar work deferred from v1.2.0, adds the Journal page promised on the home screen, and closes a small activity-logging gap from v1.1.0.
+This version finishes the habit and calendar work deferred from v1.2.0 and closes a small activity-logging gap from v1.1.0.
 
 ## Design North Star
 
 > "Set it up once, see it forever."
 
-Habits should be fully personalizable in Settings. Historical data — habits, workouts, activities — should be visible in one place on the Calendar. Journal is a quick daily note, not a second app.
+Habits should be fully personalizable in Settings. Historical data — habits, workouts, activities — should be visible in one place on the Calendar.
 
 ---
 
@@ -16,9 +16,7 @@ Habits should be fully personalizable in Settings. Historical data — habits, w
 | -------------------------------------------------------- | -------------------------------- | ---------- | ------------------------------- |
 | [US-009](./US-009-habit-creation.md)                     | Habit Creation & Management      | ✅ Built   | Carried from v1.2.0             |
 | [US-010](./US-010-habit-calendar-history.md)             | Habit History in Calendar        | ✅ Built   | Carried from v1.2.0             |
-| [US-012](./US-012-journal-page.md)                       | Journal Page                     | ✅ Built   | Deferred from v1.2.0 US-007     |
 | [US-013](./US-013-activity-calendar-edit.md)             | Activity Edit from Calendar      | ✅ Built   | Gap from v1.1.0 US-003          |
-| [US-014](./US-014-journal-speech-input.md)               | Journal Speech Input & Auto-Save | ❌ Planned | Extension of US-012             |
 
 ---
 
@@ -30,9 +28,17 @@ These foundations exist — v1.3.0 adds the missing UI and calendar integration 
 | ----------------------- | ---------- | --------------------------------------------------------------------------------- |
 | Habit logging           | v1.2.0     | `/habits` page with progress rings, stepped inputs, mood strip, 7 built-in habits |
 | Habit data layer        | v1.2.0     | IndexedDB habits + daily logs, `dailyGoal` migration, store `reorder()` method    |
-| Home journal placeholder| v1.2.0     | Journal card on home screen marked "Coming soon"                                  |
 | Activity calendar view  | v1.1.0     | Activity indicators on calendar, day detail with delete                             |
 | Workout calendar        | v1.1.0     | Session highlighting, day summary sheet, edit/delete sessions                     |
+
+---
+
+## IA Notes
+
+- The root route is now framed as **Overview** rather than **Today**.
+- The weekly selector still controls the active date everywhere in the app, but it now sits inside a broader overview/dashboard model.
+- Overview keeps summary entry points for Habits, Practice, and Activity, with one combined Practice card instead of surfacing every practice area separately.
+- Bottom navigation is intentionally slimmer: focused destinations are reached from Overview rather than all being permanent tabs.
 
 ---
 
@@ -45,10 +51,6 @@ These foundations exist — v1.3.0 adds the missing UI and calendar integration 
 | US-009       | Active/inactive toggle in Settings  | US-009       |
 | US-010       | Habit values in calendar day detail | US-010       |
 | US-010       | Habit consistency heat map          | US-010       |
-| US-007       | Journal page (card is placeholder)  | US-012       |
-
----
-
 ## Carried Over from v1.1.0
 
 | Origin story | Requirement                              | Target story |

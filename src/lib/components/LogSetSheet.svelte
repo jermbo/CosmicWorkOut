@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { onMount, tick, untrack } from 'svelte';
-	import type { Exercise, ActiveSet } from '$lib/db/types';
+	import type { Item, ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
 	const BANDS = ['Light', 'Med', 'Heavy'];
 
 	type Props = {
-		exercise: Exercise;
+		exercise: Item;
 		activeSet: ActiveSet;
 		setIndex: number;
 		onSave: (weight: number | string, reps: number) => void;

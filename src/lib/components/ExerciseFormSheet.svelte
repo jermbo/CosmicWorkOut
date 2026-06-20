@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Exercise, ExerciseCat, WeightUnit } from '$lib/db/types';
+	import type { Item, ItemCat, WeightUnit } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
-	const CATS: ExerciseCat[] = ['Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
+	const CATS: ItemCat[] = ['Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
 	const UNITS: WeightUnit[] = ['lb', 'kg', 'bodyweight', 'band'];
 
 	type Props = {
-		exercise?: Exercise | null;
+		exercise?: Item | null;
 		onClose: () => void;
-		onSave?: (ex: Exercise) => void;
+		onSave?: (ex: Item) => void;
 	};
 
 	let { exercise = null, onClose, onSave }: Props = $props();
@@ -22,7 +22,7 @@
 		name: exercise?.name ?? '',
 		cue: exercise?.cue ?? '',
 		muscles: exercise?.muscles ?? '',
-		cat: exercise?.cat ?? ('Push' as ExerciseCat),
+		cat: exercise?.cat ?? ('Push' as ItemCat),
 		unit: exercise?.unit ?? ('lb' as WeightUnit),
 		defaultSets: exercise?.defaultSets ?? 3,
 		defaultReps: exercise?.defaultReps ?? '8-10',
@@ -32,7 +32,7 @@
 	let name = $state(snap.name);
 	let cue = $state(snap.cue);
 	let muscles = $state(snap.muscles);
-	let cat = $state<ExerciseCat>(snap.cat);
+	let cat = $state<ItemCat>(snap.cat);
 	let unit = $state<WeightUnit>(snap.unit);
 	let defaultSets = $state(snap.defaultSets);
 	let defaultReps = $state(snap.defaultReps);
@@ -52,10 +52,10 @@
 		if (!validate() || saving) return;
 		saving = true;
 
-		let saved: Exercise;
+		let saved: Item;
 		const inc = unit === 'lb' || unit === 'kg' ? weightIncrement : undefined;
 		if (exercise) {
-			const updated: Exercise = {
+			const updated: Item = {
 				...exercise,
 				name: name.trim(),
 				cue: cue.trim(),
@@ -66,10 +66,10 @@
 				defaultReps,
 				weightIncrement: inc,
 			};
-			await programStore.updateExercise(updated);
+			await programStore.updateItem(updated);
 			saved = updated;
 		} else {
-			saved = await programStore.addExercise({
+			saved = await programStore.addItem({
 				name: name.trim(),
 				cue: cue.trim(),
 				muscles: muscles.trim(),

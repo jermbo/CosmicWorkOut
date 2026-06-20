@@ -7,11 +7,12 @@
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { journalStore } from '$lib/stores/journal.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
+	import DanceSessionOverlay from '$lib/components/DanceSessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
 	import Toaster from '$lib/components/Toaster.svelte';
+	import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 
 	let { children } = $props();
 
@@ -21,7 +22,7 @@
 	onMount(async () => {
 		await initDB();
 		prefsStore.load();
-		await Promise.all([programStore.load(), habitStore.load(), activityStore.load(), journalStore.load()]);
+		await Promise.all([programStore.load(), habitStore.load(), activityStore.load()]);
 
 		if (sessionStore.checkForRecovery()) {
 			hasRecoverableSession = true;
@@ -51,7 +52,11 @@
 		<BottomNav />
 
 		{#if sessionStore.isActive}
-			<SessionOverlay />
+			{#if sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID}
+				<DanceSessionOverlay />
+			{:else}
+				<SessionOverlay />
+			{/if}
 		{/if}
 
 		{#if sessionStore.isComplete}
@@ -61,7 +66,7 @@
 		{#if hasRecoverableSession}
 			<div class="recovery-banner" role="alertdialog" aria-labelledby="recovery-title" aria-modal="true">
 				<p class="recovery-banner__title" id="recovery-title">Resume session?</p>
-				<p class="recovery-banner__body">You have an unfinished workout to resume.</p>
+				<p class="recovery-banner__body">You have an unfinished session to resume.</p>
 				<div class="recovery-banner__actions">
 					<button class="recovery-banner__btn recovery-banner__btn--resume" onclick={handleResumeSession}>
 						Resume

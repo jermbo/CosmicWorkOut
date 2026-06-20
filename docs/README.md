@@ -61,6 +61,18 @@ flowchart TB
 
 **New here?** Start with [North Star](vision/north-star.md) → [How It Works](implementation/behavior.md) → [System Overview](architecture/overview.md).
 
+**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit — and the rule for where new movement types belong.
+
+---
+
+## Documenting decisions
+
+**These docs are the project's memory.** There is no separate notebook, ticket system, or AI "memory" that outlives a session — if it isn't written here, it doesn't persist. So:
+
+- When a decision is locked, record it in the relevant doc (a feature `README`, an architecture doc, or the [Glossary](glossary.md)) and mark anything not-yet-built with a clear status (`❌ Planned` / `🟡`).
+- When behavior changes, update the doc that described the old behavior in the same change — don't let docs and code drift.
+- Contributors (human or AI) should treat this wiki as the source of truth and **not** stash project knowledge in tool-specific memory stores. See the [Working Agreement](implementation/dev-guide.md#conventions-working-agreement).
+
 ---
 
 ## 30k — Vision

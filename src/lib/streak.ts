@@ -44,3 +44,20 @@ export function computeWeekStreak(sessionDates: string[], daysPerWeek: number, t
 
 	return streak;
 }
+
+/**
+ * Consecutive recent weeks where the union of session dates across all provided
+ * date sets meets at least `threshold` sessions. Used for the combined
+ * strength+dance streak on Today (US-020).
+ */
+export function computeCombinedStreak(
+	dateSets: string[][],
+	threshold = 1,
+	today: Date = new Date(),
+): number {
+	const union = new Set<string>();
+	for (const dates of dateSets) {
+		for (const d of dates) union.add(d);
+	}
+	return computeWeekStreak([...union], threshold, today);
+}

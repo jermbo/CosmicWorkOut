@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { Workout, Exercise } from '$lib/db/types';
+	import type { Routine, Item } from '$lib/db/types';
 	import { formatMinutes } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { flattenItems } from '$lib/discipline';
 
 	type Props = {
-		workout: Workout;
-		exerciseMap: Map<string, Exercise>;
+		workout: Routine;
+		exerciseMap: Map<string, Item>;
 		onStart: () => Promise<void>;
 	};
 
@@ -55,7 +56,7 @@
 		</span>
 		<span class="packet-card__tab packet-card__tab--ghost">Wk {programStore.currentWeekNumber}</span>
 		<span class="packet-card__tab packet-card__tab--ghost">
-			{workout.letter ?? programStore.currentWorkoutLetter}
+			{workout.letter ?? programStore.currentRoutineLetter}
 		</span>
 	</div>
 
@@ -90,8 +91,8 @@
 
 	<!-- Exercise list -->
 	<ul class="packet-card__exercises" role="list" aria-label="Exercises in this workout">
-		{#each workout.exercises as we, i}
-			{@const exercise = exerciseMap.get(we.exerciseId)}
+		{#each flattenItems(workout) as we, i}
+			{@const exercise = exerciseMap.get(we.itemId)}
 			{#if exercise}
 				<li class="packet-card__exercise">
 					<span class="packet-card__exercise-ix" aria-hidden="true">{i + 1}</span>

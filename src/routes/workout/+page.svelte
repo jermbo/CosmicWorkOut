@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -10,18 +11,41 @@
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
+	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 
 	const todayStr = todayIso();
 
 	let contextDate = $derived(loggingContext.date);
 
-	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
-	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
+	let programId = $derived(
+		page.url.searchParams.get('program') ??
+			programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ??
+			null,
+	);
+	let viewingProgram = $derived(programId ? programStore.programById(programId) : null);
+
+	let sessionForDate = $derived(
+		programId
+			? programStore.sessionForProgramDate(programId, contextDate)
+			: programStore.sessionForDate(contextDate),
+	);
+	let suggestedWorkout = $derived(
+		programId
+			? programStore.suggestedRoutineInCurrentWeekForProgram(programId)
+			: programStore.suggestedRoutineInCurrentWeek,
+	);
+	let weekWorkouts = $derived(
+		programId
+			? programStore.routinesForCurrentWeekForProgram(programId)
+			: programStore.routinesForCurrentWeek,
+	);
+	let isProgramComplete = $derived(
+		programId ? programStore.isProgramCompleteForProgram(programId) : programStore.isProgramComplete,
+	);
 
 	let selectedWorkout = $derived.by(() => {
 		if (loggingContext.workoutId) {
-			return programStore.getWorkoutById(loggingContext.workoutId) ?? suggestedWorkout;
+			return programStore.getRoutineById(loggingContext.workoutId) ?? suggestedWorkout;
 		}
 		return suggestedWorkout;
 	});
@@ -31,15 +55,20 @@
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
 	let showStartConfirm = $state(false);
+	let showConflictConfirm = $state(false);
 
 	async function doStartSession() {
 		const workout = selectedWorkout;
-		const program = programStore.activeProgram;
+		const program = viewingProgram;
 		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.exerciseMap, { date: contextDate });
+		await sessionStore.start(workout, program, programStore.itemMap, { date: contextDate });
 	}
 
 	async function startSession() {
+		if (sessionStore.isActive && sessionStore.activeDisciplineId !== STRENGTH_DISCIPLINE_ID) {
+			showConflictConfirm = true;
+			return;
+		}
 		if (contextDate !== todayStr) {
 			showStartConfirm = true;
 			return;
@@ -50,9 +79,10 @@
 	async function editSession() {
 		const session = sessionForDate;
 		if (!session) return;
-		const workout = programStore.getWorkoutForSession(session);
-		if (!workout) return;
-		await sessionStore.editSession(session, workout, programStore.exerciseMap);
+		const workout = programStore.getRoutineForSession(session);
+		const program = programStore.programs.find((p) => p.id === session.programId);
+		if (!workout || !program) return;
+		await sessionStore.editSession(session, workout, program, programStore.itemMap);
 	}
 
 </script>
@@ -72,17 +102,17 @@
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
 			<div class="workout-page__spinner"></div>
 		</div>
-	{:else if programStore.isProgramComplete}
+	{:else if isProgramComplete}
 		<div class="workout-complete">
 			<div class="workout-complete__icon" aria-hidden="true">🎉</div>
-			<h2 class="workout-complete__title">{programStore.activeProgram?.name ?? 'Program'} complete!</h2>
+			<h2 class="workout-complete__title">{viewingProgram?.name ?? 'Program'} complete!</h2>
 			<p class="workout-complete__body">You finished every session. Time for something new.</p>
 			<button class="workout-complete__cta" onclick={() => (showProgramSelect = true)}> Choose a new program </button>
 		</div>
-	{:else if !programStore.activeProgram}
+	{:else if !viewingProgram}
 		<div class="workout-page__no-program">
-			<p>No program active.</p>
-			<button class="workout-page__choose-btn" onclick={() => (showProgramSelect = true)}> Choose a program </button>
+			<p>No plan selected.</p>
+			<a href="/practice/workout" class="workout-page__choose-btn"> Choose a plan </a>
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<!-- Session logged for this date, not currently editing -->
@@ -101,11 +131,11 @@
 			</div>
 			<div class="session-done__info">
 				<p class="session-done__name">
-					{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
+					{programStore.getRoutineById(sessionForDate.routineId)?.name ?? 'Session logged'}
 				</p>
 				<p class="session-done__meta">
 					{formatDuration(sessionForDate.durationSeconds ?? 0)}
-					· {sessionForDate.exercises.length} exercises · {sessionForDate.totalVolume} lb
+					· {sessionForDate.items.length} exercises · {sessionForDate.totalVolume} lb
 				</p>
 			</div>
 			<button class="session-done__edit" onclick={editSession}> Edit </button>
@@ -124,7 +154,7 @@
 				onSelect={(id) => loggingContext.setWorkoutId(id)}
 			/>
 
-			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.exerciseMap} onStart={startSession} />
+			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.itemMap} onStart={startSession} />
 		</div>
 	{:else}
 		<div class="workout-page__no-program">
@@ -141,6 +171,7 @@
 			showProgramSelect = false;
 			showCreateProgram = true;
 		}}
+		disciplineId={STRENGTH_DISCIPLINE_ID}
 	/>
 {/if}
 
@@ -159,6 +190,22 @@
 		oncancel={() => (showStartConfirm = false)}
 	>
 		This session will be saved for a past date, not today.
+	</ConfirmDialog>
+{/if}
+
+{#if showConflictConfirm}
+	<ConfirmDialog
+		title="Another session is active"
+		confirmLabel="Switch anyway"
+		danger
+		onconfirm={async () => {
+			showConflictConfirm = false;
+			sessionStore.abandon();
+			await startSession();
+		}}
+		oncancel={() => (showConflictConfirm = false)}
+	>
+		You have an unfinished session in another discipline. Starting this workout will discard it.
 	</ConfirmDialog>
 {/if}
 

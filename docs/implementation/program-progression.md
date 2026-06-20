@@ -90,6 +90,15 @@ Workout edits via `saveWorkoutExercises()` propagate to **all weeks** by matchin
 
 ---
 
+## Per-Discipline progression 🟡 (v1.4.0)
+
+The logic above is unchanged — it just runs **per Discipline**. v1.4.0 tracks one active program per Discipline, so strength and belly dance each compute their own `todaysRoutine`, `currentWeek`, and streak from their own session counts. Two deliberate non-goals, locked in [US-015](../features/v1.4.0/US-015-discipline-engine-foundation.md#decisions--non-goals-locked):
+
+- **Count-driven, never calendar-driven.** No day-of-week scheduling — the user logs whichever Discipline they want on a given day, and each recommends its next routine by count (A → B → C).
+- **No load periodization.** Weeks are not auto-progressed; weight carries forward via the per-item last-used prefill and is adjusted manually.
+
+---
+
 ## Related
 
 - [How It Works](behavior.md) — Plain-language mental model

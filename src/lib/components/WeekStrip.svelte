@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SessionLog } from '$lib/db/types';
+	import type { Session } from '$lib/db/types';
 	import { goto } from '$app/navigation';
 	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
 	import { formatWeeksAgo } from '$lib/format';
@@ -7,14 +7,16 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 
 	type Props = {
-		sessions: SessionLog[];
+		sessions: Session[];
 		/** When true, date changes update context without navigating home. */
 		stayOnPage?: boolean;
 		/** Show mood-colored dots instead of workout-completion dots. */
 		showMoodDots?: boolean;
+		/** Optional multi-indicator dots keyed by ISO date, e.g. habits/workout/activity. */
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>>;
 	};
 
-	let { sessions, stayOnPage = false, showMoodDots = false }: Props = $props();
+	let { sessions, stayOnPage = false, showMoodDots = false, dayIndicators = {} }: Props = $props();
 
 	const todayStr = todayIso();
 
@@ -77,6 +79,10 @@
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
 		return log !== undefined ? log.value : null;
+	}
+
+	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'dance' | 'activity'> {
+		return dayIndicators[dateStr] ?? [];
 	}
 
 	function navigateToDate(dateStr: string) {
@@ -155,6 +161,12 @@
 						class:week-day__indicator--mood-empty={mood === null}
 						aria-hidden="true"
 					></span>
+				{:else if indicatorsForDay(day.dateStr).length > 0}
+					<span class="week-day__indicators" aria-hidden="true">
+						{#each indicatorsForDay(day.dateStr) as indicator}
+							<span class="week-day__indicator-dot week-day__indicator-dot--{indicator}"></span>
+						{/each}
+					</span>
 				{:else}
 					<span class="week-day__indicator" aria-hidden="true"></span>
 				{/if}
@@ -349,6 +361,45 @@
 			background: var(--color-accent-ink);
 			opacity: 0.5;
 		}
+	}
+
+	.week-day__indicators {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 2px;
+		min-block-size: 5px;
+		flex-wrap: wrap;
+		max-inline-size: 100%;
+		padding-inline: 2px;
+	}
+
+	.week-day__indicator-dot {
+		inline-size: 4px;
+		block-size: 4px;
+		border-radius: var(--radius-full);
+	}
+
+	.week-day__indicator-dot--habits {
+		background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+	}
+
+	.week-day__indicator-dot--strength {
+		background: var(--color-accent);
+	}
+
+	.week-day__indicator-dot--dance {
+		background: var(--color-lavender);
+	}
+
+	.week-day__indicator-dot--activity {
+		background: var(--color-lavender);
+	}
+
+	.week-day--selected .week-day__indicator-dot {
+		opacity: 0.8;
+		outline: 1px solid color-mix(in srgb, var(--color-accent-ink) 25%, transparent);
 	}
 
 	.week-strip__footer {

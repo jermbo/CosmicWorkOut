@@ -35,42 +35,43 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## v1.2.0 — Daily Dashboard & Habits
 
-| Feature                             | Status   | Notes                                                                               |
-| ----------------------------------- | -------- | ----------------------------------------------------------------------------------- |
-| Home screen as overview dashboard   | ✅ Built | 4 summary cards: Habits, Workout, Activity, Journal (placeholder)                   |
-| Global date context                 | ✅ Built | `loggingContext` store; date picker on home taps to any past day                      |
-| Activity log page (`/log`)          | ✅ Built | List, add, edit, delete activities; date-filtered                                   |
-| Dedicated workout page (`/workout`) | ✅ Built | Full session UI moved from home; back button to home                                |
-| Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal              |
-| Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid             |
-| Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal; smart step increments                        |
+| Feature                             | Status   | Notes                                                                                                                  |
+| ----------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Home screen as overview dashboard   | ✅ Built | 4 summary cards: Habits, Workout, Activity, Journal (placeholder)                                                      |
+| Global date context                 | ✅ Built | `loggingContext` store; date picker on home taps to any past day                                                       |
+| Activity log page (`/log`)          | ✅ Built | List, add, edit, delete activities; date-filtered                                                                      |
+| Dedicated workout page (`/workout`) | ✅ Built | Full session UI moved from home; back button to home                                                                   |
+| Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal                                                 |
+| Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid                                                |
+| Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal; smart step increments                                                           |
 | Pre-seeded habits                   | ✅ Built | Meditation (20 min), Writing (500 words), Reading (20 pages), Water (8 cups), Coffee (3 cups), Alcohol (boolean), Mood |
-| DB migration for existing habits    | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing records missing it                 |
-| Program complete state              | ✅ Built | Shown on `/workout` page with CTA to choose new program                              |
+| DB migration for existing habits    | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing records missing it                                                    |
+| Program complete state              | ✅ Built | Shown on `/workout` page with CTA to choose new program                                                                |
 
 ---
 
 ## v1.3.0 — Habit Management, Calendar History & Journal
 
-| Feature                           | Status     | Doc reference |
-| --------------------------------- | ---------- | ------------- |
-| Custom habit CRUD in Settings     | ✅ Built   | US-009        |
-| Habit history heatmap on Calendar | ✅ Built   | US-010        |
-| Journal page                      | ✅ Built   | US-012        |
-| Activity edit from calendar       | ✅ Built   | US-013        |
-| Journal speech input & auto-save  | ✅ Built   | US-014        |
+| Feature                           | Status   | Doc reference |
+| --------------------------------- | -------- | ------------- |
+| Custom habit CRUD in Settings     | ✅ Built | US-009        |
+| Habit history heatmap on Calendar | ✅ Built | US-010        |
+| Journal page                      | ✅ Built | US-012        |
+| Activity edit from calendar       | ✅ Built | US-013        |
+| Journal speech input & auto-save  | ✅ Built | US-014        |
 
 ---
 
-## v1.4.0 — Belly Dance Practice
+## v1.4.0 — Belly Dance & the Discipline Model
 
-| Feature                           | Status     | Doc reference |
-| --------------------------------- | ---------- | ------------- |
-| Practice item library             | ❌ Planned | US-015        |
-| Belly dance program & routines    | ❌ Planned | US-016        |
-| Practice hub & navigation         | ❌ Planned | US-017        |
-| Dance session flow                | ❌ Planned | US-018        |
-| Practice streaks & calendar       | ❌ Planned | US-019        |
+| Feature                                    | Status   | Doc reference |
+| ------------------------------------------ | -------- | ------------- |
+| Discipline engine foundation               | ✅ Built | US-015        |
+| Item library (Discipline-scoped)           | ✅ Built | US-016        |
+| Belly Dance Discipline, program & routines | ✅ Built | US-017        |
+| Practice hub & navigation                  | ✅ Built | US-018        |
+| Dance session flow                         | ✅ Built | US-019        |
+| Cross-Discipline streaks & calendar        | ✅ Built | US-020        |
 
 ---
 
@@ -84,10 +85,11 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 ## Built-In Content
 
-- **1 program:** Strength Foundation (12 weeks, 3 days/week, workouts A/B/C)
-- **31 exercises** across 8 categories (Hinge, Squat, Push, Pull, Lateral, Rotational, Power, Carry)
+- **2 programs:** Strength Foundation + Belly Dance Foundations (12 weeks each, 3 days/week, routines A/B/C)
+- **31 strength exercises** across 8 categories (Hinge, Squat, Push, Pull, Lateral, Rotational, Power, Carry)
+- **12 belly dance items** across warm-up, conditioning, moves, and cool-down
 - **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood
-- All seeded from `src/lib/db/seed.ts`; exercises upserted on every boot, habits and programs only on first run
+- All seeded from `src/lib/db/seed.ts`; items, habits, and programs are seeded only on first run (empty store). Built-in content updates ride the DB version bump (wipe + re-seed), not a per-boot rewrite.
 
 ---
 

@@ -165,11 +165,6 @@
 				</div>
 			</div>
 
-			<!-- Date -->
-			<div class="act-field">
-				<label class="act-field__label" for="act-date">Date</label>
-				<input id="act-date" class="act-date-input" type="date" bind:value={date} max={todayStr} />
-			</div>
 		</div>
 
 		<div class="act-sheet__footer">
@@ -352,23 +347,6 @@
 		background: var(--color-accent);
 		border-color: var(--color-accent);
 		color: var(--color-accent-ink);
-	}
-
-	.act-date-input {
-		block-size: 44px;
-		padding-inline: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		font: inherit;
-		font-size: 0.9375rem;
-		color: var(--color-text-primary);
-		outline: none;
-		transition: border-color var(--duration-fast) var(--ease-out);
-
-		&:focus {
-			border-color: var(--color-accent);
-		}
 	}
 
 	.act-sheet__footer {

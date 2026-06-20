@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { formatElapsed, formatCountWithWord } from '$lib/format';
+	import type { ActiveItem, ActiveSet } from '$lib/db/types';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
@@ -25,10 +26,15 @@
 
 	let elapsedFormatted = $derived(formatElapsed(elapsed));
 
-	let totalSets = $derived(sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
+	let activeItems = $derived(sessionStore.activeItems);
+
+	let totalSets = $derived(activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.length, 0));
 
 	let doneSets = $derived(
-		sessionStore.active?.exercises.reduce((sum, ex) => sum + ex.sets.filter((s) => s.completed).length, 0) ?? 0,
+		activeItems.reduce(
+			(sum: number, ex: ActiveItem) => sum + ex.sets.filter((s: ActiveSet) => s.completed).length,
+			0,
+		),
 	);
 
 	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
@@ -53,7 +59,7 @@
 	}
 
 	function handleSetTap(exerciseIndex: number, setIndex: number) {
-		const activeExercise = sessionStore.active?.exercises[exerciseIndex];
+		const activeExercise = sessionStore.activeItems[exerciseIndex];
 		const set = activeExercise?.sets[setIndex];
 		if (!set) return;
 
@@ -87,12 +93,12 @@
 
 	let sheetExercise = $derived(
 		sheetTarget
-			? programStore.exerciseMap.get(sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.exerciseId ?? '')
+			? programStore.getItemById(activeItems[sheetTarget.exerciseIndex]?.itemId ?? '')
 			: null,
 	);
 
 	let sheetActiveSet = $derived(
-		sheetTarget ? sessionStore.active?.exercises[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex] : null,
+		sheetTarget ? activeItems[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex] : null,
 	);
 </script>
 
@@ -117,7 +123,7 @@
 
 				<div class="session-overlay__titles">
 					<p class="session-overlay__workout-name" id="session-title">
-						{sessionStore.active?.workoutName ?? ''}
+						{sessionStore.activeRoutineName}
 					</p>
 					<p class="session-overlay__context">
 						{#if isEditing}
@@ -149,8 +155,8 @@
 		<!-- Exercise list -->
 		<div class="session-overlay__exercises">
 			{#if sessionStore.active}
-				{#each sessionStore.active.exercises as activeExercise, exerciseIndex}
-					{@const exercise = programStore.exerciseMap.get(activeExercise.exerciseId)}
+				{#each activeItems as activeExercise, exerciseIndex}
+					{@const exercise = programStore.getItemById(activeExercise.itemId)}
 					{#if exercise}
 						<ExerciseCard {activeExercise} {exercise} {exerciseIndex} onSetTap={handleSetTap} />
 					{/if}

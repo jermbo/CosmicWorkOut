@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
 
-	type CardVariant = 'habits' | 'workout' | 'log' | 'journal';
+	type CardVariant = 'habits' | 'workout' | 'dance' | 'log';
 
 	type Props = {
 		href: string;
@@ -32,8 +32,8 @@
 	class="home-card"
 	class:home-card--habits={variant === 'habits'}
 	class:home-card--workout={variant === 'workout'}
+	class:home-card--dance={variant === 'dance'}
 	class:home-card--log={variant === 'log'}
-	class:home-card--journal={variant === 'journal'}
 	class:home-card--done={done}
 	class:home-card--active={active}
 	aria-label={ariaLabel}
@@ -73,6 +73,20 @@
 	.home-card--done {
 		border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
 		background: color-mix(in srgb, var(--color-accent) 4%, var(--color-surface-2));
+	}
+
+	.home-card--dance.home-card--done {
+		border-color: color-mix(in srgb, var(--color-lavender) 35%, transparent);
+		background: color-mix(in srgb, var(--color-lavender) 4%, var(--color-surface-2));
+	}
+
+	.home-card--dance:hover {
+		border-color: var(--color-lavender);
+	}
+
+	.home-card--dance .home-card__badge--done {
+		background: color-mix(in srgb, var(--color-lavender) 15%, transparent);
+		color: var(--color-lavender);
 	}
 
 	.home-card--active {

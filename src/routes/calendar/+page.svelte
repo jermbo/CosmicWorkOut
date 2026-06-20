@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { SessionLog, ActivityLog } from '$lib/db/types';
+	import type { Session, ActivityLog } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { BELLYDANCE_DISCIPLINE_ID, STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -25,7 +26,7 @@
 	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
 
 	let viewDate = $state(new Date());
-	let selectedSession = $state<SessionLog | null>(null);
+	let selectedSession = $state<Session | null>(null);
 	let dayActionsDate = $state<string | null>(null);
 	let habitHistoryDate = $state<string | null>(null);
 	let editingActivity = $state<ActivityLog | null>(null);
@@ -34,12 +35,26 @@
 	const todayStr = todayIso();
 
 	let sessionsByDate = $derived.by(() => {
-		const map = new Map<string, SessionLog>();
+		const map = new Map<string, Session[]>();
 		for (const s of programStore.sessions) {
-			map.set(s.date, s);
+			const list = map.get(s.date) ?? [];
+			list.push(s);
+			map.set(s.date, list);
 		}
 		return map;
 	});
+
+	function sessionsOnDate(dateStr: string): Session[] {
+		return sessionsByDate.get(dateStr) ?? [];
+	}
+
+	function hasStrengthSession(dateStr: string): boolean {
+		return sessionsOnDate(dateStr).some((s) => s.disciplineId === STRENGTH_DISCIPLINE_ID);
+	}
+
+	function hasDanceSession(dateStr: string): boolean {
+		return sessionsOnDate(dateStr).some((s) => s.disciplineId === BELLYDANCE_DISCIPLINE_ID);
+	}
 
 	function buildCalendarDays() {
 		return monthCalendarCells(viewDate.getFullYear(), viewDate.getMonth());
@@ -82,7 +97,13 @@
 		viewDate = d;
 	}
 
-	let dayActionsSession = $derived(dayActionsDate ? (sessionsByDate.get(dayActionsDate) ?? null) : null);
+	let dayActionsSessions = $derived(dayActionsDate ? sessionsOnDate(dayActionsDate) : []);
+	let dayActionsStrengthSession = $derived(
+		dayActionsSessions.find((s) => s.disciplineId === STRENGTH_DISCIPLINE_ID) ?? null,
+	);
+	let dayActionsDanceSession = $derived(
+		dayActionsSessions.find((s) => s.disciplineId === BELLYDANCE_DISCIPLINE_ID) ?? null,
+	);
 
 	let dayActionsHasHabits = $derived(
 		dayActionsDate ? habitStore.logsForDate(dayActionsDate).length > 0 : false,
@@ -97,9 +118,8 @@
 		dayActionsDate = dateStr;
 	}
 
-	function openSessionDetails() {
-		if (!dayActionsSession) return;
-		selectedSession = dayActionsSession;
+	function openSessionDetails(session: Session) {
+		selectedSession = session;
 		dayActionsDate = null;
 	}
 
@@ -114,7 +134,7 @@
 
 	let monthKey = $derived(monthIsoKey(viewDate));
 
-	let monthSessions = $derived([...sessionsByDate.values()].filter((s) => s.date.startsWith(monthKey)));
+	let monthSessions = $derived(programStore.sessions.filter((s) => s.date.startsWith(monthKey)));
 
 	let monthActivities = $derived(activityStore.activities.filter((a) => a.date.startsWith(monthKey)));
 
@@ -200,7 +220,9 @@
 				{#each calendarDays as cell}
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
-						{@const hasSession = sessionsByDate.has(cell.date)}
+						{@const hasStrength = hasStrengthSession(cell.date)}
+						{@const hasDance = hasDanceSession(cell.date)}
+						{@const hasSession = hasStrength || hasDance}
 						{@const hasActivity = (activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
 						{@const tappable = status !== 'future'}
 						{@const ratio = status !== 'future' ? habitRatio(cell.date) : 0}
@@ -218,8 +240,11 @@
 						>
 							<span class="calendar-day__num" aria-hidden="true">{cell.dayNum}</span>
 							<span class="calendar-day__dots" aria-hidden="true">
-								{#if hasSession}
+								{#if hasStrength}
 									<span class="calendar-day__dot calendar-day__dot--session"></span>
+								{/if}
+								{#if hasDance}
+									<span class="calendar-day__dot calendar-day__dot--dance"></span>
 								{/if}
 								{#if hasActivity}
 									<span class="calendar-day__dot calendar-day__dot--activity"></span>
@@ -243,7 +268,8 @@
 
 	<!-- Legend -->
 	<div class="calendar-legend" aria-label="Legend">
-		<span class="cal-legend-item cal-legend-item--session">Workout</span>
+		<span class="cal-legend-item cal-legend-item--session">Strength</span>
+		<span class="cal-legend-item cal-legend-item--dance">Dance</span>
 		<span class="cal-legend-item cal-legend-item--activity">Activity</span>
 		<span class="cal-legend-item cal-legend-item--mood">Mood</span>
 		<span class="cal-legend-item cal-legend-item--habits">Habits logged</span>
@@ -253,7 +279,7 @@
 {#if selectedSession}
 	<DaySummarySheet
 		session={selectedSession}
-		exerciseMap={programStore.exerciseMap}
+		exerciseMap={programStore.itemMap}
 		onClose={() => (selectedSession = null)}
 	/>
 {/if}
@@ -261,12 +287,14 @@
 {#if dayActionsDate}
 	<DayActionsSheet
 		date={dayActionsDate}
-		session={dayActionsSession}
+		strengthSession={dayActionsStrengthSession}
+		danceSession={dayActionsDanceSession}
 		hasHabits={dayActionsHasHabits}
 		hasActivities={dayActionsHasActivities}
 		activities={activityStore.activitiesByDate.get(dayActionsDate) ?? []}
 		onClose={() => (dayActionsDate = null)}
-		onViewSession={dayActionsSession ? openSessionDetails : undefined}
+		onViewStrengthSession={dayActionsStrengthSession ? () => openSessionDetails(dayActionsStrengthSession!) : undefined}
+		onViewDanceSession={dayActionsDanceSession ? () => openSessionDetails(dayActionsDanceSession!) : undefined}
 		onViewHabits={dayActionsHasHabits ? openHabitHistory : undefined}
 		onEditActivity={handleEditActivity}
 	/>
@@ -532,6 +560,9 @@
 	.calendar-day__dot--session {
 		background: var(--color-accent);
 	}
+	.calendar-day__dot--dance {
+		background: var(--color-lavender);
+	}
 	.calendar-day__dot--activity {
 		background: var(--color-lavender);
 	}
@@ -575,6 +606,9 @@
 
 	.cal-legend-item--session::before {
 		background: var(--color-accent);
+	}
+	.cal-legend-item--dance::before {
+		background: var(--color-lavender);
 	}
 	.cal-legend-item--activity::before {
 		background: var(--color-lavender);

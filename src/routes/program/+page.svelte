@@ -1,31 +1,54 @@
 <script lang="ts">
-	import type { Program, Workout } from '$lib/db/types';
+	import { page } from '$app/state';
+	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
+	import {
+		flattenItems,
+		effectiveSections,
+		STRENGTH_DISCIPLINE_ID,
+		BELLYDANCE_DISCIPLINE_ID,
+	} from '$lib/discipline';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
+	import DanceRoutineEditor from '$lib/components/DanceRoutineEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
-	let editingWorkout = $state<Workout | null | undefined>(undefined);
+	let editingWorkout = $state<Routine | null | undefined>(undefined);
 	let showCreateProgram = $state(false);
 	let showDeleteProgramConfirm = $state(false);
 	let deletingProgram = $state(false);
 	let removeWorkoutName = $state<string | null>(null);
 	let selectedWeek = $state(1);
 
-	// Which program's schedule is shown in the detail panel (defaults to active)
+	let disciplineId = $derived(
+		page.url.searchParams.get('discipline') === BELLYDANCE_DISCIPLINE_ID
+			? BELLYDANCE_DISCIPLINE_ID
+			: STRENGTH_DISCIPLINE_ID,
+	);
+
+	let disciplinePrograms = $derived(programStore.programs.filter((p) => p.disciplineId === disciplineId));
+
+	// Which program's schedule is shown in the detail panel (defaults to active for discipline)
 	let viewingProgramId = $state<string | undefined>(undefined);
 
-	// Sync initial value once programs load
 	$effect(() => {
-		if (viewingProgramId === undefined && programStore.programs.length > 0) {
-			viewingProgramId = programStore.activeProgram?.id ?? programStore.programs[0]?.id;
+		if (viewingProgramId === undefined && disciplinePrograms.length > 0) {
+			viewingProgramId =
+				programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		}
 	});
 
-	let viewingProgram = $derived(programStore.programs.find((p) => p.id === viewingProgramId));
+	$effect(() => {
+		void disciplineId;
+		viewingProgramId = undefined;
+	});
 
-	let viewingIsActive = $derived(viewingProgramId === programStore.activeProgram?.id);
+	let viewingProgram = $derived(disciplinePrograms.find((p) => p.id === viewingProgramId));
+
+	let viewingIsActive = $derived(
+		viewingProgramId ? programStore.isProgramActive(viewingProgramId) : false,
+	);
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
@@ -40,9 +63,9 @@
 	};
 
 	let weekWorkouts = $derived.by(() => {
-		if (!viewingProgram) return [] as Workout[];
+		if (!viewingProgram) return [] as Routine[];
 		const week = viewingProgram.weeks[selectedWeek - 1];
-		return week?.workouts ?? [];
+		return week?.routines ?? [];
 	});
 
 	let totalWeeks = $derived(viewingProgram?.durationWeeks ?? 1);
@@ -57,15 +80,22 @@
 		if (selectedWeek > totalWeeks) selectedWeek = 1;
 	});
 
-	function getWorkoutStatus(workout: Workout): 'today' | 'done' | 'scheduled' {
+	function getWorkoutStatus(workout: Routine): 'today' | 'done' | 'scheduled' {
 		if (!viewingIsActive) return 'scheduled';
-		const todaysId = programStore.todaysWorkout?.id;
+		const todaysId = programStore.todaysRoutineFor(disciplineId)?.id;
 		if (workout.id === todaysId) return 'today';
-		const allIds = programStore.allWorkouts.map((w) => w.id);
+		const allIds = programStore.allRoutinesFor(disciplineId).map((w) => w.id);
 		const todayIdx = allIds.indexOf(todaysId ?? '');
 		const thisIdx = allIds.indexOf(workout.id);
 		if (thisIdx < todayIdx) return 'done';
 		return 'scheduled';
+	}
+
+	function displayItemsForRoutine(routine: Routine) {
+		if (!viewingProgram || disciplineId === STRENGTH_DISCIPLINE_ID) {
+			return flattenItems(routine);
+		}
+		return effectiveSections(viewingProgram, routine).flatMap((s) => s.items);
 	}
 
 	async function handleDeleteProgram() {
@@ -73,7 +103,7 @@
 		deletingProgram = true;
 		try {
 			await programStore.deleteProgram(viewingProgram.id);
-			viewingProgramId = programStore.activeProgram?.id ?? programStore.programs[0]?.id;
+			viewingProgramId = programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		} finally {
 			deletingProgram = false;
 			showDeleteProgramConfirm = false;
@@ -82,7 +112,7 @@
 
 	async function handleRemoveWorkout() {
 		if (!removeWorkoutName) return;
-		await programStore.removeWorkout(removeWorkoutName);
+		await programStore.removeRoutine(removeWorkoutName);
 		removeWorkoutName = null;
 	}
 
@@ -106,8 +136,8 @@
 	</div>
 
 	<div class="prog-list" role="list" aria-label="Available programs">
-		{#each programStore.programs as program (program.id)}
-			{@const isActive = program.id === programStore.activeProgram?.id}
+		{#each disciplinePrograms as program (program.id)}
+			{@const isActive = programStore.isProgramActive(program.id)}
 			{@const isViewing = program.id === viewingProgramId}
 			<div
 				class="prog-card"
@@ -141,7 +171,14 @@
 				</button>
 
 				<div class="prog-card__actions">
-					{#if !isActive}
+					{#if isActive}
+						<button
+							class="prog-card__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(program.id)}
+						>
+							Deactivate
+						</button>
+					{:else}
 						<button
 							class="prog-card__activate-btn"
 							onclick={() => {
@@ -176,7 +213,14 @@
 			<div class="schedule__header">
 				<div class="schedule__title-row">
 					<h2 class="schedule__title" id="schedule-heading">{viewingProgram.name}</h2>
-					{#if !viewingIsActive}
+					{#if viewingIsActive}
+						<button
+							class="schedule__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(viewingProgram!.id)}
+						>
+							Deactivate
+						</button>
+					{:else}
 						<button class="schedule__activate-btn" onclick={() => programStore.setActiveProgram(viewingProgram!.id)}>
 							Activate this program
 						</button>
@@ -188,19 +232,19 @@
 						<div class="schedule__progress-labels">
 							<span class="schedule__progress-label">Progress</span>
 							<span class="schedule__progress-wk">
-								Week {programStore.currentWeekNumber} of {viewingProgram.durationWeeks}
+								Week {programStore.currentWeekFor(disciplineId)} of {viewingProgram.durationWeeks}
 							</span>
 						</div>
 						<div
 							class="schedule__progress-bar"
 							role="progressbar"
-							aria-valuenow={programStore.currentWeekNumber}
+							aria-valuenow={programStore.currentWeekFor(disciplineId)}
 							aria-valuemin={1}
 							aria-valuemax={viewingProgram.durationWeeks}
 						>
 							<div
 								class="schedule__progress-fill"
-								style:inline-size="{((programStore.currentWeekNumber - 1) / viewingProgram.durationWeeks) * 100}%"
+								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) / viewingProgram.durationWeeks) * 100}%"
 							></div>
 						</div>
 					</div>
@@ -221,7 +265,7 @@
 				</button>
 				<span class="week-picker__label">
 					Week {selectedWeek}
-					{#if viewingIsActive && selectedWeek === programStore.currentWeekNumber}
+					{#if viewingIsActive && selectedWeek === programStore.currentWeekFor(disciplineId)}
 						<span class="week-picker__now">current</span>
 					{/if}
 				</span>
@@ -285,10 +329,10 @@
 							</div>
 						</div>
 
-						{#if workout.exercises.length > 0}
-							<div class="workout-card__chips" role="list" aria-label="Exercises in {workout.name}">
-								{#each workout.exercises as we}
-									{@const ex = programStore.exerciseMap.get(we.exerciseId)}
+						{#if displayItemsForRoutine(workout).length > 0}
+							<div class="workout-card__chips" role="list" aria-label="Items in {workout.name}">
+								{#each displayItemsForRoutine(workout) as we}
+									{@const ex = programStore.itemMap.get(we.itemId)}
 									{#if ex}
 										<span class="workout-card__chip" role="listitem">{ex.name}</span>
 									{/if}
@@ -298,10 +342,12 @@
 					</article>
 				{/each}
 
-				<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
-					<Icon name="plus" size={18} stroke={2.5} />
-					Add workout
-				</button>
+				{#if disciplineId === STRENGTH_DISCIPLINE_ID}
+					<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
+						<Icon name="plus" size={18} stroke={2.5} />
+						Add workout
+					</button>
+				{/if}
 			</div>
 		</section>
 	{/if}
@@ -335,11 +381,19 @@
 {/if}
 
 {#if editingWorkout !== undefined}
-	<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+	{#if disciplineId === BELLYDANCE_DISCIPLINE_ID && editingWorkout && viewingProgram}
+		<DanceRoutineEditor
+			program={viewingProgram}
+			routine={editingWorkout}
+			onBack={() => (editingWorkout = undefined)}
+		/>
+	{:else}
+		<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+	{/if}
 {/if}
 
 {#if showCreateProgram}
-	<CreateProgramSheet onClose={() => (showCreateProgram = false)} />
+	<CreateProgramSheet {disciplineId} onClose={() => (showCreateProgram = false)} />
 {/if}
 
 <style>
@@ -493,6 +547,23 @@
 		}
 	}
 
+	.prog-card__deactivate-btn {
+		padding-inline: var(--space-3);
+		block-size: 36px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+
+		&:hover {
+			color: var(--color-red);
+			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
+		}
+	}
+
 	.prog-card__delete-btn {
 		display: flex;
 		align-items: center;
@@ -550,6 +621,23 @@
 
 		&:hover {
 			opacity: 0.85;
+		}
+	}
+
+	.schedule__deactivate-btn {
+		padding-inline: var(--space-4);
+		block-size: 34px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+
+		&:hover {
+			color: var(--color-red);
+			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
 		}
 	}
 

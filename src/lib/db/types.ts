@@ -1,8 +1,8 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
-export type WorkoutColor = 'lime' | 'lavender' | 'red';
+export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
+export type ItemCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
 export type ActivityType =
 	| 'Run'
 	| 'Walk'
@@ -33,43 +33,98 @@ export const MOOD_SCALE = [
 	{ value: -5, label: 'Stressed' },
 ] as const;
 
-export interface Exercise {
+// ── Discipline model ──────────────────────────────────────────────
+// A Discipline is a data-driven definition of a structured movement practice.
+// It declares its ordered sections and the logging metric per section, while
+// the engine stays generic. Disciplines are seeded, read-only config (see
+// src/lib/discipline.ts) — not stored in IndexedDB and not user-editable.
+
+// How one item is logged within a session — the core flexibility lever.
+//   setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
+export type Metric = 'setsReps' | 'measure' | 'check';
+
+export interface Section {
+	key: string; // "exercises" | "warm-up" | "conditioning" | "moves" | "cool-down"
+	label: string;
+	metric: Metric;
+	isBookend?: boolean; // warm-up / cool-down inherit from Routine A (US-017)
+}
+
+export interface Discipline {
+	id: string; // "strength" | "bellydance"
+	label: string;
+	color?: string;
+	icon?: string;
+	sections: Section[]; // strength: one section; belly dance: four
+}
+
+// ── Generalized structured-practice entities ─────────────────────
+// Item (was Exercise), Routine (was Workout), Session (was SessionLog).
+// Each carries a disciplineId. Strength fields below remain required because
+// every Item that ships in v1.4.0 is a setsReps strength Item; US-016 relaxes
+// them when it introduces non-strength (measure/check) Items.
+
+export interface Item {
 	id: string;
+	disciplineId: string;
 	name: string;
 	cue: string;
-	muscles: string;
-	cat: ExerciseCat;
-	unit: WeightUnit;
-	defaultSets: number;
-	defaultReps: string;
+	section: string; // section key within the Discipline (strength: "exercises")
+	metric: Metric;
+	focus?: string[]; // generalized focus tags (US-016) — e.g. ["hips", "core"]
+	// setsReps (strength) fields — optional now that measure/check Items (e.g. belly
+	// dance) live on the same model and don't carry sets/reps/weight (US-016).
+	muscles?: string;
+	cat?: ItemCat;
+	unit?: WeightUnit;
+	defaultSets?: number;
+	defaultReps?: string;
 	weightIncrement?: number;
 	isBuiltIn: boolean;
 }
 
-export interface WorkoutExercise {
-	exerciseId: string;
-	sets: number;
-	reps: string;
+// Focus tags an Item can carry (US-016). Belly dance uses body-part focuses; the
+// list is shared across Disciplines and shown as filter chips in the item library.
+export const FOCUS_TAGS = ['hips', 'core', 'arms', 'chest', 'shoulders', 'legs', 'full-body', 'posture'] as const;
+export type FocusTag = (typeof FOCUS_TAGS)[number];
+
+export interface RoutineItem {
+	itemId: string;
+	// Strength carries upfront sets×reps targets; dance (measure/check) items do
+	// not prescribe targets — values are entered during the session (US-017 §3c).
+	sets?: number;
+	reps?: string;
 	notes?: string;
 }
 
-export interface Workout {
+export interface RoutineSection {
+	key: string; // matches a Discipline Section key
+	items: RoutineItem[];
+	// For bookend sections (warm-up / cool-down) on routines other than A: when
+	// absent/false the section inherits Routine A's items; when true the routine
+	// owns its own bookend list (US-017 §4). Ignored for non-bookend sections.
+	overridesBookends?: boolean;
+}
+
+export interface Routine {
 	id: string;
+	disciplineId: string;
 	name: string;
 	letter?: string;
 	focus?: string;
-	color?: WorkoutColor;
+	color?: RoutineColor;
 	estMin?: number;
-	exercises: WorkoutExercise[];
+	sections: RoutineSection[]; // strength: a single "exercises" section
 }
 
 export interface Week {
 	weekNumber: number;
-	workouts: Workout[];
+	routines: Routine[];
 }
 
 export interface Program {
 	id: string;
+	disciplineId: string;
 	name: string;
 	description: string;
 	durationWeeks: number;
@@ -86,26 +141,33 @@ export interface LoggedSet {
 	completedAt: string;
 }
 
-export interface LoggedExercise {
-	exerciseId: string;
+export interface LoggedItem {
+	itemId: string;
 	sets: LoggedSet[];
+	// Non-strength logging results (US-019). check → checked; measure → value with
+	// its mode. Absent for setsReps Items. skipped marks a measure item with no value.
+	checked?: boolean;
+	value?: number;
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean;
 }
 
-export interface SessionLog {
+export interface Session {
 	id: string;
+	disciplineId: string;
 	date: string;
-	workoutId: string;
+	routineId: string;
 	programId: string;
 	startedAt: string;
 	finishedAt: string;
 	durationSeconds: number;
 	totalVolume: number;
 	totalSets: number;
-	exercises: LoggedExercise[];
+	items: LoggedItem[];
 }
 
-export interface ExerciseLastUsed {
-	exerciseId: string;
+export interface ItemLastUsed {
+	itemId: string;
 	weight: number | string;
 	reps: number;
 }
@@ -126,20 +188,30 @@ export interface ActiveSet {
 	completedAt: string | null;
 }
 
-export interface ActiveExercise {
-	exerciseId: string;
+export interface ActiveItem {
+	itemId: string;
 	unit: WeightUnit;
 	sets: ActiveSet[];
+	// Metric-aware in-session state (US-019). setsReps uses `sets`; check uses
+	// `checked`; measure uses `value` + `measureMode` (+ `skipped`). `section` is the
+	// routine section key so the session UI can group items.
+	metric?: Metric;
+	section?: string;
+	checked?: boolean;
+	value?: number | null;
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean;
 }
 
 export interface ActiveSession {
 	id: string;
+	disciplineId: string;
 	date: string;
-	workoutId: string;
-	workoutName: string;
+	routineId: string;
+	routineName: string;
 	programId: string;
 	startedAt: string;
-	exercises: ActiveExercise[];
+	items: ActiveItem[];
 	isEditing?: boolean;
 	originalFinishedAt?: string;
 	originalDurationSeconds?: number;
@@ -171,12 +243,4 @@ export interface HabitLog {
 	habitId: string;
 	date: string;
 	value: number;
-}
-
-export interface JournalEntry {
-	id: string;
-	date: string;
-	content: string;
-	createdAt: string;
-	updatedAt: string;
 }

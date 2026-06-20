@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { untrack, onDestroy } from 'svelte';
-	import type { ActiveExercise, Exercise } from '$lib/db/types';
+	import type { ActiveItem, Item } from '$lib/db/types';
 	import ProgressRing from './ProgressRing.svelte';
 	import SetTile from './SetTile.svelte';
 
 	type Props = {
-		activeExercise: ActiveExercise;
-		exercise: Exercise;
+		activeExercise: ActiveItem;
+		exercise: Item;
 		exerciseIndex: number;
 		onSetTap: (exerciseIndex: number, setIndex: number) => void;
 	};

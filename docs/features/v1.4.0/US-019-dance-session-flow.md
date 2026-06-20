@@ -1,4 +1,4 @@
-# US-018 — Dance Session Flow
+# US-019 — Dance Session Flow
 
 > **Status: ❌ Planned — v1.4.0**
 >
@@ -13,7 +13,7 @@ so that I stay on track during practice without pre-planning every duration or r
 
 1. Session start
    a. The user shall be able to start a dance session from the practice page or Dance card on Today.
-   b. Starting a session shall load the selected routine's effective sections (including inherited bookends from US-016).
+   b. Starting a session shall load the selected routine's effective sections (including inherited bookends from US-017).
    c. The session shall display the routine name, letter, and four section headers in order: Warm-up, Conditioning, Moves, Cool-down.
    d. A session timer shall track total elapsed time from start to finish.
 
@@ -34,7 +34,7 @@ so that I stay on track during practice without pre-planning every duration or r
    c. Completed sections shall remain editable until the session is finished.
 
 5. Session finish and abandon
-   a. The user shall be able to finish the session when done; finish saves all logged values to a practice session log.
+   a. The user shall be able to finish the session when done; finish saves all logged values to a Session (a session log of the Belly Dance Discipline).
    b. The user shall be able to abandon an in-progress session with confirmation; abandon discards unsaved progress.
    c. Finish shall record: date, program ID, routine ID, start time, finish time, total duration, and per-item log entries.
    d. Abandoned sessions shall not increment program progression or affect streaks.
@@ -96,6 +96,6 @@ so that I stay on track during practice without pre-planning every duration or r
 - [v1.4.0 README](./README.md)
 - [How It Works — Session Flow](../../implementation/behavior.md)
 - [Program Progression](../../implementation/program-progression.md)
-- [US-016 — Belly Dance Program & Routines](./US-016-belly-dance-program-routines.md)
-- [US-017 — Practice Hub & Navigation](./US-017-practice-hub-navigation.md)
-- [US-019 — Practice Streaks & Calendar History](./US-019-practice-streaks-calendar.md)
+- [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)
+- [US-018 — Practice Hub & Navigation](./US-018-practice-hub-navigation.md)
+- [US-020 — Cross-Discipline Streaks & Calendar History](./US-020-practice-streaks-calendar.md)
