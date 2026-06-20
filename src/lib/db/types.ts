@@ -1,8 +1,8 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
-export type WorkoutColor = 'lime' | 'lavender' | 'red';
+export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export type ExerciseCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
+export type ItemCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
 export type ActivityType =
 	| 'Run'
 	| 'Walk'
@@ -33,12 +33,48 @@ export const MOOD_SCALE = [
 	{ value: -5, label: 'Stressed' },
 ] as const;
 
-export interface Exercise {
+// ── Discipline model ──────────────────────────────────────────────
+// A Discipline is a data-driven definition of a structured movement practice.
+// It declares its ordered sections and the logging metric per section, while
+// the engine stays generic. Disciplines are seeded, read-only config (see
+// src/lib/discipline.ts) — not stored in IndexedDB and not user-editable.
+
+// How one item is logged within a session — the core flexibility lever.
+//   setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
+export type Metric = 'setsReps' | 'measure' | 'check';
+
+export interface Section {
+	key: string; // "exercises" | "warm-up" | "conditioning" | "moves" | "cool-down"
+	label: string;
+	metric: Metric;
+	isBookend?: boolean; // warm-up / cool-down inherit from Routine A (US-017)
+}
+
+export interface Discipline {
+	id: string; // "strength" | "bellydance"
+	label: string;
+	color?: string;
+	icon?: string;
+	sections: Section[]; // strength: one section; belly dance: four
+}
+
+// ── Generalized structured-practice entities ─────────────────────
+// Item (was Exercise), Routine (was Workout), Session (was SessionLog).
+// Each carries a disciplineId. Strength fields below remain required because
+// every Item that ships in v1.4.0 is a setsReps strength Item; US-016 relaxes
+// them when it introduces non-strength (measure/check) Items.
+
+export interface Item {
 	id: string;
+	disciplineId: string;
 	name: string;
 	cue: string;
+	section: string; // section key within the Discipline (strength: "exercises")
+	metric: Metric;
+	focus?: string[]; // generalized focus tags (US-016) — e.g. ["hips", "core"]
+	// setsReps (strength) fields:
 	muscles: string;
-	cat: ExerciseCat;
+	cat: ItemCat;
 	unit: WeightUnit;
 	defaultSets: number;
 	defaultReps: string;
@@ -46,30 +82,37 @@ export interface Exercise {
 	isBuiltIn: boolean;
 }
 
-export interface WorkoutExercise {
-	exerciseId: string;
+export interface RoutineItem {
+	itemId: string;
 	sets: number;
 	reps: string;
 	notes?: string;
 }
 
-export interface Workout {
+export interface RoutineSection {
+	key: string; // matches a Discipline Section key
+	items: RoutineItem[];
+}
+
+export interface Routine {
 	id: string;
+	disciplineId: string;
 	name: string;
 	letter?: string;
 	focus?: string;
-	color?: WorkoutColor;
+	color?: RoutineColor;
 	estMin?: number;
-	exercises: WorkoutExercise[];
+	sections: RoutineSection[]; // strength: a single "exercises" section
 }
 
 export interface Week {
 	weekNumber: number;
-	workouts: Workout[];
+	routines: Routine[];
 }
 
 export interface Program {
 	id: string;
+	disciplineId: string;
 	name: string;
 	description: string;
 	durationWeeks: number;
@@ -86,26 +129,27 @@ export interface LoggedSet {
 	completedAt: string;
 }
 
-export interface LoggedExercise {
-	exerciseId: string;
+export interface LoggedItem {
+	itemId: string;
 	sets: LoggedSet[];
 }
 
-export interface SessionLog {
+export interface Session {
 	id: string;
+	disciplineId: string;
 	date: string;
-	workoutId: string;
+	routineId: string;
 	programId: string;
 	startedAt: string;
 	finishedAt: string;
 	durationSeconds: number;
 	totalVolume: number;
 	totalSets: number;
-	exercises: LoggedExercise[];
+	items: LoggedItem[];
 }
 
-export interface ExerciseLastUsed {
-	exerciseId: string;
+export interface ItemLastUsed {
+	itemId: string;
 	weight: number | string;
 	reps: number;
 }
@@ -126,20 +170,21 @@ export interface ActiveSet {
 	completedAt: string | null;
 }
 
-export interface ActiveExercise {
-	exerciseId: string;
+export interface ActiveItem {
+	itemId: string;
 	unit: WeightUnit;
 	sets: ActiveSet[];
 }
 
 export interface ActiveSession {
 	id: string;
+	disciplineId: string;
 	date: string;
-	workoutId: string;
-	workoutName: string;
+	routineId: string;
+	routineName: string;
 	programId: string;
 	startedAt: string;
-	exercises: ActiveExercise[];
+	items: ActiveItem[];
 	isEditing?: boolean;
 	originalFinishedAt?: string;
 	originalDurationSeconds?: number;

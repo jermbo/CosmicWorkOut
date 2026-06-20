@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SessionLog, Exercise } from '$lib/db/types';
+	import type { Session, Item } from '$lib/db/types';
 	import { formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration, formatVolume, formatCountWithWord } from '$lib/format';
 	import { formatHabitLogValue } from '$lib/habits';
@@ -11,8 +11,8 @@
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
 	type Props = {
-		session: SessionLog;
-		exerciseMap: Map<string, Exercise>;
+		session: Session;
+		exerciseMap: Map<string, Item>;
 		onClose: () => void;
 		onEdit?: () => void;
 		onDelete?: () => void;
@@ -39,13 +39,13 @@
 	});
 
 	let workoutName = $derived(
-		programStore.getWorkoutForSession(session)?.name ??
-			programStore.getWorkoutById(session.workoutId)?.name ??
+		programStore.getRoutineForSession(session)?.name ??
+			programStore.getRoutineById(session.routineId)?.name ??
 			'Workout',
 	);
 
 	async function handleEdit() {
-		const workout = programStore.getWorkoutForSession(session);
+		const workout = programStore.getRoutineForSession(session);
 		if (!workout) return;
 		await sessionStore.editSession(session, workout, exerciseMap);
 		onEdit?.();
@@ -74,7 +74,7 @@
 			</div>
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
 			<div class="day-summary__stat">
-				<span class="day-summary__stat-value">{session.exercises.length}</span>
+				<span class="day-summary__stat-value">{session.items.length}</span>
 				<span class="day-summary__stat-label">Exercises</span>
 			</div>
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
@@ -85,8 +85,8 @@
 		</div>
 
 		<div class="day-summary__exercises">
-			{#each session.exercises as loggedEx (loggedEx.exerciseId)}
-				{@const exercise = exerciseMap.get(loggedEx.exerciseId)}
+			{#each session.items as loggedEx (loggedEx.itemId)}
+				{@const exercise = exerciseMap.get(loggedEx.itemId)}
 				{#if exercise}
 					<div class="day-summary__exercise">
 						<div class="day-summary__exercise-header">

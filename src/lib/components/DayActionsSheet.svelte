@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { SessionLog, ActivityLog } from '$lib/db/types';
+	import type { Session, ActivityLog } from '$lib/db/types';
 	import { formatLongDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
@@ -11,7 +11,7 @@
 
 	type Props = {
 		date: string;
-		session?: SessionLog | null;
+		session?: Session | null;
 		hasHabits?: boolean;
 		hasActivities?: boolean;
 		activities?: ActivityLog[];
@@ -35,8 +35,8 @@
 
 	let workoutName = $derived(
 		session
-			? (programStore.getWorkoutForSession(session)?.name ??
-					programStore.getWorkoutById(session.workoutId)?.name ??
+			? (programStore.getRoutineForSession(session)?.name ??
+					programStore.getRoutineById(session.routineId)?.name ??
 					'Workout')
 			: null,
 	);

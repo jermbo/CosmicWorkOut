@@ -1,112 +1,151 @@
-import type { Program, Exercise, Workout, WorkoutExercise, SessionLog, Week, WorkoutColor } from '$lib/db/types';
+import type { Program, Item, Routine, RoutineItem, Session, Week, RoutineColor } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { computeWeekStreak } from '$lib/streak';
+import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '$lib/discipline';
 
-const ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
+// Per-Discipline active program: disciplineId → programId. Replaces the legacy
+// single 'cwout:activeProgramId' so strength and belly dance can be active at once.
+const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
+const LEGACY_ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
-const WORKOUT_COLORS: WorkoutColor[] = ['lime', 'lavender', 'red'];
+const ROUTINE_COLORS: RoutineColor[] = ['lime', 'lavender', 'red'];
 
 class ProgramStore {
 	programs = $state<Program[]>([]);
-	exercises = $state<Exercise[]>([]);
-	activeProgram = $state<Program | null>(null);
-	sessions = $state<SessionLog[]>([]);
+	items = $state<Item[]>([]);
+	sessions = $state<Session[]>([]);
+	// disciplineId → active programId
+	activeProgramIds = $state<Record<string, string>>({});
 	loaded = $state(false);
 
-	exerciseMap = $derived.by(() => {
-		const map = new Map<string, Exercise>();
-		for (const exercise of this.exercises) {
-			map.set(exercise.id, exercise);
+	itemMap = $derived.by(() => {
+		const map = new Map<string, Item>();
+		for (const item of this.items) {
+			map.set(item.id, item);
 		}
 		return map;
 	});
 
-	allWorkouts = $derived.by(() => {
-		if (!this.activeProgram) {
-			return [] as Workout[];
-		}
-		return this.activeProgram.weeks.flatMap((w) => w.workouts);
-	});
+	getItemById(id: string): Item | undefined {
+		return this.itemMap.get(id);
+	}
 
-	weekStreak = $derived.by(() => {
-		if (!this.activeProgram) return 0;
-		const programSessions = this.sessions.filter((s) => s.programId === this.activeProgram!.id);
+	// ── Per-Discipline accessors ────────────────────────────────────
+	// These read $state, so they stay reactive when called from $derived or markup.
+
+	activeProgramFor(disciplineId: string): Program | null {
+		const id = this.activeProgramIds[disciplineId];
+		if (!id) return null;
+		return this.programs.find((p) => p.id === id) ?? null;
+	}
+
+	programsForDiscipline(disciplineId: string): Program[] {
+		return this.programs.filter((p) => p.disciplineId === disciplineId);
+	}
+
+	allRoutinesFor(disciplineId: string): Routine[] {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return [];
+		return program.weeks.flatMap((w) => w.routines);
+	}
+
+	sessionsForDiscipline(disciplineId: string): Session[] {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return [];
+		return this.sessions.filter((s) => s.programId === program.id);
+	}
+
+	completedCountFor(disciplineId: string): number {
+		return this.sessionsForDiscipline(disciplineId).length;
+	}
+
+	weekStreakFor(disciplineId: string): number {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return 0;
 		return computeWeekStreak(
-			programSessions.map((s) => s.date),
-			this.activeProgram.daysPerWeek,
+			this.sessionsForDiscipline(disciplineId).map((s) => s.date),
+			program.daysPerWeek,
 		);
-	});
+	}
 
-	completedSessionCount = $derived.by(() => {
-		if (!this.activeProgram) {
-			return 0;
-		}
-		return this.sessions.filter((s) => s.programId === this.activeProgram!.id).length;
-	});
+	isProgramCompleteFor(disciplineId: string): boolean {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return false;
+		const total = program.durationWeeks * program.daysPerWeek;
+		return total > 0 && this.completedCountFor(disciplineId) >= total;
+	}
 
-	isProgramComplete = $derived.by(() => {
-		if (!this.activeProgram) return false;
-		const total = this.activeProgram.durationWeeks * this.activeProgram.daysPerWeek;
-		return total > 0 && this.completedSessionCount >= total;
-	});
-
-	currentWeekNumber = $derived.by(() => {
-		if (!this.activeProgram) return 1;
+	currentWeekFor(disciplineId: string): number {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return 1;
 		return Math.min(
-			Math.floor(this.completedSessionCount / this.activeProgram.daysPerWeek) + 1,
-			this.activeProgram.durationWeeks,
+			Math.floor(this.completedCountFor(disciplineId) / program.daysPerWeek) + 1,
+			program.durationWeeks,
 		);
-	});
+	}
 
-	currentWorkoutLetter = $derived.by(() => {
-		if (!this.activeProgram) return 'A';
-		const posInWeek = this.completedSessionCount % this.activeProgram.daysPerWeek;
-		return String.fromCharCode(65 + posInWeek); // 0→A, 1→B, 2→C
-	});
+	currentLetterFor(disciplineId: string): string {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return 'A';
+		const posInWeek = this.completedCountFor(disciplineId) % program.daysPerWeek;
+		return String.fromCharCode(65 + posInWeek);
+	}
 
-	todaysWorkout = $derived.by(() => {
-		if (this.allWorkouts.length === 0) {
-			return null as Workout | null;
-		}
-		const index = this.completedSessionCount % this.allWorkouts.length;
-		return this.allWorkouts[index];
-	});
+	todaysRoutineFor(disciplineId: string): Routine | null {
+		const all = this.allRoutinesFor(disciplineId);
+		if (all.length === 0) return null;
+		return all[this.completedCountFor(disciplineId) % all.length];
+	}
+
+	// ── Strength-facing convenience (existing UI consumes these) ────
+	// US-018 generalizes Today to iterate Disciplines via the methods above.
+
+	activeProgram = $derived(this.activeProgramFor(STRENGTH_DISCIPLINE_ID));
+	allRoutines = $derived(this.allRoutinesFor(STRENGTH_DISCIPLINE_ID));
+	weekStreak = $derived(this.weekStreakFor(STRENGTH_DISCIPLINE_ID));
+	completedSessionCount = $derived(this.completedCountFor(STRENGTH_DISCIPLINE_ID));
+	isProgramComplete = $derived(this.isProgramCompleteFor(STRENGTH_DISCIPLINE_ID));
+	currentWeekNumber = $derived(this.currentWeekFor(STRENGTH_DISCIPLINE_ID));
+	currentRoutineLetter = $derived(this.currentLetterFor(STRENGTH_DISCIPLINE_ID));
+	todaysRoutine = $derived(this.todaysRoutineFor(STRENGTH_DISCIPLINE_ID));
 
 	todaySession = $derived.by(() => {
 		return this.sessionForDate(todayIso());
 	});
 
-	workoutsForCurrentWeek = $derived.by(() => {
-		if (!this.activeProgram) return [] as Workout[];
-		const week = this.activeProgram.weeks[this.currentWeekNumber - 1];
-		return week?.workouts ?? [];
+	routinesForCurrentWeek = $derived.by(() => {
+		const program = this.activeProgram;
+		if (!program) return [] as Routine[];
+		const week = program.weeks[this.currentWeekNumber - 1];
+		return week?.routines ?? [];
 	});
 
-	suggestedWorkoutInCurrentWeek = $derived.by(() => {
-		const weekWorkouts = this.workoutsForCurrentWeek;
-		const suggested = this.todaysWorkout;
-		if (weekWorkouts.length === 0) return null as Workout | null;
-		if (!suggested) return weekWorkouts[0];
-		const byLetter = weekWorkouts.find((w) => w.letter === suggested.letter);
+	suggestedRoutineInCurrentWeek = $derived.by(() => {
+		const weekRoutines = this.routinesForCurrentWeek;
+		const suggested = this.todaysRoutine;
+		if (weekRoutines.length === 0) return null as Routine | null;
+		if (!suggested) return weekRoutines[0];
+		const byLetter = weekRoutines.find((r) => r.letter === suggested.letter);
 		if (byLetter) return byLetter;
-		const byName = weekWorkouts.find((w) => w.name === suggested.name);
-		return byName ?? weekWorkouts[0];
+		const byName = weekRoutines.find((r) => r.name === suggested.name);
+		return byName ?? weekRoutines[0];
 	});
 
-	// Get unique workout templates from week 1 (canonical definitions)
-	uniqueWorkouts = $derived.by(() => {
-		if (!this.activeProgram || this.activeProgram.weeks.length === 0) {
-			return [] as Workout[];
+	// Unique routine templates from week 1 (canonical A/B/C definitions)
+	uniqueRoutines = $derived.by(() => {
+		const program = this.activeProgram;
+		if (!program || program.weeks.length === 0) {
+			return [] as Routine[];
 		}
-		return this.activeProgram.weeks[0].workouts;
+		return program.weeks[0].routines;
 	});
 
 	async load(): Promise<void> {
-		const [programs, exercises, sessions] = await Promise.all([
+		const [programs, items, sessions] = await Promise.all([
 			db.programs.getAll(),
-			db.exercises.getAll(),
+			db.items.getAll(),
 			db.sessions.getAll(),
 		]).catch((e) => {
 			console.error('Failed to load data from IndexedDB:', e);
@@ -114,62 +153,88 @@ class ProgramStore {
 		});
 
 		this.programs = programs;
-		this.exercises = exercises;
+		this.items = items;
 		this.sessions = sessions;
+		this.activeProgramIds = this.resolveActiveProgramIds(programs);
+		this.loaded = true;
+	}
 
-		const activeProgramId = localStorage.getItem(ACTIVE_PROGRAM_KEY);
+	// Read the per-Discipline active-program map, drop stale ids, and default each
+	// Discipline that has programs but no active selection to its first program.
+	private resolveActiveProgramIds(programs: Program[]): Record<string, string> {
+		const ids: Record<string, string> = {};
 
-		if (activeProgramId) {
-			const found = programs.find((p) => p.id === activeProgramId);
-			if (found) {
-				this.activeProgram = found;
+		const stored = localStorage.getItem(ACTIVE_PROGRAMS_KEY);
+		if (stored) {
+			try {
+				const parsed = JSON.parse(stored) as Record<string, string>;
+				for (const [disciplineId, programId] of Object.entries(parsed)) {
+					if (programs.some((p) => p.id === programId)) ids[disciplineId] = programId;
+				}
+			} catch {
+				// ignore malformed map — fall through to defaults
+			}
+		} else {
+			// One-time fallback from the legacy single-program key.
+			const legacy = localStorage.getItem(LEGACY_ACTIVE_PROGRAM_KEY);
+			const legacyProgram = legacy ? programs.find((p) => p.id === legacy) : undefined;
+			if (legacyProgram) ids[legacyProgram.disciplineId] = legacyProgram.id;
+		}
+
+		for (const program of programs) {
+			if (!ids[program.disciplineId]) {
+				ids[program.disciplineId] = program.id;
 			}
 		}
 
-		if (!this.activeProgram && programs.length > 0) {
-			this.activeProgram = programs[0];
-			localStorage.setItem(ACTIVE_PROGRAM_KEY, this.activeProgram.id);
-		}
+		this.persistActiveProgramIds(ids);
+		return ids;
+	}
 
-		this.loaded = true;
+	private persistActiveProgramIds(ids: Record<string, string> = this.activeProgramIds): void {
+		localStorage.setItem(ACTIVE_PROGRAMS_KEY, JSON.stringify(ids));
 	}
 
 	async refreshSessions(): Promise<void> {
 		this.sessions = await db.sessions.getAll();
 	}
 
-	getWorkoutById(workoutId: string): Workout | undefined {
-		return this.allWorkouts.find((w) => w.id === workoutId);
+	getRoutineById(routineId: string): Routine | undefined {
+		return this.allRoutines.find((r) => r.id === routineId);
 	}
 
-	getWorkoutForSession(log: SessionLog): Workout | null {
-		const direct = this.getWorkoutById(log.workoutId);
+	getRoutineForSession(log: Session): Routine | null {
+		const direct = this.getRoutineById(log.routineId);
 		if (direct) return direct;
 
 		// Fallback: match by letter suffix (e.g. w5-lower → lower)
-		const suffix = log.workoutId.split('-').slice(1).join('-');
+		const suffix = log.routineId.split('-').slice(1).join('-');
 		if (suffix) {
-			const bySuffix = this.allWorkouts.find((w) => w.id.endsWith(`-${suffix}`));
+			const bySuffix = this.allRoutines.find((r) => r.id.endsWith(`-${suffix}`));
 			if (bySuffix) return bySuffix;
 		}
 
-		if (log.exercises.length === 0) return null;
+		if (log.items.length === 0) return null;
 
-		// Last resort: build a minimal workout from the logged data
+		// Last resort: build a minimal routine from the logged data
 		return {
-			id: log.workoutId,
-			name: 'Logged workout',
-			exercises: log.exercises.map((le) => ({
-				exerciseId: le.exerciseId,
-				sets: le.sets.length,
-				reps: String(le.sets[0]?.reps ?? 8),
-			})),
+			id: log.routineId,
+			disciplineId: log.disciplineId,
+			name: 'Logged routine',
+			sections: singleSection(
+				log.items.map((li) => ({
+					itemId: li.itemId,
+					sets: li.sets.length,
+					reps: String(li.sets[0]?.reps ?? 8),
+				})),
+			),
 		};
 	}
 
-	sessionForDate(date: string): SessionLog | null {
-		if (!this.activeProgram) return null;
-		return this.sessions.find((s) => s.date === date && s.programId === this.activeProgram!.id) ?? null;
+	sessionForDate(date: string): Session | null {
+		const program = this.activeProgram;
+		if (!program) return null;
+		return this.sessions.find((s) => s.date === date && s.programId === program.id) ?? null;
 	}
 
 	async deleteSession(id: string): Promise<void> {
@@ -182,63 +247,62 @@ class ProgramStore {
 		await this.refreshSessions();
 	}
 
-	// Save workout metadata + exercises across all weeks (matched by original name)
-	async saveWorkout(
+	// Save routine metadata + items across all weeks (matched by original name).
+	// Strength routines are single-section; items write into the lone section.
+	async saveRoutine(
 		originalName: string,
-		updates: { name: string; letter?: string; focus?: string; color?: WorkoutColor; exercises: WorkoutExercise[] },
+		updates: { name: string; letter?: string; focus?: string; color?: RoutineColor; items: RoutineItem[] },
 	): Promise<void> {
-		if (!this.activeProgram) return;
+		const program = this.activeProgram;
+		if (!program) return;
 
-		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
+		const updatedWeeks = program.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.map((w) =>
-				w.name === originalName
+			routines: week.routines.map((r) =>
+				r.name === originalName
 					? {
-							...w,
+							...r,
 							name: updates.name,
-							letter: updates.letter ?? w.letter,
-							focus: updates.focus ?? w.focus,
-							color: updates.color ?? w.color,
-							exercises: updates.exercises,
+							letter: updates.letter ?? r.letter,
+							focus: updates.focus ?? r.focus,
+							color: updates.color ?? r.color,
+							sections: singleSection(updates.items),
 						}
-					: w,
+					: r,
 			),
 		}));
 
-		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
-		try {
-			await db.programs.put($state.snapshot(this.activeProgram));
-		} catch (e) {
-			console.error('Failed to save workout:', e);
-			throw e;
-		}
-		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
+		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
-	// Add a brand-new workout to all weeks
-	async addWorkout(workout: Omit<Workout, 'id'>): Promise<void> {
-		if (!this.activeProgram) return;
+	// Add a brand-new routine to all weeks
+	async addRoutine(routine: Omit<Routine, 'id'>): Promise<void> {
+		const program = this.activeProgram;
+		if (!program) return;
 
-		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
+		const updatedWeeks = program.weeks.map((week) => ({
 			...week,
-			workouts: [...week.workouts, { ...workout, id: generateId() }],
+			routines: [...week.routines, { ...routine, id: generateId() }],
 		}));
 
-		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
+		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
+	}
+
+	private async commitActiveProgram(updated: Program): Promise<void> {
 		try {
-			await db.programs.put($state.snapshot(this.activeProgram));
+			await db.programs.put($state.snapshot(updated));
 		} catch (e) {
-			console.error('Failed to add workout:', e);
+			console.error('Failed to save program:', e);
 			throw e;
 		}
-		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
+		this.programs = this.programs.map((p) => (p.id === updated.id ? updated : p));
 	}
 
 	setActiveProgram(programId: string): void {
 		const found = this.programs.find((p) => p.id === programId);
 		if (!found) return;
-		this.activeProgram = found;
-		localStorage.setItem(ACTIVE_PROGRAM_KEY, programId);
+		this.activeProgramIds = { ...this.activeProgramIds, [found.disciplineId]: programId };
+		this.persistActiveProgramIds();
 	}
 
 	async copyProgram(program: Program): Promise<Program> {
@@ -252,7 +316,7 @@ class ProgramStore {
 		};
 		copy.weeks = copy.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.map((w) => ({ ...w, id: generateId() })),
+			routines: week.routines.map((r) => ({ ...r, id: generateId() })),
 		}));
 		try {
 			await db.programs.put(copy);
@@ -269,22 +333,26 @@ class ProgramStore {
 		description: string;
 		durationWeeks: number;
 		daysPerWeek: number;
-		workoutTemplates: { name: string; focus: string }[];
+		routineTemplates: { name: string; focus: string }[];
+		disciplineId?: string;
 	}): Promise<Program> {
+		const disciplineId = data.disciplineId ?? STRENGTH_DISCIPLINE_ID;
 		const weeks: Week[] = Array.from({ length: data.durationWeeks }, (_, wi) => ({
 			weekNumber: wi + 1,
-			workouts: data.workoutTemplates.map((tmpl, i) => ({
+			routines: data.routineTemplates.map((tmpl, i) => ({
 				id: `w${wi + 1}-${generateId().slice(0, 8)}`,
+				disciplineId,
 				name: tmpl.name,
 				letter: String.fromCharCode(65 + i),
 				focus: tmpl.focus,
-				color: WORKOUT_COLORS[i % WORKOUT_COLORS.length],
-				exercises: [],
+				color: ROUTINE_COLORS[i % ROUTINE_COLORS.length],
+				sections: singleSection([]),
 			})),
 		}));
 
 		const program: Program = {
 			id: generateId(),
+			disciplineId,
 			name: data.name,
 			description: data.description,
 			durationWeeks: data.durationWeeks,
@@ -304,67 +372,69 @@ class ProgramStore {
 		return program;
 	}
 
-	// Exercise management
-	async addExercise(exercise: Omit<Exercise, 'id' | 'isBuiltIn'>): Promise<Exercise> {
-		const newEx: Exercise = { ...exercise, id: generateId(), isBuiltIn: false };
+	// Item (exercise) management
+	async addItem(item: Omit<Item, 'id' | 'isBuiltIn' | 'disciplineId' | 'section' | 'metric'>): Promise<Item> {
+		// US-015 custom items are strength exercises; US-016 generalizes the form.
+		const newItem: Item = {
+			...item,
+			id: generateId(),
+			disciplineId: STRENGTH_DISCIPLINE_ID,
+			section: 'exercises',
+			metric: 'setsReps',
+			isBuiltIn: false,
+		};
 		try {
-			await db.exercises.put(newEx);
+			await db.items.put(newItem);
 		} catch (e) {
-			console.error('Failed to add exercise:', e);
+			console.error('Failed to add item:', e);
 			throw e;
 		}
-		this.exercises = [...this.exercises, newEx];
-		return newEx;
+		this.items = [...this.items, newItem];
+		return newItem;
 	}
 
-	async updateExercise(exercise: Exercise): Promise<void> {
+	async updateItem(item: Item): Promise<void> {
 		try {
-			await db.exercises.put(exercise);
+			await db.items.put(item);
 		} catch (e) {
-			console.error('Failed to update exercise:', e);
+			console.error('Failed to update item:', e);
 			throw e;
 		}
-		this.exercises = this.exercises.map((e) => (e.id === exercise.id ? exercise : e));
+		this.items = this.items.map((i) => (i.id === item.id ? item : i));
 	}
 
-	isExerciseInUse(id: string): boolean {
+	isItemInUse(id: string): boolean {
 		return this.programs.some((p) =>
-			p.weeks.some((w) => w.workouts.some((wo) => wo.exercises.some((we) => we.exerciseId === id))),
+			p.weeks.some((w) => w.routines.some((r) => flattenItems(r).some((ri) => ri.itemId === id))),
 		);
 	}
 
-	async deleteExercise(id: string): Promise<void> {
-		if (this.isExerciseInUse(id)) {
-			throw new Error('Exercise is used in one or more programs. Remove it from all workouts first.');
+	async deleteItem(id: string): Promise<void> {
+		if (this.isItemInUse(id)) {
+			throw new Error('Item is used in one or more programs. Remove it from all routines first.');
 		}
 		try {
-			await db.exercises.remove(id);
+			await db.items.remove(id);
 		} catch (e) {
-			console.error('Failed to delete exercise:', e);
+			console.error('Failed to delete item:', e);
 			throw e;
 		}
-		this.exercises = this.exercises.filter((e) => e.id !== id);
+		this.items = this.items.filter((i) => i.id !== id);
 	}
 
-	async removeWorkout(workoutName: string): Promise<void> {
-		if (!this.activeProgram) return;
+	async removeRoutine(routineName: string): Promise<void> {
+		const program = this.activeProgram;
+		if (!program) return;
 
-		const firstWeek = this.activeProgram.weeks[0];
-		if (!firstWeek || firstWeek.workouts.length <= 1) return;
+		const firstWeek = program.weeks[0];
+		if (!firstWeek || firstWeek.routines.length <= 1) return;
 
-		const updatedWeeks = this.activeProgram.weeks.map((week) => ({
+		const updatedWeeks = program.weeks.map((week) => ({
 			...week,
-			workouts: week.workouts.filter((w) => w.name !== workoutName),
+			routines: week.routines.filter((r) => r.name !== routineName),
 		}));
 
-		this.activeProgram = { ...this.activeProgram, weeks: updatedWeeks };
-		try {
-			await db.programs.put($state.snapshot(this.activeProgram));
-		} catch (e) {
-			console.error('Failed to remove workout:', e);
-			throw e;
-		}
-		this.programs = this.programs.map((p) => (p.id === this.activeProgram!.id ? this.activeProgram! : p));
+		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
 	async deleteProgram(id: string): Promise<void> {
@@ -379,14 +449,19 @@ class ProgramStore {
 		}
 
 		this.programs = this.programs.filter((p) => p.id !== id);
-		if (this.activeProgram?.id === id) {
-			const next = this.programs[0] ?? null;
-			this.activeProgram = next;
+
+		// If the deleted program was active for its Discipline, pick another of the
+		// same Discipline, or clear the slot if none remain.
+		if (this.activeProgramIds[program.disciplineId] === id) {
+			const next = this.programs.find((p) => p.disciplineId === program.disciplineId) ?? null;
+			const ids = { ...this.activeProgramIds };
 			if (next) {
-				localStorage.setItem(ACTIVE_PROGRAM_KEY, next.id);
+				ids[program.disciplineId] = next.id;
 			} else {
-				localStorage.removeItem(ACTIVE_PROGRAM_KEY);
+				delete ids[program.disciplineId];
 			}
+			this.activeProgramIds = ids;
+			this.persistActiveProgramIds();
 		}
 	}
 }

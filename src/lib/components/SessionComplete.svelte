@@ -15,7 +15,7 @@
 	}
 
 	let session = $derived(sessionStore.completedSession);
-	let totalSets = $derived(session?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
+	let totalSets = $derived(session?.items.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 </script>
 
 <BottomSheet onclose={handleBackToToday} maxHeight="100dvh" hideHandle fixedHeight>
@@ -58,7 +58,7 @@
 				</div>
 				<div class="session-complete__stat-sep" aria-hidden="true"></div>
 				<div class="session-complete__stat">
-					<span class="session-complete__stat-value">{session.exercises.length}</span>
+					<span class="session-complete__stat-value">{session.items.length}</span>
 					<span class="session-complete__stat-label">exercises</span>
 				</div>
 				{#if session.totalVolume > 0}

@@ -1,24 +1,26 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import type { Workout, WorkoutExercise, Exercise } from '$lib/db/types';
+	import type { Routine, RoutineItem, Item } from '$lib/db/types';
 	import { formatCountWithWord } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '$lib/discipline';
 	import ExerciseLibrarySheet from './ExerciseLibrarySheet.svelte';
 
 	type Props = {
-		workout: Workout | null;
+		workout: Routine | null;
 		onBack: () => void;
 	};
 
 	let { workout: initWorkout, onBack }: Props = $props();
 
-	// Snapshot prop at open time — editor data is intentionally frozen
+	// Snapshot prop at open time — editor data is intentionally frozen.
+	// Strength routines are single-section, so we edit a flat item list.
 	const snap = untrack(() => ({
 		isNew: initWorkout === null,
 		name: initWorkout?.name ?? 'New Workout',
 		letter: initWorkout?.letter ?? 'D',
 		focus: initWorkout?.focus ?? '',
-		exercises: initWorkout?.exercises.map((e, i) => ({ ...e, _key: i })) ?? [],
+		exercises: initWorkout ? flattenItems(initWorkout).map((e, i) => ({ ...e, _key: i })) : [],
 	}));
 
 	const isNew = snap.isNew;
@@ -26,7 +28,7 @@
 	let title = $state(snap.name);
 	let letter = $state(snap.letter);
 	let focus = $state(snap.focus);
-	let exercises = $state<(WorkoutExercise & { _key: number })[]>(snap.exercises);
+	let exercises = $state<(RoutineItem & { _key: number })[]>(snap.exercises);
 	let editingIndex = $state<number | null>(null);
 	let showLibrary = $state(false);
 	let editingTitle = $state(false);
@@ -52,12 +54,12 @@
 		}
 	}
 
-	function addFromLibrary(ex: Exercise) {
+	function addFromLibrary(ex: Item) {
 		keyCounter++;
 		exercises = [
 			...exercises,
 			{
-				exerciseId: ex.id,
+				itemId: ex.id,
 				sets: ex.defaultSets,
 				reps: ex.defaultReps,
 				_key: keyCounter,
@@ -77,23 +79,24 @@
 		}
 		saving = true;
 
-		const clean: WorkoutExercise[] = exercises.map(({ _key, ...rest }) => rest);
+		const clean: RoutineItem[] = exercises.map(({ _key, ...rest }) => rest);
 
 		if (isNew) {
-			await programStore.addWorkout({
+			await programStore.addRoutine({
+				disciplineId: programStore.activeProgram?.disciplineId ?? STRENGTH_DISCIPLINE_ID,
 				name: title,
 				letter,
 				focus,
 				color: 'lime',
-				exercises: clean,
+				sections: singleSection(clean),
 			});
 		} else {
-			await programStore.saveWorkout(initWorkout!.name, {
+			await programStore.saveRoutine(initWorkout!.name, {
 				name: title,
 				letter,
 				focus,
 				color: initWorkout!.color ?? 'lime',
-				exercises: clean,
+				items: clean,
 			});
 		}
 
@@ -192,7 +195,7 @@
 				{/if}
 
 				{#each exercises as ex, i (ex._key)}
-					{@const exercise = programStore.exerciseMap.get(ex.exerciseId)}
+					{@const exercise = programStore.itemMap.get(ex.itemId)}
 					<div class="editor-row">
 						<div class="editor-row__reorder">
 							<button
@@ -232,7 +235,7 @@
 						</div>
 						<span class="editor-row__index">{i + 1}</span>
 						<div class="editor-row__info">
-							<span class="editor-row__name">{exercise?.name ?? ex.exerciseId}</span>
+							<span class="editor-row__name">{exercise?.name ?? ex.itemId}</span>
 							<span class="editor-row__muscles">{exercise?.muscles ?? ''}</span>
 						</div>
 						<button
@@ -349,7 +352,7 @@
 
 {#if showLibrary}
 	<ExerciseLibrarySheet
-		exercises={programStore.exercises}
+		exercises={programStore.items}
 		onAdd={addFromLibrary}
 		onClose={() => (showLibrary = false)}
 	/>

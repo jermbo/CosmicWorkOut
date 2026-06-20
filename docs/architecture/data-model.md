@@ -33,6 +33,16 @@ type Discipline = {
 
 Disciplines are seeded and read-only (config, not user data). Programs, Items, Routines, and Sessions all carry a `disciplineId`.
 
+### Active program is per-Discipline 🟡 (v1.4.0)
+
+Today there is a single active program (one `cwout:activeProgramId` in localStorage, one `activeProgram` in the store). v1.4.0 generalizes this to **one active program per Discipline**: a Strength program and a Belly Dance program can be active **at the same time**. The user runs them concurrently (e.g. strength on some days, dance on others) — the app does **not** bind a Discipline to days of the week.
+
+- Active-program tracking is keyed by `disciplineId` (see [localStorage Keys](#localstorage-keys)).
+- All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) are derived **per Discipline**.
+- "One session per program per day" is enforced **per Discipline**, so one strength **and** one dance session may be logged on the same date.
+
+> **No day-of-week scheduling and no load periodization in v1.4.0.** Progression stays **count-driven** — the next routine is `completedSessionCount % routineCount`, identical to today's strength logic, now per Discipline. Weeks are not auto-periodized; carrying weight forward is the existing per-item last-used prefill, adjusted manually. See [Program Progression](../implementation/program-progression.md).
+
 ### Naming map (current → generalized)
 
 The existing strength entities are renamed/generalized — not replaced — when the engine lands. Behaviour is preserved; scope widens to "any Discipline."
@@ -315,7 +325,7 @@ DB name: `cosmic-workout`, version: `2`.
 | ------------------------ | ----------------------------------------------------- |
 | `cwout:prefs`            | UserPrefs JSON                                        |
 | `cwout:activeSession`    | ActiveSession JSON (crash recovery)                   |
-| `cwout:activeProgramId`  | Active program ID                                     |
+| `cwout:activeProgramId`  | Active program ID — **🟡 v1.4.0:** keyed per Discipline (one active program per Discipline) |
 | `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet) |
 
 ---

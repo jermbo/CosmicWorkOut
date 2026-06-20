@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Exercise } from '$lib/db/types';
+	import type { Item } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
@@ -18,8 +18,8 @@
 	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
 
 	type Props = {
-		exercises: Exercise[];
-		onAdd: (exercise: Exercise) => void;
+		exercises: Item[];
+		onAdd: (exercise: Item) => void;
 		onClose: () => void;
 	};
 
@@ -28,8 +28,8 @@
 	let activeCat = $state('All');
 	let query = $state('');
 	let expandedId = $state<string | null>(null);
-	let formExercise = $state<Exercise | null | undefined>(undefined);
-	// undefined = closed, null = new, Exercise = editing
+	let formExercise = $state<Item | null | undefined>(undefined);
+	// undefined = closed, null = new, Item = editing
 	let confirmDeleteId = $state<string | null>(null);
 	let deleteError = $state<string | null>(null);
 
@@ -51,7 +51,7 @@
 		expandedId = expandedId === id ? null : id;
 	}
 
-	async function deleteExercise(ex: Exercise) {
+	async function deleteExercise(ex: Item) {
 		if (confirmDeleteId !== ex.id) {
 			deleteError = null;
 			confirmDeleteId = ex.id;
@@ -59,7 +59,7 @@
 		}
 		confirmDeleteId = null;
 		try {
-			await programStore.deleteExercise(ex.id);
+			await programStore.deleteItem(ex.id);
 			if (expandedId === ex.id) expandedId = null;
 		} catch (e) {
 			deleteError = e instanceof Error ? e.message : 'Could not delete exercise.';

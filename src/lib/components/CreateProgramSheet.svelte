@@ -50,7 +50,7 @@
 			description: description.trim(),
 			durationWeeks,
 			daysPerWeek,
-			workoutTemplates: templates,
+			routineTemplates: templates,
 		});
 
 		programStore.setActiveProgram(program.id);

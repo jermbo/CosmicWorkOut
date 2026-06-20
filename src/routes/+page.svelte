@@ -8,6 +8,7 @@
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { journalStore } from '$lib/stores/journal.svelte';
 	import { todayIso } from '$lib/date';
+	import { flattenItems } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import WeekStreakBadge from '$lib/components/WeekStreakBadge.svelte';
@@ -34,19 +35,19 @@
 	let journalEntry = $derived(journalStore.entryForDate(contextDate));
 
 	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
+	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeek);
 	let workoutName = $derived.by(() => {
 		if (sessionForDate) {
-			return programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged';
+			return programStore.getRoutineById(sessionForDate.routineId)?.name ?? 'Session logged';
 		}
 		return suggestedWorkout?.name ?? null;
 	});
 	let workoutMeta = $derived.by(() => {
 		if (sessionForDate) {
-			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${formatCountWithWord(sessionForDate.exercises.length, 'exercise')}`;
+			return `${formatDuration(sessionForDate.durationSeconds ?? 0)} · ${formatCountWithWord(sessionForDate.items.length, 'exercise')}`;
 		}
 		if (suggestedWorkout) {
-			return `${formatCountWithWord(suggestedWorkout.exercises.length, 'exercise')} · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
+			return `${formatCountWithWord(flattenItems(suggestedWorkout).length, 'exercise')} · ~${formatMinutes(suggestedWorkout.estMin ?? 0)}`;
 		}
 		return null;
 	});

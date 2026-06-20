@@ -1,12 +1,13 @@
 <script lang="ts">
-	import type { Program, Workout } from '$lib/db/types';
+	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { flattenItems } from '$lib/discipline';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
-	let editingWorkout = $state<Workout | null | undefined>(undefined);
+	let editingWorkout = $state<Routine | null | undefined>(undefined);
 	let showCreateProgram = $state(false);
 	let showDeleteProgramConfirm = $state(false);
 	let deletingProgram = $state(false);
@@ -40,9 +41,9 @@
 	};
 
 	let weekWorkouts = $derived.by(() => {
-		if (!viewingProgram) return [] as Workout[];
+		if (!viewingProgram) return [] as Routine[];
 		const week = viewingProgram.weeks[selectedWeek - 1];
-		return week?.workouts ?? [];
+		return week?.routines ?? [];
 	});
 
 	let totalWeeks = $derived(viewingProgram?.durationWeeks ?? 1);
@@ -57,11 +58,11 @@
 		if (selectedWeek > totalWeeks) selectedWeek = 1;
 	});
 
-	function getWorkoutStatus(workout: Workout): 'today' | 'done' | 'scheduled' {
+	function getWorkoutStatus(workout: Routine): 'today' | 'done' | 'scheduled' {
 		if (!viewingIsActive) return 'scheduled';
-		const todaysId = programStore.todaysWorkout?.id;
+		const todaysId = programStore.todaysRoutine?.id;
 		if (workout.id === todaysId) return 'today';
-		const allIds = programStore.allWorkouts.map((w) => w.id);
+		const allIds = programStore.allRoutines.map((w) => w.id);
 		const todayIdx = allIds.indexOf(todaysId ?? '');
 		const thisIdx = allIds.indexOf(workout.id);
 		if (thisIdx < todayIdx) return 'done';
@@ -82,7 +83,7 @@
 
 	async function handleRemoveWorkout() {
 		if (!removeWorkoutName) return;
-		await programStore.removeWorkout(removeWorkoutName);
+		await programStore.removeRoutine(removeWorkoutName);
 		removeWorkoutName = null;
 	}
 
@@ -285,10 +286,10 @@
 							</div>
 						</div>
 
-						{#if workout.exercises.length > 0}
+						{#if flattenItems(workout).length > 0}
 							<div class="workout-card__chips" role="list" aria-label="Exercises in {workout.name}">
-								{#each workout.exercises as we}
-									{@const ex = programStore.exerciseMap.get(we.exerciseId)}
+								{#each flattenItems(workout) as we}
+									{@const ex = programStore.itemMap.get(we.itemId)}
 									{#if ex}
 										<span class="workout-card__chip" role="listitem">{ex.name}</span>
 									{/if}

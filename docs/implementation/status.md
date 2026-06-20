@@ -88,7 +88,7 @@ What's built today vs. what's still requirements-only. Updated to match the code
 - **1 program:** Strength Foundation (12 weeks, 3 days/week, workouts A/B/C)
 - **31 exercises** across 8 categories (Hinge, Squat, Push, Pull, Lateral, Rotational, Power, Carry)
 - **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood
-- All seeded from `src/lib/db/seed.ts`; exercises upserted on every boot, habits and programs only on first run
+- All seeded from `src/lib/db/seed.ts`; items, habits, and programs are seeded only on first run (empty store). Built-in content updates ride the DB version bump (wipe + re-seed), not a per-boot rewrite.
 
 ---
 

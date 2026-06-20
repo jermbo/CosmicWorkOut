@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SessionLog, ActivityLog } from '$lib/db/types';
+	import type { Session, ActivityLog } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -25,7 +25,7 @@
 	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
 
 	let viewDate = $state(new Date());
-	let selectedSession = $state<SessionLog | null>(null);
+	let selectedSession = $state<Session | null>(null);
 	let dayActionsDate = $state<string | null>(null);
 	let habitHistoryDate = $state<string | null>(null);
 	let editingActivity = $state<ActivityLog | null>(null);
@@ -34,7 +34,7 @@
 	const todayStr = todayIso();
 
 	let sessionsByDate = $derived.by(() => {
-		const map = new Map<string, SessionLog>();
+		const map = new Map<string, Session>();
 		for (const s of programStore.sessions) {
 			map.set(s.date, s);
 		}
@@ -253,7 +253,7 @@
 {#if selectedSession}
 	<DaySummarySheet
 		session={selectedSession}
-		exerciseMap={programStore.exerciseMap}
+		exerciseMap={programStore.itemMap}
 		onClose={() => (selectedSession = null)}
 	/>
 {/if}

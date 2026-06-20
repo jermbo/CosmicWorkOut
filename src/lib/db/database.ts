@@ -1,5 +1,5 @@
-import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog, JournalEntry } from './types';
-import { builtInExercises, builtInPrograms, builtInHabits } from './seed';
+import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, JournalEntry } from './types';
+import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 function reportWriteError(error: unknown): void {
@@ -8,7 +8,12 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 3;
+// v4 (v1.4.0): Discipline model. The strength-only schema is generalized and the
+// stores are renamed (exercises→items, exerciseLastUsed→itemLastUsed) with new
+// record shapes. Pre-beta, so we WIPE and re-seed rather than migrate — see
+// docs/features/v1.4.0/US-015. The upgrade drops every existing store and
+// recreates a clean set; initDB() then re-seeds both Disciplines.
+const DB_VERSION = 4;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -23,42 +28,32 @@ function openDB(): Promise<IDBDatabase> {
 		request.onupgradeneeded = (event) => {
 			const db = (event.target as IDBOpenDBRequest).result;
 
-			if (!db.objectStoreNames.contains('exercises')) {
-				db.createObjectStore('exercises', { keyPath: 'id' });
+			// Wipe-and-reseed: drop every existing store so no pre-Discipline records
+			// survive, then recreate a clean set. initDB() re-seeds afterward.
+			for (const name of Array.from(db.objectStoreNames)) {
+				db.deleteObjectStore(name);
 			}
 
-			if (!db.objectStoreNames.contains('programs')) {
-				db.createObjectStore('programs', { keyPath: 'id' });
-			}
+			db.createObjectStore('items', { keyPath: 'id' });
 
-			if (!db.objectStoreNames.contains('sessions')) {
-				const store = db.createObjectStore('sessions', { keyPath: 'id' });
-				store.createIndex('by_date', 'date');
-			}
+			db.createObjectStore('programs', { keyPath: 'id' });
 
-			if (!db.objectStoreNames.contains('exerciseLastUsed')) {
-				db.createObjectStore('exerciseLastUsed', { keyPath: 'exerciseId' });
-			}
+			const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
+			sessionStore.createIndex('by_date', 'date');
 
-			if (!db.objectStoreNames.contains('activities')) {
-				const actStore = db.createObjectStore('activities', { keyPath: 'id' });
-				actStore.createIndex('by_date', 'date');
-			}
+			db.createObjectStore('itemLastUsed', { keyPath: 'itemId' });
 
-			if (!db.objectStoreNames.contains('habits')) {
-				db.createObjectStore('habits', { keyPath: 'id' });
-			}
+			const actStore = db.createObjectStore('activities', { keyPath: 'id' });
+			actStore.createIndex('by_date', 'date');
 
-			if (!db.objectStoreNames.contains('habitLogs')) {
-				const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
-				hlStore.createIndex('by_date', 'date');
-				hlStore.createIndex('by_habit', 'habitId');
-			}
+			db.createObjectStore('habits', { keyPath: 'id' });
 
-			if (!db.objectStoreNames.contains('journals')) {
-				const jStore = db.createObjectStore('journals', { keyPath: 'id' });
-				jStore.createIndex('by_date', 'date', { unique: true });
-			}
+			const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
+			hlStore.createIndex('by_date', 'date');
+			hlStore.createIndex('by_habit', 'habitId');
+
+			const jStore = db.createObjectStore('journals', { keyPath: 'id' });
+			jStore.createIndex('by_date', 'date', { unique: true });
 		};
 
 		request.onsuccess = (event) => {
@@ -160,13 +155,19 @@ export async function clearWorkoutData(): Promise<void> {
 export async function resetWorkoutData(): Promise<void> {
 	await clearWorkoutData();
 	localStorage.removeItem('cwout:activeSession');
-	localStorage.removeItem('cwout:activeProgramId');
+	localStorage.removeItem('cwout:activeProgramId'); // legacy single-program key
+	localStorage.removeItem('cwout:activeProgramIds'); // per-Discipline active programs
 	location.reload();
 }
 
 export async function initDB(): Promise<void> {
-	// Upsert all built-in exercises in a single transaction
-	await putAllRecords('exercises', builtInExercises);
+	// Seed built-in items only on first run (empty store). Re-writing the full
+	// catalog on every boot churns IndexedDB storage without changing the data —
+	// built-in content updates ride the DB version bump (wipe + re-seed) instead.
+	const items = await getAll<Item>('items');
+	if (items.length === 0) {
+		await putAllRecords('items', builtInItems);
+	}
 
 	// Only seed programs on first run
 	const programs = await getAll<Program>('programs');
@@ -198,11 +199,11 @@ export async function initDB(): Promise<void> {
 }
 
 export const db = {
-	exercises: {
-		getAll: () => getAll<Exercise>('exercises'),
-		getOne: (id: string) => getOne<Exercise>('exercises', id),
-		put: (exercise: Exercise) => putRecord('exercises', exercise),
-		remove: (id: string) => removeRecord('exercises', id),
+	items: {
+		getAll: () => getAll<Item>('items'),
+		getOne: (id: string) => getOne<Item>('items', id),
+		put: (item: Item) => putRecord('items', item),
+		remove: (id: string) => removeRecord('items', id),
 	},
 
 	programs: {
@@ -213,15 +214,15 @@ export const db = {
 	},
 
 	sessions: {
-		getAll: () => getAll<SessionLog>('sessions'),
-		getOne: (id: string) => getOne<SessionLog>('sessions', id),
-		put: (session: SessionLog) => putRecord('sessions', session),
+		getAll: () => getAll<Session>('sessions'),
+		getOne: (id: string) => getOne<Session>('sessions', id),
+		put: (session: Session) => putRecord('sessions', session),
 		delete: (id: string) => removeRecord('sessions', id),
 	},
 
-	exerciseLastUsed: {
-		get: (exerciseId: string) => getOne<ExerciseLastUsed>('exerciseLastUsed', exerciseId),
-		put: (record: ExerciseLastUsed) => putRecord('exerciseLastUsed', record),
+	itemLastUsed: {
+		get: (itemId: string) => getOne<ItemLastUsed>('itemLastUsed', itemId),
+		put: (record: ItemLastUsed) => putRecord('itemLastUsed', record),
 	},
 
 	activities: {

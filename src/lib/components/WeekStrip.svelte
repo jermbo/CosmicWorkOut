@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SessionLog } from '$lib/db/types';
+	import type { Session } from '$lib/db/types';
 	import { goto } from '$app/navigation';
 	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
 	import { formatWeeksAgo } from '$lib/format';
@@ -7,7 +7,7 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 
 	type Props = {
-		sessions: SessionLog[];
+		sessions: Session[];
 		/** When true, date changes update context without navigating home. */
 		stayOnPage?: boolean;
 		/** Show mood-colored dots instead of workout-completion dots. */

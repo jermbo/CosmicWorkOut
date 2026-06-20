@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Workout } from '$lib/db/types';
+	import type { Routine } from '$lib/db/types';
 
 	type Props = {
-		workouts: Workout[];
+		workouts: Routine[];
 		selectedId: string;
 		suggestedId: string | undefined;
 		onSelect: (workoutId: string) => void;

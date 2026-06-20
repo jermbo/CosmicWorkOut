@@ -25,6 +25,11 @@ so that adding belly dance (and future practices) never forces me to relearn or 
    d. Linear progression — next routine = `completedSessionCount % routineCount`, week = `floor(count / daysPerWeek) + 1` — shall be a Discipline-level behaviour, identical to today's strength logic.
    e. The "one session per program per day" rule shall apply per Discipline, allowing one strength and one belly dance session on the same date.
 
+6. Concurrent programs (per-Discipline active program)
+   a. The app shall track **one active program per Discipline**, so a strength program and a belly dance program can be active at the same time.
+   b. Active-program tracking shall be keyed by `disciplineId` (replacing the single global active-program key), and all progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) shall be derived per Discipline.
+   c. The app shall not bind a Discipline to specific days of the week; the user chooses what to log on any day, and the next routine is recommended by count (A → B → C), exactly as strength does today.
+
 3. Strength preserved (no observable regression)
    a. After the engine lands, the **Strength Foundation** program, its A/B/C routines, and the 31 built-in exercises shall be available as the Strength Discipline.
    b. Starting, logging (smart-tap), finishing, abandoning, editing, and crash-recovering a strength session shall behave exactly as before.
@@ -68,6 +73,17 @@ so that adding belly dance (and future practices) never forces me to relearn or 
 5. Generalized routine editor
    a. Given a strength routine, when the user opens the editor, then a flat exercise list is shown and edits save as today.
    b. Given a multi-section routine (belly dance, US-017), when the same editor opens it, then each section renders with its own item list — confirming one editor serves both.
+
+---
+
+## Decisions & Non-Goals (locked)
+
+These were decided up front so the engine doesn't grow scope it doesn't need. They sharpen, not contradict, the requirements above.
+
+- **Concurrent Disciplines, one active program each.** Strength and belly dance run side by side; active program is tracked per `disciplineId`. The user runs them on whatever days they like — strength some days, dance others — with no enforced schedule. (Requirement 6.)
+- **No day-of-week scheduling.** Progression stays **count-driven**: the recommended routine is `completedSessionCount % routineCount` per Discipline (log A → B is recommended next). The app never says "Tuesday is a dance day."
+- **No load periodization / progression scheme.** Weeks are not auto-progressed (no light → heavy → deload engine). Carrying weight forward is the existing per-item **last-used prefill**, which the user adjusts manually. A progression engine is explicitly deferred — see [v1.4.0 Out of Scope](./README.md#out-of-scope-for-v140).
+- **Streaks unchanged in this story.** The existing weekly strength streak keeps working as-is; the cross-Discipline streak rethink is [US-020](./US-020-practice-streaks-calendar.md), not US-015.
 
 ---
 

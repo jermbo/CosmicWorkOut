@@ -16,12 +16,12 @@
 	let contextDate = $derived(loggingContext.date);
 
 	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
-	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
+	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeek);
+	let weekWorkouts = $derived(programStore.routinesForCurrentWeek);
 
 	let selectedWorkout = $derived.by(() => {
 		if (loggingContext.workoutId) {
-			return programStore.getWorkoutById(loggingContext.workoutId) ?? suggestedWorkout;
+			return programStore.getRoutineById(loggingContext.workoutId) ?? suggestedWorkout;
 		}
 		return suggestedWorkout;
 	});
@@ -36,7 +36,7 @@
 		const workout = selectedWorkout;
 		const program = programStore.activeProgram;
 		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.exerciseMap, { date: contextDate });
+		await sessionStore.start(workout, program, programStore.itemMap, { date: contextDate });
 	}
 
 	async function startSession() {
@@ -50,9 +50,9 @@
 	async function editSession() {
 		const session = sessionForDate;
 		if (!session) return;
-		const workout = programStore.getWorkoutForSession(session);
+		const workout = programStore.getRoutineForSession(session);
 		if (!workout) return;
-		await sessionStore.editSession(session, workout, programStore.exerciseMap);
+		await sessionStore.editSession(session, workout, programStore.itemMap);
 	}
 
 </script>
@@ -101,11 +101,11 @@
 			</div>
 			<div class="session-done__info">
 				<p class="session-done__name">
-					{programStore.getWorkoutById(sessionForDate.workoutId)?.name ?? 'Session logged'}
+					{programStore.getRoutineById(sessionForDate.routineId)?.name ?? 'Session logged'}
 				</p>
 				<p class="session-done__meta">
 					{formatDuration(sessionForDate.durationSeconds ?? 0)}
-					· {sessionForDate.exercises.length} exercises · {sessionForDate.totalVolume} lb
+					· {sessionForDate.items.length} exercises · {sessionForDate.totalVolume} lb
 				</p>
 			</div>
 			<button class="session-done__edit" onclick={editSession}> Edit </button>
@@ -124,7 +124,7 @@
 				onSelect={(id) => loggingContext.setWorkoutId(id)}
 			/>
 
-			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.exerciseMap} onStart={startSession} />
+			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.itemMap} onStart={startSession} />
 		</div>
 	{:else}
 		<div class="workout-page__no-program">

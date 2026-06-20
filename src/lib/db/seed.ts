@@ -1,4 +1,5 @@
-import type { Exercise, Program, Week, Workout, Habit } from './types';
+import type { Item, Program, Week, Routine, Habit } from './types';
+import { STRENGTH_DISCIPLINE_ID, singleSection } from '$lib/discipline';
 
 export const builtInHabits: Habit[] = [
 	{
@@ -73,7 +74,9 @@ export const builtInHabits: Habit[] = [
 	},
 ];
 
-export const builtInExercises: Exercise[] = [
+// Strength exercise data — the setsReps fields. The Discipline/section/metric
+// fields are injected below so every built-in Item is a Strength Item.
+const strengthExercises: Omit<Item, 'disciplineId' | 'section' | 'metric'>[] = [
 	// ── HINGE ──────────────────────────────────────────────────────
 	{
 		id: 'rdl',
@@ -446,72 +449,84 @@ export const builtInExercises: Exercise[] = [
 	},
 ];
 
-function makeWorkoutA(weekNum: number): Workout {
+// Every built-in Item is a Strength Discipline Item logged with the setsReps metric.
+export const builtInItems: Item[] = strengthExercises.map((e) => ({
+	...e,
+	disciplineId: STRENGTH_DISCIPLINE_ID,
+	section: 'exercises',
+	metric: 'setsReps',
+}));
+
+function makeRoutineA(weekNum: number): Routine {
 	return {
 		id: `w${weekNum}-lower`,
+		disciplineId: STRENGTH_DISCIPLINE_ID,
 		name: 'Lower + Lateral Power',
 		letter: 'A',
 		focus: 'Legs · Lateral · Rotational',
 		color: 'lime',
 		estMin: 45,
-		exercises: [
-			{ exerciseId: 'goblet', sets: 4, reps: '8' },
-			{ exerciseId: 'rdl', sets: 3, reps: '10' },
-			{ exerciseId: 'split', sets: 3, reps: '10 ea' },
-			{ exerciseId: 'band-walk', sets: 3, reps: '15 ea' },
-			{ exerciseId: 'medball', sets: 3, reps: '6 ea' },
-			{ exerciseId: 'copenhagen', sets: 3, reps: '30 s' },
-		],
+		sections: singleSection([
+			{ itemId: 'goblet', sets: 4, reps: '8' },
+			{ itemId: 'rdl', sets: 3, reps: '10' },
+			{ itemId: 'split', sets: 3, reps: '10 ea' },
+			{ itemId: 'band-walk', sets: 3, reps: '15 ea' },
+			{ itemId: 'medball', sets: 3, reps: '6 ea' },
+			{ itemId: 'copenhagen', sets: 3, reps: '30 s' },
+		]),
 	};
 }
 
-function makeWorkoutB(weekNum: number): Workout {
+function makeRoutineB(weekNum: number): Routine {
 	return {
 		id: `w${weekNum}-upper`,
+		disciplineId: STRENGTH_DISCIPLINE_ID,
 		name: 'Upper + Reactive',
 		letter: 'B',
 		focus: 'Push · Pull · Power',
 		color: 'lavender',
 		estMin: 40,
-		exercises: [
-			{ exerciseId: 'db-bench', sets: 4, reps: '8' },
-			{ exerciseId: 'cs-row', sets: 4, reps: '10' },
-			{ exerciseId: 'push-press', sets: 3, reps: '8' },
-			{ exerciseId: 'face-pull', sets: 3, reps: '15' },
-			{ exerciseId: 'pogo', sets: 3, reps: '20' },
-			{ exerciseId: 'pallof', sets: 3, reps: '12' },
-		],
+		sections: singleSection([
+			{ itemId: 'db-bench', sets: 4, reps: '8' },
+			{ itemId: 'cs-row', sets: 4, reps: '10' },
+			{ itemId: 'push-press', sets: 3, reps: '8' },
+			{ itemId: 'face-pull', sets: 3, reps: '15' },
+			{ itemId: 'pogo', sets: 3, reps: '20' },
+			{ itemId: 'pallof', sets: 3, reps: '12' },
+		]),
 	};
 }
 
-function makeWorkoutC(weekNum: number): Workout {
+function makeRoutineC(weekNum: number): Routine {
 	return {
 		id: `w${weekNum}-conditioning`,
+		disciplineId: STRENGTH_DISCIPLINE_ID,
 		name: 'Full + Conditioning',
 		letter: 'C',
 		focus: 'Posterior chain · Carry · Power',
 		color: 'red',
 		estMin: 50,
-		exercises: [
-			{ exerciseId: 'trap-dl', sets: 4, reps: '6' },
-			{ exerciseId: 'push-press', sets: 3, reps: '8' },
-			{ exerciseId: 'sled-push', sets: 4, reps: '20m' },
-			{ exerciseId: 'farmer', sets: 3, reps: '40m' },
-			{ exerciseId: 'woodchop', sets: 3, reps: '12 ea' },
-		],
+		sections: singleSection([
+			{ itemId: 'trap-dl', sets: 4, reps: '6' },
+			{ itemId: 'push-press', sets: 3, reps: '8' },
+			{ itemId: 'sled-push', sets: 4, reps: '20m' },
+			{ itemId: 'farmer', sets: 3, reps: '40m' },
+			{ itemId: 'woodchop', sets: 3, reps: '12 ea' },
+		]),
 	};
 }
 
 function makeWeek(weekNum: number): Week {
 	return {
 		weekNumber: weekNum,
-		workouts: [makeWorkoutA(weekNum), makeWorkoutB(weekNum), makeWorkoutC(weekNum)],
+		routines: [makeRoutineA(weekNum), makeRoutineB(weekNum), makeRoutineC(weekNum)],
 	};
 }
 
 export const builtInPrograms: Program[] = [
 	{
 		id: 'strength-foundation',
+		disciplineId: STRENGTH_DISCIPLINE_ID,
 		name: 'Strength Foundation',
 		description:
 			'A 12-week full-body strength program. Alternates lower body, upper push, and upper pull sessions across 3 days per week.',
