@@ -1,21 +1,18 @@
 # US-004 — Habit Tracking
 
-> **Status: ⚠️ Partial**
+> **Status: ✅ Shipped (v1.1.0 / v1.2.0)**
 >
 > **Shipped:**
 >
-> - Habit definitions in Settings: add, edit, delete, toggle active/inactive
-> - Dashboard widgets: count (tap to increment), boolean (tap to toggle), duration (tap to enter minutes)
-> - Progress rings and goal display on widgets
-> - Daily reset via date-scoped log storage
+> - Habit logging on `/habits` with progress rings, stepped inputs, boolean toggles, and mood strip (v1.2.0 US-008)
+> - 7 built-in habits pre-seeded; daily reset via date-scoped log storage
 > - Historical log data stored and queryable by date
+> - Count correction UI on habit log page (v1.2.0 US-008)
 >
-> **Deferred to v1.2.0:**
+> **Remaining — tracked in [v1.3.0](../v1.3.0/README.md):**
 >
-> - Habit reorder — store method exists (`reorder()`) but no drag UI in Settings
-> - Count correction UI — store method exists (`correctValue()`) but not exposed in the widget
-> - Habit history in Calendar view (req 4b)
-> - GitHub-style heat map (req 4b)
+> - Settings UI for habit CRUD, reorder, and active toggle → [US-009](../v1.3.0/US-009-habit-creation.md)
+> - Habit history in Calendar view and heat map → [US-010](../v1.3.0/US-010-habit-calendar-history.md)
 
 As a **health-conscious user**, I want to track daily wellness habits alongside my workouts
 so that I can monitor my overall health, not just my fitness performance.

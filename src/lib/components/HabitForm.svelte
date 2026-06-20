@@ -4,13 +4,12 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { HABIT_TYPES, HABIT_PRESETS, habitTypeLabel } from '$lib/habits';
 
-	let {
-		editing = null,
-		onclose,
-	}: {
+	type Props = {
 		editing?: Habit | null;
 		onclose: () => void;
-	} = $props();
+	};
+
+	let { editing = null, onclose }: Props = $props();
 
 	// Form is seeded from `editing` once; the dialog is recreated on each open.
 	let name = $state(untrack(() => editing?.name ?? ''));

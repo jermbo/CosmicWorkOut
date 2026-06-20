@@ -10,19 +10,15 @@
 	import BottomSheet from './BottomSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
-	let {
-		session,
-		exerciseMap,
-		onClose,
-		onEdit,
-		onDelete,
-	}: {
+	type Props = {
 		session: SessionLog;
 		exerciseMap: Map<string, Exercise>;
 		onClose: () => void;
 		onEdit?: () => void;
 		onDelete?: () => void;
-	} = $props();
+	};
+
+	let { session, exerciseMap, onClose, onEdit, onDelete }: Props = $props();
 
 	let habitLogsForDay = $derived(habitStore.logsForDate(session.date));
 
@@ -133,17 +129,17 @@
 		</div>
 	</div>
 
-{#if showDeleteConfirm}
-	<ConfirmDialog
-		title="Delete this session?"
-		confirmLabel="Delete"
-		danger
-		onconfirm={handleDeleteConfirm}
-		oncancel={() => (showDeleteConfirm = false)}
-	>
-		This cannot be undone.
-	</ConfirmDialog>
-{/if}
+	{#if showDeleteConfirm}
+		<ConfirmDialog
+			title="Delete this session?"
+			confirmLabel="Delete"
+			danger
+			onconfirm={handleDeleteConfirm}
+			oncancel={() => (showDeleteConfirm = false)}
+		>
+			This cannot be undone.
+		</ConfirmDialog>
+	{/if}
 </BottomSheet>
 
 <style>

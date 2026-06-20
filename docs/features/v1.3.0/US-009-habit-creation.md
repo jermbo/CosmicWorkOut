@@ -1,5 +1,20 @@
 # US-009 — Habit Creation & Management
 
+> **Status: 🚧 Partial — v1.3.0**
+>
+> **Shipped in v1.2.0:**
+>
+> - 7 built-in habits pre-seeded (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood)
+> - Full habit logging on `/habits` (progress rings, stepped inputs, boolean toggles, mood strip)
+> - Habit data layer in IndexedDB with `dailyGoal` migration
+> - Store methods for reorder and value correction
+>
+> **Remaining for v1.3.0:**
+>
+> - Settings UI to add, edit, delete, and reorder habits
+> - Active/inactive toggle in Settings
+> - Creation form with type presets
+
 As a **health-conscious user**, I want to create, configure, and manage my personal habits
 so that the habits I track reflect exactly what matters to me and feed into my long-term data.
 
@@ -13,7 +28,7 @@ so that the habits I track reflect exactly what matters to me and feed into my l
    - **Minutes** — numeric duration entry (e.g. meditation)
    - **Count** — numeric counter with a custom unit label (e.g. glasses of water, pages read, words written)
    - **Yes/No** — boolean toggle (e.g. alcohol, cold shower)
-   - **Mood** — integer on a fixed -5 to +5 scale with named labels (see mood scale in README)
+   - **Mood** — integer on a fixed -5 to +5 scale with named labels (see mood scale in [v1.2.0 README](../v1.2.0/README.md))
      b. The type determines how the habit is logged on the habit log page and how its data is stored for graphing.
      c. Habit types shall not be changeable after creation — changing type would corrupt historical data.
 
@@ -49,7 +64,7 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 1. Habit types
    a. Given the user selects "Minutes" as the type, when the habit is created, then logging it shows a minutes input.
    b. Given the user selects "Mood" as the type, when the habit is created, then logging it opens the 11-state mood selector.
-   c. Given a habit has historical data, when the user views the creation form for a new habit, then the type of the existing habit cannot be changed.
+   c. Given a habit has historical data, when the user views the edit form, then the habit type cannot be changed.
 
 2. Creating a habit
    a. Given the user taps "Add Habit" in Settings, when they enter a name and select a type, then the habit is saved and immediately appears on the habit log page.
@@ -72,7 +87,7 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 
 ## Related Docs
 
-- [US-008 — Habit Log Page](./US-008-habit-log-page.md)
+- [v1.2.0 US-008 — Habit Log Page](../v1.2.0/US-008-habit-log-page.md)
 - [US-010 — Habit History in Calendar](./US-010-habit-calendar-history.md)
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
 - [Data Model](../../architecture/data-model.md)

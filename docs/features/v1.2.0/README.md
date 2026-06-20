@@ -1,6 +1,8 @@
 # v1.2.0 — Home Screen Redesign & Habit Log
 
-This version reshapes the home screen into a unified daily dashboard of overview cards, each acting as a gateway to its own route. It introduces a dedicated Habit Log page with a redesigned habit creation flow, a mood tracking type, and a date context that flows from the home screen across all pages.
+This version reshapes the home screen into a unified daily dashboard of overview cards, each acting as a gateway to its own route. It introduces a dedicated Habit Log page with a mood tracking type, and a date context that flows from the home screen across all pages.
+
+**Status: ✅ Shipped** — incomplete stories migrated to [v1.3.0](../v1.3.0/README.md).
 
 ## Design North Star
 
@@ -42,31 +44,33 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 ## User Stories
 
-| ID                                           | Title                       | Status       |
-| -------------------------------------------- | --------------------------- | ------------ |
-| [US-007](./US-007-home-screen-redesign.md)   | Home Screen Redesign        | ✅ Done      |
-| [US-008](./US-008-habit-log-page.md)         | Habit Log Page              | ✅ Done      |
-| [US-009](./US-009-habit-creation.md)         | Habit Creation & Management | 🚧 Partial   |
-| [US-010](./US-010-habit-calendar-history.md) | Habit History in Calendar   | ❌ Not built |
-| [US-011](./US-011-program-complete-state.md) | Program Completion State    | ✅ Done      |
-
-### Status notes
-
-**US-009 (Partial):** 7 built-in habits are pre-seeded (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood). The habits page works fully for interacting with these. However, no Settings UI exists yet for adding custom habits, editing existing ones, reordering, or toggling active state.
-
-**US-010 (Not built):** Habit history heatmap/calendar integration has not been started.
+| ID                                           | Title                    | Status  |
+| -------------------------------------------- | ------------------------ | ------- |
+| [US-007](./US-007-home-screen-redesign.md)   | Home Screen Redesign     | ✅ Done |
+| [US-008](./US-008-habit-log-page.md)         | Habit Log Page           | ✅ Done |
+| [US-011](./US-011-program-complete-state.md) | Program Completion State | ✅ Done |
 
 ---
 
-## Carried Over from v1.1.0
+## Migrated to v1.3.0
 
-| Origin        | Requirement                            | Target Story |
-| ------------- | -------------------------------------- | ------------ |
-| US-004 req 4b | Habit history in Calendar view         | US-010       |
-| US-004 req 4b | GitHub-style heat map                  | US-010       |
-| US-004 req 1e | Habit reorder drag UI in Settings      | US-009       |
-| US-004 req 2f | Count habit correction UI on dashboard | US-008       |
-| US-005 req 2f | Program-complete state on home screen  | US-011       |
+These stories were started in v1.2.0 but not finished. Full specs live in the v1.3.0 folder.
+
+| ID     | Title                       | v1.2.0 outcome                                              |
+| ------ | --------------------------- | ----------------------------------------------------------- |
+| US-009 | Habit Creation & Management | Built-in habits + `/habits` logging shipped; Settings UI → v1.3.0 |
+| US-010 | Habit History in Calendar   | Not started → v1.3.0                                        |
+
+---
+
+## Carried Over from v1.1.0 (resolved)
+
+| Origin        | Requirement                            | Resolved in |
+| ------------- | -------------------------------------- | ----------- |
+| US-004 req 2f | Count habit correction UI on dashboard | US-008 ✅   |
+| US-005 req 2f | Program-complete state on home screen  | US-011 ✅   |
+
+Items still open from v1.1.0 are tracked in [v1.3.0](../v1.3.0/README.md).
 
 ---
 

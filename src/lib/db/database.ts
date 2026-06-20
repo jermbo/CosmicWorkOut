@@ -1,4 +1,4 @@
-import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog } from './types';
+import type { Exercise, Program, SessionLog, ExerciseLastUsed, ActivityLog, Habit, HabitLog, JournalEntry } from './types';
 import { builtInExercises, builtInPrograms, builtInHabits } from './seed';
 import { toastStore } from '$lib/stores/toast.svelte';
 
@@ -8,7 +8,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -53,6 +53,11 @@ function openDB(): Promise<IDBDatabase> {
 				const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
 				hlStore.createIndex('by_date', 'date');
 				hlStore.createIndex('by_habit', 'habitId');
+			}
+
+			if (!db.objectStoreNames.contains('journals')) {
+				const jStore = db.createObjectStore('journals', { keyPath: 'id' });
+				jStore.createIndex('by_date', 'date', { unique: true });
 			}
 		};
 
@@ -235,5 +240,12 @@ export const db = {
 		getAll: () => getAll<HabitLog>('habitLogs'),
 		put: (log: HabitLog) => putRecord('habitLogs', log),
 		remove: (id: string) => removeRecord('habitLogs', id),
+	},
+
+	journals: {
+		getAll: () => getAll<JournalEntry>('journals'),
+		getOne: (id: string) => getOne<JournalEntry>('journals', id),
+		put: (entry: JournalEntry) => putRecord('journals', entry),
+		remove: (id: string) => removeRecord('journals', id),
 	},
 };

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -7,7 +6,7 @@
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
@@ -16,12 +15,7 @@
 
 	let contextDate = $derived(loggingContext.date);
 
-	let displayDate = $derived(formatWeekdayShortDate(contextDate));
-
 	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let activeSessions = $derived(
-		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
-	);
 	let suggestedWorkout = $derived(programStore.suggestedWorkoutInCurrentWeek);
 	let weekWorkouts = $derived(programStore.workoutsForCurrentWeek);
 
@@ -68,28 +62,11 @@
 </svelte:head>
 
 <div class="page page--wide workout-page">
-	<header class="workout-page__header">
-		<button class="back-btn" onclick={() => goto('/')} aria-label="Back to today">
-			<svg
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				aria-hidden="true"
-			>
-				<polyline points="15 18 9 12 15 6" />
-			</svg>
-		</button>
-		<div>
-			<h1 class="workout-page__title">Workout</h1>
-			<p class="workout-page__date">{displayDate}</p>
-		</div>
-	</header>
-
-	{#if programStore.loaded}
-		<WeekStrip sessions={activeSessions} stayOnPage />
-	{/if}
+	<PageHeader title="Workout" showBack>
+		{#snippet trailing()}
+			<a href="/program" class="workout-page__programs-link">Programs</a>
+		{/snippet}
+	</PageHeader>
 
 	{#if !programStore.loaded}
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
@@ -190,45 +167,23 @@
 		inline-size: 100%;
 	}
 
-	.workout-page__header {
-		display: flex;
+	.workout-page__programs-link {
+		display: inline-flex;
 		align-items: center;
-		gap: var(--space-3);
-		margin-block-end: var(--space-5);
-	}
-
-	.back-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		inline-size: 40px;
-		block-size: 40px;
+		padding-inline: var(--space-3);
+		block-size: 34px;
 		border-radius: var(--radius-full);
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 20px;
-			block-size: 20px;
-		}
-	}
-
-	.workout-page__title {
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.1;
-	}
-
-	.workout-page__date {
 		font-size: 0.8125rem;
-		font-weight: 700;
-		color: var(--color-accent);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		white-space: nowrap;
+		transition: color var(--duration-fast) var(--ease-out);
+
+		&:hover {
+			color: var(--color-accent);
+		}
 	}
 
 	/* Loading */

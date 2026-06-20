@@ -23,17 +23,14 @@
 
 	const INTENSITIES: ActivityIntensity[] = ['Easy', 'Moderate', 'Hard'];
 
-	let {
-		editing = null,
-		initialDate,
-		onClose,
-		onSave,
-	}: {
+	type Props = {
 		editing?: ActivityLog | null;
 		initialDate?: string;
 		onClose: () => void;
 		onSave?: () => void;
-	} = $props();
+	};
+
+	let { editing = null, initialDate, onClose, onSave }: Props = $props();
 
 	const todayStr = todayIso();
 

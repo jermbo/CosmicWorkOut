@@ -36,6 +36,7 @@ so that I can immediately see what still needs to be done and tap into the right
 
 6. Journal card
    a. The Journal card shall be present but marked as coming soon. No logging interaction is required in this version.
+   b. Full journal page is tracked in [v1.3.0 US-012](../v1.3.0/US-012-journal-page.md).
 
 ---
 

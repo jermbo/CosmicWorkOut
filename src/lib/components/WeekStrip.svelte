@@ -6,17 +6,15 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 
-	let {
-		sessions,
-		stayOnPage = false,
-		showMoodDots = false,
-	}: {
+	type Props = {
 		sessions: SessionLog[];
 		/** When true, date changes update context without navigating home. */
 		stayOnPage?: boolean;
 		/** Show mood-colored dots instead of workout-completion dots. */
 		showMoodDots?: boolean;
-	} = $props();
+	};
+
+	let { sessions, stayOnPage = false, showMoodDots = false }: Props = $props();
 
 	const todayStr = todayIso();
 
@@ -50,7 +48,6 @@
 	let isCurrentWeek = $derived(viewWeekStart === currentWeekStart);
 
 	let weekDays = $derived(getWeekDays(viewWeekStart));
-	let doneDays = $derived(weekDays.filter((d) => d.status === 'done').length);
 
 	let weekLabel = $derived(isCurrentWeek ? 'This week' : formatWeekRange(viewWeekStart));
 
@@ -129,16 +126,6 @@
 				</svg>
 			</button>
 		</div>
-
-		<span class="week-strip__count">
-			{#if viewingPastDate}
-				<button type="button" class="week-strip__back-today" onclick={() => navigateToDate(todayStr)}>
-					Back to today
-				</button>
-			{:else}
-				{doneDays} done
-			{/if}
-		</span>
 	</div>
 
 	<div class="week-strip__days" aria-label="Days in {weekLabel}">
@@ -175,8 +162,8 @@
 		{/each}
 	</div>
 
-	{#if stayOnPage || viewingPastDate || !isCurrentWeek}
-		<p class="week-strip__legend" class:week-strip__legend--compact={stayOnPage && isCurrentWeek && !viewingPastDate}>
+	<div class="week-strip__footer">
+		<p class="week-strip__legend" class:week-strip__legend--hidden={!stayOnPage && !viewingPastDate && isCurrentWeek}>
 			{#if viewingPastDate}
 				<span class="week-strip__legend-item week-strip__legend-item--selected">Selected</span>
 			{/if}
@@ -186,7 +173,12 @@
 				<span class="week-strip__legend-item week-strip__legend-item--today">Today</span>
 			{/if}
 		</p>
-	{/if}
+		{#if viewingPastDate}
+			<button type="button" class="week-strip__back-today" onclick={() => navigateToDate(todayStr)}>
+				Back to today
+			</button>
+		{/if}
+	</div>
 </section>
 
 <style>
@@ -263,14 +255,6 @@
 		color: var(--color-accent);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-	}
-
-	.week-strip__count {
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		color: var(--color-text-secondary);
-		flex-shrink: 0;
-		padding-block-start: 6px;
 	}
 
 	.week-strip__days {
@@ -367,16 +351,20 @@
 		}
 	}
 
-	.week-strip__legend {
+	.week-strip__footer {
 		display: flex;
-		justify-content: center;
-		gap: var(--space-4);
+		align-items: center;
+		justify-content: space-between;
 		margin-block-start: var(--space-2);
 		min-block-size: 18px;
 	}
 
-	.week-strip__legend--compact {
-		/* Keeps legend row height stable on sub-pages when viewing today */
+	.week-strip__legend {
+		display: flex;
+		gap: var(--space-4);
+	}
+
+	.week-strip__legend--hidden {
 		visibility: hidden;
 	}
 
@@ -426,8 +414,10 @@
 	}
 
 	.week-strip__back-today {
-		font-size: 0.75rem;
+		font-size: 0.625rem;
 		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 		color: var(--color-accent);
 		white-space: nowrap;
 	}

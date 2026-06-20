@@ -2,13 +2,12 @@
 	import type { ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 
-	let {
-		set,
-		onTap,
-	}: {
+	type Props = {
 		set: ActiveSet;
 		onTap: () => void;
-	} = $props();
+	};
+
+	let { set, onTap }: Props = $props();
 
 	let isAnimating = $state(false);
 

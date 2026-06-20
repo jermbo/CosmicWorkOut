@@ -5,13 +5,12 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import ExerciseLibrarySheet from './ExerciseLibrarySheet.svelte';
 
-	let {
-		workout: initWorkout,
-		onBack,
-	}: {
+	type Props = {
 		workout: Workout | null;
 		onBack: () => void;
-	} = $props();
+	};
+
+	let { workout: initWorkout, onBack }: Props = $props();
 
 	// Snapshot prop at open time — editor data is intentionally frozen
 	const snap = untrack(() => ({

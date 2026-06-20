@@ -3,6 +3,22 @@
 	import { habitTypeLabel } from '$lib/habits';
 	import Icon from './Icon.svelte';
 
+	type Props = {
+		habit: Habit;
+		dragging?: boolean;
+		dragover?: boolean;
+		confirmingDelete?: boolean;
+		ondragstart: (e: DragEvent) => void;
+		ondragover: (e: DragEvent) => void;
+		ondragleave: () => void;
+		ondrop: (e: DragEvent) => void;
+		ondragend: () => void;
+		ontoggle: () => void;
+		onedit: () => void;
+		ondelete: () => void;
+		oncanceldelete: () => void;
+	};
+
 	let {
 		habit,
 		dragging = false,
@@ -17,21 +33,7 @@
 		onedit,
 		ondelete,
 		oncanceldelete,
-	}: {
-		habit: Habit;
-		dragging?: boolean;
-		dragover?: boolean;
-		confirmingDelete?: boolean;
-		ondragstart: (e: DragEvent) => void;
-		ondragover: (e: DragEvent) => void;
-		ondragleave: () => void;
-		ondrop: (e: DragEvent) => void;
-		ondragend: () => void;
-		ontoggle: () => void;
-		onedit: () => void;
-		ondelete: () => void;
-		oncanceldelete: () => void;
-	} = $props();
+	}: Props = $props();
 
 	let meta = $derived.by(() => {
 		const parts = [habitTypeLabel(habit.type)];

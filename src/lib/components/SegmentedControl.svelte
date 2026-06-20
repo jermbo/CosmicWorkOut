@@ -1,15 +1,12 @@
 <script lang="ts" generics="T extends string">
-	let {
-		options,
-		value,
-		onchange,
-		ariaLabel,
-	}: {
+	type Props = {
 		options: { value: T; label: string }[];
 		value: T;
 		onchange: (value: T) => void;
 		ariaLabel: string;
-	} = $props();
+	};
+
+	let { options, value, onchange, ariaLabel }: Props = $props();
 </script>
 
 <div class="seg-control" role="radiogroup" aria-label={ariaLabel}>

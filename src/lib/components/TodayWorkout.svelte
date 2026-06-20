@@ -3,15 +3,13 @@
 	import { formatMinutes } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
 
-	let {
-		workout,
-		exerciseMap,
-		onStart,
-	}: {
+	type Props = {
 		workout: Workout;
 		exerciseMap: Map<string, Exercise>;
 		onStart: () => Promise<void>;
-	} = $props();
+	};
+
+	let { workout, exerciseMap, onStart }: Props = $props();
 
 	let starting = $state(false);
 

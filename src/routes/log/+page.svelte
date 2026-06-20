@@ -1,20 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
-	import { formatWeekdayShortDate } from '$lib/date';
+	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { formatActivitySummary } from '$lib/activities';
 
 	let contextDate = $derived(loggingContext.date);
-
-	let displayDate = $derived(formatWeekdayShortDate(contextDate));
-
-	let activeSessions = $derived(
-		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
-	);
 
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
@@ -41,28 +32,7 @@
 </svelte:head>
 
 <div class="page log-page">
-	<header class="log-page__header">
-		<button class="log-page__back" onclick={() => goto('/')} aria-label="Back to home">
-			<svg
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				aria-hidden="true"
-			>
-				<polyline points="15 18 9 12 15 6" />
-			</svg>
-		</button>
-		<div class="log-page__heading">
-			<p class="log-page__date">{displayDate}</p>
-			<h1 class="log-page__title">Activity</h1>
-		</div>
-	</header>
-
-	{#if programStore.loaded}
-		<WeekStrip sessions={activeSessions} stayOnPage />
-	{/if}
+	<PageHeader title="Activity" showBack />
 
 	<button class="log-page__add-btn" onclick={openNew}>
 		<svg
@@ -126,53 +96,6 @@
 {/if}
 
 <style>
-	.log-page__header {
-		display: flex;
-		align-items: flex-start;
-		gap: var(--space-3);
-		margin-block-end: var(--space-5);
-	}
-
-	.log-page__back {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 40px;
-		block-size: 40px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-		flex-shrink: 0;
-		margin-block-start: 4px;
-
-		svg {
-			inline-size: 20px;
-			block-size: 20px;
-		}
-	}
-
-	.log-page__heading {
-		flex: 1;
-	}
-
-	.log-page__date {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-accent);
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		margin-block-end: var(--space-1);
-	}
-
-	.log-page__title {
-		font-family: var(--font-display);
-		font-size: 2rem;
-		font-weight: 700;
-		line-height: 1;
-		letter-spacing: -0.02em;
-	}
-
 	.log-page__add-btn {
 		display: inline-flex;
 		align-items: center;

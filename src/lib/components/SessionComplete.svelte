@@ -1,15 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { formatDuration, formatVolume } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-
-	let dialog: HTMLDialogElement;
-
-	onMount(() => {
-		dialog.showModal();
-	});
+	import BottomSheet from './BottomSheet.svelte';
 
 	function handleBackToToday() {
 		sessionStore.dismissComplete();
@@ -24,8 +18,8 @@
 	let totalSets = $derived(session?.exercises.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 </script>
 
-<dialog bind:this={dialog} class="session-complete" aria-labelledby="complete-title" aria-modal="true">
-	<div class="session-complete__inner">
+<BottomSheet onclose={handleBackToToday} maxHeight="100dvh" hideHandle fixedHeight>
+	<div class="session-complete" aria-labelledby="complete-title" aria-modal="true">
 		<!-- Check circle -->
 		<div class="session-complete__graphic" aria-hidden="true">
 			<div class="session-complete__circle">
@@ -87,7 +81,7 @@
 			</button>
 		</div>
 	</div>
-</dialog>
+</BottomSheet>
 
 <style>
 	@keyframes circle-pop {
@@ -117,35 +111,6 @@
 	}
 
 	.session-complete {
-		position: fixed;
-		inset: 0;
-		inline-size: 100%;
-		block-size: 100dvh;
-		background: var(--color-bg);
-		border: none;
-		padding: 0;
-		z-index: 300;
-
-		&::backdrop {
-			background: rgba(0, 0, 0, 0.9);
-		}
-	}
-
-	@container app (inline-size >= 720px) {
-		.session-complete {
-			inset-block: 10dvh;
-			inset-inline-start: var(--side-nav-width);
-			inset-inline-end: 0;
-			margin-inline: auto;
-			inline-size: min(480px, calc(100dvw - var(--side-nav-width) - var(--space-8)));
-			block-size: 80dvh;
-			border-radius: var(--r-2xl);
-			border: 1px solid var(--color-border);
-			box-shadow: var(--shadow-lg);
-		}
-	}
-
-	.session-complete__inner {
 		display: flex;
 		flex-direction: column;
 		align-items: center;

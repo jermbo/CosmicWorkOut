@@ -4,17 +4,14 @@
 	import ProgressRing from './ProgressRing.svelte';
 	import SetTile from './SetTile.svelte';
 
-	let {
-		activeExercise,
-		exercise,
-		exerciseIndex,
-		onSetTap,
-	}: {
+	type Props = {
 		activeExercise: ActiveExercise;
 		exercise: Exercise;
 		exerciseIndex: number;
 		onSetTap: (exerciseIndex: number, setIndex: number) => void;
-	} = $props();
+	};
+
+	let { activeExercise, exercise, exerciseIndex, onSetTap }: Props = $props();
 
 	let doneSets = $derived(activeExercise.sets.filter((s) => s.completed).length);
 	let totalSets = $derived(activeExercise.sets.length);

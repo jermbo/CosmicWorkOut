@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SessionLog } from '$lib/db/types';
+	import type { SessionLog, ActivityLog } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -18,6 +18,8 @@
 	import { formatMoodValue } from '$lib/habits';
 	import DaySummarySheet from '$lib/components/DaySummarySheet.svelte';
 	import DayActionsSheet from '$lib/components/DayActionsSheet.svelte';
+	import HabitHistorySheet from '$lib/components/HabitHistorySheet.svelte';
+	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 
 	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
@@ -25,6 +27,8 @@
 	let viewDate = $state(new Date());
 	let selectedSession = $state<SessionLog | null>(null);
 	let dayActionsDate = $state<string | null>(null);
+	let habitHistoryDate = $state<string | null>(null);
+	let editingActivity = $state<ActivityLog | null>(null);
 
 	const today = new Date();
 	const todayStr = todayIso();
@@ -97,6 +101,15 @@
 		if (!dayActionsSession) return;
 		selectedSession = dayActionsSession;
 		dayActionsDate = null;
+	}
+
+	function openHabitHistory() {
+		habitHistoryDate = dayActionsDate;
+		dayActionsDate = null;
+	}
+
+	function handleEditActivity(activity: ActivityLog) {
+		editingActivity = activity;
 	}
 
 	let monthKey = $derived(monthIsoKey(viewDate));
@@ -251,8 +264,25 @@
 		session={dayActionsSession}
 		hasHabits={dayActionsHasHabits}
 		hasActivities={dayActionsHasActivities}
+		activities={activityStore.activitiesByDate.get(dayActionsDate) ?? []}
 		onClose={() => (dayActionsDate = null)}
 		onViewSession={dayActionsSession ? openSessionDetails : undefined}
+		onViewHabits={dayActionsHasHabits ? openHabitHistory : undefined}
+		onEditActivity={handleEditActivity}
+	/>
+{/if}
+
+{#if habitHistoryDate}
+	<HabitHistorySheet
+		date={habitHistoryDate}
+		onClose={() => (habitHistoryDate = null)}
+	/>
+{/if}
+
+{#if editingActivity}
+	<ActivityLogSheet
+		editing={editingActivity}
+		onClose={() => (editingActivity = null)}
 	/>
 {/if}
 

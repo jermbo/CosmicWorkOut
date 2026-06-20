@@ -16,17 +16,14 @@
 		| 'flame'
 		| 'drag';
 
-	let {
-		name,
-		size = 18,
-		stroke = 2,
-		title,
-	}: {
+	type Props = {
 		name: IconName;
 		size?: number;
 		stroke?: number;
 		title?: string;
-	} = $props();
+	};
+
+	let { name, size = 18, stroke = 2, title }: Props = $props();
 
 	let filled = $derived(name === 'flame' || name === 'drag');
 </script>
