@@ -46,10 +46,9 @@
 	const PROGRESS_PALETTE = ['#b2f042', '#60c6ff', '#f59e0b', '#b286fd', '#e55733'];
 
 	// ── Date range ────────────────────────────────────────────────
-	type RangeKey = 'last-45' | 'this-week' | 'last-7' | 'mtd' | 'ytd' | 'custom';
+	type RangeKey = 'this-week' | 'last-7' | 'mtd' | 'ytd' | 'custom';
 
 	const RANGE_OPTIONS: { key: RangeKey; label: string }[] = [
-		{ key: 'last-45',    label: '45 days' },
 		{ key: 'this-week',  label: 'This week' },
 		{ key: 'last-7',     label: 'Last 7d' },
 		{ key: 'mtd',        label: 'MTD' },
@@ -57,7 +56,7 @@
 		{ key: 'custom',     label: 'Custom' },
 	];
 
-	let rangeKey   = $state<RangeKey>('last-45');
+	let rangeKey   = $state<RangeKey>('last-7');
 	let customStart = $state('');
 	let customEnd   = $state('');
 
@@ -85,11 +84,6 @@
 				return { start: toLocalIso(new Date(today.getFullYear(), 0, 1)), end: todayStr };
 			case 'custom':
 				return { start: cs, end: ce };
-			default: {
-				const d = new Date(today);
-				d.setDate(d.getDate() - 44);
-				return { start: toLocalIso(d), end: todayStr };
-			}
 		}
 	}
 
@@ -127,7 +121,6 @@
 			return `${MONTHS[parseInt(m) - 1]} ${parseInt(day)}`;
 		};
 		switch (rangeKey) {
-			case 'last-45':   return 'Last 45 days';
 			case 'this-week': return 'This week';
 			case 'last-7':    return 'Last 7 days';
 			case 'mtd':       return 'Month to date';
@@ -157,11 +150,11 @@
 	let hasAnyData    = $derived(hasSessions || hasActivities || hasHabitLogs);
 
 	// ── Canvas refs ───────────────────────────────────────────────
-	let moodCanvas:     HTMLCanvasElement;
-	let volumeCanvas:   HTMLCanvasElement;
-	let activityCanvas: HTMLCanvasElement;
-	let radarCanvas:    HTMLCanvasElement;
-	let progressCanvas: HTMLCanvasElement;
+	let moodCanvas:     HTMLCanvasElement = $state()!;
+	let volumeCanvas:   HTMLCanvasElement = $state()!;
+	let activityCanvas: HTMLCanvasElement = $state()!;
+	let radarCanvas:    HTMLCanvasElement = $state()!;
+	let progressCanvas: HTMLCanvasElement = $state()!;
 
 	function cssVar(name: string): string {
 		return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -217,8 +210,9 @@
 			const coffeeData = coffeeHabit ? dates.map((d) => logMap.get(coffeeHabit.id)?.get(d) ?? null) : null;
 			const waterData  = waterHabit  ? dates.map((d) => logMap.get(waterHabit.id)?.get(d)  ?? null) : null;
 
-			const amber = '#f59e0b';
-			const sky   = '#60c6ff';
+			const moodColor   = '#e879f9'; // fuchsia — distinct from accent
+			const coffeeColor = '#f59e0b'; // amber
+			const waterColor  = '#60c6ff'; // sky
 
 			charts.push(new Chart(moodCanvas, {
 				type: 'line',
@@ -227,18 +221,24 @@
 					datasets: [
 						...(moodData ? [{
 							label: 'Mood', data: moodData, yAxisID: 'yMood',
-							borderColor: accent, backgroundColor: accent + '33',
-							pointBackgroundColor: accent, pointRadius: 3, spanGaps: false, tension: 0.3,
+							borderColor: moodColor, backgroundColor: moodColor + '22',
+							pointBackgroundColor: moodColor,
+							borderWidth: 1.5, pointRadius: 2,
+							spanGaps: true, tension: 0.3,
 						}] : []),
 						...(coffeeData ? [{
 							label: coffeeHabit!.name, data: coffeeData, yAxisID: 'yHabits',
-							borderColor: amber, backgroundColor: amber + '33',
-							pointBackgroundColor: amber, pointRadius: 3, spanGaps: false, tension: 0.3,
+							borderColor: coffeeColor, backgroundColor: coffeeColor + '22',
+							pointBackgroundColor: coffeeColor,
+							borderWidth: 1.5, borderDash: [6, 3], pointRadius: 2,
+							spanGaps: true, tension: 0.3,
 						}] : []),
 						...(waterData ? [{
 							label: waterHabit!.name, data: waterData, yAxisID: 'yHabits',
-							borderColor: sky, backgroundColor: sky + '33',
-							pointBackgroundColor: sky, pointRadius: 3, spanGaps: false, tension: 0.3,
+							borderColor: waterColor, backgroundColor: waterColor + '22',
+							pointBackgroundColor: waterColor,
+							borderWidth: 1.5, borderDash: [2, 3], pointRadius: 2,
+							spanGaps: true, tension: 0.3,
 						}] : []),
 					],
 				},
