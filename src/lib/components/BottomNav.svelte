@@ -2,8 +2,7 @@
 	import { page } from '$app/state';
 
 	const navItems = [
-		{ href: '/', label: 'Today', exact: true },
-		{ href: '/habits', label: 'Habits', exact: false },
+		{ href: '/', label: 'Overview', exact: true },
 		{ href: '/practice', label: 'Practice', exact: false },
 		{ href: '/calendar', label: 'History', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
@@ -30,7 +29,7 @@
 					class:bottom-nav__link--active={isActive(item)}
 					aria-current={isActive(item) ? 'page' : undefined}
 				>
-					{#if item.label === 'Today'}
+					{#if item.label === 'Overview'}
 						<svg
 							class="bottom-nav__icon"
 							aria-hidden="true"
@@ -42,20 +41,6 @@
 							stroke-linejoin="round"
 						>
 							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-						</svg>
-					{:else if item.label === 'Habits'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M9 11l3 3L22 4" />
-							<path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
 						</svg>
 					{:else if item.label === 'Practice'}
 						<svg

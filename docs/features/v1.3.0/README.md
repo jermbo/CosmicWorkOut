@@ -33,6 +33,15 @@ These foundations exist — v1.3.0 adds the missing UI and calendar integration 
 
 ---
 
+## IA Notes
+
+- The root route is now framed as **Overview** rather than **Today**.
+- The weekly selector still controls the active date everywhere in the app, but it now sits inside a broader overview/dashboard model.
+- Overview keeps summary entry points for Habits, Practice, and Activity, with one combined Practice card instead of surfacing every practice area separately.
+- Bottom navigation is intentionally slimmer: focused destinations are reached from Overview rather than all being permanent tabs.
+
+---
+
 ## Carried Over from v1.2.0
 
 | Origin story | Requirement                         | Target story |
