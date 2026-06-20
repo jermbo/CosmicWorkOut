@@ -14,7 +14,7 @@
 	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
 	import ChartActivityMix from '$lib/components/insights/ChartActivityMix.svelte';
 	import ChartHabitRadar from '$lib/components/insights/ChartHabitRadar.svelte';
-	import ChartStrengthProgress from '$lib/components/insights/ChartStrengthProgress.svelte';
+
 
 	// ── Range state ───────────────────────────────────────────────
 	let rangeKey    = $state<RangeKey>('last-7');
@@ -109,15 +109,6 @@
 				</section>
 			{/if}
 
-			{#if hasSessions}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Strength Progress</h2>
-					<p class="chart-section__desc">Max weight per session for your top 5 exercises.</p>
-					<div class="chart-wrap">
-						<ChartStrengthProgress {dates} {xLabels} />
-					</div>
-				</section>
-			{/if}
 		</div>
 	{/if}
 </div>

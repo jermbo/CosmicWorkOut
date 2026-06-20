@@ -40,8 +40,6 @@ export const ACTIVITY_PALETTE = [
 	'#e879f9', '#94a3b8',
 ];
 
-export const PROGRESS_PALETTE = ['#b2f042', '#60c6ff', '#f59e0b', '#b286fd', '#e55733'];
-
 // ── Date range types ──────────────────────────────────────────────────────────
 export type RangeKey = 'this-week' | 'last-7' | 'mtd' | 'ytd' | 'custom';
 
