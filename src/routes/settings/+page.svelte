@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Density, Roundness, Habit } from '$lib/db/types';
-	import { resetWorkoutData } from '$lib/db/database';
+	import { resetWorkoutData, loadDebugSeedData } from '$lib/db/database';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -30,8 +30,10 @@
 
 	let showClearDataConfirm = $state(false);
 	let showResetPrefsConfirm = $state(false);
+	let showSeedConfirm = $state(false);
 	let clearDataError = $state<string | null>(null);
 	let clearingData = $state(false);
+	let seedingData = $state(false);
 
 	let showHabitForm = $state(false);
 	let editingHabit = $state<Habit | null>(null);
@@ -111,6 +113,11 @@
 			clearDataError = err instanceof Error ? err.message : 'Could not clear data. Please try again.';
 			clearingData = false;
 		}
+	}
+
+	async function handleLoadSeedData() {
+		seedingData = true;
+		await loadDebugSeedData();
 	}
 
 	function handleResetPreferences() {
@@ -221,6 +228,16 @@
 
 			<div class="data-action">
 				<p class="data-action__desc">
+					Load 45 days of realistic debug data — workout sessions, activities, and habit logs — for testing graphs and
+					visualizations. Existing data is kept. Remove with "Clear workout data" above.
+				</p>
+				<button class="data-action__btn data-action__btn--secondary" onclick={() => (showSeedConfirm = true)}>
+					Load debug data
+				</button>
+			</div>
+
+			<div class="data-action">
+				<p class="data-action__desc">
 					Reset accent color, weight unit, completion feel, density, and roundness to their defaults. Workout data is
 					not affected.
 				</p>
@@ -252,6 +269,20 @@
 		{#if sessionStore.isActive}
 			<br /><br />You have a session in progress — it will be discarded.
 		{/if}
+	</ConfirmDialog>
+{/if}
+
+{#if showSeedConfirm}
+	<ConfirmDialog
+		title="Load debug data?"
+		confirmLabel="Load debug data"
+		confirmBusyLabel="Loading…"
+		busy={seedingData}
+		onconfirm={handleLoadSeedData}
+		oncancel={() => (showSeedConfirm = false)}
+	>
+		Adds 45 days of randomized workout sessions, activities, and habit logs. Your existing data is not removed. The
+		page will reload when done.
 	</ConfirmDialog>
 {/if}
 

@@ -1,5 +1,6 @@
 import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog } from './types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
+import { generateDebugSeedData } from './debugSeed';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 function reportWriteError(error: unknown): void {
@@ -150,6 +151,14 @@ export async function clearWorkoutData(): Promise<void> {
 		request.onblocked = () =>
 			reject(new Error('Database deletion blocked — close other CosmicWorkOut tabs and try again'));
 	});
+}
+
+export async function loadDebugSeedData(): Promise<void> {
+	const { sessions, activities, habitLogs } = generateDebugSeedData();
+	await putAllRecords('sessions', sessions);
+	await putAllRecords('activities', activities);
+	await putAllRecords('habitLogs', habitLogs);
+	location.reload();
 }
 
 export async function resetWorkoutData(): Promise<void> {
