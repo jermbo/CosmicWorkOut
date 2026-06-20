@@ -62,7 +62,11 @@
 </svelte:head>
 
 <div class="page page--wide workout-page">
-	<PageHeader title="Workout" showBack />
+	<PageHeader title="Workout" showBack>
+		{#snippet trailing()}
+			<a href="/program" class="workout-page__programs-link">Programs</a>
+		{/snippet}
+	</PageHeader>
 
 	{#if !programStore.loaded}
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
@@ -161,6 +165,25 @@
 <style>
 	.workout-page {
 		inline-size: 100%;
+	}
+
+	.workout-page__programs-link {
+		display: inline-flex;
+		align-items: center;
+		padding-inline: var(--space-3);
+		block-size: 34px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		white-space: nowrap;
+		transition: color var(--duration-fast) var(--ease-out);
+
+		&:hover {
+			color: var(--color-accent);
+		}
 	}
 
 	/* Loading */
