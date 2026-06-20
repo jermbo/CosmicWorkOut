@@ -1,8 +1,8 @@
-# US-015 — Item Library (Discipline-scoped)
+# US-016 — Item Library (Discipline-scoped)
 
 > **Status: ❌ Planned — v1.4.0**
 >
-> Foundation for the Discipline engine. Generalizes the strength Exercise into a Discipline-scoped **Item**. Belly dance items ship as the first non-strength instance; strength exercises become Items of the Strength Discipline. See the [Glossary](../../glossary.md).
+> Builds on the Discipline engine (US-015): the library of **Items** (the generalized Exercise). Belly dance items ship as the first non-strength instance; strength exercises are Items of the Strength Discipline. See the [Glossary](../../glossary.md).
 
 As an **active user**, I want to browse and manage a library of items tagged by section and focus, scoped to each Discipline,
 so that I can build dance routines from a useful starter catalog and add my own moves as my repertoire grows.
@@ -25,7 +25,7 @@ so that I can build dance routines from a useful starter catalog and add my own 
    c. Built-in items shall not be editable or deletable.
 
 3. Browsing and filtering
-   a. The user shall be able to browse the item library from the routine editor (US-016).
+   a. The user shall be able to browse the item library from the routine editor (US-017).
    b. The library shall display item name, type, and focus tags.
    c. The user shall be able to search items by name.
    d. The user shall be able to filter items by type and by focus.
@@ -67,7 +67,7 @@ so that I can build dance routines from a useful starter catalog and add my own 
    d. Given a custom item is used in one or more routines, when the user attempts to delete it, then deletion is blocked with a message explaining it is in use.
 
 5. Logging mode hint
-   a. Given a warm-up item is added to a routine, when the session flow renders that item (US-018), then it appears as a checkbox step.
+   a. Given a warm-up item is added to a routine, when the session flow renders that item (US-019), then it appears as a checkbox step.
    b. Given a move item is added to a routine, when the session flow renders that item, then it supports duration or reps entry.
 
 ---
@@ -76,5 +76,6 @@ so that I can build dance routines from a useful starter catalog and add my own 
 
 - [v1.4.0 README](./README.md)
 - [Data Model](../../architecture/data-model.md)
+- [US-015 — Discipline Engine Foundation](./US-015-discipline-engine-foundation.md)
 - [US-006 — Exercise Library](../v1.1.0/US-006-exercise-library.md)
-- [US-016 — Belly Dance Discipline, Program & Routines](./US-016-belly-dance-program-routines.md)
+- [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)

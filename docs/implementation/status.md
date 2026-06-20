@@ -66,11 +66,12 @@ What's built today vs. what's still requirements-only. Updated to match the code
 
 | Feature                                    | Status     | Doc reference |
 | ------------------------------------------ | ---------- | ------------- |
-| Item library (Discipline-scoped)           | ❌ Planned | US-015        |
-| Belly Dance Discipline, program & routines | ❌ Planned | US-016        |
-| Practice hub & navigation                  | ❌ Planned | US-017        |
-| Dance session flow                         | ❌ Planned | US-018        |
-| Cross-Discipline streaks & calendar        | ❌ Planned | US-019        |
+| Discipline engine foundation               | ❌ Planned | US-015        |
+| Item library (Discipline-scoped)           | ❌ Planned | US-016        |
+| Belly Dance Discipline, program & routines | ❌ Planned | US-017        |
+| Practice hub & navigation                  | ❌ Planned | US-018        |
+| Dance session flow                         | ❌ Planned | US-019        |
+| Cross-Discipline streaks & calendar        | ❌ Planned | US-020        |
 
 ---
 

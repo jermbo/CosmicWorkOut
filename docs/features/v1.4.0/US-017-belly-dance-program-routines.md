@@ -1,8 +1,8 @@
-# US-016 — Belly Dance Discipline, Program & Routines
+# US-017 — Belly Dance Discipline, Program & Routines
 
 > **Status: ❌ Planned — v1.4.0**
 >
-> Defines the **Belly Dance Discipline** and its program structure, rotating routines, bookend inheritance, and routine editor — all on the generalized Discipline engine (US-015). Strength is the other Discipline on the same engine. See the [Glossary](../../glossary.md).
+> Defines the **Belly Dance Discipline** and its program structure, rotating routines, bookend inheritance, and routine editor — all on the generalized Discipline engine (US-015), using Items from the library (US-016). Strength is the other Discipline on the same engine. See the [Glossary](../../glossary.md).
 
 As an **active user**, I want a belly dance program with rotating routines I can customize
 so that I can follow a structured A/B/C rotation with shared warm-up and cool-down but different conditioning and move focus each session.
@@ -26,7 +26,7 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 
 3. Routine sections
    a. Each routine shall be composed of four ordered sections: warm-up, conditioning, moves, cool-down.
-   b. Each section shall contain an ordered list of items from the library (US-015).
+   b. Each section shall contain an ordered list of items from the library (US-016).
    c. Routine items shall not store upfront targets (no prescribed duration or reps at build time).
 
 4. Bookend inheritance
@@ -38,7 +38,7 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 
 5. Routine editor
    a. The user shall be able to view and edit routines from a program page (sub-route, not in main nav).
-   b. The editor shall allow adding, removing, and reordering items within each section using the item library picker (US-015).
+   b. The editor shall allow adding, removing, and reordering items within each section using the item library picker (US-016).
    c. The picker shall filter by section type when adding items.
    d. The user shall be able to reset overridden bookends on B or C back to inherit from Routine A.
 
@@ -85,6 +85,7 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 - [v1.4.0 README](./README.md)
 - [Program Progression](../../implementation/program-progression.md)
 - [Program Management Requirements](../../requirements/program-management.md)
-- [US-015 — Item Library (Discipline-scoped)](./US-015-practice-item-library.md)
+- [US-015 — Discipline Engine Foundation](./US-015-discipline-engine-foundation.md)
+- [US-016 — Item Library (Discipline-scoped)](./US-016-practice-item-library.md)
 - [US-001 — Program Library & Selection](../v1.1.0/US-001-program-library.md)
-- [US-017 — Practice Hub & Navigation](./US-017-practice-hub-navigation.md)
+- [US-018 — Practice Hub & Navigation](./US-018-practice-hub-navigation.md)

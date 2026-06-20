@@ -1,4 +1,4 @@
-# US-017 — Practice Hub & Navigation
+# US-018 — Practice Hub & Navigation
 
 > **Status: ❌ Planned — v1.4.0**
 >
@@ -19,9 +19,10 @@ so that I can open the app on a dance day and start the right session without ex
    e. When no belly dance program is active, the card shall show an empty state with a prompt to select a program.
    f. Tapping the card shall navigate to the practice session page for belly dance.
 
-2. Today — parallel display
-   a. The Workout card and Dance card shall both be visible on Today regardless of which is scheduled.
-   b. On dates where both a strength session and a dance session are logged, both cards shall show completed states independently.
+2. Today — per-Discipline display
+   a. Today shall render one practice card **per active Discipline** (a generic pattern, not two hard-coded cards) — for v1.4.0 that is the Strength card and the Dance card.
+   b. The Workout (Strength) card and Dance card shall both be visible on Today regardless of which is scheduled.
+   c. On dates where both a strength session and a dance session are logged, both cards shall show completed states independently.
 
 3. Navigation — Practice destination
    a. The bottom nav item currently labeled "Workout" shall be renamed to "Practice".
@@ -31,7 +32,7 @@ so that I can open the app on a dance day and start the right session without ex
 
 4. Program access
    a. The practice page shall link to belly dance program management (routine editor, program selection) as a sub-route — not added to main nav.
-   b. Program selection for belly dance shall follow the same copy-before-edit rules as strength programs (US-016).
+   b. Program selection for belly dance shall follow the same copy-before-edit rules as strength programs (US-017).
 
 5. Global date context
    a. Dance practice shall respect the global date context from the home screen (same as workouts and habits).
@@ -52,8 +53,9 @@ so that I can open the app on a dance day and start the right session without ex
    c. Given no belly dance program is active, when the home screen loads, then the Dance card prompts program selection.
    d. Given the user taps the Dance card, when navigation completes, then the practice session page opens for belly dance.
 
-2. Today — parallel display
-   a. Given both a workout and a dance session were logged on June 10, when the user selects June 10 on Today, then both cards show completed states.
+2. Today — per-Discipline display
+   a. Given two Disciplines are active (Strength, Belly Dance), when Today loads, then one practice card renders per Discipline.
+   b. Given both a workout and a dance session were logged on June 10, when the user selects June 10 on Today, then both cards show completed states.
 
 3. Navigation — Practice destination
    a. Given the bottom nav is visible, when the user views the labels, then "Practice" replaces "Workout".
@@ -78,5 +80,5 @@ so that I can open the app on a dance day and start the right session without ex
 - [v1.4.0 README](./README.md)
 - [App Structure](../../implementation/app-structure.md)
 - [v1.2.0 US-007 — Home Screen Redesign](../v1.2.0/US-007-home-screen-redesign.md)
-- [US-016 — Belly Dance Discipline, Program & Routines](./US-016-belly-dance-program-routines.md)
-- [US-018 — Dance Session Flow](./US-018-dance-session-flow.md)
+- [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)
+- [US-019 — Dance Session Flow](./US-019-dance-session-flow.md)

@@ -40,7 +40,7 @@ This version is the first that touches the **shared engine**, not just one featu
 | SessionLog            | **Session**    | one concept across Disciplines        |
 | —                     | **Discipline** | new — sections, metrics, seed, labels |
 
-US-015 and US-016 define these generalized entities; the belly dance content is the first non-strength instance of them.
+US-015 introduces the Discipline engine and these generalized entities (and re-seeds strength onto them with no observable change); US-016 and US-017 then add the belly-dance Items, program, and routines on top.
 
 ---
 
@@ -48,13 +48,14 @@ US-015 and US-016 define these generalized entities; the belly dance content is 
 
 Implement in order — each story builds on the previous.
 
-| ID                                                 | Title                                       | Status     | Depends on |
-| -------------------------------------------------- | ------------------------------------------- | ---------- | ---------- |
-| [US-015](./US-015-practice-item-library.md)        | Item Library (Discipline-scoped)            | ❌ Planned | —          |
-| [US-016](./US-016-belly-dance-program-routines.md) | Belly Dance Discipline, Program & Routines  | ❌ Planned | US-015     |
-| [US-017](./US-017-practice-hub-navigation.md)      | Practice Hub & Navigation                   | ❌ Planned | US-016     |
-| [US-018](./US-018-dance-session-flow.md)           | Dance Session Flow                          | ❌ Planned | US-017     |
-| [US-019](./US-019-practice-streaks-calendar.md)    | Cross-Discipline Streaks & Calendar History | ❌ Planned | US-018     |
+| ID                                                    | Title                                       | Status     | Depends on |
+| ----------------------------------------------------- | ------------------------------------------- | ---------- | ---------- |
+| [US-015](./US-015-discipline-engine-foundation.md)    | Discipline Engine Foundation                | ❌ Planned | —          |
+| [US-016](./US-016-practice-item-library.md)           | Item Library (Discipline-scoped)            | ❌ Planned | US-015     |
+| [US-017](./US-017-belly-dance-program-routines.md)    | Belly Dance Discipline, Program & Routines  | ❌ Planned | US-016     |
+| [US-018](./US-018-practice-hub-navigation.md)         | Practice Hub & Navigation                   | ❌ Planned | US-017     |
+| [US-019](./US-019-dance-session-flow.md)              | Dance Session Flow                          | ❌ Planned | US-018     |
+| [US-020](./US-020-practice-streaks-calendar.md)       | Cross-Discipline Streaks & Calendar History | ❌ Planned | US-019     |
 
 ---
 
@@ -79,7 +80,7 @@ The Discipline engine generalizes patterns and infrastructure proven on strength
 - **Belly dance item catalog** — starter warm-ups, conditioning exercises, dance moves, and cool-downs with section/type + focus tags.
 - Items seeded from each Discipline's seed data; custom items stored alongside built-ins.
 
-Exact catalog contents are defined during US-015 implementation.
+Exact catalog contents are defined during US-016 implementation.
 
 ---
 
@@ -90,6 +91,7 @@ Exact catalog contents are defined during US-015 implementation.
 | Per-item session notes                    | Deferred — log during session without a notes field in MVP                             |
 | Additional Disciplines                    | Beyond strength + belly dance — engine supports them; only these two ship              |
 | Cardio/sports as Disciplines              | Stay on the Activity quick-log path — not in scope to restructure                      |
+| Activity distance / pace fields           | Deferred — enriching ActivityLog (e.g. distance for bike/run) is the likely _next_ version; confirms cardio stays on the Activity path, not a Discipline |
 | Prescribed targets on dance routine items | Routines are ordered lists; values entered during the session                          |
 | Separate Dance nav tab                    | Today + Practice destination covers alternating-day usage                              |
 | Data migration                            | Pre-beta — wipe and re-seed instead of migrating shipped records                       |

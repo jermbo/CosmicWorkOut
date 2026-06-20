@@ -1,4 +1,4 @@
-# US-019 — Cross-Discipline Streaks & Calendar History
+# US-020 — Cross-Discipline Streaks & Calendar History
 
 > **Status: ❌ Planned — v1.4.0**
 >
@@ -26,7 +26,7 @@ so that I can see overall momentum across Disciplines and drill into each one se
    a. Dates with a logged dance session shall be visually indicated on the calendar month grid (distinct from or alongside strength session indicators).
    b. Tapping a date with a dance session shall include dance session summary in the day detail sheet.
    c. The day detail shall show routine name, duration, and items completed for the dance session.
-   d. The user shall be able to navigate from day detail to edit the dance session (links to practice page edit flow from US-018).
+   d. The user shall be able to navigate from day detail to edit the dance session (links to practice page edit flow from US-019).
    e. The user shall be able to delete a dance session log from day detail with confirmation.
 
 4. Calendar — mixed days
@@ -79,6 +79,6 @@ so that I can see overall momentum across Disciplines and drill into each one se
 - [v1.4.0 README](./README.md)
 - [History & Calendar Requirements](../../requirements/history-calendar.md)
 - [Program Progression](../../implementation/program-progression.md)
-- [US-017 — Practice Hub & Navigation](./US-017-practice-hub-navigation.md)
-- [US-018 — Dance Session Flow](./US-018-dance-session-flow.md)
+- [US-018 — Practice Hub & Navigation](./US-018-practice-hub-navigation.md)
+- [US-019 — Dance Session Flow](./US-019-dance-session-flow.md)
 - [v1.3.0 US-010 — Habit History in Calendar](../v1.3.0/US-010-habit-calendar-history.md)
