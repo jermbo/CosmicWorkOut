@@ -76,16 +76,16 @@ class ProgramStore {
 
 	combinedWeekStreak = $derived(
 		computeCombinedStreak(
-			[STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID].map((id) =>
-				this.sessionsForDiscipline(id).map((s) => s.date),
-			),
+			disciplines.map((d) => this.sessions.filter((s) => s.disciplineId === d.id).map((s) => s.date)),
 			1,
 		),
 	);
 
-	activeDisciplines = $derived(
-		disciplines.filter((d) => this.activeProgramFor(d.id) !== null),
-	);
+	isDisciplineActive(disciplineId: string): boolean {
+		return this.activeProgramIds[disciplineId] !== undefined;
+	}
+
+	activeDisciplines = $derived(disciplines.filter((d) => this.isDisciplineActive(d.id)));
 
 	isProgramCompleteFor(disciplineId: string): boolean {
 		const program = this.activeProgramFor(disciplineId);
@@ -189,32 +189,37 @@ class ProgramStore {
 		this.loaded = true;
 	}
 
-	// Read the per-Discipline active-program map, drop stale ids, and default each
-	// Discipline that has programs but no active selection to its first program.
+	// Read the per-Discipline active-program map and drop stale ids. Does not
+	// auto-activate every Discipline — the user opts in per Discipline. On a
+	// completely fresh install (no stored map, no legacy key), strength alone
+	// defaults active so the original workout flow isn't empty.
 	private resolveActiveProgramIds(programs: Program[]): Record<string, string> {
 		const ids: Record<string, string> = {};
+		let hadPriorSelection = false;
 
 		const stored = localStorage.getItem(ACTIVE_PROGRAMS_KEY);
 		if (stored) {
+			hadPriorSelection = true;
 			try {
 				const parsed = JSON.parse(stored) as Record<string, string>;
 				for (const [disciplineId, programId] of Object.entries(parsed)) {
 					if (programs.some((p) => p.id === programId)) ids[disciplineId] = programId;
 				}
 			} catch {
-				// ignore malformed map — fall through to defaults
+				// ignore malformed map
 			}
 		} else {
-			// One-time fallback from the legacy single-program key.
 			const legacy = localStorage.getItem(LEGACY_ACTIVE_PROGRAM_KEY);
 			const legacyProgram = legacy ? programs.find((p) => p.id === legacy) : undefined;
-			if (legacyProgram) ids[legacyProgram.disciplineId] = legacyProgram.id;
+			if (legacyProgram) {
+				ids[legacyProgram.disciplineId] = legacyProgram.id;
+				hadPriorSelection = true;
+			}
 		}
 
-		for (const program of programs) {
-			if (!ids[program.disciplineId]) {
-				ids[program.disciplineId] = program.id;
-			}
+		if (!hadPriorSelection && Object.keys(ids).length === 0) {
+			const strengthDefault = programs.find((p) => p.disciplineId === STRENGTH_DISCIPLINE_ID);
+			if (strengthDefault) ids[STRENGTH_DISCIPLINE_ID] = strengthDefault.id;
 		}
 
 		this.persistActiveProgramIds(ids);
@@ -286,8 +291,10 @@ class ProgramStore {
 
 	sessionForDisciplineDate(disciplineId: string, date: string): Session | null {
 		const program = this.activeProgramFor(disciplineId);
-		if (!program) return null;
-		return this.sessions.find((s) => s.date === date && s.programId === program.id) ?? null;
+		if (program) {
+			return this.sessions.find((s) => s.date === date && s.programId === program.id) ?? null;
+		}
+		return this.sessions.find((s) => s.date === date && s.disciplineId === disciplineId) ?? null;
 	}
 
 	sessionsForDate(date: string): Session[] {
@@ -392,6 +399,14 @@ class ProgramStore {
 		const found = this.programs.find((p) => p.id === programId);
 		if (!found) return;
 		this.activeProgramIds = { ...this.activeProgramIds, [found.disciplineId]: programId };
+		this.persistActiveProgramIds();
+	}
+
+	deactivateProgram(disciplineId: string): void {
+		if (!this.activeProgramIds[disciplineId]) return;
+		const ids = { ...this.activeProgramIds };
+		delete ids[disciplineId];
+		this.activeProgramIds = ids;
 		this.persistActiveProgramIds();
 	}
 

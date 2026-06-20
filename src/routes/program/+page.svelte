@@ -169,7 +169,14 @@
 				</button>
 
 				<div class="prog-card__actions">
-					{#if !isActive}
+					{#if isActive}
+						<button
+							class="prog-card__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(program.disciplineId)}
+						>
+							Deactivate
+						</button>
+					{:else}
 						<button
 							class="prog-card__activate-btn"
 							onclick={() => {
@@ -204,7 +211,14 @@
 			<div class="schedule__header">
 				<div class="schedule__title-row">
 					<h2 class="schedule__title" id="schedule-heading">{viewingProgram.name}</h2>
-					{#if !viewingIsActive}
+					{#if viewingIsActive}
+						<button
+							class="schedule__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(disciplineId)}
+						>
+							Deactivate
+						</button>
+					{:else}
 						<button class="schedule__activate-btn" onclick={() => programStore.setActiveProgram(viewingProgram!.id)}>
 							Activate this program
 						</button>
@@ -531,6 +545,23 @@
 		}
 	}
 
+	.prog-card__deactivate-btn {
+		padding-inline: var(--space-3);
+		block-size: 36px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		white-space: nowrap;
+
+		&:hover {
+			color: var(--color-red);
+			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
+		}
+	}
+
 	.prog-card__delete-btn {
 		display: flex;
 		align-items: center;
@@ -588,6 +619,23 @@
 
 		&:hover {
 			opacity: 0.85;
+		}
+	}
+
+	.schedule__deactivate-btn {
+		padding-inline: var(--space-4);
+		block-size: 34px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+
+		&:hover {
+			color: var(--color-red);
+			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
 		}
 	}
 

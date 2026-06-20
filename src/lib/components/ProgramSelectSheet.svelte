@@ -22,11 +22,19 @@
 		onClose();
 	}
 
+	function deactivate() {
+		if (!disciplineId) return;
+		programStore.deactivateProgram(disciplineId);
+		onClose();
+	}
+
 	let activeId = $derived(
 		disciplineId
 			? programStore.activeProgramFor(disciplineId)?.id
 			: programStore.activeProgram?.id,
 	);
+
+	let hasActive = $derived(!!activeId);
 </script>
 
 <BottomSheet onclose={onClose} maxHeight="80dvh">
@@ -64,13 +72,21 @@
 						</span>
 					</div>
 					{#if isActive}
-						<span class="prog-row__active-badge">Active</span>
+						<button class="prog-row__deactivate-btn" onclick={deactivate}>Deactivate</button>
 					{:else}
-						<button class="prog-row__action-btn" onclick={() => switchTo(program)}> Select </button>
+						<button class="prog-row__action-btn" onclick={() => switchTo(program)}>Activate</button>
 					{/if}
 				</div>
 			{/each}
 		</div>
+
+		{#if disciplineId && hasActive}
+			<div class="prog-sheet__deactivate-hint">
+				<button class="prog-sheet__deactivate-link" onclick={deactivate}>
+					Turn off {disciplineId === 'bellydance' ? 'belly dance' : disciplineId} entirely
+				</button>
+			</div>
+		{/if}
 
 		<div class="prog-sheet__footer">
 			<button class="prog-sheet__new-btn" onclick={onCreateNew}>
@@ -190,19 +206,6 @@
 		margin-block-start: 2px;
 	}
 
-	.prog-row__active-badge {
-		font-size: 0.75rem;
-		font-weight: 700;
-		padding-inline: var(--space-2);
-		block-size: 26px;
-		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
-		display: flex;
-		align-items: center;
-		flex-shrink: 0;
-	}
-
 	.prog-row__action-btn {
 		padding-inline: var(--space-3);
 		block-size: 32px;
@@ -218,6 +221,41 @@
 		&:disabled {
 			opacity: 0.6;
 			cursor: default;
+		}
+	}
+
+	.prog-row__deactivate-btn {
+		padding-inline: var(--space-3);
+		block-size: 32px;
+		border-radius: var(--radius-full);
+		background: transparent;
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		flex-shrink: 0;
+
+		&:hover {
+			color: var(--color-red);
+			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
+		}
+	}
+
+	.prog-sheet__deactivate-hint {
+		padding-inline: var(--space-5);
+		padding-block-start: var(--space-3);
+		text-align: center;
+	}
+
+	.prog-sheet__deactivate-link {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+
+		&:hover {
+			color: var(--color-text-secondary);
 		}
 	}
 
