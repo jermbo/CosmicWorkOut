@@ -6,10 +6,14 @@
 		children,
 		onclose,
 		maxHeight = '90dvh',
+		hideHandle = false,
+		fixedHeight = false,
 	}: {
 		children: Snippet;
 		onclose: () => void;
 		maxHeight?: string;
+		hideHandle?: boolean;
+		fixedHeight?: boolean;
 	} = $props();
 
 	let dialog: HTMLDialogElement;
@@ -36,8 +40,15 @@
 	}}
 	onclick={handleDialogClick}
 >
-	<div class="bottom-sheet__panel" style:max-block-size={maxHeight}>
-		<div class="bottom-sheet__grab" aria-hidden="true"></div>
+	<div
+		class="bottom-sheet__panel"
+		class:bottom-sheet__panel--fixed={fixedHeight}
+		style:max-block-size={maxHeight}
+		style:block-size={fixedHeight ? maxHeight : undefined}
+	>
+		{#if !hideHandle}
+			<div class="bottom-sheet__grab" aria-hidden="true"></div>
+		{/if}
 		{@render children()}
 	</div>
 </dialog>
@@ -100,6 +111,12 @@
 			inset-inline-start: var(--side-nav-width);
 			inset-inline-end: 0;
 		}
+	}
+
+	.bottom-sheet__panel--fixed {
+		overflow: hidden;
+		padding-block-end: 0;
+		border-radius: 0;
 	}
 
 	.bottom-sheet__grab {

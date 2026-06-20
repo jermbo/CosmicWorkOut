@@ -3,18 +3,17 @@
 	import { formatElapsed, formatCountWithWord } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
+	import BottomSheet from './BottomSheet.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
-	let dialog: HTMLDialogElement;
 	let showAbandonConfirm = $state(false);
 	let elapsed = $state(0);
 	let sheetTarget = $state<{ exerciseIndex: number; setIndex: number } | null>(null);
 	let timerInterval: ReturnType<typeof setInterval>;
 
 	onMount(() => {
-		dialog.showModal();
 		timerInterval = setInterval(() => {
 			elapsed++;
 		}, 1000);
@@ -35,11 +34,6 @@
 	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
 	let allDone = $derived(totalSets > 0 && doneSets === totalSets);
 	let isEditing = $derived(sessionStore.active?.isEditing === true);
-
-	function handleCancel(event: Event) {
-		event.preventDefault();
-		showAbandonConfirm = true;
-	}
 
 	async function handleFinish() {
 		await sessionStore.finish(elapsed);
@@ -102,14 +96,8 @@
 	);
 </script>
 
-<dialog
-	bind:this={dialog}
-	class="session-overlay"
-	oncancel={handleCancel}
-	aria-labelledby="session-title"
-	aria-modal="true"
->
-	<div class="session-overlay__inner">
+<BottomSheet onclose={handleAbandonRequest} maxHeight="100dvh" hideHandle fixedHeight>
+	<div class="session-overlay__inner" aria-labelledby="session-title" aria-modal="true">
 		<!-- Header -->
 		<header class="session-overlay__header">
 			<div class="session-overlay__top-row">
@@ -195,25 +183,25 @@
 				{/if}
 			</button>
 		</div>
-	</div>
 
-	{#if showAbandonConfirm}
-	<ConfirmDialog
-		title={isEditing ? 'Discard changes?' : 'End this session?'}
-		confirmLabel={isEditing ? 'Discard' : 'End session'}
-		cancelLabel="Keep going"
-		danger
-		onconfirm={handleAbandonConfirm}
-		oncancel={handleAbandonCancel}
-	>
-		{#if isEditing}
-			Your saved session will be kept. Only unsaved edits are lost.
-		{:else}
-			Your progress will not be saved.
+		{#if showAbandonConfirm}
+			<ConfirmDialog
+				title={isEditing ? 'Discard changes?' : 'End this session?'}
+				confirmLabel={isEditing ? 'Discard' : 'End session'}
+				cancelLabel="Keep going"
+				danger
+				onconfirm={handleAbandonConfirm}
+				oncancel={handleAbandonCancel}
+			>
+				{#if isEditing}
+					Your saved session will be kept. Only unsaved edits are lost.
+				{:else}
+					Your progress will not be saved.
+				{/if}
+			</ConfirmDialog>
 		{/if}
-	</ConfirmDialog>
-{/if}
-</dialog>
+	</div>
+</BottomSheet>
 
 {#if sheetTarget && sheetExercise && sheetActiveSet}
 	<LogSetSheet
@@ -226,38 +214,6 @@
 {/if}
 
 <style>
-	.session-overlay {
-		position: fixed;
-		inset: 0;
-		inline-size: 100%;
-		block-size: 100dvh;
-		max-block-size: 100dvh;
-		background: var(--color-bg);
-		border: none;
-		padding: 0;
-		overflow: hidden;
-		z-index: 200;
-
-		&::backdrop {
-			background: rgba(0, 0, 0, 0.8);
-		}
-	}
-
-	@container app (inline-size >= 720px) {
-		.session-overlay {
-			inset-block: 5dvh;
-			inset-inline-start: var(--side-nav-width);
-			inset-inline-end: 0;
-			margin-inline: auto;
-			inline-size: min(580px, calc(100dvw - var(--side-nav-width) - var(--space-8)));
-			block-size: 90dvh;
-			max-block-size: 90dvh;
-			border-radius: var(--r-2xl);
-			border: 1px solid var(--color-border);
-			box-shadow: var(--shadow-lg);
-		}
-	}
-
 	.session-overlay__inner {
 		display: flex;
 		flex-direction: column;
