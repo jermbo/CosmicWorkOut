@@ -46,7 +46,9 @@
 
 	let viewingProgram = $derived(disciplinePrograms.find((p) => p.id === viewingProgramId));
 
-	let viewingIsActive = $derived(viewingProgramId === programStore.activeProgramFor(disciplineId)?.id);
+	let viewingIsActive = $derived(
+		viewingProgramId ? programStore.isProgramActive(viewingProgramId) : false,
+	);
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
@@ -135,7 +137,7 @@
 
 	<div class="prog-list" role="list" aria-label="Available programs">
 		{#each disciplinePrograms as program (program.id)}
-			{@const isActive = program.id === programStore.activeProgramFor(disciplineId)?.id}
+			{@const isActive = programStore.isProgramActive(program.id)}
 			{@const isViewing = program.id === viewingProgramId}
 			<div
 				class="prog-card"
@@ -172,7 +174,7 @@
 					{#if isActive}
 						<button
 							class="prog-card__deactivate-btn"
-							onclick={() => programStore.deactivateProgram(program.disciplineId)}
+							onclick={() => programStore.deactivateProgram(program.id)}
 						>
 							Deactivate
 						</button>
@@ -214,7 +216,7 @@
 					{#if viewingIsActive}
 						<button
 							class="schedule__deactivate-btn"
-							onclick={() => programStore.deactivateProgram(disciplineId)}
+							onclick={() => programStore.deactivateProgram(viewingProgram!.id)}
 						>
 							Deactivate
 						</button>

@@ -17,30 +17,19 @@
 			: programStore.programs,
 	);
 
-	function switchTo(program: Program) {
+	function activate(program: Program) {
 		programStore.setActiveProgram(program.id);
-		onClose();
 	}
 
-	function deactivate() {
-		if (!disciplineId) return;
-		programStore.deactivateProgram(disciplineId);
-		onClose();
+	function pause(program: Program) {
+		programStore.deactivateProgram(program.id);
 	}
-
-	let activeId = $derived(
-		disciplineId
-			? programStore.activeProgramFor(disciplineId)?.id
-			: programStore.activeProgram?.id,
-	);
-
-	let hasActive = $derived(!!activeId);
 </script>
 
 <BottomSheet onclose={onClose} maxHeight="80dvh">
 	<div class="prog-sheet">
 		<div class="prog-sheet__header">
-			<h2 class="prog-sheet__title">Programs</h2>
+			<h2 class="prog-sheet__title">Plans</h2>
 			<button class="prog-sheet__close" onclick={onClose} aria-label="Close">
 				<svg
 					viewBox="0 0 24 24"
@@ -58,7 +47,7 @@
 
 		<div class="prog-sheet__list">
 			{#each programs as program (program.id)}
-				{@const isActive = program.id === activeId}
+				{@const isActive = programStore.isProgramActive(program.id)}
 				<div class="prog-row" class:prog-row--active={isActive}>
 					<div class="prog-row__info">
 						<div class="prog-row__name-row">
@@ -72,21 +61,13 @@
 						</span>
 					</div>
 					{#if isActive}
-						<button class="prog-row__deactivate-btn" onclick={deactivate}>Deactivate</button>
+						<button class="prog-row__deactivate-btn" onclick={() => pause(program)}>Pause</button>
 					{:else}
-						<button class="prog-row__action-btn" onclick={() => switchTo(program)}>Activate</button>
+						<button class="prog-row__action-btn" onclick={() => activate(program)}>Activate</button>
 					{/if}
 				</div>
 			{/each}
 		</div>
-
-		{#if disciplineId && hasActive}
-			<div class="prog-sheet__deactivate-hint">
-				<button class="prog-sheet__deactivate-link" onclick={deactivate}>
-					Turn off {disciplineId === 'bellydance' ? 'belly dance' : disciplineId} entirely
-				</button>
-			</div>
-		{/if}
 
 		<div class="prog-sheet__footer">
 			<button class="prog-sheet__new-btn" onclick={onCreateNew}>
@@ -101,7 +82,7 @@
 					<line x1="12" y1="5" x2="12" y2="19" />
 					<line x1="5" y1="12" x2="19" y2="12" />
 				</svg>
-				Create new program
+				Create new plan
 			</button>
 		</div>
 	</div>
@@ -216,12 +197,6 @@
 		font-weight: 600;
 		color: var(--color-text-secondary);
 		flex-shrink: 0;
-		transition: color var(--duration-fast) var(--ease-out);
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: default;
-		}
 	}
 
 	.prog-row__deactivate-btn {
@@ -238,24 +213,6 @@
 		&:hover {
 			color: var(--color-red);
 			border-color: color-mix(in srgb, var(--color-red) 40%, var(--color-border));
-		}
-	}
-
-	.prog-sheet__deactivate-hint {
-		padding-inline: var(--space-5);
-		padding-block-start: var(--space-3);
-		text-align: center;
-	}
-
-	.prog-sheet__deactivate-link {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
-		text-decoration: underline;
-		text-underline-offset: 2px;
-
-		&:hover {
-			color: var(--color-text-secondary);
 		}
 	}
 
@@ -276,9 +233,6 @@
 		font-size: 0.9375rem;
 		font-weight: 600;
 		color: var(--color-text-secondary);
-		transition:
-			border-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
 
 		svg {
 			inline-size: 18px;

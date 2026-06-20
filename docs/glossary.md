@@ -48,7 +48,13 @@ Strength and Belly Dance are both Disciplines. Adding a third structured practic
 
 ### Practice 🟡
 
-The **UI surface and bottom-nav destination** where you do a guided session — the screen formerly labeled "Workout." It is Discipline-agnostic: on a strength day it opens the strength session, on a dance day the dance session, and when both are available it lets you choose. "Practice" is a *label and a route*, **not** a data entity — there is no `Practice` type. The underlying data is always a Discipline's Program → Routine → Session.
+The **bottom-nav destination** and page shell for guided sessions. Practice is organized as:
+
+- **Practice groups** — broad buckets like Workout and Dance (UI config, not stored in IndexedDB).
+- **Plans** — multi-week Programs the user activates. Many plans can be active at once.
+- **Disciplines** — the data-model layer (strength, bellydance) that powers logging engines inside each group.
+
+Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
 
 ### Section 🟡
 

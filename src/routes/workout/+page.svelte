@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -16,9 +17,31 @@
 
 	let contextDate = $derived(loggingContext.date);
 
-	let sessionForDate = $derived(programStore.sessionForDate(contextDate));
-	let suggestedWorkout = $derived(programStore.suggestedRoutineInCurrentWeek);
-	let weekWorkouts = $derived(programStore.routinesForCurrentWeek);
+	let programId = $derived(
+		page.url.searchParams.get('program') ??
+			programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ??
+			null,
+	);
+	let viewingProgram = $derived(programId ? programStore.programById(programId) : null);
+
+	let sessionForDate = $derived(
+		programId
+			? programStore.sessionForProgramDate(programId, contextDate)
+			: programStore.sessionForDate(contextDate),
+	);
+	let suggestedWorkout = $derived(
+		programId
+			? programStore.suggestedRoutineInCurrentWeekForProgram(programId)
+			: programStore.suggestedRoutineInCurrentWeek,
+	);
+	let weekWorkouts = $derived(
+		programId
+			? programStore.routinesForCurrentWeekForProgram(programId)
+			: programStore.routinesForCurrentWeek,
+	);
+	let isProgramComplete = $derived(
+		programId ? programStore.isProgramCompleteForProgram(programId) : programStore.isProgramComplete,
+	);
 
 	let selectedWorkout = $derived.by(() => {
 		if (loggingContext.workoutId) {
@@ -36,7 +59,7 @@
 
 	async function doStartSession() {
 		const workout = selectedWorkout;
-		const program = programStore.activeProgram;
+		const program = viewingProgram;
 		if (!workout || !program) return;
 		await sessionStore.start(workout, program, programStore.itemMap, { date: contextDate });
 	}
@@ -79,17 +102,17 @@
 		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
 			<div class="workout-page__spinner"></div>
 		</div>
-	{:else if programStore.isProgramComplete}
+	{:else if isProgramComplete}
 		<div class="workout-complete">
 			<div class="workout-complete__icon" aria-hidden="true">🎉</div>
-			<h2 class="workout-complete__title">{programStore.activeProgram?.name ?? 'Program'} complete!</h2>
+			<h2 class="workout-complete__title">{viewingProgram?.name ?? 'Program'} complete!</h2>
 			<p class="workout-complete__body">You finished every session. Time for something new.</p>
 			<button class="workout-complete__cta" onclick={() => (showProgramSelect = true)}> Choose a new program </button>
 		</div>
-	{:else if !programStore.activeProgram}
+	{:else if !viewingProgram}
 		<div class="workout-page__no-program">
-			<p>No program active.</p>
-			<button class="workout-page__choose-btn" onclick={() => (showProgramSelect = true)}> Choose a program </button>
+			<p>No plan selected.</p>
+			<a href="/practice/workout" class="workout-page__choose-btn"> Choose a plan </a>
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<!-- Session logged for this date, not currently editing -->
@@ -148,6 +171,7 @@
 			showProgramSelect = false;
 			showCreateProgram = true;
 		}}
+		disciplineId={STRENGTH_DISCIPLINE_ID}
 	/>
 {/if}
 

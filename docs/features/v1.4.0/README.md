@@ -19,7 +19,8 @@ A belly dance session should feel as familiar as a strength session — rotating
 - **Wipe and re-seed — no data migration.** The app has no users yet (pre-beta), so we reset IndexedDB and re-seed both Disciplines rather than writing a migration. Clean end state, cheap.
 - **Cardio/sports do _not_ become Disciplines.** Running, biking, pickleball, swimming stay on the **Activity** quick-log path. The litmus test (see Glossary): _guided routine → Discipline; just record it → Activity type._
 - **Rotating routines A / B / C** — unchanged linear progression: `completedSessionCount % routineCount`, now a Discipline-level behavior.
-- **One active program _per Discipline_** — strength and belly dance can be active concurrently; the user runs them on whatever days they choose (no enforced schedule). Active-program tracking moves from a single global key to one keyed per Discipline.
+- **Practice groups and plans** — Workout and Dance are UI groups; users activate individual plans (Programs). Many plans can be active at once; nothing is preselected on first launch. See [US-021](./US-021-practice-groups-plans.md).
+- **One active program _per Discipline_** — *(superseded by US-021)* strength and belly dance can be active concurrently…
 - **Count-driven, no periodization** — progression stays count-based, not calendar-based, and there is no auto load-progression engine. Weight carries forward via the existing last-used prefill and is bumped manually. (Locked in [US-015](./US-015-discipline-engine-foundation.md#decisions--non-goals-locked).)
 - **Hybrid item library** — built-in seed items plus user-created custom items, scoped per Discipline. Strength exercises and belly dance moves are both **Items**.
 - **Item tags** — each Item has a **section/type** (warm-up, conditioning, move, cool-down) and **focus** tags (hips, core, arms…).
@@ -58,6 +59,7 @@ Implement in order — each story builds on the previous.
 | [US-018](./US-018-practice-hub-navigation.md)         | Practice Hub & Navigation                   | ✅ Built | US-017     |
 | [US-019](./US-019-dance-session-flow.md)              | Dance Session Flow                          | ✅ Built | US-018     |
 | [US-020](./US-020-practice-streaks-calendar.md)       | Cross-Discipline Streaks & Calendar History | ✅ Built | US-019     |
+| [US-021](./US-021-practice-groups-plans.md)           | Practice Groups & Plans                     | 🟡 Built | US-018     |
 
 ---
 

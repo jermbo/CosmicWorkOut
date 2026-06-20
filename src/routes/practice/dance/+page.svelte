@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -15,11 +16,28 @@
 	const todayStr = todayIso();
 
 	let contextDate = $derived(loggingContext.date);
-	let activeProgram = $derived(programStore.activeProgramFor(disciplineId));
+	let programId = $derived(
+		page.url.searchParams.get('program') ??
+			programStore.activeProgramFor(disciplineId)?.id ??
+			null,
+	);
+	let activeProgram = $derived(programId ? programStore.programById(programId) : null);
 
-	let sessionForDate = $derived(programStore.sessionForDisciplineDate(disciplineId, contextDate));
-	let suggestedRoutine = $derived(programStore.suggestedRoutineInCurrentWeekFor(disciplineId));
-	let weekRoutines = $derived(programStore.routinesForCurrentWeekFor(disciplineId));
+	let sessionForDate = $derived(
+		programId
+			? programStore.sessionForProgramDate(programId, contextDate)
+			: programStore.sessionForDisciplineDate(disciplineId, contextDate),
+	);
+	let suggestedRoutine = $derived(
+		programId
+			? programStore.suggestedRoutineInCurrentWeekForProgram(programId)
+			: programStore.suggestedRoutineInCurrentWeekFor(disciplineId),
+	);
+	let weekRoutines = $derived(
+		programId
+			? programStore.routinesForCurrentWeekForProgram(programId)
+			: programStore.routinesForCurrentWeekFor(disciplineId),
+	);
 
 	let selectedRoutine = $derived.by(() => {
 		if (loggingContext.workoutId) {

@@ -4,9 +4,10 @@ import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
 import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
+import { practiceGroups, practiceGroupById } from '$lib/practice';
 
-// Per-Discipline active program: disciplineId → programId. Replaces the legacy
-// single 'cwout:activeProgramId' so strength and belly dance can be active at once.
+// Active plans: many program ids may be active at once. Replaces the legacy
+// per-discipline map (disciplineId → one programId).
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
 const LEGACY_ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
@@ -16,8 +17,7 @@ class ProgramStore {
 	programs = $state<Program[]>([]);
 	items = $state<Item[]>([]);
 	sessions = $state<Session[]>([]);
-	// disciplineId → active programId
-	activeProgramIds = $state<Record<string, string>>({});
+	activeProgramIds = $state<string[]>([]);
 	loaded = $state(false);
 
 	itemMap = $derived.by(() => {
@@ -39,30 +39,75 @@ class ProgramStore {
 	// ── Per-Discipline accessors ────────────────────────────────────
 	// These read $state, so they stay reactive when called from $derived or markup.
 
+	isProgramActive(programId: string): boolean {
+		return this.activeProgramIds.includes(programId);
+	}
+
+	activePrograms = $derived.by(() =>
+		this.activeProgramIds
+			.map((id) => this.programs.find((p) => p.id === id))
+			.filter((p): p is Program => !!p),
+	);
+
+	activeProgramsForGroup(groupId: string): Program[] {
+		const group = practiceGroupById(groupId);
+		if (!group) return [];
+		return this.activePrograms.filter((p) => group.disciplineIds.includes(p.disciplineId));
+	}
+
+	isGroupActive(groupId: string): boolean {
+		return this.activeProgramsForGroup(groupId).length > 0;
+	}
+
+	activeGroups = $derived(practiceGroups.filter((g) => this.isGroupActive(g.id)));
+
+	activeProgramsForDiscipline(disciplineId: string): Program[] {
+		return this.activePrograms.filter((p) => p.disciplineId === disciplineId);
+	}
+
+	/** First active plan for a discipline — legacy default for single-plan screens. */
 	activeProgramFor(disciplineId: string): Program | null {
-		const id = this.activeProgramIds[disciplineId];
-		if (!id) return null;
-		return this.programs.find((p) => p.id === id) ?? null;
+		return this.activeProgramsForDiscipline(disciplineId)[0] ?? null;
+	}
+
+	programById(programId: string): Program | undefined {
+		return this.programs.find((p) => p.id === programId);
 	}
 
 	programsForDiscipline(disciplineId: string): Program[] {
 		return this.programs.filter((p) => p.disciplineId === disciplineId);
 	}
 
-	allRoutinesFor(disciplineId: string): Routine[] {
-		const program = this.activeProgramFor(disciplineId);
+	allRoutinesForProgram(programId: string): Routine[] {
+		const program = this.programById(programId);
 		if (!program) return [];
 		return program.weeks.flatMap((w) => w.routines);
 	}
 
-	sessionsForDiscipline(disciplineId: string): Session[] {
+	allRoutinesFor(disciplineId: string): Routine[] {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return [];
-		return this.sessions.filter((s) => s.programId === program.id);
+		return this.allRoutinesForProgram(program.id);
+	}
+
+	sessionsForProgram(programId: string): Session[] {
+		return this.sessions.filter((s) => s.programId === programId);
+	}
+
+	sessionsForDiscipline(disciplineId: string): Session[] {
+		const activeIds = new Set(this.activeProgramsForDiscipline(disciplineId).map((p) => p.id));
+		return this.sessions.filter((s) => activeIds.has(s.programId) || s.disciplineId === disciplineId);
+	}
+
+	completedCountForProgram(programId: string): number {
+		return this.sessionsForProgram(programId).length;
 	}
 
 	completedCountFor(disciplineId: string): number {
-		return this.sessionsForDiscipline(disciplineId).length;
+		return this.activeProgramsForDiscipline(disciplineId).reduce(
+			(n, p) => n + this.completedCountForProgram(p.id),
+			0,
+		);
 	}
 
 	weekStreakFor(disciplineId: string): number {
@@ -82,38 +127,62 @@ class ProgramStore {
 	);
 
 	isDisciplineActive(disciplineId: string): boolean {
-		return this.activeProgramIds[disciplineId] !== undefined;
+		return this.activeProgramsForDiscipline(disciplineId).length > 0;
 	}
 
 	activeDisciplines = $derived(disciplines.filter((d) => this.isDisciplineActive(d.id)));
 
+	isProgramCompleteForProgram(programId: string): boolean {
+		const program = this.programById(programId);
+		if (!program) return false;
+		const total = program.durationWeeks * program.daysPerWeek;
+		return total > 0 && this.completedCountForProgram(programId) >= total;
+	}
+
 	isProgramCompleteFor(disciplineId: string): boolean {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return false;
-		const total = program.durationWeeks * program.daysPerWeek;
-		return total > 0 && this.completedCountFor(disciplineId) >= total;
+		return this.isProgramCompleteForProgram(program.id);
+	}
+
+	currentWeekForProgram(programId: string): number {
+		const program = this.programById(programId);
+		if (!program) return 1;
+		return Math.min(
+			Math.floor(this.completedCountForProgram(programId) / program.daysPerWeek) + 1,
+			program.durationWeeks,
+		);
 	}
 
 	currentWeekFor(disciplineId: string): number {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return 1;
-		return Math.min(
-			Math.floor(this.completedCountFor(disciplineId) / program.daysPerWeek) + 1,
-			program.durationWeeks,
-		);
+		return this.currentWeekForProgram(program.id);
+	}
+
+	currentLetterForProgram(programId: string): string {
+		const program = this.programById(programId);
+		if (!program) return 'A';
+		const posInWeek = this.completedCountForProgram(programId) % program.daysPerWeek;
+		return String.fromCharCode(65 + posInWeek);
 	}
 
 	currentLetterFor(disciplineId: string): string {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return 'A';
-		const posInWeek = this.completedCountFor(disciplineId) % program.daysPerWeek;
-		return String.fromCharCode(65 + posInWeek);
+		return this.currentLetterForProgram(program.id);
+	}
+
+	todaysRoutineForProgram(programId: string): Routine | null {
+		const all = this.allRoutinesForProgram(programId);
+		if (all.length === 0) return null;
+		return all[this.completedCountForProgram(programId) % all.length];
 	}
 
 	todaysRoutineFor(disciplineId: string): Routine | null {
-		const all = this.allRoutinesFor(disciplineId);
-		if (all.length === 0) return null;
-		return all[this.completedCountFor(disciplineId) % all.length];
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return null;
+		return this.todaysRoutineForProgram(program.id);
 	}
 
 	// ── Strength-facing convenience (existing UI consumes these) ────
@@ -143,11 +212,11 @@ class ProgramStore {
 		return this.suggestedRoutineInCurrentWeekFor(STRENGTH_DISCIPLINE_ID);
 	});
 
-	suggestedRoutineInCurrentWeekFor(disciplineId: string): Routine | null {
-		const program = this.activeProgramFor(disciplineId);
+	suggestedRoutineInCurrentWeekForProgram(programId: string): Routine | null {
+		const program = this.programById(programId);
 		if (!program) return null;
-		const weekRoutines = program.weeks[this.currentWeekFor(disciplineId) - 1]?.routines ?? [];
-		const suggested = this.todaysRoutineFor(disciplineId);
+		const weekRoutines = program.weeks[this.currentWeekForProgram(programId) - 1]?.routines ?? [];
+		const suggested = this.todaysRoutineForProgram(programId);
 		if (weekRoutines.length === 0) return null;
 		if (!suggested) return weekRoutines[0];
 		const byLetter = weekRoutines.find((r) => r.letter === suggested.letter);
@@ -156,11 +225,23 @@ class ProgramStore {
 		return byName ?? weekRoutines[0];
 	}
 
+	suggestedRoutineInCurrentWeekFor(disciplineId: string): Routine | null {
+		const program = this.activeProgramFor(disciplineId);
+		if (!program) return null;
+		return this.suggestedRoutineInCurrentWeekForProgram(program.id);
+	}
+
+	routinesForCurrentWeekForProgram(programId: string): Routine[] {
+		const program = this.programById(programId);
+		if (!program) return [];
+		const week = program.weeks[this.currentWeekForProgram(programId) - 1];
+		return week?.routines ?? [];
+	}
+
 	routinesForCurrentWeekFor(disciplineId: string): Routine[] {
 		const program = this.activeProgramFor(disciplineId);
 		if (!program) return [];
-		const week = program.weeks[this.currentWeekFor(disciplineId) - 1];
-		return week?.routines ?? [];
+		return this.routinesForCurrentWeekForProgram(program.id);
 	}
 
 	// Unique routine templates from week 1 (canonical A/B/C definitions)
@@ -189,44 +270,38 @@ class ProgramStore {
 		this.loaded = true;
 	}
 
-	// Read the per-Discipline active-program map and drop stale ids. Does not
-	// auto-activate every Discipline — the user opts in per Discipline. On a
-	// completely fresh install (no stored map, no legacy key), strength alone
-	// defaults active so the original workout flow isn't empty.
-	private resolveActiveProgramIds(programs: Program[]): Record<string, string> {
-		const ids: Record<string, string> = {};
-		let hadPriorSelection = false;
+	// Read active plan ids and drop stale entries. Nothing is preselected on a fresh
+	// install — the user opts in via Practice.
+	private resolveActiveProgramIds(programs: Program[]): string[] {
+		const valid = new Set(programs.map((p) => p.id));
+		const ids: string[] = [];
 
 		const stored = localStorage.getItem(ACTIVE_PROGRAMS_KEY);
 		if (stored) {
-			hadPriorSelection = true;
 			try {
-				const parsed = JSON.parse(stored) as Record<string, string>;
-				for (const [disciplineId, programId] of Object.entries(parsed)) {
-					if (programs.some((p) => p.id === programId)) ids[disciplineId] = programId;
+				const parsed = JSON.parse(stored) as unknown;
+				if (Array.isArray(parsed)) {
+					for (const id of parsed) {
+						if (typeof id === 'string' && valid.has(id) && !ids.includes(id)) ids.push(id);
+					}
+				} else if (parsed && typeof parsed === 'object') {
+					for (const programId of Object.values(parsed as Record<string, string>)) {
+						if (valid.has(programId) && !ids.includes(programId)) ids.push(programId);
+					}
 				}
 			} catch {
-				// ignore malformed map
+				// ignore malformed storage
 			}
 		} else {
 			const legacy = localStorage.getItem(LEGACY_ACTIVE_PROGRAM_KEY);
-			const legacyProgram = legacy ? programs.find((p) => p.id === legacy) : undefined;
-			if (legacyProgram) {
-				ids[legacyProgram.disciplineId] = legacyProgram.id;
-				hadPriorSelection = true;
-			}
-		}
-
-		if (!hadPriorSelection && Object.keys(ids).length === 0) {
-			const strengthDefault = programs.find((p) => p.disciplineId === STRENGTH_DISCIPLINE_ID);
-			if (strengthDefault) ids[STRENGTH_DISCIPLINE_ID] = strengthDefault.id;
+			if (legacy && valid.has(legacy)) ids.push(legacy);
 		}
 
 		this.persistActiveProgramIds(ids);
 		return ids;
 	}
 
-	private persistActiveProgramIds(ids: Record<string, string> = this.activeProgramIds): void {
+	private persistActiveProgramIds(ids: string[] = this.activeProgramIds): void {
 		localStorage.setItem(ACTIVE_PROGRAMS_KEY, JSON.stringify(ids));
 	}
 
@@ -289,10 +364,14 @@ class ProgramStore {
 		};
 	}
 
+	sessionForProgramDate(programId: string, date: string): Session | null {
+		return this.sessions.find((s) => s.date === date && s.programId === programId) ?? null;
+	}
+
 	sessionForDisciplineDate(disciplineId: string, date: string): Session | null {
-		const program = this.activeProgramFor(disciplineId);
-		if (program) {
-			return this.sessions.find((s) => s.date === date && s.programId === program.id) ?? null;
+		for (const program of this.activeProgramsForDiscipline(disciplineId)) {
+			const session = this.sessionForProgramDate(program.id, date);
+			if (session) return session;
 		}
 		return this.sessions.find((s) => s.date === date && s.disciplineId === disciplineId) ?? null;
 	}
@@ -396,17 +475,14 @@ class ProgramStore {
 	}
 
 	setActiveProgram(programId: string): void {
-		const found = this.programs.find((p) => p.id === programId);
-		if (!found) return;
-		this.activeProgramIds = { ...this.activeProgramIds, [found.disciplineId]: programId };
+		if (!this.programs.some((p) => p.id === programId) || this.isProgramActive(programId)) return;
+		this.activeProgramIds = [...this.activeProgramIds, programId];
 		this.persistActiveProgramIds();
 	}
 
-	deactivateProgram(disciplineId: string): void {
-		if (!this.activeProgramIds[disciplineId]) return;
-		const ids = { ...this.activeProgramIds };
-		delete ids[disciplineId];
-		this.activeProgramIds = ids;
+	deactivateProgram(programId: string): void {
+		if (!this.isProgramActive(programId)) return;
+		this.activeProgramIds = this.activeProgramIds.filter((id) => id !== programId);
 		this.persistActiveProgramIds();
 	}
 
@@ -562,15 +638,8 @@ class ProgramStore {
 
 		// If the deleted program was active for its Discipline, pick another of the
 		// same Discipline, or clear the slot if none remain.
-		if (this.activeProgramIds[program.disciplineId] === id) {
-			const next = this.programs.find((p) => p.disciplineId === program.disciplineId) ?? null;
-			const ids = { ...this.activeProgramIds };
-			if (next) {
-				ids[program.disciplineId] = next.id;
-			} else {
-				delete ids[program.disciplineId];
-			}
-			this.activeProgramIds = ids;
+		if (this.isProgramActive(id)) {
+			this.activeProgramIds = this.activeProgramIds.filter((pid) => pid !== id);
 			this.persistActiveProgramIds();
 		}
 	}
