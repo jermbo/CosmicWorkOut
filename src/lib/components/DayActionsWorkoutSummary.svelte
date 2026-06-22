@@ -9,7 +9,9 @@
 </script>
 
 <div class="day-actions-summary" class:day-actions-summary--dance={variant === 'dance'}>
-	<span class="day-actions-summary__label">{variant === 'dance' ? 'Dance logged' : 'Workout logged'}</span>
+	<span class="day-actions-summary__label">
+		{#if variant === 'dance'}Dance logged{:else}Workout logged{/if}
+	</span>
 	<span class="day-actions-summary__value">{workoutName}</span>
 	{#if durationLabel}
 		<span class="day-actions-summary__meta">{durationLabel}</span>

@@ -13,7 +13,6 @@
 
 	let contextDate = $derived(loggingContext.date);
 
-	// Smart step: minutes always 5; count uses goal/10 rounded to a nice number
 	function getStep(habit: Habit): number {
 		if (habit.type === 'minutes') return 5;
 		const goal = habit.dailyGoal ?? 10;
@@ -25,15 +24,27 @@
 		return formatMoodValue(value);
 	}
 
-	const MOOD_SCALE_ASC = [...MOOD_SCALE].reverse(); // -5 → +5 for left-to-right display
+	const MOOD_SCALE_ASC = [...MOOD_SCALE].reverse();
 
 	let moodHabit = $derived(habitStore.habits.find((h) => h.type === 'mood' && h.active));
 
 	let currentMoodValue = $derived.by(() => {
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, contextDate);
-		return log !== undefined ? log.value : null;
+		if (log !== undefined) return log.value;
+		return null;
 	});
+
+	function signPrefix(value: number | null): string {
+		if (value !== null && value > 0) return '+';
+		return '';
+	}
+
+	function exactUnit(): string {
+		if (!exactTarget) return '';
+		if (exactTarget.type === 'minutes') return minuteUnitLabel();
+		return exactTarget.unit || '';
+	}
 
 	async function setMoodDirect(value: number) {
 		if (!moodHabit) return;
@@ -60,7 +71,6 @@
 		await habitStore.toggle(habit.id, contextDate);
 	}
 
-	// Exact-value dialog
 	let exactTarget = $state<Habit | null>(null);
 
 	function openExact(habit: Habit) {
@@ -96,7 +106,7 @@
 						aria-live="polite"
 					>
 						{getMoodLabel(currentMoodValue)}
-						<span class="mood-section__score">{currentMoodValue > 0 ? '+' : ''}{currentMoodValue}</span>
+						<span class="mood-section__score">{signPrefix(currentMoodValue)}{currentMoodValue}</span>
 					</span>
 				{:else}
 					<span class="mood-section__empty" aria-live="polite">Select below</span>
@@ -119,9 +129,9 @@
 							value={item.value}
 							checked={currentMoodValue === item.value}
 							onchange={() => setMoodDirect(item.value)}
-							aria-label="{item.label} ({item.value > 0 ? '+' : ''}{item.value})"
+							aria-label="{item.label} ({signPrefix(item.value)}{item.value})"
 						/>
-						{item.value > 0 ? '+' : ''}{item.value}
+						{signPrefix(item.value)}{item.value}
 					</label>
 				{/each}
 			</fieldset>
@@ -155,7 +165,7 @@
 {#if exactTarget}
 	<ValueDialog
 		title={exactTarget.name}
-		unit={exactTarget.type === 'minutes' ? minuteUnitLabel() : exactTarget.unit || ''}
+		unit={exactUnit()}
 		initialValue={habitStore.valueFor(exactTarget, contextDate)}
 		onsave={saveExact}
 		onclose={() => (exactTarget = null)}
@@ -163,7 +173,6 @@
 {/if}
 
 <style>
-	/* ── Empty state ── */
 	.empty-state {
 		display: flex;
 		flex-direction: column;
@@ -179,14 +188,12 @@
 		}
 	}
 
-	/* ── Grid ── */
 	.habit-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
 		gap: var(--space-4);
 	}
 
-	/* ── Mood section ── */
 	.mood-section {
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);

@@ -84,11 +84,11 @@ Reference tokens also exist in the [inspiration package](../_inspiration/packet/
 All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db/database.ts` — **not Dexie.js**.
 
 ```typescript
-// DB name: 'cosmic-workout', version 1
-// Stores: exercises, programs, sessions (indexed by date), exerciseLastUsed
+// DB name: 'cosmic-workout', version 7
+// Stores: items, programs, sessions (indexed by date), itemLastUsed, activities, habits, habitLogs
 ```
 
-Built-in exercises are upserted on every boot (so new fields land on old records). Programs seed only on first run.
+Built-in items and programs are upserted on every boot (so new fields land on old records). Habits seed only on first run.
 
 ---
 
@@ -106,11 +106,11 @@ See [State Management](../implementation/state.md).
 
 ---
 
-## Offline / PWA — Not Yet Implemented
+## Offline / PWA — Implemented
 
-Service worker, Workbox, and web app manifest are **planned** but not built. The app works offline after first load in a browser tab (assets cached by the browser), but there is no installable PWA yet.
+Installable PWA via SvelteKit's **built-in service worker** (`src/service-worker.ts` using the `$service-worker` module) plus a web app manifest — **no Workbox**, to keep the dependency surface minimal. The SW precaches the app shell (cache-first) and serves a cached fallback for offline navigations. The build uses `@sveltejs/adapter-static` with an `index.html` SPA fallback.
 
-See [Offline Strategy](offline-strategy.md) for the target approach.
+See [Offline Strategy](offline-strategy.md) for the caching and install details.
 
 ---
 

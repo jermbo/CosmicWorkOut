@@ -70,19 +70,18 @@
 		return 'future';
 	}
 
-	// Habit heat map: completion ratio for a date (0..1)
 	function habitRatio(dateStr: string): number {
 		return habitStore.completionRatioForDate(dateStr);
 	}
 
-	// Mood for a date (first mood habit log found)
 	function moodForDate(dateStr: string): { label: string; value: number } | null {
 		const moodHabit = habitStore.habits.find((h) => h.type === 'mood');
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
 		if (log === undefined) return null;
 		const label = formatMoodValue(log.value);
-		return label === '—' ? null : { label, value: log.value };
+		if (label === '—') return null;
+		return { label, value: log.value };
 	}
 
 	function prevMonth() {
@@ -97,7 +96,10 @@
 		viewDate = d;
 	}
 
-	let dayActionsSessions = $derived(dayActionsDate ? sessionsOnDate(dayActionsDate) : []);
+	let dayActionsSessions = $derived.by(() => {
+		if (dayActionsDate) return sessionsOnDate(dayActionsDate);
+		return [];
+	});
 	let dayActionsStrengthSession = $derived(
 		dayActionsSessions.find((s) => s.disciplineId === STRENGTH_DISCIPLINE_ID) ?? null,
 	);
@@ -105,13 +107,40 @@
 		dayActionsSessions.find((s) => s.disciplineId === BELLYDANCE_DISCIPLINE_ID) ?? null,
 	);
 
-	let dayActionsHasHabits = $derived(
-		dayActionsDate ? habitStore.logsForDate(dayActionsDate).length > 0 : false,
-	);
+	let dayActionsHasHabits = $derived.by(() => {
+		if (dayActionsDate) return habitStore.logsForDate(dayActionsDate).length > 0;
+		return false;
+	});
 
-	let dayActionsHasActivities = $derived(
-		dayActionsDate ? (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0 : false,
-	);
+	let dayActionsHasActivities = $derived.by(() => {
+		if (dayActionsDate) return (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0;
+		return false;
+	});
+
+	function ratioFor(status: string, date: string): number {
+		if (status !== 'future') return habitRatio(date);
+		return 0;
+	}
+
+	function moodFor(status: string, date: string) {
+		if (status !== 'future') return moodForDate(date);
+		return null;
+	}
+
+	let viewStrengthHandler = $derived.by(() => {
+		if (dayActionsStrengthSession) return () => openSessionDetails(dayActionsStrengthSession!);
+		return undefined;
+	});
+
+	let viewDanceHandler = $derived.by(() => {
+		if (dayActionsDanceSession) return () => openSessionDetails(dayActionsDanceSession!);
+		return undefined;
+	});
+
+	let viewHabitsHandler = $derived.by(() => {
+		if (dayActionsHasHabits) return openHabitHistory;
+		return undefined;
+	});
 
 	function handleDayTap(dateStr: string) {
 		loggingContext.setDate(dateStr);
@@ -140,7 +169,6 @@
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));
 
-	// Month habit stats
 	let monthHabitDays = $derived.by(() => {
 		const totalDays = daysInMonth(viewDate);
 		let loggedDays = 0;
@@ -173,7 +201,6 @@
 		<h1 class="calendar-page__title">History</h1>
 	</header>
 
-	<!-- Stats -->
 	<div class="calendar-page__stats">
 		<div class="cal-stat">
 			<span class="cal-stat__value">{monthSessions.length}</span>
@@ -193,7 +220,6 @@
 		</div>
 	</div>
 
-	<!-- Calendar grid -->
 	<div class="calendar-month">
 		<div class="calendar-month__nav">
 			<button class="calendar-month__nav-btn" onclick={prevMonth} aria-label="Previous month">
@@ -225,8 +251,8 @@
 						{@const hasSession = hasStrength || hasDance}
 						{@const hasActivity = (activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
 						{@const tappable = status !== 'future'}
-						{@const ratio = status !== 'future' ? habitRatio(cell.date) : 0}
-						{@const mood = status !== 'future' ? moodForDate(cell.date) : null}
+						{@const ratio = ratioFor(status, cell.date)}
+						{@const mood = moodFor(status, cell.date)}
 						<button
 							class="calendar-day"
 							class:calendar-day--today={status === 'today'}
@@ -266,7 +292,6 @@
 		</div>
 	</div>
 
-	<!-- Legend -->
 	<div class="calendar-legend" aria-label="Legend">
 		<span class="cal-legend-item cal-legend-item--session">Strength</span>
 		<span class="cal-legend-item cal-legend-item--dance">Dance</span>
@@ -293,25 +318,19 @@
 		hasActivities={dayActionsHasActivities}
 		activities={activityStore.activitiesByDate.get(dayActionsDate) ?? []}
 		onClose={() => (dayActionsDate = null)}
-		onViewStrengthSession={dayActionsStrengthSession ? () => openSessionDetails(dayActionsStrengthSession!) : undefined}
-		onViewDanceSession={dayActionsDanceSession ? () => openSessionDetails(dayActionsDanceSession!) : undefined}
-		onViewHabits={dayActionsHasHabits ? openHabitHistory : undefined}
+		onViewStrengthSession={viewStrengthHandler}
+		onViewDanceSession={viewDanceHandler}
+		onViewHabits={viewHabitsHandler}
 		onEditActivity={handleEditActivity}
 	/>
 {/if}
 
 {#if habitHistoryDate}
-	<HabitHistorySheet
-		date={habitHistoryDate}
-		onClose={() => (habitHistoryDate = null)}
-	/>
+	<HabitHistorySheet date={habitHistoryDate} onClose={() => (habitHistoryDate = null)} />
 {/if}
 
 {#if editingActivity}
-	<ActivityLogSheet
-		editing={editingActivity}
-		onClose={() => (editingActivity = null)}
-	/>
+	<ActivityLogSheet editing={editingActivity} onClose={() => (editingActivity = null)} />
 {/if}
 
 <style>
@@ -380,7 +399,6 @@
 		letter-spacing: -0.02em;
 	}
 
-	/* Stats */
 	.calendar-page__stats {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
@@ -416,7 +434,6 @@
 		text-align: center;
 	}
 
-	/* Calendar */
 	.calendar-month {
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
@@ -501,7 +518,6 @@
 			background-color var(--duration-fast) var(--ease-out),
 			transform var(--duration-fast) var(--ease-out);
 
-		/* Habit heat map overlay */
 		&::before {
 			content: '';
 			position: absolute;
@@ -576,7 +592,6 @@
 		background: #f87171;
 	}
 
-	/* Legend */
 	.calendar-legend {
 		display: flex;
 		gap: var(--space-4);

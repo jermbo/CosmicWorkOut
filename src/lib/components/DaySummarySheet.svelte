@@ -79,7 +79,9 @@
 			<div class="day-summary__stat-sep" aria-hidden="true"></div>
 			<div class="day-summary__stat">
 				<span class="day-summary__stat-value">{session.items.length}</span>
-				<span class="day-summary__stat-label">{isDance ? 'Items' : 'Exercises'}</span>
+				<span class="day-summary__stat-label"
+					>{#if isDance}Items{:else}Exercises{/if}</span
+				>
 			</div>
 			{#if !isDance}
 				<div class="day-summary__stat-sep" aria-hidden="true"></div>
@@ -104,7 +106,8 @@
 									{:else if loggedEx.skipped}
 										Skipped
 									{:else if loggedEx.value != null}
-										{loggedEx.value} {loggedEx.measureMode === 'reps' ? 'reps' : 'sec'}
+										{loggedEx.value}
+										{#if loggedEx.measureMode === 'reps'}reps{:else}sec{/if}
 									{/if}
 								</span>
 							{:else}

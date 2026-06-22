@@ -3,11 +3,9 @@ import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
-import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
+import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
 import { practiceGroups, practiceGroupById } from '$lib/practice';
 
-// Active plans: many program ids may be active at once. Replaces the legacy
-// per-discipline map (disciplineId → one programId).
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
 const LEGACY_ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
 
@@ -36,17 +34,12 @@ class ProgramStore {
 		return this.items.filter((i) => i.disciplineId === disciplineId);
 	}
 
-	// ── Per-Discipline accessors ────────────────────────────────────
-	// These read $state, so they stay reactive when called from $derived or markup.
-
 	isProgramActive(programId: string): boolean {
 		return this.activeProgramIds.includes(programId);
 	}
 
 	activePrograms = $derived.by(() =>
-		this.activeProgramIds
-			.map((id) => this.programs.find((p) => p.id === id))
-			.filter((p): p is Program => !!p),
+		this.activeProgramIds.map((id) => this.programs.find((p) => p.id === id)).filter((p): p is Program => !!p),
 	);
 
 	activeProgramsForGroup(groupId: string): Program[] {
@@ -65,7 +58,6 @@ class ProgramStore {
 		return this.activePrograms.filter((p) => p.disciplineId === disciplineId);
 	}
 
-	/** First active plan for a discipline — legacy default for single-plan screens. */
 	activeProgramFor(disciplineId: string): Program | null {
 		return this.activeProgramsForDiscipline(disciplineId)[0] ?? null;
 	}
@@ -104,10 +96,7 @@ class ProgramStore {
 	}
 
 	completedCountFor(disciplineId: string): number {
-		return this.activeProgramsForDiscipline(disciplineId).reduce(
-			(n, p) => n + this.completedCountForProgram(p.id),
-			0,
-		);
+		return this.activeProgramsForDiscipline(disciplineId).reduce((n, p) => n + this.completedCountForProgram(p.id), 0);
 	}
 
 	weekStreakFor(disciplineId: string): number {
@@ -185,9 +174,6 @@ class ProgramStore {
 		return this.todaysRoutineForProgram(program.id);
 	}
 
-	// ── Strength-facing convenience (existing UI consumes these) ────
-	// US-018 generalizes Today to iterate Disciplines via the methods above.
-
 	activeProgram = $derived(this.activeProgramFor(STRENGTH_DISCIPLINE_ID));
 	allRoutines = $derived(this.allRoutinesFor(STRENGTH_DISCIPLINE_ID));
 	weekStreak = $derived(this.weekStreakFor(STRENGTH_DISCIPLINE_ID));
@@ -244,7 +230,6 @@ class ProgramStore {
 		return this.routinesForCurrentWeekForProgram(program.id);
 	}
 
-	// Unique routine templates from week 1 (canonical A/B/C definitions)
 	uniqueRoutines = $derived.by(() => {
 		const program = this.activeProgram;
 		if (!program || program.weeks.length === 0) {
@@ -270,8 +255,6 @@ class ProgramStore {
 		this.loaded = true;
 	}
 
-	// Read active plan ids and drop stale entries. Nothing is preselected on a fresh
-	// install — the user opts in via Practice.
 	private resolveActiveProgramIds(programs: Program[]): string[] {
 		const valid = new Set(programs.map((p) => p.id));
 		const ids: string[] = [];
@@ -290,7 +273,7 @@ class ProgramStore {
 					}
 				}
 			} catch {
-				// ignore malformed storage
+				ids.length = 0;
 			}
 		} else {
 			const legacy = localStorage.getItem(LEGACY_ACTIVE_PROGRAM_KEY);
@@ -394,8 +377,6 @@ class ProgramStore {
 		await this.refreshSessions();
 	}
 
-	// Save routine metadata + items across all weeks (matched by original name).
-	// Strength routines are single-section; items write into the lone section.
 	async saveRoutine(
 		originalName: string,
 		updates: { name: string; letter?: string; focus?: string; color?: RoutineColor; items: RoutineItem[] },
@@ -405,26 +386,22 @@ class ProgramStore {
 
 		const updatedWeeks = program.weeks.map((week) => ({
 			...week,
-			routines: week.routines.map((r) =>
-				r.name === originalName
-					? {
-							...r,
-							name: updates.name,
-							letter: updates.letter ?? r.letter,
-							focus: updates.focus ?? r.focus,
-							color: updates.color ?? r.color,
-							sections: singleSection(updates.items),
-						}
-					: r,
-			),
+			routines: week.routines.map((r) => {
+				if (r.name !== originalName) return r;
+				return {
+					...r,
+					name: updates.name,
+					letter: updates.letter ?? r.letter,
+					focus: updates.focus ?? r.focus,
+					color: updates.color ?? r.color,
+					sections: singleSection(updates.items),
+				};
+			}),
 		}));
 
 		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
-	// Save a multi-section routine (belly dance) across every week of a program,
-	// matched by the routine's original name. Sections carry their own bookend
-	// override flags (US-017); strength keeps the single-section saveRoutine above.
 	async saveRoutineSections(
 		programId: string,
 		originalName: string,
@@ -435,23 +412,21 @@ class ProgramStore {
 
 		const updatedWeeks = program.weeks.map((week) => ({
 			...week,
-			routines: week.routines.map((r) =>
-				r.name === originalName
-					? {
-							...r,
-							name: updates.name,
-							focus: updates.focus ?? r.focus,
-							color: updates.color ?? r.color,
-							sections: structuredClone(updates.sections),
-						}
-					: r,
-			),
+			routines: week.routines.map((r) => {
+				if (r.name !== originalName) return r;
+				return {
+					...r,
+					name: updates.name,
+					focus: updates.focus ?? r.focus,
+					color: updates.color ?? r.color,
+					sections: structuredClone(updates.sections),
+				};
+			}),
 		}));
 
 		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
-	// Add a brand-new routine to all weeks
 	async addRoutine(routine: Omit<Routine, 'id'>): Promise<void> {
 		const program = this.activeProgram;
 		if (!program) return;
@@ -471,7 +446,10 @@ class ProgramStore {
 			console.error('Failed to save program:', e);
 			throw e;
 		}
-		this.programs = this.programs.map((p) => (p.id === updated.id ? updated : p));
+		this.programs = this.programs.map((p) => {
+			if (p.id === updated.id) return updated;
+			return p;
+		});
 	}
 
 	setActiveProgram(programId: string): void {
@@ -518,7 +496,7 @@ class ProgramStore {
 		disciplineId?: string;
 	}): Promise<Program> {
 		const disciplineId = data.disciplineId ?? STRENGTH_DISCIPLINE_ID;
-		const defaultSections = disciplineId === STRENGTH_DISCIPLINE_ID ? singleSection([]) : emptySections(disciplineId);
+		const defaultSections = this.defaultSectionsFor(disciplineId);
 		const weeks: Week[] = Array.from({ length: data.durationWeeks }, (_, wi) => ({
 			weekNumber: wi + 1,
 			routines: data.routineTemplates.map((tmpl, i) => ({
@@ -554,9 +532,11 @@ class ProgramStore {
 		return program;
 	}
 
-	// Item management. Strength items default to the strength Discipline's single
-	// section + setsReps; dance (and future Disciplines) pass disciplineId, section,
-	// metric, and focus explicitly (US-016).
+	private defaultSectionsFor(disciplineId: string): RoutineSection[] {
+		if (disciplineId === STRENGTH_DISCIPLINE_ID) return singleSection([]);
+		return emptySections(disciplineId);
+	}
+
 	async addItem(
 		item: Omit<Item, 'id' | 'isBuiltIn' | 'disciplineId' | 'section' | 'metric'> &
 			Partial<Pick<Item, 'disciplineId' | 'section' | 'metric'>>,
@@ -586,7 +566,10 @@ class ProgramStore {
 			console.error('Failed to update item:', e);
 			throw e;
 		}
-		this.items = this.items.map((i) => (i.id === item.id ? item : i));
+		this.items = this.items.map((i) => {
+			if (i.id === item.id) return item;
+			return i;
+		});
 	}
 
 	isItemInUse(id: string): boolean {
@@ -636,8 +619,6 @@ class ProgramStore {
 
 		this.programs = this.programs.filter((p) => p.id !== id);
 
-		// If the deleted program was active for its Discipline, pick another of the
-		// same Discipline, or clear the slot if none remain.
 		if (this.isProgramActive(id)) {
 			this.activeProgramIds = this.activeProgramIds.filter((pid) => pid !== id);
 			this.persistActiveProgramIds();

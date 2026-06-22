@@ -18,27 +18,25 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let programId = $derived(
-		page.url.searchParams.get('program') ??
-			programStore.activeProgramFor(disciplineId)?.id ??
-			null,
+		page.url.searchParams.get('program') ?? programStore.activeProgramFor(disciplineId)?.id ?? null,
 	);
-	let activeProgram = $derived(programId ? programStore.programById(programId) : null);
+	let activeProgram = $derived.by(() => {
+		if (programId) return programStore.programById(programId);
+		return null;
+	});
 
-	let sessionForDate = $derived(
-		programId
-			? programStore.sessionForProgramDate(programId, contextDate)
-			: programStore.sessionForDisciplineDate(disciplineId, contextDate),
-	);
-	let suggestedRoutine = $derived(
-		programId
-			? programStore.suggestedRoutineInCurrentWeekForProgram(programId)
-			: programStore.suggestedRoutineInCurrentWeekFor(disciplineId),
-	);
-	let weekRoutines = $derived(
-		programId
-			? programStore.routinesForCurrentWeekForProgram(programId)
-			: programStore.routinesForCurrentWeekFor(disciplineId),
-	);
+	let sessionForDate = $derived.by(() => {
+		if (programId) return programStore.sessionForProgramDate(programId, contextDate);
+		return programStore.sessionForDisciplineDate(disciplineId, contextDate);
+	});
+	let suggestedRoutine = $derived.by(() => {
+		if (programId) return programStore.suggestedRoutineInCurrentWeekForProgram(programId);
+		return programStore.suggestedRoutineInCurrentWeekFor(disciplineId);
+	});
+	let weekRoutines = $derived.by(() => {
+		if (programId) return programStore.routinesForCurrentWeekForProgram(programId);
+		return programStore.routinesForCurrentWeekFor(disciplineId);
+	});
 
 	let selectedRoutine = $derived.by(() => {
 		if (loggingContext.workoutId) {
@@ -47,9 +45,7 @@
 		return suggestedRoutine;
 	});
 
-	let showSuggestedHint = $derived(
-		selectedRoutine && suggestedRoutine && selectedRoutine.id !== suggestedRoutine.id,
-	);
+	let showSuggestedHint = $derived(selectedRoutine && suggestedRoutine && selectedRoutine.id !== suggestedRoutine.id);
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
@@ -64,9 +60,7 @@
 
 		const itemCount = effectiveSections(program, routine).reduce((n, s) => n + s.items.length, 0);
 		if (itemCount === 0) {
-			toastStore.error(
-				'This routine has no moves yet. Activate “Belly Dance Foundations” or add items in Programs.',
-			);
+			toastStore.error('This routine has no moves yet. Activate “Belly Dance Foundations” or add items in Programs.');
 			return;
 		}
 
@@ -182,7 +176,7 @@
 					<p class="routine-preview__time">~{formatMinutes(selectedRoutine.estMin)}</p>
 				{/if}
 				<button class="routine-preview__start" onclick={startSession} disabled={starting} aria-busy={starting}>
-					{starting ? 'Starting…' : 'Start practice'}
+					{#if starting}Starting…{:else}Start practice{/if}
 				</button>
 			</article>
 		</div>
@@ -206,7 +200,7 @@
 {/if}
 
 {#if showCreateProgram}
-	<CreateProgramSheet disciplineId={disciplineId} onClose={() => (showCreateProgram = false)} />
+	<CreateProgramSheet {disciplineId} onClose={() => (showCreateProgram = false)} />
 {/if}
 
 {#if showStartConfirm}

@@ -9,12 +9,12 @@ so that Practice stays focused on what I actually use, without noise from paused
 
 ## Model
 
-| Term | Meaning |
-| --- | --- |
+| Term               | Meaning                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------ |
 | **Practice group** | A broad bucket like Workout or Dance. UI-only organization, not stored in IndexedDB. |
-| **Plan** | A multi-week Program the user activates. Many plans can be active at once. |
-| **Active plan** | A plan the user has turned on; it appears in Practice. |
-| **Inactive plan** | A plan that exists but is hidden from the main Practice flow. History is preserved. |
+| **Plan**           | A multi-week Program the user activates. Many plans can be active at once.           |
+| **Active plan**    | A plan the user has turned on; it appears in Practice.                               |
+| **Inactive plan**  | A plan that exists but is hidden from the main Practice flow. History is preserved.  |
 
 Disciplines (strength, bellydance) remain the data-model layer for logging engines. Practice groups sit above them for navigation.
 

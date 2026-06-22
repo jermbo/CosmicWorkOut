@@ -57,30 +57,20 @@
 		<section class="practice-empty">
 			<h2 class="practice-empty__title">Choose what you practice</h2>
 			<p class="practice-empty__body">
-				Nothing is turned on yet. Add a workout or dance plan when you're ready — you can pause or add more
-				anytime.
+				Nothing is turned on yet. Add a workout or dance plan when you're ready — you can pause or add more anytime.
 			</p>
-			<button class="practice-empty__btn" type="button" onclick={() => (showAddPractice = true)}>
-				Add practice
-			</button>
+			<button class="practice-empty__btn" type="button" onclick={() => (showAddPractice = true)}> Add practice </button>
 		</section>
 	{:else}
 		<div class="practice-page__toolbar">
-			<button class="practice-page__add" type="button" onclick={() => (showAddPractice = true)}>
-				Add practice
-			</button>
+			<button class="practice-page__add" type="button" onclick={() => (showAddPractice = true)}> Add practice </button>
 		</div>
 
 		<div class="practice-page__cards">
 			{#each programStore.activeGroups as group (group.id)}
 				{@const plans = programStore.activeProgramsForGroup(group.id)}
 				{@const info = groupSummary(group.id)}
-				<PracticeGroupCard
-					{group}
-					planCount={plans.length}
-					summary={info.summary}
-					meta={info.meta}
-				/>
+				<PracticeGroupCard {group} planCount={plans.length} summary={info.summary} meta={info.meta} />
 			{/each}
 		</div>
 	{/if}

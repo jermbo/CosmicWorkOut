@@ -5,11 +5,7 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { effectiveSections } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
-	import {
-		practiceGroupById,
-		sessionRouteForProgram,
-		programRouteForDiscipline,
-	} from '$lib/practice';
+	import { practiceGroupById, sessionRouteForProgram, programRouteForDiscipline } from '$lib/practice';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import HomeCard from '$lib/components/HomeCard.svelte';
 	import AddPracticeSheet from '$lib/components/AddPracticeSheet.svelte';
@@ -19,7 +15,26 @@
 	let contextDate = $derived(loggingContext.date);
 	let showAddPractice = $state(false);
 
-	let activePlans = $derived(group ? programStore.activeProgramsForGroup(group.id) : []);
+	let activePlans = $derived.by(() => {
+		if (group) return programStore.activeProgramsForGroup(group.id);
+		return [];
+	});
+
+	function variantForColor(color: string): 'dance' | 'workout' {
+		if (color === 'lavender') return 'dance';
+		return 'workout';
+	}
+
+	function planAriaLabel(programName: string, infoName: string | null): string {
+		if (infoName) return `${programName}: ${infoName}`;
+		return programName;
+	}
+
+	function planBadge(info: { live: boolean; done: boolean }): 'live' | 'done' | null {
+		if (info.live) return 'live';
+		if (info.done) return 'done';
+		return null;
+	}
 
 	function planMeta(programId: string) {
 		const program = programStore.programById(programId);
@@ -70,12 +85,8 @@
 		<PageHeader title={group.label} showBack backHref="/practice" />
 
 		<div class="group-page__toolbar">
-			<button class="group-page__add" type="button" onclick={() => (showAddPractice = true)}>
-				Add plan
-			</button>
-			<a class="group-page__manage" href={programRouteForDiscipline(group.disciplineIds[0])}>
-				Manage plans
-			</a>
+			<button class="group-page__add" type="button" onclick={() => (showAddPractice = true)}> Add plan </button>
+			<a class="group-page__manage" href={programRouteForDiscipline(group.disciplineIds[0])}> Manage plans </a>
 		</div>
 
 		{#if activePlans.length === 0}
@@ -87,16 +98,16 @@
 			<div class="group-page__plans">
 				{#each activePlans as program (program.id)}
 					{@const info = planMeta(program.id)}
-					{@const variant = group.color === 'lavender' ? 'dance' : 'workout'}
+					{@const variant = variantForColor(group.color)}
 					<div class="group-plan">
 						<HomeCard
 							href={sessionRouteForProgram(program)}
 							title={program.name}
-							ariaLabel="{program.name}{info.name ? ': ' + info.name : ''}"
+							ariaLabel={planAriaLabel(program.name, info.name)}
 							{variant}
 							done={info.done}
 							active={info.live}
-							badge={info.live ? 'live' : info.done ? 'done' : null}
+							badge={planBadge(info)}
 						>
 							{#snippet children()}
 								<p class="group-plan__name">{info.name}</p>

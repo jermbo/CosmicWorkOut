@@ -71,14 +71,12 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref             | Default       | Applied via                          |
-| ---------------- | ------------- | ------------------------------------ |
-| `accentColor`    | `#b2f042`     | `--color-accent` CSS var + ink color |
-| `loggingMode`    | `instant`     | SessionOverlay tap behavior          |
-| `completionFeel` | `full`        | Confetti on/off                      |
-| `density`        | `comfortable` | `data-density` on `<html>`           |
-| `roundness`      | `default`     | `data-roundness` on `<html>`         |
-| `weightUnit`     | `lb`          | Display in SetTile, LogSetSheet      |
+| Pref          | Default       | Applied via                          |
+| ------------- | ------------- | ------------------------------------ |
+| `accentColor` | `#b2f042`     | `--color-accent` CSS var + ink color |
+| `density`     | `comfortable` | `data-density` on `<html>`           |
+| `roundness`   | `default`     | `data-roundness` on `<html>`         |
+| `weightUnit`  | `lb`          | Display in SetTile, LogSetSheet      |
 
 All settings are editable via `/settings`.
 
@@ -188,7 +186,7 @@ flowchart TB
     SS -->|isActive / isComplete| UI
     HS -->|activeHabits, logs| UI
     AS -->|activitiesByDate| UI
-    PR -->|accent, loggingMode| UI
+    PR -->|accent, density, roundness| UI
 ```
 
 ---

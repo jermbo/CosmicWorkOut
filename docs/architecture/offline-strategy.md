@@ -17,40 +17,41 @@ The app must be fully functional from the moment it launches, regardless of netw
 ```mermaid
 flowchart LR
     subgraph idb ["IndexedDB — persistent"]
-        E[exercises<br/>boot upsert]
+        E[items<br/>boot upsert]
         P[programs<br/>editor save]
         S[sessions<br/>session finish]
-        ELU[exerciseLastUsed<br/>each set confirm]
+        ELU[itemLastUsed<br/>each set confirm]
     end
 
     subgraph ls ["localStorage — synchronous"]
         PREFS[cwout:prefs<br/>pref change]
         ACTIVE[cwout:activeSession<br/>each set confirm]
-        PROGID[cwout:activeProgramId<br/>program load]
+        PROGID[cwout:activeProgramIds<br/>program load]
     end
 ```
 
-| Store                   | Technology   | Written When                                |
-| ----------------------- | ------------ | ------------------------------------------- |
-| `exercises`             | IndexedDB    | On boot (upsert built-ins) + workout editor |
-| `programs`              | IndexedDB    | On workout save in editor                   |
-| `sessions`              | IndexedDB    | On session finish                           |
-| `exerciseLastUsed`      | IndexedDB    | On each set confirm                         |
-| `cwout:prefs`           | localStorage | On every preference change                  |
-| `cwout:activeSession`   | localStorage | On every set confirm (crash recovery)       |
-| `cwout:activeProgramId` | localStorage | On program load (auto-select first)         |
+| Store                    | Technology   | Written When                                |
+| ------------------------ | ------------ | ------------------------------------------- |
+| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor |
+| `programs`               | IndexedDB    | On routine save in editor                   |
+| `sessions`               | IndexedDB    | On session finish                           |
+| `itemLastUsed`           | IndexedDB    | On each set confirm                         |
+| `cwout:prefs`            | localStorage | On every preference change                  |
+| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
+| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
 
 ---
 
-## App Shell Caching — Planned
+## App Shell Caching — Implemented
 
-A service worker will cache static assets on first load:
+A service worker ([`src/service-worker.ts`](../../src/service-worker.ts)) precaches the app shell on `install` and serves it offline.
 
-- `index.html`, JS bundles, CSS, fonts, icons
+- **Precached** (`$service-worker` `build` + `files`): JS bundles, CSS, icons, manifest, and everything in `static/`. Served **cache-first** — these assets are immutable per build.
+- **Everything else** (including SPA navigations): **network-first**, falling back to cache, then to the cached `/` shell. Cold offline launches boot from the cached fallback shell.
+- **Cross-origin** requests (Google Fonts, etc.) are passed straight to the network — never cached, so we never store opaque responses.
+- **Versioning:** the cache name embeds the build `version`, so each deploy installs a fresh SW, precaches the new shell, and deletes stale caches on `activate`.
 
-**Status: not built.** The app currently relies on normal browser HTTP caching after first load. This is sufficient for development but not for installable PWA offline launch.
-
-**Target strategy:** Cache-first for all app shell assets.
+The build emits a single SPA fallback (`adapter-static` with `fallback: 'index.html'`, since `ssr=false`/`prerender=false`), which is what the SW serves for offline navigations.
 
 ---
 
@@ -78,7 +79,7 @@ Implemented in `sessionStore.checkForRecovery()` and the recovery banner in `+la
 ## Data Integrity (Implemented)
 
 - `SessionLog` is finalized on session finish — in-progress state lives only in `activeSession`
-- `exerciseLastUsed` is written per-set, always reflects the most recent log
+- `itemLastUsed` is written per-set, always reflects the most recent log
 - Completed sets within an active session survive browser close via localStorage
 
 ---
@@ -89,9 +90,15 @@ Nothing special. No sync to trigger. Network awareness will only matter for serv
 
 ---
 
-## PWA Install — Planned
+## PWA Install — Implemented
 
-Service worker + web app manifest will enable "Add to Home Screen." `app.html` already includes mobile-web-app meta tags, but there is no manifest or service worker file yet.
+"Add to Home Screen" / installable PWA is wired up:
+
+- **Manifest:** [`static/manifest.webmanifest`](../../static/manifest.webmanifest) — `standalone` display, `#101010` theme/background, fitness categories.
+- **Icons:** [`static/icon.svg`](../../static/icon.svg) is the master (cosmic dumbbell emblem); `icon-192.png` / `icon-512.png` (purpose `any maskable`) and `apple-touch-icon.png` (180px, required by iOS) are rasterized from it. Regenerate the PNGs from the SVG with a one-off `sharp` script if the logo changes.
+- **Meta:** [`src/app.html`](../../src/app.html) links the manifest, icons, and apple-touch-icon alongside the existing mobile-web-app meta tags.
+
+**Notes:** install + service worker require a secure context — works on `localhost` and any HTTPS host, but **not** over plain `http://` LAN (`npm run dev --host`). iOS never shows an install prompt; it's always manual _Share → Add to Home Screen_.
 
 ---
 

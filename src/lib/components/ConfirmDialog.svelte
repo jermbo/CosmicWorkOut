@@ -28,6 +28,11 @@
 	}: Props = $props();
 
 	const titleId = $props.id();
+
+	let confirmText = $derived.by(() => {
+		if (busy) return confirmBusyLabel ?? confirmLabel;
+		return confirmLabel;
+	});
 </script>
 
 <div class="confirm-backdrop" role="presentation" onclick={() => !busy && oncancel()}></div>
@@ -50,7 +55,7 @@
 			onclick={onconfirm}
 			disabled={busy}
 		>
-			{busy ? (confirmBusyLabel ?? confirmLabel) : confirmLabel}
+			{confirmText}
 		</button>
 	</div>
 </div>

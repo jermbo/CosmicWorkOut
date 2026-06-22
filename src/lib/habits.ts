@@ -24,7 +24,6 @@ export function habitTypeLabel(type: HabitType): string {
 	return HABIT_TYPES.find((t) => t.value === type)?.label ?? type;
 }
 
-/** Display string for a habit log value in summaries and history views. */
 export function formatHabitLogValue(habit: Habit, value: number): string {
 	if (habit.type === 'boolean') return formatHabitBooleanValue(value);
 	if (habit.type === 'mood') return formatMoodValue(value);
@@ -32,14 +31,16 @@ export function formatHabitLogValue(habit: Habit, value: number): string {
 	return formatCount(value, habit.unit || undefined);
 }
 
-/** Yes/No for history summaries and cards. */
 export function formatHabitBooleanValue(value: number): string {
-	return value === 1 ? 'Yes' : 'No';
+	if (value === 1) return 'Yes';
+	return 'No';
 }
 
-/** Done/No (or custom unit) for live widget labels. */
 export function formatHabitProgressLabel(habit: Habit, value: number): string {
-	if (habit.type === 'boolean') return value ? 'Done' : habit.unit || 'No';
+	if (habit.type === 'boolean') {
+		if (value) return 'Done';
+		return habit.unit || 'No';
+	}
 	if (habit.dailyGoal) {
 		return `${formatCount(value, habit.unit || undefined)} / ${formatCount(habit.dailyGoal, habit.unit || undefined)}`;
 	}
@@ -47,12 +48,10 @@ export function formatHabitProgressLabel(habit: Habit, value: number): string {
 	return formatCount(value, habit.unit || undefined);
 }
 
-/** Mood label for a numeric mood value. */
 export function formatMoodValue(value: number): string {
 	return MOOD_SCALE.find((m) => m.value === value)?.label ?? '—';
 }
 
-/** Whether a habit counts as "done" given its log — the single source of truth. */
 export function isHabitComplete(habit: Habit, log: HabitLog | undefined): boolean {
 	if (!log) return false;
 	if (habit.type === 'boolean') return log.value === 1;
@@ -61,11 +60,17 @@ export function isHabitComplete(habit: Habit, log: HabitLog | undefined): boolea
 	return log.value > 0;
 }
 
-/** Completion progress for a habit given its log, 0–100. */
 export function habitProgressPct(habit: Habit, log: HabitLog | undefined): number {
-	if (habit.type === 'boolean') return log?.value === 1 ? 100 : 0;
-	if (habit.type === 'mood') return log !== undefined ? 100 : 0;
+	if (habit.type === 'boolean') {
+		if (log?.value === 1) return 100;
+		return 0;
+	}
+	if (habit.type === 'mood') {
+		if (log !== undefined) return 100;
+		return 0;
+	}
 	const value = log?.value ?? 0;
 	if (habit.dailyGoal) return Math.min(100, (value / habit.dailyGoal) * 100);
-	return value > 0 ? 100 : 0;
+	if (value > 0) return 100;
+	return 0;
 }

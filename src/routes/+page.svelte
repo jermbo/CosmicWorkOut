@@ -30,44 +30,47 @@
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
+	let liveDiscipline = $derived.by(() => {
+		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
+		return null;
+	});
+
 	let practiceNextUp = $derived(
 		computePracticeNextUp({
 			activePrograms: programStore.activePrograms,
 			contextDate,
-			liveDisciplineId: sessionStore.isActive ? sessionStore.activeDisciplineId : null,
+			liveDisciplineId: liveDiscipline,
 			liveRoutineName: sessionStore.active?.routineName ?? null,
 			sessionsForProgram: (programId, date) => programStore.sessionForProgramDate(programId, date),
-			suggestedRoutineForProgram: (programId) =>
-				programStore.suggestedRoutineInCurrentWeekForProgram(programId),
+			suggestedRoutineForProgram: (programId) => programStore.suggestedRoutineInCurrentWeekForProgram(programId),
 		}),
 	);
 
-let weekIndicators = $derived.by(() => {
-	const indicators: Record<
-		string,
-		Array<'habits' | 'strength' | 'dance' | 'activity'>
-	> = {};
+	let weekIndicators = $derived.by(() => {
+		const indicators: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>> = {};
 
-	function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity') {
-		if (!indicators[date]) indicators[date] = [];
-		if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
-	}
+		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity') {
+			if (!indicators[date]) indicators[date] = [];
+			if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
+		}
 
-	for (const session of programStore.sessions) {
-		add(session.date, session.disciplineId === BELLYDANCE_DISCIPLINE_ID ? 'dance' : 'strength');
-	}
+		for (const session of programStore.sessions) {
+			let kind: 'dance' | 'strength' = 'strength';
+			if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
+			add(session.date, kind);
+		}
 
-	for (const activity of activityStore.activities) {
-		add(activity.date, 'activity');
-	}
+		for (const activity of activityStore.activities) {
+			add(activity.date, 'activity');
+		}
 
-	const activeHabitIds = new Set(habitStore.activeHabits.map((habit) => habit.id));
-	for (const log of habitStore.logs) {
-		if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
-	}
+		const activeHabitIds = new Set(habitStore.activeHabits.map((habit) => habit.id));
+		for (const log of habitStore.logs) {
+			if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+		}
 
-	return indicators;
-});
+		return indicators;
+	});
 </script>
 
 <svelte:head>
@@ -75,11 +78,7 @@ let weekIndicators = $derived.by(() => {
 </svelte:head>
 
 <div class="page page--wide home-page">
-	<PageHeader
-		title="Overview"
-		dayIndicators={weekIndicators}
-		onDateChange={() => goto('/', { replaceState: true })}
-	>
+	<PageHeader title="Overview" dayIndicators={weekIndicators} onDateChange={() => goto('/', { replaceState: true })}>
 		{#snippet trailing()}
 			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
 		{/snippet}

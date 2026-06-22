@@ -32,7 +32,7 @@
 			try {
 				navigator.vibrate([12, 40, 18]);
 			} catch {
-				// vibrate not available
+				justCompleted = true;
 			}
 
 			completionTimer = setTimeout(() => {

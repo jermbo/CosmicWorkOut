@@ -2,12 +2,7 @@
 	import { page } from '$app/state';
 	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import {
-		flattenItems,
-		effectiveSections,
-		STRENGTH_DISCIPLINE_ID,
-		BELLYDANCE_DISCIPLINE_ID,
-	} from '$lib/discipline';
+	import { flattenItems, effectiveSections, STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
 	import DanceRoutineEditor from '$lib/components/DanceRoutineEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
@@ -29,13 +24,11 @@
 
 	let disciplinePrograms = $derived(programStore.programs.filter((p) => p.disciplineId === disciplineId));
 
-	// Which program's schedule is shown in the detail panel (defaults to active for discipline)
 	let viewingProgramId = $state<string | undefined>(undefined);
 
 	$effect(() => {
 		if (viewingProgramId === undefined && disciplinePrograms.length > 0) {
-			viewingProgramId =
-				programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
+			viewingProgramId = programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		}
 	});
 
@@ -46,9 +39,10 @@
 
 	let viewingProgram = $derived(disciplinePrograms.find((p) => p.id === viewingProgramId));
 
-	let viewingIsActive = $derived(
-		viewingProgramId ? programStore.isProgramActive(viewingProgramId) : false,
-	);
+	let viewingIsActive = $derived.by(() => {
+		if (viewingProgramId) return programStore.isProgramActive(viewingProgramId);
+		return false;
+	});
 
 	const ACCENT_MAP: Record<string, string> = {
 		lime: 'var(--color-lime)',
@@ -70,7 +64,6 @@
 
 	let totalWeeks = $derived(viewingProgram?.durationWeeks ?? 1);
 
-	// Reset week when switching programs
 	$effect(() => {
 		void viewingProgramId;
 		selectedWeek = 1;
@@ -126,7 +119,6 @@
 </svelte:head>
 
 <div class="page page--wide program-page">
-	<!-- ── Library ── -->
 	<div class="prog-header">
 		<h1 class="prog-header__title">Programs</h1>
 		<button class="prog-header__new" onclick={() => (showCreateProgram = true)}>
@@ -172,10 +164,7 @@
 
 				<div class="prog-card__actions">
 					{#if isActive}
-						<button
-							class="prog-card__deactivate-btn"
-							onclick={() => programStore.deactivateProgram(program.id)}
-						>
+						<button class="prog-card__deactivate-btn" onclick={() => programStore.deactivateProgram(program.id)}>
 							Deactivate
 						</button>
 					{:else}
@@ -206,18 +195,13 @@
 		{/each}
 	</div>
 
-	<!-- ── Program Schedule ── -->
 	{#if viewingProgram}
 		<section class="schedule" aria-labelledby="schedule-heading">
-			<!-- Schedule header -->
 			<div class="schedule__header">
 				<div class="schedule__title-row">
 					<h2 class="schedule__title" id="schedule-heading">{viewingProgram.name}</h2>
 					{#if viewingIsActive}
-						<button
-							class="schedule__deactivate-btn"
-							onclick={() => programStore.deactivateProgram(viewingProgram!.id)}
-						>
+						<button class="schedule__deactivate-btn" onclick={() => programStore.deactivateProgram(viewingProgram!.id)}>
 							Deactivate
 						</button>
 					{:else}
@@ -244,14 +228,14 @@
 						>
 							<div
 								class="schedule__progress-fill"
-								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) / viewingProgram.durationWeeks) * 100}%"
+								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) / viewingProgram.durationWeeks) *
+									100}%"
 							></div>
 						</div>
 					</div>
 				{/if}
 			</div>
 
-			<!-- Week picker -->
 			<div class="week-picker" aria-label="Browse weeks">
 				<button
 					class="week-picker__btn"
@@ -281,7 +265,6 @@
 				</button>
 			</div>
 
-			<!-- Workout cards -->
 			<div class="schedule__workouts">
 				{#each weekWorkouts as workout (workout.id)}
 					{@const accent = ACCENT_MAP[workout.color ?? 'lime'] ?? 'var(--color-accent)'}
@@ -353,7 +336,6 @@
 	{/if}
 </div>
 
-<!-- Confirm dialogs -->
 {#if showDeleteProgramConfirm}
 	<ConfirmDialog
 		title="Delete program?"
@@ -382,11 +364,7 @@
 
 {#if editingWorkout !== undefined}
 	{#if disciplineId === BELLYDANCE_DISCIPLINE_ID && editingWorkout && viewingProgram}
-		<DanceRoutineEditor
-			program={viewingProgram}
-			routine={editingWorkout}
-			onBack={() => (editingWorkout = undefined)}
-		/>
+		<DanceRoutineEditor program={viewingProgram} routine={editingWorkout} onBack={() => (editingWorkout = undefined)} />
 	{:else}
 		<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
 	{/if}
@@ -404,7 +382,6 @@
 		gap: var(--space-6);
 	}
 
-	/* ── Library header ── */
 	.prog-header {
 		display: flex;
 		align-items: center;
@@ -434,7 +411,6 @@
 		flex-shrink: 0;
 	}
 
-	/* ── Program cards ── */
 	.prog-list {
 		display: flex;
 		flex-direction: column;
@@ -580,7 +556,6 @@
 		}
 	}
 
-	/* ── Schedule panel ── */
 	.schedule {
 		display: flex;
 		flex-direction: column;
@@ -641,7 +616,6 @@
 		}
 	}
 
-	/* Progress */
 	.schedule__progress {
 		display: flex;
 		flex-direction: column;
@@ -682,7 +656,6 @@
 		transition: inline-size 600ms var(--ease-spring);
 	}
 
-	/* Week picker */
 	.week-picker {
 		display: flex;
 		align-items: center;
@@ -736,7 +709,6 @@
 		align-items: center;
 	}
 
-	/* Workout cards */
 	.schedule__workouts {
 		display: flex;
 		flex-direction: column;

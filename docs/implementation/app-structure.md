@@ -69,9 +69,9 @@ sequenceDiagram
     L->>L: appReady = true
 ```
 
-1. `initDB()` — open IndexedDB (version 2), upsert exercises, seed programs + habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
+1. `initDB()` — open IndexedDB (version 7), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
 2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
-3. `programStore.load()` — load programs, exercises, sessions; pick active program
+3. `programStore.load()` — load programs, items, sessions; pick active program per Discipline
 4. `habitStore.load()` — load habits and all habit logs
 5. `activityStore.load()` — load all activity logs
 6. `sessionStore.checkForRecovery()` — flag recoverable session if from today

@@ -12,7 +12,11 @@
 
 	let { groupCount, planCount, completedCount, live, headline, detail }: Props = $props();
 
-	let badge = $derived<'live' | 'done' | null>(live ? 'live' : completedCount > 0 ? 'done' : null);
+	let badge = $derived.by<'live' | 'done' | null>(() => {
+		if (live) return 'live';
+		if (completedCount > 0) return 'done';
+		return null;
+	});
 
 	let ariaLabel = $derived(`Practice: ${headline}`);
 </script>

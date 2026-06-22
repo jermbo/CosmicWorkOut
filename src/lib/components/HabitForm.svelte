@@ -11,7 +11,6 @@
 
 	let { editing = null, onclose }: Props = $props();
 
-	// Form is seeded from `editing` once; the dialog is recreated on each open.
 	let name = $state(untrack(() => editing?.name ?? ''));
 	let unit = $state(untrack(() => editing?.unit ?? ''));
 	let type = $state<HabitType>(untrack(() => editing?.type ?? 'times'));
@@ -37,12 +36,17 @@
 		if (value !== 'count') unit = '';
 	}
 
+	function resolveDailyGoal(): number | undefined {
+		if (typeHasGoal && goal && goal > 0) return goal;
+		return undefined;
+	}
+
 	async function save() {
 		if (!name.trim() || saving) return;
 		if (typeRequiresUnit && !unit.trim()) return;
 		saving = true;
 		try {
-			const dailyGoal = typeHasGoal && goal && goal > 0 ? goal : undefined;
+			const dailyGoal = resolveDailyGoal();
 			if (editing) {
 				await habitStore.updateHabit({
 					...editing,
@@ -62,7 +66,9 @@
 
 <div class="modal-backdrop" role="presentation" onclick={() => !saving && onclose()}></div>
 <div class="modal" role="dialog" aria-labelledby={titleId} aria-modal="true">
-	<p class="modal__title" id={titleId}>{editing ? 'Edit Habit' : 'New Habit'}</p>
+	<p class="modal__title" id={titleId}>
+		{#if editing}Edit Habit{:else}New Habit{/if}
+	</p>
 
 	{#if showPresets && !editing}
 		<div class="hf-presets">
@@ -132,7 +138,7 @@
 				onclick={save}
 				disabled={!name.trim() || saving || (typeRequiresUnit && !unit.trim())}
 			>
-				{saving ? 'Saving…' : 'Save'}
+				{#if saving}Saving…{:else}Save{/if}
 			</button>
 		</div>
 	{/if}

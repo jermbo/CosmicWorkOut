@@ -48,7 +48,10 @@
 
 	let totalItems = $derived(activeItems.length);
 	let doneItems = $derived(activeItems.filter(isItemDone).length);
-	let progressPct = $derived(totalItems > 0 ? (doneItems / totalItems) * 100 : 0);
+	let progressPct = $derived.by(() => {
+		if (totalItems > 0) return (doneItems / totalItems) * 100;
+		return 0;
+	});
 	let allDone = $derived(totalItems > 0 && doneItems === totalItems);
 
 	async function handleFinish() {
@@ -74,11 +77,30 @@
 		measureTarget = null;
 	}
 
+	function measureUnitLabel(mode: 'duration' | 'reps' | undefined): string {
+		if (mode === 'reps') return 'reps';
+		return 'sec';
+	}
+
+	function measureDialogTitle(mode: 'duration' | 'reps' | undefined): string {
+		if (mode === 'reps') return 'Log reps';
+		return 'Log duration (seconds)';
+	}
+
+	let abandonTitle = $derived.by(() => {
+		if (isEditing) return 'Discard changes?';
+		return 'End this practice?';
+	});
+
+	let abandonConfirmLabel = $derived.by(() => {
+		if (isEditing) return 'Discard';
+		return 'End practice';
+	});
+
 	function formatMeasureValue(item: ActiveItem): string {
 		if (item.skipped) return 'Skipped';
 		if (item.value == null) return 'Tap to log';
-		const unit = item.measureMode === 'reps' ? 'reps' : 'sec';
-		return `${item.value} ${unit}`;
+		return `${item.value} ${measureUnitLabel(item.measureMode)}`;
 	}
 </script>
 
@@ -87,7 +109,14 @@
 		<header class="dance-session__header">
 			<div class="dance-session__top">
 				<button class="dance-session__back" onclick={handleAbandonRequest} aria-label="End session">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<polyline points="15 18 9 12 15 6" />
 					</svg>
 				</button>
@@ -106,7 +135,13 @@
 					<span class="dance-session__timer-value">{elapsedFormatted}</span>
 				</div>
 			</div>
-			<div class="dance-session__progress" role="progressbar" aria-valuenow={doneItems} aria-valuemin={0} aria-valuemax={totalItems}>
+			<div
+				class="dance-session__progress"
+				role="progressbar"
+				aria-valuenow={doneItems}
+				aria-valuemin={0}
+				aria-valuemax={totalItems}
+			>
 				<div class="dance-session__progress-fill" style:inline-size="{progressPct}%"></div>
 			</div>
 			<div class="dance-session__sections" role="tablist" aria-label="Routine sections">
@@ -181,7 +216,8 @@
 
 		<div class="dance-session__footer">
 			<div class="dance-session__nav">
-				<button class="dance-session__nav-btn" disabled={sectionIdx === 0} onclick={() => sectionIdx--}>Previous</button>
+				<button class="dance-session__nav-btn" disabled={sectionIdx === 0} onclick={() => sectionIdx--}>Previous</button
+				>
 				<button
 					class="dance-session__nav-btn"
 					disabled={sectionIdx >= sections.length - 1}
@@ -203,8 +239,8 @@
 
 		{#if showAbandonConfirm}
 			<ConfirmDialog
-				title={isEditing ? 'Discard changes?' : 'End this practice?'}
-				confirmLabel={isEditing ? 'Discard' : 'End practice'}
+				title={abandonTitle}
+				confirmLabel={abandonConfirmLabel}
 				cancelLabel="Keep going"
 				danger
 				onconfirm={handleAbandonConfirm}
@@ -223,8 +259,8 @@
 {#if measureTarget}
 	{@const item = activeItems[measureTarget.itemIndex]}
 	<ValueDialog
-		title={measureTarget.mode === 'reps' ? 'Log reps' : 'Log duration (seconds)'}
-		unit={measureTarget.mode === 'reps' ? 'reps' : 'sec'}
+		title={measureDialogTitle(measureTarget.mode)}
+		unit={measureUnitLabel(measureTarget.mode)}
 		initialValue={item?.value ?? 0}
 		onsave={handleMeasureSave}
 		onclose={() => (measureTarget = null)}

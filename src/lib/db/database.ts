@@ -9,14 +9,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-// v4 (v1.4.0): Discipline model. The strength-only schema is generalized and the
-// stores are renamed (exercises→items, exerciseLastUsed→itemLastUsed) with new
-// record shapes. Pre-beta, so we WIPE and re-seed rather than migrate — see
-// docs/features/v1.4.0/US-015. The upgrade drops every existing store and
-// recreates a clean set; initDB() then re-seeds both Disciplines.
-// v5 (v1.4.0): belly dance content lands — Belly Dance items + program seed
-// (US-016/US-017). Same wipe-and-reseed policy; bump forces the new seed in.
-const DB_VERSION = 5;
+const DB_VERSION = 7;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -31,8 +24,6 @@ function openDB(): Promise<IDBDatabase> {
 		request.onupgradeneeded = (event) => {
 			const db = (event.target as IDBOpenDBRequest).result;
 
-			// Wipe-and-reseed: drop every existing store so no pre-Discipline records
-			// survive, then recreate a clean set. initDB() re-seeds afterward.
 			for (const name of Array.from(db.objectStoreNames)) {
 				db.deleteObjectStore(name);
 			}
@@ -54,7 +45,6 @@ function openDB(): Promise<IDBDatabase> {
 			const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
 			hlStore.createIndex('by_date', 'date');
 			hlStore.createIndex('by_habit', 'habitId');
-
 		};
 
 		request.onsuccess = (event) => {
@@ -164,12 +154,11 @@ export async function loadDebugSeedData(): Promise<void> {
 export async function resetWorkoutData(): Promise<void> {
 	await clearWorkoutData();
 	localStorage.removeItem('cwout:activeSession');
-	localStorage.removeItem('cwout:activeProgramId'); // legacy single-program key
-	localStorage.removeItem('cwout:activeProgramIds'); // per-Discipline active programs
+	localStorage.removeItem('cwout:activeProgramId');
+	localStorage.removeItem('cwout:activeProgramIds');
 	location.reload();
 }
 
-/** Upsert shipped catalog entries without touching user-created records. */
 async function upsertBuiltInRecords<T extends { id: string; isBuiltIn: boolean }>(
 	storeName: string,
 	existing: T[],
@@ -186,21 +175,16 @@ async function upsertBuiltInRecords<T extends { id: string; isBuiltIn: boolean }
 }
 
 export async function initDB(): Promise<void> {
-	// Upsert built-in items/programs on every boot: add missing entries (e.g.
-	// bellydance-foundations landing after strength-only data) and refresh
-	// built-in rows when seed content changes. User custom records are untouched.
 	const items = await getAll<Item>('items');
 	await upsertBuiltInRecords('items', items, builtInItems);
 
 	const programs = await getAll<Program>('programs');
 	await upsertBuiltInRecords('programs', programs, builtInPrograms);
 
-	// Only seed habits on first run
 	const habits = await getAll<Habit>('habits');
 	if (habits.length === 0) {
 		await putAllRecords('habits', builtInHabits);
 	} else {
-		// Migrate: apply default goals to built-in habits that are missing them
 		const goalMap: Record<string, number> = {
 			'habit-meditation': 20,
 			'habit-writing': 500,
@@ -262,5 +246,4 @@ export const db = {
 		put: (log: HabitLog) => putRecord('habitLogs', log),
 		remove: (id: string) => removeRecord('habitLogs', id),
 	},
-
 };

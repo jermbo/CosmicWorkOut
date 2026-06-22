@@ -1,14 +1,4 @@
-import type {
-	Session,
-	ActivityLog,
-	HabitLog,
-	LoggedItem,
-	LoggedSet,
-	ActivityType,
-	ActivityIntensity,
-} from './types';
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
+import type { Session, ActivityLog, HabitLog, LoggedItem, LoggedSet, ActivityType, ActivityIntensity } from './types';
 
 function rInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -31,27 +21,43 @@ function shiftDays(base: Date, n: number): Date {
 	return d;
 }
 
-// ── Workouts ───────────────────────────────────────────────────────────────────
-
-type WorkoutKey = 'A' | 'B' | 'C' | 'D';
+type WorkoutKey = 'A' | 'B' | 'C';
 
 const ITEM_UNITS: Record<string, string> = {
-	goblet: 'lb', rdl: 'lb', split: 'lb', 'band-walk': 'band', medball: 'lb', copenhagen: 'bodyweight',
-	'db-bench': 'lb', 'cs-row': 'lb', 'push-press': 'lb', 'face-pull': 'band', pogo: 'bodyweight', pallof: 'band',
-	'trap-dl': 'lb', 'sled-push': 'lb', farmer: 'lb', woodchop: 'lb',
-	'box-jump': 'bodyweight', 'broad-jump': 'bodyweight', 'pull-up': 'bodyweight',
-	'db-ohp': 'lb', 'sl-rdl': 'lb', 'kb-swing': 'lb', 'box-squat': 'lb',
-	landmine: 'lb', 'band-pull': 'band', 'step-up': 'lb', 'good-morn': 'lb',
-	'side-plank': 'bodyweight', 'mb-rainbow': 'lb', 'mb-chest': 'lb', suitcase: 'lb',
+	'st-leg-press': 'lb',
+	'st-lat-pulldown-wide': 'lb',
+	'st-pec-deck': 'lb',
+	'st-leg-curl': 'lb',
+	'st-seated-cable-row': 'lb',
+	'st-plank': 'bodyweight',
+	'st-goblet-squat': 'lb',
+	'st-push-ups': 'bodyweight',
+	'st-lat-pulldown-close': 'lb',
+	'st-db-curl': 'lb',
+	'st-tricep-rope-pushdown': 'lb',
+	'st-side-plank': 'bodyweight',
+	'st-leg-extension': 'lb',
+	'st-machine-row': 'lb',
+	'st-cable-chest-fly': 'lb',
+	'st-reverse-fly-machine': 'lb',
+	'st-cable-crunch': 'lb',
 };
 
 const BASE_WEIGHTS: Record<string, number> = {
-	goblet: 45, rdl: 115, split: 35, medball: 15,
-	'db-bench': 45, 'cs-row': 55, 'push-press': 75,
-	'trap-dl': 175, 'sled-push': 135, farmer: 60, woodchop: 40,
-	'db-ohp': 40, 'sl-rdl': 30, 'kb-swing': 35, 'box-squat': 95,
-	landmine: 45, 'step-up': 25, 'good-morn': 65,
-	'mb-rainbow': 15, 'mb-chest': 15, suitcase: 50,
+	'st-leg-press': 180,
+	'st-lat-pulldown-wide': 100,
+	'st-pec-deck': 80,
+	'st-leg-curl': 70,
+	'st-seated-cable-row': 90,
+	'st-goblet-squat': 40,
+	'st-lat-pulldown-close': 95,
+	'st-db-curl': 25,
+	'st-tricep-rope-pushdown': 50,
+	'st-leg-extension': 80,
+	'st-machine-row': 85,
+	'st-cable-chest-fly': 40,
+	'st-reverse-fly-machine': 50,
+	'st-cable-crunch': 60,
 };
 
 function lbWeight(itemId: string): number {
@@ -60,55 +66,50 @@ function lbWeight(itemId: string): number {
 }
 
 const WORKOUTS: Record<WorkoutKey, Array<{ itemId: string; sets: number; reps: number }>> = {
-	// Lower + Lateral Power
 	A: [
-		{ itemId: 'goblet',     sets: 4, reps: 8  },
-		{ itemId: 'rdl',        sets: 3, reps: 10 },
-		{ itemId: 'split',      sets: 3, reps: 10 },
-		{ itemId: 'band-walk',  sets: 3, reps: 15 },
-		{ itemId: 'medball',    sets: 3, reps: 6  },
-		{ itemId: 'copenhagen', sets: 3, reps: 30 },
+		{ itemId: 'st-leg-press', sets: 4, reps: 10 },
+		{ itemId: 'st-lat-pulldown-wide', sets: 3, reps: 10 },
+		{ itemId: 'st-pec-deck', sets: 3, reps: 12 },
+		{ itemId: 'st-leg-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-seated-cable-row', sets: 3, reps: 10 },
+		{ itemId: 'st-plank', sets: 3, reps: 45 },
 	],
-	// Upper + Reactive
 	B: [
-		{ itemId: 'db-bench',   sets: 4, reps: 8  },
-		{ itemId: 'cs-row',     sets: 4, reps: 10 },
-		{ itemId: 'push-press', sets: 3, reps: 8  },
-		{ itemId: 'face-pull',  sets: 3, reps: 15 },
-		{ itemId: 'band-pull',  sets: 3, reps: 20 },
-		{ itemId: 'pogo',       sets: 3, reps: 20 },
-		{ itemId: 'pallof',     sets: 3, reps: 12 },
+		{ itemId: 'st-goblet-squat', sets: 3, reps: 12 },
+		{ itemId: 'st-push-ups', sets: 3, reps: 12 },
+		{ itemId: 'st-lat-pulldown-close', sets: 3, reps: 10 },
+		{ itemId: 'st-db-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-tricep-rope-pushdown', sets: 3, reps: 12 },
+		{ itemId: 'st-side-plank', sets: 3, reps: 30 },
 	],
-	// Full Body + Conditioning
 	C: [
-		{ itemId: 'trap-dl',    sets: 4, reps: 6  },
-		{ itemId: 'push-press', sets: 3, reps: 8  },
-		{ itemId: 'sled-push',  sets: 4, reps: 20 },
-		{ itemId: 'farmer',     sets: 3, reps: 40 },
-		{ itemId: 'woodchop',   sets: 3, reps: 12 },
-		{ itemId: 'suitcase',   sets: 3, reps: 30 },
-	],
-	// Power + Mobility
-	D: [
-		{ itemId: 'box-jump',   sets: 4, reps: 5  },
-		{ itemId: 'broad-jump', sets: 3, reps: 5  },
-		{ itemId: 'pull-up',    sets: 4, reps: 6  },
-		{ itemId: 'db-ohp',     sets: 3, reps: 10 },
-		{ itemId: 'sl-rdl',     sets: 3, reps: 8  },
-		{ itemId: 'kb-swing',   sets: 4, reps: 15 },
-		{ itemId: 'side-plank', sets: 3, reps: 30 },
+		{ itemId: 'st-leg-extension', sets: 3, reps: 12 },
+		{ itemId: 'st-machine-row', sets: 3, reps: 10 },
+		{ itemId: 'st-cable-chest-fly', sets: 3, reps: 12 },
+		{ itemId: 'st-reverse-fly-machine', sets: 3, reps: 12 },
+		{ itemId: 'st-leg-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-cable-crunch', sets: 3, reps: 15 },
 	],
 };
 
 const ROUTINE_META: Record<WorkoutKey, { id: string; name: string; estMin: number }> = {
-	A: { id: 'w1-lower',        name: 'Lower + Lateral Power',   estMin: 45 },
-	B: { id: 'w1-upper',        name: 'Upper + Reactive',         estMin: 40 },
-	C: { id: 'w1-conditioning', name: 'Full Body + Conditioning', estMin: 55 },
-	D: { id: 'w2-lower',        name: 'Power + Mobility',         estMin: 50 },
+	A: { id: 'st-beginner-101-w1-a', name: 'Machine Full Body', estMin: 45 },
+	B: { id: 'st-beginner-101-w1-b', name: 'Bodyweight & Cables', estMin: 40 },
+	C: { id: 'st-beginner-101-w1-c', name: 'Isolation Focus', estMin: 42 },
 };
 
 const DISCIPLINE_ID = 'strength';
-const PROGRAM_ID = 'strength-foundation';
+const PROGRAM_ID = 'st-beginner-101';
+
+function startingWeight(unit: string, itemId: string): number {
+	if (unit === 'lb') return lbWeight(itemId);
+	return 0;
+}
+
+function actualRepsFor(unit: string, reps: number): number {
+	if (unit === 'lb') return Math.max(1, reps + rInt(-2, 2));
+	return reps;
+}
 
 function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 	const meta = ROUTINE_META[type];
@@ -124,12 +125,12 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 
 	const items: LoggedItem[] = WORKOUTS[type].map(({ itemId, sets, reps }) => {
 		const unit = ITEM_UNITS[itemId] ?? 'lb';
-		const weight: number | string = unit === 'lb' ? lbWeight(itemId) : 0;
+		const weight: number | string = startingWeight(unit, itemId);
 		const loggedSets: LoggedSet[] = [];
 
 		for (let s = 1; s <= sets; s++) {
 			setTime = new Date(setTime.getTime() + rInt(90, 210) * 1000);
-			const actualReps = unit === 'lb' ? Math.max(1, reps + rInt(-2, 2)) : reps;
+			const actualReps = actualRepsFor(unit, reps);
 			if (unit === 'lb') totalVolume += (weight as number) * actualReps;
 			totalSets++;
 			loggedSets.push({ setNumber: s, weight, reps: actualReps, completedAt: setTime.toISOString() });
@@ -154,38 +155,53 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 	};
 }
 
-// ── Activities ─────────────────────────────────────────────────────────────────
-
 const ACTIVITY_DURATION: Partial<Record<ActivityType, [number, number]>> = {
-	Walk:       [25, 60 ],
-	Run:        [20, 50 ],
-	Bike:       [30, 75 ],
-	Swim:       [25, 45 ],
-	Hike:       [60, 120],
-	Pickleball: [60, 90 ],
-	Tennis:     [45, 90 ],
-	Basketball: [45, 75 ],
-	Yoga:       [30, 60 ],
-	Stretching: [15, 30 ],
-	Cardio:     [20, 45 ],
+	Walk: [25, 60],
+	Run: [20, 50],
+	Bike: [30, 75],
+	Swim: [25, 45],
+	Hike: [60, 120],
+	Pickleball: [60, 90],
+	Tennis: [45, 90],
+	Basketball: [45, 75],
+	Yoga: [30, 60],
+	Stretching: [15, 30],
+	Cardio: [20, 45],
 };
 
 const EASY_ACTIVITIES: ActivityType[] = ['Yoga', 'Stretching', 'Walk'];
 const ALL_ACTIVITIES: ActivityType[] = [
-	'Walk', 'Walk', 'Run', 'Run',
-	'Bike', 'Swim', 'Hike',
-	'Pickleball', 'Pickleball', 'Tennis', 'Basketball',
-	'Yoga', 'Stretching', 'Cardio',
+	'Walk',
+	'Walk',
+	'Run',
+	'Run',
+	'Bike',
+	'Swim',
+	'Hike',
+	'Pickleball',
+	'Pickleball',
+	'Tennis',
+	'Basketball',
+	'Yoga',
+	'Stretching',
+	'Cardio',
 ];
 
+function pickActivityType(light: boolean): ActivityType {
+	if (light) return pick(EASY_ACTIVITIES);
+	return pick(ALL_ACTIVITIES);
+}
+
+function intensityFor(type: ActivityType, light: boolean): ActivityIntensity {
+	if (EASY_ACTIVITIES.includes(type)) return 'Easy';
+	if (light) return pick<ActivityIntensity>(['Easy', 'Moderate']);
+	return pick<ActivityIntensity>(['Easy', 'Moderate', 'Moderate', 'Hard']);
+}
+
 function buildActivity(date: Date, idx: number, light = false): ActivityLog {
-	const type = light ? pick(EASY_ACTIVITIES) : pick(ALL_ACTIVITIES);
+	const type = pickActivityType(light);
 	const [minD, maxD] = ACTIVITY_DURATION[type] ?? [30, 60];
-	const intensity: ActivityIntensity = EASY_ACTIVITIES.includes(type)
-		? 'Easy'
-		: light
-			? pick<ActivityIntensity>(['Easy', 'Moderate'])
-			: pick<ActivityIntensity>(['Easy', 'Moderate', 'Moderate', 'Hard']);
+	const intensity = intensityFor(type, light);
 	return {
 		id: `seed-activity-${idx}`,
 		date: toDateStr(date),
@@ -195,8 +211,6 @@ function buildActivity(date: Date, idx: number, light = false): ActivityLog {
 		createdAt: date.toISOString(),
 	};
 }
-
-// ── Habits ─────────────────────────────────────────────────────────────────────
 
 const HABIT_IDS = [
 	'habit-meditation',
@@ -208,53 +222,73 @@ const HABIT_IDS = [
 	'habit-mood',
 ] as const;
 
+function chance(probability: number): boolean {
+	return Math.random() < probability;
+}
+
+function clampMood(value: number): number {
+	return Math.max(-5, Math.min(5, value));
+}
+
+function meditationValue(workoutDay: boolean): number {
+	if (workoutDay) return rInt(15, 35);
+	if (chance(0.45)) return rInt(0, 15);
+	return rInt(10, 30);
+}
+
+function waterValue(workoutDay: boolean): number {
+	if (workoutDay) return rInt(6, 12);
+	if (chance(0.4)) return rInt(2, 6);
+	return rInt(5, 10);
+}
+
+function moodValue(workoutDay: boolean): number {
+	if (workoutDay) return clampMood(rInt(-1, 5));
+	return clampMood(rInt(-4, 4));
+}
+
 function habitValue(habitId: string, workoutDay: boolean): number {
 	switch (habitId) {
 		case 'habit-meditation':
-			return workoutDay ? rInt(15, 35) : Math.random() < 0.45 ? rInt(0, 15) : rInt(10, 30);
+			return meditationValue(workoutDay);
 		case 'habit-writing':
-			return Math.random() < 0.35 ? rInt(0, 350) : rInt(200, 1000);
+			if (chance(0.35)) return rInt(0, 350);
+			return rInt(200, 1000);
 		case 'habit-reading':
-			return Math.random() < 0.35 ? rInt(0, 12) : rInt(8, 40);
+			if (chance(0.35)) return rInt(0, 12);
+			return rInt(8, 40);
 		case 'habit-water':
-			return workoutDay ? rInt(6, 12) : Math.random() < 0.4 ? rInt(2, 6) : rInt(5, 10);
+			return waterValue(workoutDay);
 		case 'habit-coffee':
 			return pick([0, 1, 1, 2, 2, 3, 3, 3, 4]);
 		case 'habit-alcohol':
-			return Math.random() < 0.18 ? 1 : 0;
+			if (chance(0.18)) return 1;
+			return 0;
 		case 'habit-mood':
-			return workoutDay
-				? Math.max(-5, Math.min(5, rInt(-1, 5)))
-				: Math.max(-5, Math.min(5, rInt(-4, 4)));
+			return moodValue(workoutDay);
 		default:
 			return 0;
 	}
 }
 
-// ── Schedule ───────────────────────────────────────────────────────────────────
-//
-// Fixed offsets from day 0 (= today − 45) for predictable edge-case coverage:
-//   Week 1 (days  0- 6): 3 sessions — baseline
-//   Week 2 (days  7-13): 3 sessions
-//   Week 3 (days 14-20): 4 sessions — heavy week
-//   Week 4 (days 21-27): 1 session  — rest/recovery (streak break for graphs)
-//   Week 5 (days 28-34): 3 sessions
-//   Week 6 (days 35-41): 3 sessions
-//   Partial (days 42-44): 2 sessions
-
 const WORKOUT_OFFSETS = [1, 3, 5, 8, 10, 12, 15, 17, 19, 20, 25, 29, 31, 33, 36, 38, 41, 43, 44];
-const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map((_, i) => (['A', 'B', 'C', 'D'] as WorkoutKey[])[i % 4]);
+const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map((_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3]);
 
-// Workout days that also get a short light activity (morning session + evening walk)
 const DUAL_ACTIVITY_OFFSETS = new Set([3, 12, 19, 31, 41]);
 
-// Non-workout days that get an activity
 const ACTIVITY_OFFSETS = [
-	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27,
-	28, 30, 32, 34, 35, 37, 39, 40, 42,
+	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27, 28, 30, 32, 34, 35, 37, 39, 40, 42,
 ];
 
-// ── Main export ────────────────────────────────────────────────────────────────
+function adjustedLogRate(habitId: string, logRate: number): number {
+	if (habitId === 'habit-alcohol' || habitId === 'habit-mood') return logRate * 0.85;
+	return logRate;
+}
+
+function dayLogRate(isWorkoutDay: boolean): number {
+	if (isWorkoutDay) return 0.95;
+	return 0.82;
+}
 
 export function generateDebugSeedData(): {
 	sessions: Session[];
@@ -266,7 +300,6 @@ export function generateDebugSeedData(): {
 	const start = shiftDays(today, -45);
 
 	const workoutOffsetSet = new Set(WORKOUT_OFFSETS);
-	const activityOffsetSet = new Set(ACTIVITY_OFFSETS);
 
 	const sessions: Session[] = WORKOUT_OFFSETS.map((offset, i) =>
 		buildSession(shiftDays(start, offset), WORKOUT_SEQUENCE[i], i),
@@ -287,11 +320,10 @@ export function generateDebugSeedData(): {
 	for (let i = 0; i < 45; i++) {
 		const date = shiftDays(start, i);
 		const isWorkoutDay = workoutOffsetSet.has(i);
-		const logRate = isWorkoutDay ? 0.95 : 0.82;
+		const logRate = dayLogRate(isWorkoutDay);
 
 		for (const habitId of HABIT_IDS) {
-			const adjustedRate =
-				habitId === 'habit-alcohol' || habitId === 'habit-mood' ? logRate * 0.85 : logRate;
+			const adjustedRate = adjustedLogRate(habitId, logRate);
 			if (Math.random() < adjustedRate) {
 				habitLogs.push({
 					id: `seed-hl-${habitId}-${toDateStr(date)}`,

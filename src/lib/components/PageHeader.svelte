@@ -11,23 +11,20 @@
 		showBack?: boolean;
 		backHref?: string;
 		showMoodDots?: boolean;
-	dayIndicators?: Record<
-		string,
-		Array<'habits' | 'strength' | 'dance' | 'activity'>
-	>;
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
 	};
 
-let {
-	title,
-	showBack = false,
-	backHref = '/',
-	showMoodDots = false,
-	dayIndicators = {},
-	onDateChange,
-	trailing,
-}: Props = $props();
+	let {
+		title,
+		showBack = false,
+		backHref = '/',
+		showMoodDots = false,
+		dayIndicators = {},
+		onDateChange,
+		trailing,
+	}: Props = $props();
 
 	const todayStr = todayIso();
 

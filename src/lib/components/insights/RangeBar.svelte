@@ -3,13 +3,13 @@
 	import { toLocalIso } from '$lib/date';
 
 	let {
-		rangeKey   = $bindable<RangeKey>('last-7'),
+		rangeKey = $bindable<RangeKey>('last-7'),
 		customStart = $bindable(''),
-		customEnd   = $bindable(''),
+		customEnd = $bindable(''),
 	}: {
-		rangeKey?:    RangeKey;
+		rangeKey?: RangeKey;
 		customStart?: string;
-		customEnd?:   string;
+		customEnd?: string;
 	} = $props();
 
 	const todayStr = toLocalIso(new Date());
@@ -17,7 +17,7 @@
 	function handleSelect(key: RangeKey) {
 		if (key === 'custom' && !customStart) {
 			const today = new Date();
-			customEnd   = toLocalIso(today);
+			customEnd = toLocalIso(today);
 			const s = new Date(today);
 			s.setDate(s.getDate() - 29);
 			customStart = toLocalIso(s);
@@ -44,23 +44,12 @@
 		<div class="range-custom">
 			<label class="range-custom__label">
 				From
-				<input
-					class="range-custom__input"
-					type="date"
-					bind:value={customStart}
-					max={customEnd || todayStr}
-				/>
+				<input class="range-custom__input" type="date" bind:value={customStart} max={customEnd || todayStr} />
 			</label>
 			<span class="range-custom__sep" aria-hidden="true">→</span>
 			<label class="range-custom__label">
 				To
-				<input
-					class="range-custom__input"
-					type="date"
-					bind:value={customEnd}
-					min={customStart}
-					max={todayStr}
-				/>
+				<input class="range-custom__input" type="date" bind:value={customEnd} min={customStart} max={todayStr} />
 			</label>
 		</div>
 	{/if}

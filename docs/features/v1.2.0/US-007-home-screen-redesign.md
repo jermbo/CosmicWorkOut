@@ -11,10 +11,10 @@ so that I can immediately see what still needs to be done and tap into the right
    a. The root route shall be presented as **Overview**, not **Today**, because the selected date may be any past day or today.
    b. The Overview screen shall keep the weekly date selector with per-day indicators near the top.
    c. The Overview screen shall have two distinct layers:
-      - an **overview snapshot** for cross-app scanning
-      - a **selected day** summary that balances focus and progress for the currently selected date
-   d. Overview cards shall act as entry points to their focused pages.
-   c. The layout shall be usable one-handed in portrait orientation with no horizontal scrolling.
+   - an **overview snapshot** for cross-app scanning
+   - a **selected day** summary that balances focus and progress for the currently selected date
+     d. Overview cards shall act as entry points to their focused pages.
+     c. The layout shall be usable one-handed in portrait orientation with no horizontal scrolling.
 
 2. Date selector
    a. The date selector shall display the currently selected date prominently at the top of the screen, but the page identity shall remain Overview.

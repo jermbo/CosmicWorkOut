@@ -34,7 +34,6 @@
 
 	const todayStr = todayIso();
 
-	// Form is seeded from props once; the sheet is recreated on each open.
 	let selectedType = $state<ActivityType>(untrack(() => editing?.type ?? activityStore.lastUsedType));
 	let customType = $state(untrack(() => editing?.customType ?? ''));
 	let durationMinutes = $state(untrack(() => editing?.durationMinutes ?? 30));
@@ -42,6 +41,16 @@
 	let date = $state(untrack(() => editing?.date ?? initialDate ?? todayStr));
 	let saving = $state(false);
 	let confirming = $state(false);
+
+	let deleteAriaLabel = $derived.by(() => {
+		if (confirming) return 'Tap again to confirm delete';
+		return 'Delete this activity';
+	});
+
+	function resolveCustomType(): string | undefined {
+		if (selectedType === 'Other') return customType.trim() || undefined;
+		return undefined;
+	}
 
 	async function handleSave() {
 		if (saving) return;
@@ -51,7 +60,7 @@
 				await activityStore.update({
 					...editing,
 					type: selectedType,
-					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
+					customType: resolveCustomType(),
 					durationMinutes,
 					intensity,
 					date,
@@ -60,7 +69,7 @@
 				await activityStore.add({
 					date,
 					type: selectedType,
-					customType: selectedType === 'Other' ? customType.trim() || undefined : undefined,
+					customType: resolveCustomType(),
 					durationMinutes,
 					intensity,
 				});
@@ -94,7 +103,9 @@
 <BottomSheet onclose={onClose} maxHeight="80dvh">
 	<div class="act-sheet">
 		<div class="act-sheet__header">
-			<h2 class="act-sheet__title">{editing ? 'Edit Activity' : 'Log Activity'}</h2>
+			<h2 class="act-sheet__title">
+				{#if editing}Edit Activity{:else}Log Activity{/if}
+			</h2>
 			<button class="act-sheet__close" onclick={onClose} aria-label="Close">
 				<svg
 					viewBox="0 0 24 24"
@@ -111,7 +122,6 @@
 		</div>
 
 		<div class="act-sheet__body">
-			<!-- Activity type -->
 			<div class="act-field">
 				<span class="act-field__label">Activity</span>
 				<div class="act-type-grid" role="radiogroup" aria-label="Activity type">
@@ -139,7 +149,6 @@
 				{/if}
 			</div>
 
-			<!-- Duration -->
 			<div class="act-field">
 				<span class="act-field__label">Duration</span>
 				<div class="act-stepper" aria-label="Duration in minutes">
@@ -149,7 +158,6 @@
 				</div>
 			</div>
 
-			<!-- Intensity -->
 			<div class="act-field">
 				<span class="act-field__label">Intensity</span>
 				<div class="act-intensity" role="radiogroup" aria-label="Intensity">
@@ -164,21 +172,20 @@
 					{/each}
 				</div>
 			</div>
-
 		</div>
 
 		<div class="act-sheet__footer">
 			<button class="act-sheet__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : editing ? 'Save changes' : 'Log activity'}
+				{#if saving}Saving…{:else if editing}Save changes{:else}Log activity{/if}
 			</button>
 			{#if editing}
 				<button
 					class="act-sheet__delete-btn"
 					class:act-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
-					aria-label={confirming ? 'Tap again to confirm delete' : 'Delete this activity'}
+					aria-label={deleteAriaLabel}
 				>
-					{confirming ? 'Tap to confirm delete' : 'Delete'}
+					{#if confirming}Tap to confirm delete{:else}Delete{/if}
 				</button>
 			{/if}
 		</div>

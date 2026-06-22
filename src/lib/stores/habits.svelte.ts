@@ -31,17 +31,14 @@ class HabitStore {
 		return this.logs.filter((l) => l.date === date);
 	}
 
-	/** The logged value for a habit on a date (0 if none). */
 	valueFor(habit: Habit, date?: string): number {
 		return this.getLog(habit.id, date)?.value ?? 0;
 	}
 
-	/** Whether a habit counts as "done" on a date. */
 	isComplete(habit: Habit, date?: string): boolean {
 		return isHabitComplete(habit, this.getLog(habit.id, date));
 	}
 
-	/** Completion progress for a habit on a date, 0–100. */
 	progressPct(habit: Habit, date?: string): number {
 		return habitProgressPct(habit, this.getLog(habit.id, date));
 	}
@@ -50,7 +47,6 @@ class HabitStore {
 		return this.activeHabits.filter((h) => this.isComplete(h, date)).length;
 	}
 
-	// For calendar heat map: ratio of completed habits 0–1
 	completionRatioForDate(date: string): number {
 		const total = this.activeHabits.length;
 		if (total === 0) return 0;
@@ -59,10 +55,10 @@ class HabitStore {
 
 	async load(): Promise<void> {
 		const [habits, logs] = await Promise.all([db.habits.getAll(), db.habitLogs.getAll()]);
-		// Migrate legacy 'duration' type → 'minutes'
-		const normalized = habits.map((h) =>
-			(h.type as string) === 'duration' ? { ...h, type: 'minutes' as HabitType } : h,
-		);
+		const normalized = habits.map((h) => {
+			if ((h.type as string) === 'duration') return { ...h, type: 'minutes' as HabitType };
+			return h;
+		});
 		this.habits = normalized.sort((a, b) => a.sortOrder - b.sortOrder);
 		this.logs = logs;
 		this.loaded = true;
@@ -89,7 +85,10 @@ class HabitStore {
 
 	async updateHabit(habit: Habit): Promise<void> {
 		await db.habits.put(habit);
-		this.habits = this.habits.map((h) => (h.id === habit.id ? habit : h));
+		this.habits = this.habits.map((h) => {
+			if (h.id === habit.id) return habit;
+			return h;
+		});
 	}
 
 	async toggleActive(id: string): Promise<void> {
@@ -101,7 +100,8 @@ class HabitStore {
 	async reorder(orderedIds: string[]): Promise<void> {
 		const updated = this.habits.map((h) => {
 			const idx = orderedIds.indexOf(h.id);
-			return idx >= 0 ? { ...h, sortOrder: idx } : h;
+			if (idx >= 0) return { ...h, sortOrder: idx };
+			return h;
 		});
 		await Promise.all(updated.map((h) => db.habits.put(h)));
 		this.habits = updated.sort((a, b) => a.sortOrder - b.sortOrder);
@@ -110,7 +110,6 @@ class HabitStore {
 	async deleteHabit(id: string): Promise<void> {
 		await db.habits.remove(id);
 		this.habits = this.habits.filter((h) => h.id !== id);
-		// Keep historical logs — don't delete them
 	}
 
 	async logValue(habitId: string, value: number, date?: string): Promise<void> {
@@ -128,7 +127,9 @@ class HabitStore {
 
 	async toggle(habitId: string, date?: string): Promise<void> {
 		const existing = this.getLog(habitId, date);
-		await this.logValue(habitId, existing?.value ? 0 : 1, date);
+		let nextValue = 1;
+		if (existing?.value) nextValue = 0;
+		await this.logValue(habitId, nextValue, date);
 	}
 
 	async setMinutes(habitId: string, minutes: number, date?: string): Promise<void> {
@@ -140,8 +141,8 @@ class HabitStore {
 	}
 
 	async logMood(habitId: string, value: number, date?: string): Promise<void> {
-		// Mood value clamped to -5..+5
-		await this.logValue(habitId, Math.max(-5, Math.min(5, value)), date);
+		const clamped = Math.max(-5, Math.min(5, value));
+		await this.logValue(habitId, clamped, date);
 	}
 }
 

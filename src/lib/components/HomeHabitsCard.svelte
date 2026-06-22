@@ -8,9 +8,10 @@
 
 	let { logged, total }: Props = $props();
 
-	let ariaLabel = $derived(
-		total === 0 ? 'Habits: Add habits' : `Habits: ${logged} of ${total} logged`,
-	);
+	let ariaLabel = $derived.by(() => {
+		if (total === 0) return 'Habits: Add habits';
+		return `Habits: ${logged} of ${total} logged`;
+	});
 </script>
 
 <HomeCard href="/habits" title="Habits" {ariaLabel} variant="habits">

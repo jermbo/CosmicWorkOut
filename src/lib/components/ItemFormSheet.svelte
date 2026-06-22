@@ -33,7 +33,16 @@
 	let errors = $state<Record<string, string>>({});
 
 	function toggleFocus(tag: string) {
-		focus = focus.includes(tag) ? focus.filter((f) => f !== tag) : [...focus, tag];
+		if (focus.includes(tag)) {
+			focus = focus.filter((f) => f !== tag);
+		} else {
+			focus = [...focus, tag];
+		}
+	}
+
+	function metricHint(): string {
+		if (sectionMetric(disciplineId, section) === 'check') return 'checkbox';
+		return 'duration / reps';
 	}
 
 	function validate(): boolean {
@@ -81,9 +90,18 @@
 <BottomSheet onclose={onClose} maxHeight="92dvh">
 	<div class="item-form">
 		<div class="item-form__header">
-			<h2 class="item-form__title">{item ? 'Edit Item' : 'New Item'}</h2>
+			<h2 class="item-form__title">
+				{#if item}Edit Item{:else}New Item{/if}
+			</h2>
 			<button class="item-form__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					aria-hidden="true"
+				>
 					<line x1="18" y1="6" x2="6" y2="18" />
 					<line x1="6" y1="6" x2="18" y2="18" />
 				</svg>
@@ -99,32 +117,59 @@
 		>
 			<div class="form-field" class:form-field--error={errors.name}>
 				<label class="form-field__label" for="item-name">Name</label>
-				<input id="item-name" class="form-field__input" type="text" bind:value={name} placeholder="e.g. Hip Shimmy" autocomplete="off" />
+				<input
+					id="item-name"
+					class="form-field__input"
+					type="text"
+					bind:value={name}
+					placeholder="e.g. Hip Shimmy"
+					autocomplete="off"
+				/>
 				{#if errors.name}<span class="form-field__error">{errors.name}</span>{/if}
 			</div>
 
 			<div class="form-field">
 				<label class="form-field__label" for="item-cue">Cue <span class="form-field__optional">optional</span></label>
-				<input id="item-cue" class="form-field__input" type="text" bind:value={cue} placeholder="e.g. Relax the knees, let it travel" autocomplete="off" />
+				<input
+					id="item-cue"
+					class="form-field__input"
+					type="text"
+					bind:value={cue}
+					placeholder="e.g. Relax the knees, let it travel"
+					autocomplete="off"
+				/>
 			</div>
 
 			<div class="form-field">
 				<span class="form-field__label" id="item-section-label">Section</span>
 				<div class="chips" role="radiogroup" aria-labelledby="item-section-label">
 					{#each sections as s}
-						<button type="button" class="chip" class:chip--active={section === s.key} role="radio" aria-checked={section === s.key} onclick={() => (section = s.key)}>
+						<button
+							type="button"
+							class="chip"
+							class:chip--active={section === s.key}
+							role="radio"
+							aria-checked={section === s.key}
+							onclick={() => (section = s.key)}
+						>
 							{s.label}
 						</button>
 					{/each}
 				</div>
-				<span class="form-field__hint">Logged as: {sectionMetric(disciplineId, section) === 'check' ? 'checkbox' : 'duration / reps'}</span>
+				<span class="form-field__hint">Logged as: {metricHint()}</span>
 			</div>
 
 			<div class="form-field" class:form-field--error={errors.focus}>
 				<span class="form-field__label" id="item-focus-label">Focus</span>
 				<div class="chips" role="group" aria-labelledby="item-focus-label">
 					{#each FOCUS_TAGS as tag}
-						<button type="button" class="chip" class:chip--active={focus.includes(tag)} aria-pressed={focus.includes(tag)} onclick={() => toggleFocus(tag)}>
+						<button
+							type="button"
+							class="chip"
+							class:chip--active={focus.includes(tag)}
+							aria-pressed={focus.includes(tag)}
+							onclick={() => toggleFocus(tag)}
+						>
 							{tag}
 						</button>
 					{/each}
@@ -133,7 +178,7 @@
 			</div>
 
 			<button type="submit" class="item-form__submit" disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : item ? 'Save changes' : 'Add item'}
+				{#if saving}Saving…{:else if item}Save changes{:else}Add item{/if}
 			</button>
 		</form>
 	</div>

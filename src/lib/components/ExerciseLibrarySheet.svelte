@@ -1,21 +1,22 @@
 <script lang="ts">
 	import type { Item } from '$lib/db/types';
+	import { STRENGTH_CATS } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
 
 	const CAT_COLORS: Record<string, string> = {
-		Hinge: 'var(--color-lime)',
-		Squat: 'var(--color-lime)',
-		Push: 'var(--color-lavender)',
-		Pull: 'var(--color-sky)',
-		Lateral: 'var(--color-red)',
-		Rotational: 'var(--color-red)',
-		Power: 'var(--color-lime)',
-		Carry: 'var(--color-lavender)',
+		Chest: 'var(--color-red)',
+		Back: 'var(--color-sky)',
+		Shoulders: 'var(--color-lavender)',
+		Biceps: 'var(--color-lime)',
+		Triceps: 'var(--color-lime)',
+		Legs: 'var(--color-lime)',
+		Core: 'var(--color-red)',
+		'Full Body': 'var(--color-lavender)',
 	};
 
-	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
+	const CATS = ['All', ...STRENGTH_CATS];
 
 	type Props = {
 		exercises: Item[];
@@ -29,7 +30,6 @@
 	let query = $state('');
 	let expandedId = $state<string | null>(null);
 	let formExercise = $state<Item | null | undefined>(undefined);
-	// undefined = closed, null = new, Item = editing
 	let confirmDeleteId = $state<string | null>(null);
 	let deleteError = $state<string | null>(null);
 
@@ -48,7 +48,11 @@
 	);
 
 	function toggleExpand(id: string) {
-		expandedId = expandedId === id ? null : id;
+		if (expandedId === id) {
+			expandedId = null;
+		} else {
+			expandedId = id;
+		}
 	}
 
 	async function deleteExercise(ex: Item) {
@@ -62,7 +66,11 @@
 			await programStore.deleteItem(ex.id);
 			if (expandedId === ex.id) expandedId = null;
 		} catch (e) {
-			deleteError = e instanceof Error ? e.message : 'Could not delete exercise.';
+			if (e instanceof Error) {
+				deleteError = e.message;
+			} else {
+				deleteError = 'Could not delete exercise.';
+			}
 		}
 	}
 </script>

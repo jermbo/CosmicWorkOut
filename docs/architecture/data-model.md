@@ -1,17 +1,18 @@
 # Data Model
 
-All data is stored locally. Source of truth: `src/lib/db/types.ts`. See [Offline Strategy](offline-strategy.md) for write timing.
+All data is stored locally on the device. **Source of truth: `src/lib/db/types.ts`** (entity shapes) and `src/lib/db/database.ts` (stores + DB version). See [Offline Strategy](offline-strategy.md) for write timing.
 
-> **🟡 v1.4.0 in flight.** The entities below describe the **current, strength-only** code. v1.4.0 generalizes them into the [Discipline Model](#discipline-model--planned-v140) so strength and belly dance share one engine. Terms are defined in the [Glossary](../glossary.md). Until that lands, the strength-only types here remain the shipped reality.
+> The Discipline model is **shipped** (since v1.4.0). Strength and Belly Dance are two Disciplines running on one generic engine. Terms are defined in the [Glossary](../glossary.md).
 
 ---
 
-## Discipline Model — planned (v1.4.0)
+## Discipline model
 
-A **Discipline** is a data-driven definition of a structured movement practice. It is what makes the engine specific (each Discipline brings its own sections, metrics, and seed) while staying generic (the engine has no belly-dance or strength knowledge baked in). Strength and Belly Dance are the two Disciplines that ship.
+A **Discipline** is a data-driven definition of a structured movement practice. It makes the engine specific (each Discipline brings its own sections, metrics, and seed content) while the engine itself stays generic — no belly-dance or strength knowledge is baked into the code.
+
+Disciplines are **seeded, read-only config** — they live in `src/lib/discipline.ts`, **not** in IndexedDB, and are not user-editable. Programs, Items, Routines, and Sessions all carry a `disciplineId`.
 
 ```typescript
-// How one item is logged within a session — the core flexibility lever.
 type Metric = 'setsReps' | 'measure' | 'check';
 // setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
 
@@ -31,168 +32,204 @@ type Discipline = {
 };
 ```
 
-Disciplines are seeded and read-only (config, not user data). Programs, Items, Routines, and Sessions all carry a `disciplineId`.
+The two shipped Disciplines (`src/lib/discipline.ts`):
 
-### Active program is per-Discipline 🟡 (v1.4.0)
+| Discipline  | id           | Sections                                        | Section metrics                        |
+| ----------- | ------------ | ----------------------------------------------- | -------------------------------------- |
+| Strength    | `strength`   | `exercises`                                     | `setsReps`                             |
+| Belly Dance | `bellydance` | `warm-up`, `conditioning`, `moves`, `cool-down` | `check`, `measure`, `measure`, `check` |
 
-Today there is a single active program (one `cwout:activeProgramId` in localStorage, one `activeProgram` in the store). v1.4.0 generalizes this to **one active program per Discipline**: a Strength program and a Belly Dance program can be active **at the same time**. The user runs them concurrently (e.g. strength on some days, dance on others) — the app does **not** bind a Discipline to days of the week.
+Belly Dance's `warm-up` and `cool-down` are **bookends** — routines other than A inherit Routine A's bookend items unless they set `overridesBookends`.
 
-- Active-program tracking is keyed by `disciplineId` (see [localStorage Keys](#localstorage-keys)).
-- All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) are derived **per Discipline**.
-- "One session per program per day" is enforced **per Discipline**, so one strength **and** one dance session may be logged on the same date.
+### Active program is per-Discipline
 
-> **No day-of-week scheduling and no load periodization in v1.4.0.** Progression stays **count-driven** — the next routine is `completedSessionCount % routineCount`, identical to today's strength logic, now per Discipline. Weeks are not auto-periodized; carrying weight forward is the existing per-item last-used prefill, adjusted manually. See [Program Progression](../implementation/program-progression.md).
-
-### Naming map (current → generalized)
-
-The existing strength entities are renamed/generalized — not replaced — when the engine lands. Behaviour is preserved; scope widens to "any Discipline."
-
-| Current (below) | Generalized                       | Change                                                         |
-| --------------- | --------------------------------- | -------------------------------------------------------------- |
-| `Exercise`      | `Item`                            | gains `disciplineId`, `section`/type tag, `focus[]`, `metric`  |
-| `Workout`       | `Routine`                         | gains `disciplineId`; sections instead of a flat exercise list |
-| `Program`       | `Program`                         | gains `disciplineId`                                           |
-| `SessionLog`    | `Session`                         | gains `disciplineId`; logged values vary by item metric        |
-| —               | `Discipline`, `Section`, `Metric` | new                                                            |
-
-Because the app is pre-beta with no users, v1.4.0 **wipes IndexedDB and re-seeds** rather than migrating records — see the [v1.4.0 README](../features/v1.4.0/README.md).
+There is **one active program per Discipline** — a Strength program and a Belly Dance program can be active at the same time. The user runs them concurrently (strength on some days, dance on others); the app does **not** bind a Discipline to days of the week. All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive per Discipline, and "one session per program per day" is enforced per Discipline. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
 
 ---
 
-## Entities (current — strength-only)
+## Catalog → Item derivation
 
-### Exercise
+Built-in **Items are derived from catalog seeds**, not hand-written one by one:
 
-A single movement — the atomic unit of any workout.
+- **Strength:** `strength-exercises.ts` (72 exercise catalog entries) → `strengthItems` (section `exercises`, metric `setsReps`).
+- **Belly Dance:** `bellydance-moves.ts` (39 moves) + `bellydance-bookends.ts` (10 warm-up/cool-down) → `bellyDanceItems` (moves metric `measure`; bookends metric `check`).
+
+`src/lib/db/seed.ts` composes `builtInItems = [...strengthItems, ...bellyDanceItems]` (**121 built-in items**) and `builtInPrograms = [...strengthPrograms, ...bellyDancePrograms]` (**12 programs**).
+
+---
+
+## Entities
+
+### Item
+
+A single movement — the atomic unit of any routine. One model spans every Discipline; strength-only fields are optional so `measure`/`check` items (belly dance) share the shape.
 
 ```typescript
-type Exercise = {
+type Item = {
 	id: string;
+	disciplineId: string;
 	name: string;
 	cue: string; // coaching note shown during session
-	muscles: string; // e.g. "Hamstrings · Glutes"
-	cat: ExerciseCat; // Hinge | Squat | Push | Pull | ...
-	unit: 'lb' | 'kg' | 'band' | 'bodyweight';
-	defaultSets: number;
-	defaultReps: string; // "8-10" or "10 ea" — string for ranges
-	weightIncrement?: number; // stepper step size in lb/kg — not used for band/bodyweight
+	section: string; // section key within the Discipline (strength: "exercises")
+	metric: Metric;
+	focus?: string[]; // body-part focus tags, e.g. ["hips", "core"]
+	// Belly dance catalog metadata (dance items only)
+	danceCat?: string;
+	movementType?: 'sharp' | 'smooth' | 'variable';
+	difficulty?: 'beginner' | 'intermediate' | 'advanced';
+	// setsReps (strength) fields — absent on measure/check items
+	muscles?: string;
+	cat?: ItemCat; // Chest | Back | Shoulders | Biceps | Triceps | Legs | Core | Full Body
+	exerciseType?: 'compound' | 'isolation' | 'dynamic' | 'isometric';
+	equipment?: string[];
+	unit?: 'lb' | 'kg' | 'band' | 'bodyweight';
+	defaultSets?: number;
+	defaultReps?: string; // "8-10" or "10 ea" — string for ranges
+	weightIncrement?: number; // stepper step in lb/kg
 	isBuiltIn: boolean;
 };
 ```
 
-Built-in exercises ship in `src/lib/db/seed.ts` and are upserted on every boot.
+Strength categories (`STRENGTH_CATS`) are **body-part based**: Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body.
 
----
+### Routine
+
+A single training day. Holds **sections** (not a flat item list), so one engine serves strength's single section and belly dance's four.
+
+```typescript
+type RoutineItem = {
+	itemId: string;
+	sets?: number; // strength only — dance items enter values during the session
+	reps?: string;
+	notes?: string;
+};
+
+type RoutineSection = {
+	key: string; // matches a Discipline Section key
+	items: RoutineItem[];
+	overridesBookends?: boolean; // bookend sections only — own list vs. inherit Routine A
+};
+
+type Routine = {
+	id: string;
+	disciplineId: string;
+	name: string;
+	letter?: string; // "A", "B", "C"
+	focus?: string;
+	color?: 'lime' | 'lavender' | 'red';
+	estMin?: number;
+	sections: RoutineSection[]; // strength: a single "exercises" section
+};
+```
 
 ### Program
 
 A multi-week training plan.
 
 ```typescript
+type Week = { weekNumber: number; routines: Routine[] };
+
 type Program = {
 	id: string;
+	disciplineId: string;
 	name: string;
 	description: string;
 	durationWeeks: number;
 	daysPerWeek: number;
 	weeks: Week[];
-	createdAt: string; // ISO datetime
+	createdAt: string;
 	isBuiltIn: boolean;
 };
 ```
 
-Currently ships one built-in: **Strength Foundation** (12 weeks, 3 days/week).
+Twelve built-in programs ship: six Strength and six Belly Dance "course" programs (Beginner 101–103, Intermediate 101–103).
 
----
+### Session
 
-### Workout
-
-A single training day.
+A completed session, written on finish. Logged values vary by item metric.
 
 ```typescript
-type Workout = {
-	id: string;
-	name: string; // "Lower + Lateral Power"
-	letter?: string; // "A", "B", "C"
-	focus?: string; // "Legs · Lateral · Rotational"
-	color?: 'lime' | 'lavender' | 'red';
-	estMin?: number;
-	exercises: WorkoutExercise[];
-};
-
-type WorkoutExercise = {
-	exerciseId: string;
-	sets: number;
-	reps: string;
-	notes?: string;
-};
-```
-
----
-
-### SessionLog
-
-A completed workout session. Written on session finish.
-
-```typescript
-type SessionLog = {
-	id: string;
-	date: string; // ISO date "2025-06-10"
-	workoutId: string;
-	programId: string;
-	startedAt: string;
-	finishedAt: string;
-	durationSeconds: number;
-	totalVolume: number; // sum of weight × reps (numeric weights only)
-	totalSets: number;
-	exercises: LoggedExercise[];
-};
-
 type LoggedSet = {
 	setNumber: number;
 	weight: number | string; // string for band levels
 	reps: number;
 	completedAt: string;
 };
-```
 
----
+type LoggedItem = {
+	itemId: string;
+	sets: LoggedSet[]; // setsReps items
+	checked?: boolean; // check items
+	value?: number; // measure items
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean; // measure item logged with no value
+};
+
+type Session = {
+	id: string;
+	disciplineId: string;
+	date: string; // ISO date "2026-06-10"
+	routineId: string;
+	programId: string;
+	startedAt: string;
+	finishedAt: string;
+	durationSeconds: number;
+	totalVolume: number; // sum of weight × reps (numeric weights only)
+	totalSets: number;
+	items: LoggedItem[];
+};
+```
 
 ### ActiveSession (in-memory + localStorage)
 
-In-progress session for crash recovery. Not an IndexedDB entity.
+In-progress session for crash recovery. Not an IndexedDB entity — persisted to `cwout:activeSession`.
 
 ```typescript
-type ActiveSession = {
-	id: string;
-	date: string;
-	workoutId: string;
-	workoutName: string;
-	programId: string;
-	startedAt: string;
-	exercises: ActiveExercise[];
-};
-```
-
----
-
-### ExerciseLastUsed
-
-Last logged weight and reps per exercise. Pre-fills weight when a new session starts for that exercise.
-
-```typescript
-type ExerciseLastUsed = {
-	exerciseId: string;
+type ActiveSet = {
+	setNumber: number;
+	targetReps: string;
 	weight: number | string;
 	reps: number;
+	completed: boolean;
+	completedAt: string | null;
+};
+
+type ActiveItem = {
+	itemId: string;
+	unit: 'lb' | 'kg' | 'band' | 'bodyweight';
+	sets: ActiveSet[]; // setsReps
+	metric?: Metric;
+	section?: string;
+	checked?: boolean; // check
+	value?: number | null; // measure
+	measureMode?: 'duration' | 'reps';
+	skipped?: boolean;
+};
+
+type ActiveSession = {
+	id: string;
+	disciplineId: string;
+	date: string;
+	routineId: string;
+	routineName: string;
+	programId: string;
+	startedAt: string;
+	items: ActiveItem[];
+	isEditing?: boolean; // editing a finished session
+	originalFinishedAt?: string;
+	originalDurationSeconds?: number;
 };
 ```
 
----
+### ItemLastUsed
 
-### Habit
+Last logged weight and reps per item. Pre-fills weight when a new session starts.
 
-A trackable daily behaviour.
+```typescript
+type ItemLastUsed = { itemId: string; weight: number | string; reps: number };
+```
+
+### Habit & HabitLog
 
 ```typescript
 type HabitType = 'times' | 'minutes' | 'count' | 'boolean' | 'mood';
@@ -202,34 +239,21 @@ type Habit = {
 	name: string;
 	unit: string; // display label, e.g. "cups", "pages", ""
 	type: HabitType;
-	dailyGoal?: number; // undefined for boolean and mood types
+	dailyGoal?: number; // undefined for boolean and mood
 	active: boolean;
 	sortOrder: number;
 	createdAt: string;
 };
-```
 
-Seven built-in habits ship in `src/lib/db/seed.ts`. Seeded on first run only. A boot-time migration patches `dailyGoal` onto any existing built-in records that pre-date the goal fields being added.
-
----
-
-### HabitLog
-
-A single day's logged value for one habit.
-
-```typescript
 type HabitLog = {
 	id: string; // composite: "habitId_dateStr"
 	habitId: string;
-	date: string; // ISO date "2025-06-10"
+	date: string; // ISO date
 	value: number; // 0/1 for boolean; -5..+5 for mood; count for others
-	loggedAt: string;
 };
 ```
 
-One record per (habitId, date) pair. Upserted on every interaction.
-
----
+Seven built-in habits ship in `seed.ts` (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood), seeded on first run only. A boot-time migration in `initDB()` patches `dailyGoal` onto pre-existing built-in habit records that lack it.
 
 ### ActivityLog
 
@@ -250,20 +274,16 @@ type ActivityType =
 	| 'Cardio'
 	| 'Other';
 
-type ActivityIntensity = 'Easy' | 'Moderate' | 'Hard';
-
 type ActivityLog = {
 	id: string;
-	date: string; // ISO date
+	date: string;
 	type: ActivityType;
 	customType?: string; // filled when type === "Other"
 	durationMinutes: number;
-	intensity: ActivityIntensity;
+	intensity: 'Easy' | 'Moderate' | 'Hard';
 	createdAt: string;
 };
 ```
-
----
 
 ### UserPrefs
 
@@ -272,7 +292,6 @@ Stored in localStorage (`cwout:prefs`).
 ```typescript
 type UserPrefs = {
 	accentColor: string; // hex, default "#b2f042"
-	completionFeel: 'full' | 'subtle';
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg';
@@ -285,48 +304,64 @@ type UserPrefs = {
 
 ```mermaid
 erDiagram
+    Discipline ||--|{ Section : declares
+    Program }o--|| Discipline : "scoped to"
     Program ||--|{ Week : contains
-    Week ||--|{ Workout : contains
-    Workout ||--|{ WorkoutExercise : contains
-    WorkoutExercise }o--|| Exercise : references
-    SessionLog }o--|| Workout : "performed (workoutId)"
-    SessionLog }o--|| Program : "belongs to (programId)"
-    SessionLog ||--|{ LoggedExercise : contains
-    LoggedExercise }o--|| Exercise : references
-    LoggedExercise ||--|{ LoggedSet : contains
-    ActiveSession ||--|{ ActiveExercise : "in-progress"
-    ActiveExercise ||--|{ ActiveSet : contains
-    ActiveSession ||--|| SessionLog : "becomes on finish"
-    ExerciseLastUsed }o--|| Exercise : "last weight/reps"
+    Week ||--|{ Routine : contains
+    Routine ||--|{ RoutineSection : contains
+    RoutineSection ||--|{ RoutineItem : contains
+    RoutineItem }o--|| Item : references
+    Session }o--|| Routine : "performed (routineId)"
+    Session }o--|| Program : "belongs to (programId)"
+    Session ||--|{ LoggedItem : contains
+    LoggedItem }o--|| Item : references
+    LoggedItem ||--o{ LoggedSet : contains
+    ActiveSession ||--|{ ActiveItem : "in-progress"
+    ActiveItem ||--o{ ActiveSet : contains
+    ActiveSession ||--|| Session : "becomes on finish"
+    ItemLastUsed }o--|| Item : "last weight/reps"
     HabitLog }o--|| Habit : "daily value for"
 ```
 
 ---
 
-## IndexedDB Stores
+## IndexedDB stores
 
-DB name: `cosmic-workout`, version: `2`.
+DB name `cosmic-workout`, version **7**. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
 
-| Store              | Key          | Indexes               | Contents                      |
-| ------------------ | ------------ | --------------------- | ----------------------------- |
-| `exercises`        | `id`         | —                     | Exercise library              |
-| `programs`         | `id`         | —                     | All programs                  |
-| `sessions`         | `id`         | `by_date`             | Completed workout sessions    |
-| `exerciseLastUsed` | `exerciseId` | —                     | Last weight/reps per exercise |
-| `activities`       | `id`         | `by_date`             | Activity log entries          |
-| `habits`           | `id`         | —                     | Habit definitions             |
-| `habitLogs`        | `id`         | `by_date`, `by_habit` | Daily habit log values        |
+**Version history:**
+
+| Version     | Change                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v4 (v1.4.0) | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines. |
+| v5 (v1.4.0) | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                        |
+| v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                 |
+| v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                            |
+
+| Store          | Key      | Indexes               | Contents                         |
+| -------------- | -------- | --------------------- | -------------------------------- |
+| `items`        | `id`     | —                     | Item library (built-in + custom) |
+| `programs`     | `id`     | —                     | All programs                     |
+| `sessions`     | `id`     | `by_date`             | Completed sessions               |
+| `itemLastUsed` | `itemId` | —                     | Last weight/reps per item        |
+| `activities`   | `id`     | `by_date`             | Activity log entries             |
+| `habits`       | `id`     | —                     | Habit definitions                |
+| `habitLogs`    | `id`     | `by_date`, `by_habit` | Daily habit log values           |
+
+Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
 ---
 
-## localStorage Keys
+## localStorage keys
 
-| Key                      | Contents                                              |
-| ------------------------ | ----------------------------------------------------- |
-| `cwout:prefs`            | UserPrefs JSON                                        |
-| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                   |
-| `cwout:activeProgramId`  | Active program ID — **🟡 v1.4.0:** keyed per Discipline (one active program per Discipline) |
-| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet) |
+| Key                      | Contents                                                           |
+| ------------------------ | ------------------------------------------------------------------ |
+| `cwout:prefs`            | UserPrefs JSON                                                     |
+| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                |
+| `cwout:activeProgramIds` | Active program id per Discipline                                   |
+| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset) |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)              |
+| `cwout:habitDay`         | Selected day on the habit log                                      |
 
 ---
 

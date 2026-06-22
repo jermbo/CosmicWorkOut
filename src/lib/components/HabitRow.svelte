@@ -37,13 +37,20 @@
 
 	let meta = $derived.by(() => {
 		const parts = [habitTypeLabel(habit.type)];
+		let goalUnitSuffix = '';
+		if (habit.unit) goalUnitSuffix = ` ${habit.unit}`;
 		if (habit.dailyGoal) {
-			parts.push(`goal ${habit.dailyGoal}${habit.unit ? ' ' + habit.unit : ''}`);
+			parts.push(`goal ${habit.dailyGoal}${goalUnitSuffix}`);
 		} else if (habit.unit) {
 			parts.push(habit.unit);
 		}
 		return parts.join(' · ');
 	});
+
+	function toggleAriaLabel(): string {
+		if (habit.active) return `Deactivate ${habit.name}`;
+		return `Activate ${habit.name}`;
+	}
 </script>
 
 <div
@@ -70,7 +77,7 @@
 			class="habit-row__toggle"
 			class:habit-row__toggle--active={habit.active}
 			onclick={ontoggle}
-			aria-label="{habit.active ? 'Deactivate' : 'Activate'} {habit.name}"
+			aria-label={toggleAriaLabel()}
 			role="switch"
 			aria-checked={habit.active}
 		>

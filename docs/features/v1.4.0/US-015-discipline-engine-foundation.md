@@ -25,24 +25,24 @@ so that adding belly dance (and future practices) never forces me to relearn or 
    d. Linear progression — next routine = `completedSessionCount % routineCount`, week = `floor(count / daysPerWeek) + 1` — shall be a Discipline-level behaviour, identical to today's strength logic.
    e. The "one session per program per day" rule shall apply per Discipline, allowing one strength and one belly dance session on the same date.
 
-6. Concurrent programs (per-Discipline active program)
+3. Concurrent programs (per-Discipline active program)
    a. The app shall track **one active program per Discipline**, so a strength program and a belly dance program can be active at the same time.
    b. Active-program tracking shall be keyed by `disciplineId` (replacing the single global active-program key), and all progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) shall be derived per Discipline.
    c. The app shall not bind a Discipline to specific days of the week; the user chooses what to log on any day, and the next routine is recommended by count (A → B → C), exactly as strength does today.
 
-3. Strength preserved (no observable regression)
+4. Strength preserved (no observable regression)
    a. After the engine lands, the **Strength Foundation** program, its A/B/C routines, and the 31 built-in exercises shall be available as the Strength Discipline.
    b. Starting, logging (smart-tap), finishing, abandoning, editing, and crash-recovering a strength session shall behave exactly as before.
    c. Strength history (past sessions), volume totals, the weekly consistency streak, and scheduled/skipped day inference shall be unchanged.
    d. Per-exercise last-used weight and per-exercise weight increments shall continue to pre-fill on session start.
    e. Custom exercises, custom programs, and copy-before-edit on built-ins shall continue to work, now as Items and routines of the Strength Discipline.
 
-4. Data reset on upgrade
+5. Data reset on upgrade
    a. Because the app is pre-beta with no production users, the upgrade shall **reset local data and re-seed** both Disciplines rather than migrate existing records.
    b. After reset, the app shall boot into a clean, fully seeded state with no orphaned strength records and no console errors.
    c. Settings data controls shall clear or reset data in terms of the new model and shall never leave the app in a broken or un-seeded state.
 
-5. Generalized routine editor
+6. Generalized routine editor
    a. A single routine editor shall edit any Discipline's routine by rendering that routine's sections.
    b. For a single-section (strength) routine, the editor shall present a flat item list as it does today.
    c. The editor shall be extensible to multi-section routines with bookend inheritance and per-section item pickers (defined for belly dance in US-017) without a second editor.
