@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Chart } from 'chart.js';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { chartTheme, ACTIVITY_PALETTE } from '$lib/chart-utils';
+	import { Chart, chartTheme, ACTIVITY_PALETTE } from '$lib/chart-utils';
 
 	let { dates, rangeLabel }: { dates: string[]; rangeLabel: string } = $props();
 
@@ -15,9 +14,7 @@
 			if (!dateSet.has(a.date)) continue;
 			counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
 		}
-		return [...counts.entries()]
-			.sort((a, b) => b[1] - a[1])
-			.map(([type, count]) => ({ type, count }));
+		return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([type, count]) => ({ type, count }));
 	});
 
 	let activityTotal = $derived(activityBreakdown.reduce((s, a) => s + a.count, 0));
@@ -28,22 +25,25 @@
 		const { legendOpts } = chartTheme();
 		const { textPrimary } = chartTheme();
 
-		const types  = activityBreakdown.map((a) => a.type);
+		const types = activityBreakdown.map((a) => a.type);
 		const counts = activityBreakdown.map((a) => a.count);
 
 		const chart = new Chart(canvas, {
 			type: 'doughnut',
 			data: {
 				labels: types,
-				datasets: [{
-					data: counts,
-					backgroundColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc'),
-					borderColor:     types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length]),
-					borderWidth: 1,
-				}],
+				datasets: [
+					{
+						data: counts,
+						backgroundColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc'),
+						borderColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length]),
+						borderWidth: 1,
+					},
+				],
 			},
 			options: {
-				responsive: true, maintainAspectRatio: false,
+				responsive: true,
+				maintainAspectRatio: false,
 				onResize(chart, { width }) {
 					const pos = width >= 360 ? 'right' : 'bottom';
 					if (chart.options.plugins?.legend?.position !== pos) {
@@ -55,15 +55,19 @@
 					legend: {
 						position: 'right',
 						labels: {
-							...legendOpts, boxWidth: 14, boxHeight: 14,
+							...legendOpts,
+							boxWidth: 14,
+							boxHeight: 14,
 							generateLabels: (chart) => {
 								const data = chart.data;
 								return (data.labels as string[]).map((label, i) => ({
 									text: `${label} (${(data.datasets[0].data as number[])[i]})`,
-									fillStyle:   ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc',
+									fillStyle: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc',
 									strokeStyle: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length],
-									fontColor:   textPrimary,
-									lineWidth: 1, index: i, hidden: false,
+									fontColor: textPrimary,
+									lineWidth: 1,
+									index: i,
+									hidden: false,
 								}));
 							},
 						},

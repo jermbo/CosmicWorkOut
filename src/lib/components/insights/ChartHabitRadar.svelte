@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Chart } from 'chart.js';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { chartTheme } from '$lib/chart-utils';
+	import { Chart, chartTheme } from '$lib/chart-utils';
 
 	let { dates }: { dates: string[] } = $props();
 

@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Chart } from 'chart.js';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { chartTheme } from '$lib/chart-utils';
+	import { Chart, chartTheme } from '$lib/chart-utils';
 
 	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
 
@@ -22,70 +21,79 @@
 			logMap.get(log.habitId)!.set(log.date, log.value);
 		}
 
-		const moodData = moodHabit ? dates.map((d) => logMap.get(moodHabit.id)?.get(d) ?? null) : null;
-		const coffeeData = coffeeHabit ? dates.map((d) => logMap.get(coffeeHabit.id)?.get(d) ?? null) : null;
-		const waterData = waterHabit ? dates.map((d) => logMap.get(waterHabit.id)?.get(d) ?? null) : null;
+		let moodData: (number | null)[] | null = null;
+		if (moodHabit) {
+			moodData = dates.map((d) => logMap.get(moodHabit.id)?.get(d) ?? null);
+		}
+
+		let coffeeData: (number | null)[] | null = null;
+		if (coffeeHabit) {
+			coffeeData = dates.map((d) => logMap.get(coffeeHabit.id)?.get(d) ?? null);
+		}
+
+		let waterData: (number | null)[] | null = null;
+		if (waterHabit) {
+			waterData = dates.map((d) => logMap.get(waterHabit.id)?.get(d) ?? null);
+		}
 
 		const moodColor = '#e879f9';
 		const coffeeColor = '#f59e0b';
 		const waterColor = '#60c6ff';
 
+		const datasets = [];
+
+		if (moodData) {
+			datasets.push({
+				label: 'Mood',
+				data: moodData,
+				yAxisID: 'yMood',
+				borderColor: moodColor,
+				backgroundColor: moodColor + '22',
+				pointBackgroundColor: moodColor,
+				borderWidth: 1.5,
+				pointRadius: 2,
+				spanGaps: true,
+				tension: 0.3,
+			});
+		}
+
+		if (coffeeData) {
+			datasets.push({
+				label: coffeeHabit!.name,
+				data: coffeeData,
+				yAxisID: 'yHabits',
+				borderColor: coffeeColor,
+				backgroundColor: coffeeColor + '22',
+				pointBackgroundColor: coffeeColor,
+				borderWidth: 1.5,
+				borderDash: [6, 3],
+				pointRadius: 2,
+				spanGaps: true,
+				tension: 0.3,
+			});
+		}
+
+		if (waterData) {
+			datasets.push({
+				label: waterHabit!.name,
+				data: waterData,
+				yAxisID: 'yHabits',
+				borderColor: waterColor,
+				backgroundColor: waterColor + '22',
+				pointBackgroundColor: waterColor,
+				borderWidth: 1.5,
+				borderDash: [2, 3],
+				pointRadius: 2,
+				spanGaps: true,
+				tension: 0.3,
+			});
+		}
+
 		const chart = new Chart(canvas, {
 			type: 'line',
 			data: {
 				labels: xLabels,
-				datasets: [
-					...(moodData
-						? [
-								{
-									label: 'Mood',
-									data: moodData,
-									yAxisID: 'yMood',
-									borderColor: moodColor,
-									backgroundColor: moodColor + '22',
-									pointBackgroundColor: moodColor,
-									borderWidth: 1.5,
-									pointRadius: 2,
-									spanGaps: true,
-									tension: 0.3,
-								},
-							]
-						: []),
-					...(coffeeData
-						? [
-								{
-									label: coffeeHabit!.name,
-									data: coffeeData,
-									yAxisID: 'yHabits',
-									borderColor: coffeeColor,
-									backgroundColor: coffeeColor + '22',
-									pointBackgroundColor: coffeeColor,
-									borderWidth: 1.5,
-									borderDash: [6, 3],
-									pointRadius: 2,
-									spanGaps: true,
-									tension: 0.3,
-								},
-							]
-						: []),
-					...(waterData
-						? [
-								{
-									label: waterHabit!.name,
-									data: waterData,
-									yAxisID: 'yHabits',
-									borderColor: waterColor,
-									backgroundColor: waterColor + '22',
-									pointBackgroundColor: waterColor,
-									borderWidth: 1.5,
-									borderDash: [2, 3],
-									pointRadius: 2,
-									spanGaps: true,
-									tension: 0.3,
-								},
-							]
-						: []),
-				],
+				datasets,
 			},
 			options: {
 				responsive: true,

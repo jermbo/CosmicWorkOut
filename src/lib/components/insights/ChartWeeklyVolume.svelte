@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { Chart } from 'chart.js';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { chartTheme, getMondayOf } from '$lib/chart-utils';
+	import { Chart, chartTheme, getMondayOf } from '$lib/chart-utils';
 
 	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
 

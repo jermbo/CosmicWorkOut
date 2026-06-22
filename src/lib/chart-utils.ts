@@ -16,6 +16,8 @@ import {
 } from 'chart.js';
 import { toLocalIso } from '$lib/date';
 
+export { Chart };
+
 Chart.register(
 	CategoryScale,
 	LinearScale,
