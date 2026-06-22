@@ -18,6 +18,11 @@
 		}
 		return pathname.startsWith(item.href);
 	}
+
+	function ariaCurrentFor(item: (typeof navItems)[number]): 'page' | undefined {
+		if (isActive(item)) return 'page';
+		return undefined;
+	}
 </script>
 
 <nav class="bottom-nav" aria-label="Main navigation">
@@ -28,7 +33,7 @@
 					href={item.href}
 					class="bottom-nav__link"
 					class:bottom-nav__link--active={isActive(item)}
-					aria-current={isActive(item) ? 'page' : undefined}
+					aria-current={ariaCurrentFor(item)}
 				>
 					{#if item.label === 'Overview'}
 						<svg

@@ -12,12 +12,7 @@
 	let { icon, label, description, secondary = false, onclick }: Props = $props();
 </script>
 
-<button
-	class="day-action-item"
-	class:day-action-item--secondary={secondary}
-	type="button"
-	{onclick}
->
+<button class="day-action-item" class:day-action-item--secondary={secondary} type="button" {onclick}>
 	<span class="day-action-item__icon" aria-hidden="true">
 		<Icon name={icon} size={20} />
 	</span>

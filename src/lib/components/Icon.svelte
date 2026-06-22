@@ -1,7 +1,4 @@
 <script lang="ts">
-	// Shared icon set for the repeated inline SVGs. Stroke icons inherit
-	// `currentColor`; size and stroke width are caller-controlled so each call
-	// site can match its previous inline markup.
 	export type IconName =
 		| 'plus'
 		| 'minus'
@@ -26,6 +23,26 @@
 	let { name, size = 18, stroke = 2, title }: Props = $props();
 
 	let filled = $derived(name === 'flame' || name === 'drag');
+
+	let fillValue = $derived.by(() => {
+		if (filled) return 'currentColor';
+		return 'none';
+	});
+
+	let strokeValue = $derived.by(() => {
+		if (filled) return 'none';
+		return 'currentColor';
+	});
+
+	let roleValue = $derived.by(() => {
+		if (title) return 'img';
+		return undefined;
+	});
+
+	let ariaHiddenValue = $derived.by<'true' | undefined>(() => {
+		if (title) return undefined;
+		return 'true';
+	});
 </script>
 
 <svg
@@ -33,13 +50,13 @@
 	viewBox="0 0 24 24"
 	width={size}
 	height={size}
-	fill={filled ? 'currentColor' : 'none'}
-	stroke={filled ? 'none' : 'currentColor'}
+	fill={fillValue}
+	stroke={strokeValue}
 	stroke-width={stroke}
 	stroke-linecap="round"
 	stroke-linejoin="round"
-	role={title ? 'img' : undefined}
-	aria-hidden={title ? undefined : 'true'}
+	role={roleValue}
+	aria-hidden={ariaHiddenValue}
 	aria-label={title}
 >
 	{#if name === 'plus'}

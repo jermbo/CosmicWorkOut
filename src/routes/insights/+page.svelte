@@ -3,39 +3,38 @@
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { toLocalIso } from '$lib/date';
-	import {
-		type RangeKey,
-		computeRange,
-		buildDatesBetween,
-		xLabelsFor,
-	} from '$lib/chart-utils';
+	import { type RangeKey, computeRange, buildDatesBetween, xLabelsFor } from '$lib/chart-utils';
 	import RangeBar from '$lib/components/insights/RangeBar.svelte';
 	import ChartMoodHabits from '$lib/components/insights/ChartMoodHabits.svelte';
 	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
 	import ChartActivityMix from '$lib/components/insights/ChartActivityMix.svelte';
 	import ChartHabitRadar from '$lib/components/insights/ChartHabitRadar.svelte';
 
-
-	// ── Range state ───────────────────────────────────────────────
-	let rangeKey    = $state<RangeKey>('last-7');
+	let rangeKey = $state<RangeKey>('last-7');
 	let customStart = $state('');
-	let customEnd   = $state('');
+	let customEnd = $state('');
 
 	let effectiveRange = $derived.by(() => computeRange(rangeKey, customStart, customEnd));
 
 	let rangeLabel = $derived.by(() => {
 		const { start, end } = effectiveRange;
-		const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+		const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 		const fmt = (d: string) => {
 			const [, m, day] = d.split('-');
 			return `${MONTHS[parseInt(m) - 1]} ${parseInt(day)}`;
 		};
 		switch (rangeKey) {
-			case 'this-week': return 'This week';
-			case 'last-7':    return 'Last 7 days';
-			case 'mtd':       return 'Month to date';
-			case 'ytd':       return 'Year to date';
-			default:          return start && end ? `${fmt(start)} – ${fmt(end)}` : 'Select a range';
+			case 'this-week':
+				return 'This week';
+			case 'last-7':
+				return 'Last 7 days';
+			case 'mtd':
+				return 'Month to date';
+			case 'ytd':
+				return 'Year to date';
+			default:
+				if (start && end) return `${fmt(start)} – ${fmt(end)}`;
+				return 'Select a range';
 		}
 	});
 
@@ -47,12 +46,11 @@
 
 	let xLabels = $derived(xLabelsFor(dates));
 
-	// ── Data presence guards ──────────────────────────────────────
-	let hasSessions   = $derived(programStore.sessions.length > 0);
+	let hasSessions = $derived(programStore.sessions.length > 0);
 	let hasActivities = $derived(activityStore.activities.length > 0);
-	let hasHabitLogs  = $derived(habitStore.logs.length > 0);
-	let hasHabits     = $derived(habitStore.activeHabits.length > 0);
-	let hasAnyData    = $derived(hasSessions || hasActivities || hasHabitLogs);
+	let hasHabitLogs = $derived(habitStore.logs.length > 0);
+	let hasHabits = $derived(habitStore.activeHabits.length > 0);
+	let hasAnyData = $derived(hasSessions || hasActivities || hasHabitLogs);
 </script>
 
 <div class="insights-page">
@@ -108,16 +106,11 @@
 					</div>
 				</section>
 			{/if}
-
 		</div>
 	{/if}
 </div>
 
 <style>
-	/*
-	  NOT using global .page — it caps width at 460px.
-	  Sidebar offset handled globally by app__main padding-inline-start.
-	*/
 	.insights-page {
 		inline-size: 100%;
 		max-inline-size: 920px;
@@ -150,7 +143,6 @@
 		color: var(--color-text-secondary);
 	}
 
-	/* ── Charts grid ───────────────────────────────────────────── */
 	.charts {
 		display: grid;
 		grid-template-columns: 1fr;

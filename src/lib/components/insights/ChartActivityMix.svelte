@@ -45,7 +45,8 @@
 				responsive: true,
 				maintainAspectRatio: false,
 				onResize(chart, { width }) {
-					const pos = width >= 360 ? 'right' : 'bottom';
+					let pos: 'right' | 'bottom' = 'bottom';
+					if (width >= 360) pos = 'right';
 					if (chart.options.plugins?.legend?.position !== pos) {
 						chart.options.plugins!.legend!.position = pos;
 						chart.update('none');

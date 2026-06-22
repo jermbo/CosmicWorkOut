@@ -11,7 +11,12 @@
 
 	let { title, unit = '', initialValue, onsave, onclose }: Props = $props();
 
-	let input = $state(untrack(() => (initialValue ? String(initialValue) : '')));
+	let input = $state(
+		untrack(() => {
+			if (initialValue) return String(initialValue);
+			return '';
+		}),
+	);
 	let dialog: HTMLDialogElement;
 
 	onMount(() => {

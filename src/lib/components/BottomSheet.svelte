@@ -10,13 +10,7 @@
 		fixedHeight?: boolean;
 	};
 
-	let {
-		children,
-		onclose,
-		maxHeight = '90dvh',
-		hideHandle = false,
-		fixedHeight = false,
-	}: Props = $props();
+	let { children, onclose, maxHeight = '90dvh', hideHandle = false, fixedHeight = false }: Props = $props();
 
 	let dialog: HTMLDialogElement;
 
@@ -24,13 +18,20 @@
 		dialog.showModal();
 	});
 
+	function isBackdropClick(e: MouseEvent): boolean {
+		return e.target === dialog;
+	}
+
 	function handleDialogClick(e: MouseEvent) {
-		// e.target stays as the original clicked element even when bubbling,
-		// so this only fires when the user clicks the transparent backdrop area
-		if (e.target === dialog) {
+		if (isBackdropClick(e)) {
 			onclose();
 		}
 	}
+
+	let panelBlockSize = $derived.by(() => {
+		if (fixedHeight) return maxHeight;
+		return undefined;
+	});
 </script>
 
 <dialog
@@ -46,7 +47,7 @@
 		class="bottom-sheet__panel"
 		class:bottom-sheet__panel--fixed={fixedHeight}
 		style:max-block-size={maxHeight}
-		style:block-size={fixedHeight ? maxHeight : undefined}
+		style:block-size={panelBlockSize}
 	>
 		{#if !hideHandle}
 			<div class="bottom-sheet__grab" aria-hidden="true"></div>

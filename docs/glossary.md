@@ -10,20 +10,20 @@
 
 Every way a person records movement in this app falls into one of three archetypes. New ideas don't get new architecture — they get **classified** into one of these.
 
-| Archetype | What it is | Logged how | Examples |
-| --- | --- | --- | --- |
-| **Structured** | A multi-week plan you're guided through, step by step | Start a session, work through routine items, finish | Strength, Belly Dance |
-| **Quick-log** | A thing you did that you just want on the record | One short entry: type + duration + intensity | Run, Bike, Pickleball, Swim, Hike |
-| **Habit** | A daily recurring value | Tap a counter / toggle / mood | Water, Mood, Steps |
+| Archetype      | What it is                                            | Logged how                                          | Examples                          |
+| -------------- | ----------------------------------------------------- | --------------------------------------------------- | --------------------------------- |
+| **Structured** | A multi-week plan you're guided through, step by step | Start a session, work through routine items, finish | Strength, Belly Dance             |
+| **Quick-log**  | A thing you did that you just want on the record      | One short entry: type + duration + intensity        | Run, Bike, Pickleball, Swim, Hike |
+| **Habit**      | A daily recurring value                               | Tap a counter / toggle / mood                       | Water, Mood, Steps                |
 
 ### The litmus test
 
-When you think of the *next* thing (mobility flow, kickboxing, a hike), ask one question:
+When you think of the _next_ thing (mobility flow, kickboxing, a hike), ask one question:
 
 > **Do I want to be _guided through a repeatable routine_, or do I just want to _record that I did it_?**
 
-- **Guided routine →** it's a new **Discipline**. That's *config + seed data*, not a new model.
-- **Just record it →** it's an **Activity type**. That's *one line of config*.
+- **Guided routine →** it's a new **Discipline**. That's _config + seed data_, not a new model.
+- **Just record it →** it's an **Activity type**. That's _one line of config_.
 
 Pickleball is already an Activity type — it cost zero architecture. That's the test working.
 
@@ -35,7 +35,7 @@ These generalize the original strength model so belly dance (and anything after 
 
 ### Discipline ✅
 
-A first-class, data-driven definition of a structured movement practice. A Discipline declares everything that makes it *specific* while the engine stays *generic*:
+A first-class, data-driven definition of a structured movement practice. A Discipline declares everything that makes it _specific_ while the engine stays _generic_:
 
 - its **sections** and the order they run in,
 - the **metric** each section's items are logged with,
@@ -44,7 +44,7 @@ A first-class, data-driven definition of a structured movement practice. A Disci
 
 Strength and Belly Dance are both Disciplines (seeded, read-only config in `src/lib/discipline.ts`). Adding a third structured practice = authoring a new Discipline config, not forking the engine.
 
-> **Discipline vs. Practice — don't conflate them.** *Discipline* is the **data-model** term (config in code). *Practice* (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
+> **Discipline vs. Practice — don't conflate them.** _Discipline_ is the **data-model** term (config in code). _Practice_ (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
 
 ### Practice ✅
 
@@ -69,11 +69,11 @@ Each section is tied to a **metric**, which decides how its items are logged.
 
 The rule for how one item is recorded during a session. This is the core flexibility lever — a new Discipline picks from existing metrics or adds one.
 
-| Metric | Logs | Used by |
-| --- | --- | --- |
-| `setsReps` | sets × reps × weight → contributes to volume | strength exercises |
-| `measure` | a duration or a rep count entered live | conditioning, moves |
-| `check` | done / not done | warm-up, cool-down |
+| Metric     | Logs                                         | Used by             |
+| ---------- | -------------------------------------------- | ------------------- |
+| `setsReps` | sets × reps × weight → contributes to volume | strength exercises  |
+| `measure`  | a duration or a rep count entered live       | conditioning, moves |
+| `check`    | done / not done                              | warm-up, cool-down  |
 
 ### Item ✅ _(renamed from **Exercise**)_
 
@@ -127,13 +127,13 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 ## Cross-cutting terms
 
-| Term | Status | Meaning |
-| --- | --- | --- |
-| **Global date context** | ✅ | The selected date that Today, habits, and practice all read from. Backdating requires confirmation. |
-| **Active session** | ✅ | An in-progress session held in memory + localStorage for crash recovery. Becomes a Session on finish. |
-| **Linear progression** | ✅ | "Today's routine" is chosen by count of completed sessions, **not** the calendar: `index = completedCount % routineCount`, per Discipline. |
-| **Built-in vs custom** | ✅ | Built-in content is seeded and read-only (edit = copy-first); custom is user-created and fully editable. |
-| **Seed** | ✅ | Built-in items/programs upserted on every boot (`src/lib/db/seed.ts`); habits seed on first run only. |
+| Term                    | Status | Meaning                                                                                                                                    |
+| ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Global date context** | ✅     | The selected date that Today, habits, and practice all read from. Backdating requires confirmation.                                        |
+| **Active session**      | ✅     | An in-progress session held in memory + localStorage for crash recovery. Becomes a Session on finish.                                      |
+| **Linear progression**  | ✅     | "Today's routine" is chosen by count of completed sessions, **not** the calendar: `index = completedCount % routineCount`, per Discipline. |
+| **Built-in vs custom**  | ✅     | Built-in content is seeded and read-only (edit = copy-first); custom is user-created and fully editable.                                   |
+| **Seed**                | ✅     | Built-in items/programs upserted on every boot (`src/lib/db/seed.ts`); habits seed on first run only.                                      |
 
 ---
 
@@ -141,13 +141,13 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 The v1.4.0 generalization renamed the strength-only entities. These old names no longer appear in the code.
 
-| Original | Current | Why |
-| --- | --- | --- |
-| Exercise | Item | Items exist in any Discipline, not just strength |
-| Workout | Routine | "Workout" reads as strength-only |
-| SessionLog | Session | One concept across all Disciplines |
-| Program _(strength)_ | Program _(Discipline-scoped)_ | Now belongs to a Discipline |
-| — | Discipline, Section, Metric, Focus | New in the generalized model |
+| Original             | Current                            | Why                                              |
+| -------------------- | ---------------------------------- | ------------------------------------------------ |
+| Exercise             | Item                               | Items exist in any Discipline, not just strength |
+| Workout              | Routine                            | "Workout" reads as strength-only                 |
+| SessionLog           | Session                            | One concept across all Disciplines               |
+| Program _(strength)_ | Program _(Discipline-scoped)_      | Now belongs to a Discipline                      |
+| —                    | Discipline, Section, Metric, Focus | New in the generalized model                     |
 
 ---
 

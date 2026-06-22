@@ -110,7 +110,11 @@
 		try {
 			await resetWorkoutData();
 		} catch (err) {
-			clearDataError = err instanceof Error ? err.message : 'Could not clear data. Please try again.';
+			if (err instanceof Error) {
+				clearDataError = err.message;
+			} else {
+				clearDataError = 'Could not clear data. Please try again.';
+			}
 			clearingData = false;
 		}
 	}
@@ -281,8 +285,8 @@
 		onconfirm={handleLoadSeedData}
 		oncancel={() => (showSeedConfirm = false)}
 	>
-		Adds 45 days of randomized workout sessions, activities, and habit logs. Your existing data is not removed. The
-		page will reload when done.
+		Adds 45 days of randomized workout sessions, activities, and habit logs. Your existing data is not removed. The page
+		will reload when done.
 	</ConfirmDialog>
 {/if}
 
@@ -360,7 +364,6 @@
 		margin-block-end: var(--space-3);
 	}
 
-	/* Habits section */
 	.settings-section__title-row {
 		display: flex;
 		align-items: center;
@@ -403,7 +406,6 @@
 		gap: var(--space-2);
 	}
 
-	/* Data actions */
 	.data-action {
 		margin-block-end: var(--space-5);
 

@@ -18,30 +18,29 @@
 	let contextDate = $derived(loggingContext.date);
 
 	let programId = $derived(
-		page.url.searchParams.get('program') ??
-			programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ??
-			null,
+		page.url.searchParams.get('program') ?? programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ?? null,
 	);
-	let viewingProgram = $derived(programId ? programStore.programById(programId) : null);
+	let viewingProgram = $derived.by(() => {
+		if (programId) return programStore.programById(programId);
+		return null;
+	});
 
-	let sessionForDate = $derived(
-		programId
-			? programStore.sessionForProgramDate(programId, contextDate)
-			: programStore.sessionForDate(contextDate),
-	);
-	let suggestedWorkout = $derived(
-		programId
-			? programStore.suggestedRoutineInCurrentWeekForProgram(programId)
-			: programStore.suggestedRoutineInCurrentWeek,
-	);
-	let weekWorkouts = $derived(
-		programId
-			? programStore.routinesForCurrentWeekForProgram(programId)
-			: programStore.routinesForCurrentWeek,
-	);
-	let isProgramComplete = $derived(
-		programId ? programStore.isProgramCompleteForProgram(programId) : programStore.isProgramComplete,
-	);
+	let sessionForDate = $derived.by(() => {
+		if (programId) return programStore.sessionForProgramDate(programId, contextDate);
+		return programStore.sessionForDate(contextDate);
+	});
+	let suggestedWorkout = $derived.by(() => {
+		if (programId) return programStore.suggestedRoutineInCurrentWeekForProgram(programId);
+		return programStore.suggestedRoutineInCurrentWeek;
+	});
+	let weekWorkouts = $derived.by(() => {
+		if (programId) return programStore.routinesForCurrentWeekForProgram(programId);
+		return programStore.routinesForCurrentWeek;
+	});
+	let isProgramComplete = $derived.by(() => {
+		if (programId) return programStore.isProgramCompleteForProgram(programId);
+		return programStore.isProgramComplete;
+	});
 
 	let selectedWorkout = $derived.by(() => {
 		if (loggingContext.workoutId) {
@@ -84,7 +83,6 @@
 		if (!workout || !program) return;
 		await sessionStore.editSession(session, workout, program, programStore.itemMap);
 	}
-
 </script>
 
 <svelte:head>
@@ -115,7 +113,6 @@
 			<a href="/practice/workout" class="workout-page__choose-btn"> Choose a plan </a>
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
-		<!-- Session logged for this date, not currently editing -->
 		<div class="session-done">
 			<div class="session-done__icon" aria-hidden="true">
 				<svg
@@ -141,7 +138,6 @@
 			<button class="session-done__edit" onclick={editSession}> Edit </button>
 		</div>
 	{:else if weekWorkouts.length > 0 && selectedWorkout}
-		<!-- Active or ready to start -->
 		<div class="workout-page__body">
 			{#if showSuggestedHint && suggestedWorkout}
 				<p class="workout-page__hint">Suggested: {suggestedWorkout.name}</p>
@@ -233,7 +229,6 @@
 		}
 	}
 
-	/* Loading */
 	.workout-page__loading {
 		display: flex;
 		justify-content: center;
@@ -255,7 +250,6 @@
 		}
 	}
 
-	/* Program complete */
 	.workout-complete {
 		display: flex;
 		flex-direction: column;
@@ -294,7 +288,6 @@
 		font-weight: 700;
 	}
 
-	/* No program */
 	.workout-page__no-program {
 		display: flex;
 		flex-direction: column;
@@ -334,7 +327,6 @@
 		gap: var(--space-3);
 	}
 
-	/* Session done */
 	.session-done {
 		display: flex;
 		align-items: center;

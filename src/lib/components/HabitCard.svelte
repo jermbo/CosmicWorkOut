@@ -20,8 +20,18 @@
 
 	let { habit, value, pct, done, step, readOnly = false, onadd, onsubtract, ontoggle, oneditexact }: Props = $props();
 
-	let unitLabel = $derived(habit.type === 'minutes' ? minuteUnitLabel() : habit.unit);
-	let stepLabel = $derived(habit.type === 'minutes' ? formatMinutes(step) : formatCount(step, habit.unit || undefined));
+	let unitLabel = $derived.by(() => {
+		if (habit.type === 'minutes') return minuteUnitLabel();
+		return habit.unit;
+	});
+	let stepLabel = $derived.by(() => {
+		if (habit.type === 'minutes') return formatMinutes(step);
+		return formatCount(step, habit.unit || undefined);
+	});
+	let boolLabel = $derived.by(() => {
+		if (done) return formatHabitBooleanValue(1);
+		return formatHabitBooleanValue(0);
+	});
 </script>
 
 <div class="habit-card" class:habit-card--done={done}>
@@ -29,7 +39,7 @@
 		<ProgressRing done={pct} total={100} complete={done} size={120} strokeWidth={7} dimUntilComplete>
 			{#if habit.type === 'boolean'}
 				<span class="habit-card__value habit-card__value--bool" class:habit-card__value--done={done}>
-					{formatHabitBooleanValue(done ? 1 : 0)}
+					{boolLabel}
 				</span>
 			{:else}
 				<button
@@ -64,7 +74,7 @@
 					onchange={ontoggle}
 					aria-label={habit.name}
 				/>
-				{done ? '✓ Done' : 'Mark done'}
+				{#if done}✓ Done{:else}Mark done{/if}
 			</label>
 		{:else}
 			<div class="stepper">

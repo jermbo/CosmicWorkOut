@@ -8,7 +8,6 @@
 
 	type Props = {
 		onClose: () => void;
-		/** When set, skip group picker and go straight to plans for this group. */
 		groupId?: string;
 	};
 
@@ -17,7 +16,12 @@
 	type Filter = 'all' | 'mine' | 'builtin';
 	type Step = 'group' | 'plans';
 
-	let step = $state<Step>(untrack(() => (initialGroupId ? 'plans' : 'group')));
+	let step = $state<Step>(
+		untrack(() => {
+			if (initialGroupId) return 'plans';
+			return 'group';
+		}),
+	);
 	let groupId = $state(untrack(() => initialGroupId ?? ''));
 	let filter = $state<Filter>('all');
 	let createDisciplineId = $state<string | null>(null);
@@ -78,9 +82,7 @@
 			</div>
 		{:else if group}
 			{#if !initialGroupId}
-				<button class="add-practice__back" type="button" onclick={() => (step = 'group')}>
-					← All areas
-				</button>
+				<button class="add-practice__back" type="button" onclick={() => (step = 'group')}> ← All areas </button>
 			{/if}
 
 			<p class="add-practice__lead">Turn plans on or off. History is always kept when you pause.</p>
@@ -120,9 +122,7 @@
 						{#if isActive}
 							<button class="add-practice__pause" type="button" onclick={() => pause(program)}>Pause</button>
 						{:else}
-							<button class="add-practice__activate" type="button" onclick={() => activate(program)}>
-								Activate
-							</button>
+							<button class="add-practice__activate" type="button" onclick={() => activate(program)}> Activate </button>
 						{/if}
 					</div>
 				{:else}
@@ -131,11 +131,7 @@
 			</div>
 
 			<div class="add-practice__footer">
-				<button
-					class="add-practice__create"
-					type="button"
-					onclick={() => (createDisciplineId = disciplineId)}
-				>
+				<button class="add-practice__create" type="button" onclick={() => (createDisciplineId = disciplineId)}>
 					Create new plan
 				</button>
 			</div>

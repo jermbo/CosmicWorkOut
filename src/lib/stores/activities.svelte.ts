@@ -55,7 +55,10 @@ class ActivityStore {
 
 	async update(activity: ActivityLog): Promise<void> {
 		await db.activities.put(activity);
-		this.activities = this.activities.map((a) => (a.id === activity.id ? activity : a));
+		this.activities = this.activities.map((a) => {
+			if (a.id === activity.id) return activity;
+			return a;
+		});
 	}
 
 	async remove(id: string): Promise<void> {

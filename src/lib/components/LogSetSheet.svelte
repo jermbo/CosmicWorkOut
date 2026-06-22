@@ -24,7 +24,6 @@
 		return { n: parseInt(m[1], 10), suffix: m[2].trim() };
 	}
 
-	// Snapshot props at open time — sheet data is intentionally frozen while open
 	const snap = untrack(() => {
 		const unit = exercise.unit;
 		const parsed = parseTargetReps(activeSet.targetReps);
@@ -49,12 +48,27 @@
 		return Math.round(v / weightStep) * weightStep;
 	}
 
-	// First time = no previous numeric weight logged
 	const isFirstTime = isLb && (typeof snap.weight !== 'number' || snap.weight <= 0);
 
-	let stepWeight = $state(isLb ? roundWeight(typeof snap.weight === 'number' ? snap.weight : 0) : 0);
-	let stepBand = $state(isBand ? (typeof snap.weight === 'string' ? snap.weight : 'Med') : 'Med');
-	let stepReps = $state(snap.reps > 0 ? snap.reps : defReps);
+	function initialStepWeight(): number {
+		if (!isLb) return 0;
+		if (typeof snap.weight === 'number') return roundWeight(snap.weight);
+		return roundWeight(0);
+	}
+
+	function initialStepBand(): string {
+		if (isBand && typeof snap.weight === 'string') return snap.weight;
+		return 'Med';
+	}
+
+	function initialStepReps(): number {
+		if (snap.reps > 0) return snap.reps;
+		return defReps;
+	}
+
+	let stepWeight = $state(initialStepWeight());
+	let stepBand = $state(initialStepBand());
+	let stepReps = $state(initialStepReps());
 	let manualWeightStr = $state('');
 	let manualWeightInput = $state<HTMLInputElement | null>(null);
 
@@ -65,7 +79,11 @@
 		}
 	});
 
-	const repStep = suffix === 's' ? 5 : 1;
+	function computeRepStep(): number {
+		if (suffix === 's') return 5;
+		return 1;
+	}
+	const repStep = computeRepStep();
 
 	function bumpWeight(d: number) {
 		if (isBand) {
@@ -80,6 +98,11 @@
 		stepReps = Math.max(0, stepReps + d * repStep);
 	}
 
+	function manualWeightValue(): number {
+		if (manualWeightStr) return roundWeight(parseFloat(manualWeightStr));
+		return 0;
+	}
+
 	function handleSave() {
 		let finalWeight: number | string;
 		if (isBw) {
@@ -87,18 +110,63 @@
 		} else if (isBand) {
 			finalWeight = stepBand;
 		} else if (isFirstTime) {
-			finalWeight = manualWeightStr ? roundWeight(parseFloat(manualWeightStr)) : 0;
+			finalWeight = manualWeightValue();
 		} else {
 			finalWeight = stepWeight;
 		}
 		onSave(finalWeight, stepReps);
 	}
 
-	let hasPrevious = $derived(
-		isBand
-			? typeof activeSet.weight === 'string' && Boolean(activeSet.weight)
-			: typeof activeSet.weight === 'number' && activeSet.weight > 0,
-	);
+	let hasPrevious = $derived.by(() => {
+		if (isBand) return typeof activeSet.weight === 'string' && Boolean(activeSet.weight);
+		return typeof activeSet.weight === 'number' && activeSet.weight > 0;
+	});
+
+	let weightOrBandLabel = $derived.by(() => {
+		if (isBand) return 'Band';
+		return 'Weight';
+	});
+
+	let weightOrBandNoun = $derived.by(() => {
+		if (isBand) return 'band';
+		return 'weight';
+	});
+
+	let stepperValue = $derived.by(() => {
+		if (isBand) return stepBand;
+		return stepWeight;
+	});
+
+	let stepperUnitLabel = $derived.by(() => {
+		if (isBand) return 'level';
+		return prefsStore.weightUnit;
+	});
+
+	let repCapLabel = $derived.by(() => {
+		if (suffix === 's') return 'Hold (sec)';
+		return 'Reps';
+	});
+
+	let repUnitLabel = $derived.by(() => {
+		if (suffix === 's') return 'sec';
+		if (suffix === 'ea') return 'each';
+		return 'reps';
+	});
+
+	let lastTimeWeight = $derived.by(() => {
+		if (isBand) return String(activeSet.weight);
+		return `${activeSet.weight} ${prefsStore.weightUnit}`;
+	});
+
+	let suffixLabel = $derived.by(() => {
+		if (suffix) return ` ${suffix}`;
+		return '';
+	});
+
+	let confirmLabel = $derived.by(() => {
+		if (activeSet.completed) return 'Update set';
+		return `Log set ${setIndex + 1}`;
+	});
 </script>
 
 <BottomSheet onclose={onClose}>
@@ -111,18 +179,18 @@
 		<p class="log-sheet__prev">
 			{#if hasPrevious}
 				Last time ·
-				<strong>{isBand ? activeSet.weight : `${activeSet.weight} ${prefsStore.weightUnit}`}</strong>
-				× {defReps}{suffix ? ` ${suffix}` : ''}
+				<strong>{lastTimeWeight}</strong>
+				× {defReps}{suffixLabel}
 			{:else}
-				Target · <strong>{defReps}{suffix ? ` ${suffix}` : ''}</strong>
-				{isBw ? '· bodyweight' : ''}
+				Target · <strong>{defReps}{suffixLabel}</strong>
+				{#if isBw}· bodyweight{/if}
 			{/if}
 		</p>
 
 		<div class="log-sheet__steppers">
 			{#if !isBw}
 				<div class="stepper">
-					<div class="stepper__cap">{isBand ? 'Band' : 'Weight'}</div>
+					<div class="stepper__cap">{weightOrBandLabel}</div>
 					{#if isFirstTime}
 						<div class="stepper__first-time">
 							<input
@@ -138,11 +206,7 @@
 						</div>
 					{:else}
 						<div class="stepper__row">
-							<button
-								class="stepper__btn"
-								onclick={() => bumpWeight(-1)}
-								aria-label="Decrease {isBand ? 'band' : 'weight'}"
-							>
+							<button class="stepper__btn" onclick={() => bumpWeight(-1)} aria-label="Decrease {weightOrBandNoun}">
 								<svg
 									viewBox="0 0 24 24"
 									fill="none"
@@ -155,14 +219,10 @@
 								</svg>
 							</button>
 							<div class="stepper__val">
-								<span class="stepper__n">{isBand ? stepBand : stepWeight}</span>
-								<span class="stepper__u">{isBand ? 'level' : prefsStore.weightUnit}</span>
+								<span class="stepper__n">{stepperValue}</span>
+								<span class="stepper__u">{stepperUnitLabel}</span>
 							</div>
-							<button
-								class="stepper__btn"
-								onclick={() => bumpWeight(1)}
-								aria-label="Increase {isBand ? 'band' : 'weight'}"
-							>
+							<button class="stepper__btn" onclick={() => bumpWeight(1)} aria-label="Increase {weightOrBandNoun}">
 								<svg
 									viewBox="0 0 24 24"
 									fill="none"
@@ -180,7 +240,7 @@
 				</div>
 			{/if}
 			<div class="stepper">
-				<div class="stepper__cap">{suffix === 's' ? 'Hold (sec)' : 'Reps'}</div>
+				<div class="stepper__cap">{repCapLabel}</div>
 				<div class="stepper__row">
 					<button class="stepper__btn" onclick={() => bumpReps(-1)} aria-label="Decrease reps">
 						<svg
@@ -196,7 +256,7 @@
 					</button>
 					<div class="stepper__val">
 						<span class="stepper__n">{stepReps}</span>
-						<span class="stepper__u">{suffix === 's' ? 'sec' : suffix === 'ea' ? 'each' : 'reps'}</span>
+						<span class="stepper__u">{repUnitLabel}</span>
 					</div>
 					<button class="stepper__btn" onclick={() => bumpReps(1)} aria-label="Increase reps">
 						<svg
@@ -227,7 +287,7 @@
 			>
 				<polyline points="20 6 9 17 4 12" />
 			</svg>
-			{activeSet.completed ? 'Update set' : `Log set ${setIndex + 1}`}
+			{confirmLabel}
 		</button>
 	</div>
 </BottomSheet>
@@ -271,7 +331,6 @@
 		}
 	}
 
-	/* Steppers */
 	.log-sheet__steppers {
 		display: flex;
 		gap: var(--space-3);
@@ -327,7 +386,6 @@
 			color: var(--color-text-muted);
 		}
 
-		/* hide browser spinners */
 		&::-webkit-outer-spin-button,
 		&::-webkit-inner-spin-button {
 			-webkit-appearance: none;
@@ -377,7 +435,6 @@
 		margin-block-start: 2px;
 	}
 
-	/* Confirm button */
 	.log-sheet__confirm {
 		display: flex;
 		align-items: center;

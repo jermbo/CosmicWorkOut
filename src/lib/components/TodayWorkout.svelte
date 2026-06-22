@@ -31,14 +31,15 @@
 		starting = false;
 	}
 
-	let focusChips = $derived(workout.focus ? workout.focus.split(' · ') : []);
+	let focusChips = $derived.by(() => {
+		if (workout.focus) return workout.focus.split(' · ');
+		return [];
+	});
 </script>
 
 <article class="packet-card" style:--workout-accent={accentColor}>
-	<!-- Ruled texture overlay -->
 	<div class="packet-card__ruled" aria-hidden="true"></div>
 
-	<!-- Staple-tab row -->
 	<div class="packet-card__tabs">
 		<span class="packet-card__tab packet-card__tab--active">
 			<svg
@@ -60,10 +61,8 @@
 		</span>
 	</div>
 
-	<!-- Workout title -->
 	<h2 class="packet-card__title">{workout.name}</h2>
 
-	<!-- Focus chips + estimated time -->
 	<div class="packet-card__meta">
 		{#each focusChips as chip}
 			<span class="packet-card__chip">
@@ -89,7 +88,6 @@
 		{/if}
 	</div>
 
-	<!-- Exercise list -->
 	<ul class="packet-card__exercises" role="list" aria-label="Exercises in this workout">
 		{#each flattenItems(workout) as we, i}
 			{@const exercise = exerciseMap.get(we.itemId)}
@@ -103,7 +101,6 @@
 		{/each}
 	</ul>
 
-	<!-- Start CTA -->
 	<button class="packet-card__start" onclick={handleStart} disabled={starting} aria-busy={starting}>
 		{#if starting}
 			<svg
@@ -148,7 +145,6 @@
 		animation: slide-up var(--duration-normal) var(--ease-out) both;
 	}
 
-	/* Notebook ruled lines */
 	.packet-card__ruled {
 		position: absolute;
 		inset: 0;
@@ -163,7 +159,6 @@
 		pointer-events: none;
 	}
 
-	/* Tabs */
 	.packet-card__tabs {
 		display: flex;
 		align-items: center;
@@ -216,7 +211,6 @@
 		flex-shrink: 0;
 	}
 
-	/* Title */
 	.packet-card__title {
 		font-family: var(--font-display);
 		font-size: 1.5rem;
@@ -228,7 +222,6 @@
 		z-index: 1;
 	}
 
-	/* Focus chips */
 	.packet-card__meta {
 		display: flex;
 		flex-wrap: wrap;
@@ -264,7 +257,6 @@
 		background: var(--workout-accent);
 	}
 
-	/* Exercise list */
 	.packet-card__exercises {
 		display: flex;
 		flex-direction: column;
@@ -315,7 +307,6 @@
 		flex-shrink: 0;
 	}
 
-	/* Start CTA */
 	.packet-card__start {
 		display: flex;
 		align-items: center;

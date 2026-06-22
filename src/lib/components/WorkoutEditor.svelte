@@ -13,14 +13,17 @@
 
 	let { workout: initWorkout, onBack }: Props = $props();
 
-	// Snapshot prop at open time — editor data is intentionally frozen.
-	// Strength routines are single-section, so we edit a flat item list.
+	function initialExercises(): (RoutineItem & { _key: number })[] {
+		if (!initWorkout) return [];
+		return flattenItems(initWorkout).map((e, i) => ({ ...e, _key: i }));
+	}
+
 	const snap = untrack(() => ({
 		isNew: initWorkout === null,
 		name: initWorkout?.name ?? 'New Workout',
 		letter: initWorkout?.letter ?? 'D',
 		focus: initWorkout?.focus ?? '',
-		exercises: initWorkout ? flattenItems(initWorkout).map((e, i) => ({ ...e, _key: i })) : [],
+		exercises: initialExercises(),
 	}));
 
 	const isNew = snap.isNew;
@@ -69,7 +72,10 @@
 	}
 
 	function updateExerciseSets(i: number, sets: number, reps: string) {
-		exercises = exercises.map((e, idx) => (idx === i ? { ...e, sets, reps } : e));
+		exercises = exercises.map((e, idx) => {
+			if (idx === i) return { ...e, sets, reps };
+			return e;
+		});
 		editingIndex = null;
 	}
 
@@ -122,7 +128,6 @@
 	aria-modal="true"
 >
 	<div class="workout-editor__inner">
-		<!-- Header -->
 		<div class="workout-editor__top">
 			<div class="workout-editor__bar">
 				<button class="icon-btn" onclick={onBack} aria-label="Back">
@@ -180,12 +185,11 @@
 					</p>
 				</div>
 				<button class="workout-editor__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
-					{saving ? 'Saving…' : 'Save'}
+					{#if saving}Saving…{:else}Save{/if}
 				</button>
 			</div>
 		</div>
 
-		<!-- Exercise list -->
 		<div class="workout-editor__scroll">
 			<div class="workout-editor__list">
 				{#if exercises.length === 0}
@@ -351,11 +355,7 @@
 </dialog>
 
 {#if showLibrary}
-	<ExerciseLibrarySheet
-		exercises={programStore.items}
-		onAdd={addFromLibrary}
-		onClose={() => (showLibrary = false)}
-	/>
+	<ExerciseLibrarySheet exercises={programStore.items} onAdd={addFromLibrary} onClose={() => (showLibrary = false)} />
 {/if}
 
 <style>
@@ -622,7 +622,6 @@
 		}
 	}
 
-	/* Inline editor */
 	.inline-editor {
 		background: var(--color-surface-3);
 		border: 1px solid var(--color-border);
@@ -718,7 +717,6 @@
 		font-weight: 700;
 	}
 
-	/* Divider + add button */
 	.workout-editor__divider {
 		block-size: 1px;
 		background: var(--color-border);

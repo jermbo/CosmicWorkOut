@@ -9,7 +9,6 @@
 
 	type Props = {
 		disciplineId: string;
-		// When opened from a routine section, default the section filter to it.
 		defaultSection?: string;
 		onAdd: (item: Item) => void;
 		onClose: () => void;
@@ -23,7 +22,7 @@
 	let activeFocus = $state<string | null>(null);
 	let query = $state('');
 	let expandedId = $state<string | null>(null);
-	let formItem = $state<Item | null | undefined>(undefined); // undefined = closed, null = new, Item = editing
+	let formItem = $state<Item | null | undefined>(undefined);
 	let confirmDeleteId = $state<string | null>(null);
 	let deleteError = $state<string | null>(null);
 
@@ -42,7 +41,24 @@
 	);
 
 	function toggleExpand(id: string) {
-		expandedId = expandedId === id ? null : id;
+		if (expandedId === id) {
+			expandedId = null;
+		} else {
+			expandedId = id;
+		}
+	}
+
+	function toggleFocusFilter(tag: string) {
+		if (activeFocus === tag) {
+			activeFocus = null;
+		} else {
+			activeFocus = tag;
+		}
+	}
+
+	function resolveDefaultSection(): string | undefined {
+		if (activeSection === 'all') return defaultSection;
+		return activeSection;
 	}
 
 	async function deleteItem(it: Item) {
@@ -56,7 +72,11 @@
 			await programStore.deleteItem(it.id);
 			if (expandedId === it.id) expandedId = null;
 		} catch (e) {
-			deleteError = e instanceof Error ? e.message : 'Could not delete item.';
+			if (e instanceof Error) {
+				deleteError = e.message;
+			} else {
+				deleteError = 'Could not delete item.';
+			}
 		}
 	}
 </script>
@@ -67,14 +87,28 @@
 			<h2 class="lib-sheet__title">Item Library</h2>
 			<div class="lib-sheet__header-actions">
 				<button class="lib-sheet__add-btn" onclick={() => (formItem = null)} aria-label="Add custom item">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<line x1="12" y1="5" x2="12" y2="19" />
 						<line x1="5" y1="12" x2="19" y2="12" />
 					</svg>
 					New
 				</button>
 				<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
 						<line x1="18" y1="6" x2="6" y2="18" />
 						<line x1="6" y1="6" x2="18" y2="18" />
 					</svg>
@@ -83,24 +117,59 @@
 		</div>
 
 		<div class="lib-sheet__search">
-			<svg class="lib-sheet__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<svg
+				class="lib-sheet__search-icon"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
 				<circle cx="11" cy="11" r="8" />
 				<line x1="21" y1="21" x2="16.65" y2="16.65" />
 			</svg>
-			<input class="lib-sheet__search-input" type="search" placeholder="Search items…" bind:value={query} aria-label="Search items" />
+			<input
+				class="lib-sheet__search-input"
+				type="search"
+				placeholder="Search items…"
+				bind:value={query}
+				aria-label="Search items"
+			/>
 		</div>
 
 		<div class="lib-sheet__cats" role="group" aria-label="Filter by section">
-			<button class="lib-chip" class:lib-chip--active={activeSection === 'all'} onclick={() => (activeSection = 'all')} aria-pressed={activeSection === 'all'}>All</button>
+			<button
+				class="lib-chip"
+				class:lib-chip--active={activeSection === 'all'}
+				onclick={() => (activeSection = 'all')}
+				aria-pressed={activeSection === 'all'}>All</button
+			>
 			{#each sections as s}
-				<button class="lib-chip" class:lib-chip--active={activeSection === s.key} onclick={() => (activeSection = s.key)} aria-pressed={activeSection === s.key}>{s.label}</button>
+				<button
+					class="lib-chip"
+					class:lib-chip--active={activeSection === s.key}
+					onclick={() => (activeSection = s.key)}
+					aria-pressed={activeSection === s.key}>{s.label}</button
+				>
 			{/each}
 		</div>
 
 		<div class="lib-sheet__cats" role="group" aria-label="Filter by focus">
-			<button class="lib-chip lib-chip--focus" class:lib-chip--active={activeFocus === null} onclick={() => (activeFocus = null)} aria-pressed={activeFocus === null}>Any focus</button>
+			<button
+				class="lib-chip lib-chip--focus"
+				class:lib-chip--active={activeFocus === null}
+				onclick={() => (activeFocus = null)}
+				aria-pressed={activeFocus === null}>Any focus</button
+			>
 			{#each FOCUS_TAGS as tag}
-				<button class="lib-chip lib-chip--focus" class:lib-chip--active={activeFocus === tag} onclick={() => (activeFocus = activeFocus === tag ? null : tag)} aria-pressed={activeFocus === tag}>{tag}</button>
+				<button
+					class="lib-chip lib-chip--focus"
+					class:lib-chip--active={activeFocus === tag}
+					onclick={() => toggleFocusFilter(tag)}
+					aria-pressed={activeFocus === tag}>{tag}</button
+				>
 			{/each}
 		</div>
 
@@ -122,7 +191,17 @@
 							<span class="lib-row__focus">{(it.focus ?? []).join(' · ')}</span>
 						</div>
 						<span class="lib-row__cat">{sectionLabel(it.section)}</span>
-						<svg class="lib-row__chevron" class:lib-row__chevron--open={isOpen} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<svg
+							class="lib-row__chevron"
+							class:lib-row__chevron--open={isOpen}
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
 							<polyline points="6 9 12 15 18 9" />
 						</svg>
 					</button>
@@ -135,8 +214,21 @@
 								<p class="lib-row__error">{deleteError}</p>
 							{/if}
 							<div class="lib-row__actions">
-								<button class="lib-row__add" onclick={() => { onAdd(it); expandedId = null; }}>
-									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+								<button
+									class="lib-row__add"
+									onclick={() => {
+										onAdd(it);
+										expandedId = null;
+									}}
+								>
+									<svg
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2.5"
+										stroke-linecap="round"
+										aria-hidden="true"
+									>
 										<line x1="12" y1="5" x2="12" y2="19" />
 										<line x1="5" y1="12" x2="19" y2="12" />
 									</svg>
@@ -144,22 +236,47 @@
 								</button>
 								{#if !it.isBuiltIn}
 									<button class="lib-row__edit" onclick={() => (formItem = it)} aria-label="Edit {it.name}">
-										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+										<svg
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											aria-hidden="true"
+										>
 											<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
 											<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 										</svg>
 									</button>
 									{#if confirmDeleteId === it.id}
-										<button class="lib-row__delete lib-row__delete--confirm" onclick={() => deleteItem(it)} aria-label="Confirm delete {it.name}">Sure?</button>
+										<button
+											class="lib-row__delete lib-row__delete--confirm"
+											onclick={() => deleteItem(it)}
+											aria-label="Confirm delete {it.name}">Sure?</button
+										>
 										<button class="lib-row__delete" onclick={() => (confirmDeleteId = null)} aria-label="Cancel delete">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												aria-hidden="true"
+											>
 												<line x1="18" y1="6" x2="6" y2="18" />
 												<line x1="6" y1="6" x2="18" y2="18" />
 											</svg>
 										</button>
 									{:else}
 										<button class="lib-row__delete" onclick={() => deleteItem(it)} aria-label="Delete {it.name}">
-											<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+											<svg
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												stroke-width="2"
+												stroke-linecap="round"
+												aria-hidden="true"
+											>
 												<polyline points="3 6 5 6 21 6" />
 												<path d="M19 6l-1 14H6L5 6" />
 												<path d="M10 11v6M14 11v6" />
@@ -178,7 +295,12 @@
 </BottomSheet>
 
 {#if formItem !== undefined}
-	<ItemFormSheet {disciplineId} item={formItem} defaultSection={activeSection === 'all' ? defaultSection : activeSection} onClose={() => (formItem = undefined)} />
+	<ItemFormSheet
+		{disciplineId}
+		item={formItem}
+		defaultSection={resolveDefaultSection()}
+		onClose={() => (formItem = undefined)}
+	/>
 {/if}
 
 <style>

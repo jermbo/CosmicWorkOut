@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import Icon from './Icon.svelte';
+
+	function roleForKind(kind: string): 'alert' | 'status' {
+		if (kind === 'error') return 'alert';
+		return 'status';
+	}
 </script>
 
 <div class="toaster" aria-live="polite">
 	{#each toastStore.toasts as toast (toast.id)}
-		<div class="toast" class:toast--error={toast.kind === 'error'} role={toast.kind === 'error' ? 'alert' : 'status'}>
+		<div class="toast" class:toast--error={toast.kind === 'error'} role={roleForKind(toast.kind)}>
 			<span class="toast__message">{toast.message}</span>
 			<button class="toast__close" onclick={() => toastStore.dismiss(toast.id)} aria-label="Dismiss">
 				<Icon name="close" size={14} />

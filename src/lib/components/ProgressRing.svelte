@@ -23,7 +23,10 @@
 
 	let radius = $derived(size / 2 - strokeWidth - 1);
 	let circumference = $derived(2 * Math.PI * radius);
-	let ratio = $derived(total > 0 ? Math.min(1, done / total) : 0);
+	let ratio = $derived.by(() => {
+		if (total > 0) return Math.min(1, done / total);
+		return 0;
+	});
 	let dashOffset = $derived(circumference - ratio * circumference);
 	let center = $derived(size / 2);
 </script>

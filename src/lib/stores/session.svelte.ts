@@ -17,6 +17,22 @@ import { effectiveSections } from '$lib/discipline';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
+function metricForLoggedItem(logged: LoggedItem): Metric {
+	if (logged.checked !== undefined) return 'check';
+	if (logged.value !== undefined || logged.skipped) return 'measure';
+	return 'setsReps';
+}
+
+function valueForMeasure(logged: { skipped?: boolean; value?: number | null }): number | null {
+	if (logged.skipped) return null;
+	return logged.value ?? null;
+}
+
+function resolveFinishedAt(isEditing: boolean, originalFinishedAt: string | undefined, now: string): string {
+	if (isEditing) return originalFinishedAt ?? now;
+	return now;
+}
+
 function snapshotLog(log: Session): Session {
 	return $state.snapshot(log) as Session;
 }
@@ -182,8 +198,7 @@ class SessionStore {
 		for (const logged of log.items) {
 			if (!seen.has(logged.itemId)) {
 				const item = { itemId: logged.itemId, sets: logged.sets ?? [] };
-				const metric: Metric =
-					logged.checked !== undefined ? 'check' : logged.value !== undefined || logged.skipped ? 'measure' : 'setsReps';
+				const metric = metricForLoggedItem(logged);
 				result.push({ itemId: logged.itemId, logged: item, metric, section: '' });
 			}
 		}
@@ -202,7 +217,12 @@ class SessionStore {
 		};
 	}
 
-	async start(routine: Routine, program: Program, itemMap: Map<string, Item>, options?: { date?: string }): Promise<void> {
+	async start(
+		routine: Routine,
+		program: Program,
+		itemMap: Map<string, Item>,
+		options?: { date?: string },
+	): Promise<void> {
 		const date = options?.date ?? todayIso();
 		const now = new Date().toISOString();
 		const items = await this.buildActiveItems(routine, program, itemMap);
@@ -250,7 +270,7 @@ class SessionStore {
 					sets: [],
 					metric: 'measure',
 					section: entry.section,
-					value: entry.logged.skipped ? null : (entry.logged.value ?? null),
+					value: valueForMeasure(entry.logged),
 					measureMode: entry.logged.measureMode ?? 'duration',
 					skipped: entry.logged.skipped ?? false,
 				});
@@ -442,7 +462,7 @@ class SessionStore {
 			routineId: this.active.routineId,
 			programId: this.active.programId,
 			startedAt: this.active.startedAt,
-			finishedAt: isEditing ? (this.active.originalFinishedAt ?? now) : now,
+			finishedAt: resolveFinishedAt(isEditing, this.active.originalFinishedAt, now),
 			durationSeconds: elapsed,
 			totalVolume,
 			totalSets,

@@ -25,6 +25,11 @@
 	function chipLabel(activity: (typeof activityStore.activities)[0]): string {
 		return formatActivitySummary(activity);
 	}
+
+	let sheetInitialDate = $derived.by(() => {
+		if (editingActivity) return undefined;
+		return contextDate;
+	});
 </script>
 
 <svelte:head>
@@ -60,7 +65,7 @@
 					<button class="activity-item" onclick={() => openEdit(activity)} aria-label="Edit: {chipLabel(activity)}">
 						<div class="activity-item__info">
 							<span class="activity-item__name">
-								{activity.type === 'Other' ? activity.customType || 'Other' : activity.type}
+								{#if activity.type === 'Other'}{activity.customType || 'Other'}{:else}{activity.type}{/if}
 							</span>
 							<span class="activity-item__meta">
 								{formatActivitySummary(activity)}
@@ -87,7 +92,7 @@
 {#if showActivitySheet}
 	<ActivityLogSheet
 		editing={editingActivity}
-		initialDate={editingActivity ? undefined : contextDate}
+		initialDate={sheetInitialDate}
 		onClose={() => {
 			showActivitySheet = false;
 			editingActivity = null;

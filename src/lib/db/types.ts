@@ -2,16 +2,7 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export const STRENGTH_CATS = [
-	'Chest',
-	'Back',
-	'Shoulders',
-	'Biceps',
-	'Triceps',
-	'Legs',
-	'Core',
-	'Full Body',
-] as const;
+export const STRENGTH_CATS = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Legs', 'Core', 'Full Body'] as const;
 export type ItemCat = (typeof STRENGTH_CATS)[number];
 export type ExerciseType = 'compound' | 'isolation' | 'dynamic' | 'isometric';
 export type CatalogDifficulty = 'beginner' | 'intermediate' | 'advanced';
@@ -45,51 +36,34 @@ export const MOOD_SCALE = [
 	{ value: -5, label: 'Stressed' },
 ] as const;
 
-// ── Discipline model ──────────────────────────────────────────────
-// A Discipline is a data-driven definition of a structured movement practice.
-// It declares its ordered sections and the logging metric per section, while
-// the engine stays generic. Disciplines are seeded, read-only config (see
-// src/lib/discipline.ts) — not stored in IndexedDB and not user-editable.
-
-// How one item is logged within a session — the core flexibility lever.
-//   setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
 export type Metric = 'setsReps' | 'measure' | 'check';
 
 export interface Section {
-	key: string; // "exercises" | "warm-up" | "conditioning" | "moves" | "cool-down"
+	key: string;
 	label: string;
 	metric: Metric;
-	isBookend?: boolean; // warm-up / cool-down inherit from Routine A (US-017)
+	isBookend?: boolean;
 }
 
 export interface Discipline {
-	id: string; // "strength" | "bellydance"
+	id: string;
 	label: string;
 	color?: string;
 	icon?: string;
-	sections: Section[]; // strength: one section; belly dance: four
+	sections: Section[];
 }
-
-// ── Generalized structured-practice entities ─────────────────────
-// Item (was Exercise), Routine (was Workout), Session (was SessionLog).
-// Each carries a disciplineId. Strength fields below remain required because
-// every Item that ships in v1.4.0 is a setsReps strength Item; US-016 relaxes
-// them when it introduces non-strength (measure/check) Items.
 
 export interface Item {
 	id: string;
 	disciplineId: string;
 	name: string;
 	cue: string;
-	section: string; // section key within the Discipline (strength: "exercises")
+	section: string;
 	metric: Metric;
-	focus?: string[]; // generalized focus tags (US-016) — e.g. ["hips", "core"]
-	// Belly dance catalog metadata (optional, dance items only).
+	focus?: string[];
 	danceCat?: string;
 	movementType?: DanceMovementType;
 	difficulty?: CatalogDifficulty;
-	// setsReps (strength) fields — optional now that measure/check Items (e.g. belly
-	// dance) live on the same model and don't carry sets/reps/weight (US-016).
 	muscles?: string;
 	cat?: ItemCat;
 	exerciseType?: ExerciseType;
@@ -102,11 +76,8 @@ export interface Item {
 }
 
 export type DanceMovementType = 'sharp' | 'smooth' | 'variable';
-/** @deprecated Use CatalogDifficulty */
 export type DanceDifficulty = CatalogDifficulty;
 
-// Focus tags an Item can carry (US-016). Belly dance uses body-part focuses; the
-// list is shared across Disciplines and shown as filter chips in the item library.
 export const FOCUS_TAGS = [
 	'hips',
 	'core',
@@ -125,19 +96,14 @@ export type FocusTag = (typeof FOCUS_TAGS)[number];
 
 export interface RoutineItem {
 	itemId: string;
-	// Strength carries upfront sets×reps targets; dance (measure/check) items do
-	// not prescribe targets — values are entered during the session (US-017 §3c).
 	sets?: number;
 	reps?: string;
 	notes?: string;
 }
 
 export interface RoutineSection {
-	key: string; // matches a Discipline Section key
+	key: string;
 	items: RoutineItem[];
-	// For bookend sections (warm-up / cool-down) on routines other than A: when
-	// absent/false the section inherits Routine A's items; when true the routine
-	// owns its own bookend list (US-017 §4). Ignored for non-bookend sections.
 	overridesBookends?: boolean;
 }
 
@@ -149,7 +115,7 @@ export interface Routine {
 	focus?: string;
 	color?: RoutineColor;
 	estMin?: number;
-	sections: RoutineSection[]; // strength: a single "exercises" section
+	sections: RoutineSection[];
 }
 
 export interface Week {
@@ -179,8 +145,6 @@ export interface LoggedSet {
 export interface LoggedItem {
 	itemId: string;
 	sets: LoggedSet[];
-	// Non-strength logging results (US-019). check → checked; measure → value with
-	// its mode. Absent for setsReps Items. skipped marks a measure item with no value.
 	checked?: boolean;
 	value?: number;
 	measureMode?: 'duration' | 'reps';
@@ -227,9 +191,6 @@ export interface ActiveItem {
 	itemId: string;
 	unit: WeightUnit;
 	sets: ActiveSet[];
-	// Metric-aware in-session state (US-019). setsReps uses `sets`; check uses
-	// `checked`; measure uses `value` + `measureMode` (+ `skipped`). `section` is the
-	// routine section key so the session UI can group items.
 	metric?: Metric;
 	section?: string;
 	checked?: boolean;

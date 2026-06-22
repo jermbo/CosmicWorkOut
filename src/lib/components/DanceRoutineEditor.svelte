@@ -19,7 +19,7 @@
 		key: string;
 		label: string;
 		isBookend: boolean;
-		inherits: boolean; // bookend on a non-A routine currently inheriting
+		inherits: boolean;
 		items: EditItem[];
 	};
 
@@ -40,9 +40,7 @@
 				const isA = routine.letter === 'A';
 				const own = routine.sections.find((rs) => rs.key === s.key);
 				const inherits = !!s.isBookend && !isA && own?.overridesBookends !== true;
-				const items = inherits
-					? routineA?.sections.find((rs) => rs.key === s.key)?.items ?? []
-					: own?.items ?? [];
+				const items = inherits ? (routineA?.sections.find((rs) => rs.key === s.key)?.items ?? []) : (own?.items ?? []);
 				return {
 					key: s.key,
 					label: s.label,
@@ -58,7 +56,7 @@
 	let focus = $state(snap.focus);
 	let sections = $state<EditSection[]>(snap.sections);
 	let saving = $state(false);
-	let librarySection = $state<string | null>(null); // section key whose picker is open
+	let librarySection = $state<string | null>(null);
 
 	function move(secIdx: number, i: number, dir: number) {
 		const items = sections[secIdx].items;
@@ -80,12 +78,10 @@
 		librarySection = null;
 	}
 
-	// Customize an inheriting bookend: start from the inherited list, now editable.
 	function customizeBookend(secIdx: number) {
 		sections[secIdx].inherits = false;
 	}
 
-	// Reset an overridden bookend back to inheriting Routine A.
 	function resetBookend(secIdx: number) {
 		const routineA = routineALetter(program);
 		const inheritedItems = routineA?.sections.find((rs) => rs.key === sections[secIdx].key)?.items ?? [];
@@ -99,11 +95,18 @@
 
 		const cleanSections: RoutineSection[] = sections.map((s) => {
 			const overrides = s.isBookend && !isRoutineA && !s.inherits;
-			return {
+			const inheritsBookend = s.inherits && s.isBookend && !isRoutineA;
+			const section: RoutineSection = {
 				key: s.key,
-				items: s.inherits && s.isBookend && !isRoutineA ? [] : s.items.map(({ _key, ...rest }) => rest),
-				...(overrides ? { overridesBookends: true } : {}),
+				items: [],
 			};
+			if (!inheritsBookend) {
+				section.items = s.items.map(({ _key, ...rest }) => rest);
+			}
+			if (overrides) {
+				section.overridesBookends = true;
+			}
+			return section;
 		});
 
 		await programStore.saveRoutineSections(program.id, routine.name, {
@@ -143,7 +146,7 @@
 			<span class="dance-editor__letter">{routine.letter ?? '?'}</span>
 			<h2 class="dance-editor__title" id="dance-editor-title">Edit Routine</h2>
 			<button class="dance-editor__save" onclick={handleSave} disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : 'Save'}
+				{#if saving}Saving…{:else}Save{/if}
 			</button>
 		</div>
 
@@ -153,8 +156,17 @@
 				<input id="dance-name" class="dance-field__input" type="text" bind:value={name} autocomplete="off" />
 			</div>
 			<div class="dance-field">
-				<label class="dance-field__label" for="dance-focus">Focus <span class="dance-field__optional">optional</span></label>
-				<input id="dance-focus" class="dance-field__input" type="text" bind:value={focus} placeholder="e.g. Hip isolations & shimmies" autocomplete="off" />
+				<label class="dance-field__label" for="dance-focus"
+					>Focus <span class="dance-field__optional">optional</span></label
+				>
+				<input
+					id="dance-focus"
+					class="dance-field__input"
+					type="text"
+					bind:value={focus}
+					placeholder="e.g. Hip isolations & shimmies"
+					autocomplete="off"
+				/>
 			</div>
 
 			{#each sections as section, secIdx (section.key)}
@@ -179,7 +191,8 @@
 								<li class="sec__row sec__row--readonly">{itemName(it.itemId)}</li>
 							{/each}
 						</ul>
-						<button class="sec__bookend-btn" onclick={() => customizeBookend(secIdx)}>Customize for this routine</button>
+						<button class="sec__bookend-btn" onclick={() => customizeBookend(secIdx)}>Customize for this routine</button
+						>
 					{:else}
 						<ul class="sec__list" aria-label="{section.label} items">
 							{#if section.items.length === 0}
@@ -189,13 +202,27 @@
 								<li class="sec__row">
 									<span class="sec__row-name">{itemName(it.itemId)}</span>
 									<div class="sec__row-actions">
-										<button class="sec__icon" onclick={() => move(secIdx, i, -1)} disabled={i === 0} aria-label="Move up">
+										<button
+											class="sec__icon"
+											onclick={() => move(secIdx, i, -1)}
+											disabled={i === 0}
+											aria-label="Move up"
+										>
 											<Icon name="chevron-left" size={14} stroke={2.5} />
 										</button>
-										<button class="sec__icon" onclick={() => move(secIdx, i, 1)} disabled={i === section.items.length - 1} aria-label="Move down">
+										<button
+											class="sec__icon"
+											onclick={() => move(secIdx, i, 1)}
+											disabled={i === section.items.length - 1}
+											aria-label="Move down"
+										>
 											<Icon name="chevron-right" size={14} stroke={2.5} />
 										</button>
-										<button class="sec__icon sec__icon--remove" onclick={() => remove(secIdx, i)} aria-label="Remove {itemName(it.itemId)}">
+										<button
+											class="sec__icon sec__icon--remove"
+											onclick={() => remove(secIdx, i)}
+											aria-label="Remove {itemName(it.itemId)}"
+										>
 											<Icon name="close" size={14} stroke={2.5} />
 										</button>
 									</div>
@@ -208,7 +235,9 @@
 								Add item
 							</button>
 							{#if section.isBookend && !isRoutineA}
-								<button class="sec__bookend-btn sec__bookend-btn--reset" onclick={() => resetBookend(secIdx)}>Reset to inherit</button>
+								<button class="sec__bookend-btn sec__bookend-btn--reset" onclick={() => resetBookend(secIdx)}
+									>Reset to inherit</button
+								>
 							{/if}
 						</div>
 					{/if}

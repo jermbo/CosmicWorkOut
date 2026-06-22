@@ -12,14 +12,14 @@ This version does for Strength what v1.6.0 did for Belly Dance — expands a sta
 
 ## What Shipped
 
-| Area | Detail | Source |
-| --- | --- | --- |
-| Full exercise catalog | **72 strength exercises** with cues, muscles, equipment, exercise type, default sets/reps, and weight increments | `src/lib/db/seeds/strength-exercises.ts` |
-| Body-part categories | `STRENGTH_CATS` changed to **body-part groups**: Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body (replacing the earlier movement-pattern scheme: Hinge/Squat/Push/Pull/…) | `src/lib/db/types.ts` |
-| Course programs | **6 strength programs** | `src/lib/db/seeds/strength-programs.ts` |
-| PWA / service worker | Installable PWA: `src/service-worker.ts` (SvelteKit `$service-worker`, no Workbox) precaches the app shell; static adapter with SPA fallback | `src/service-worker.ts`, `vite.config.ts` |
-| Insights refactor | Chart components streamlined (imports/readability) | commit `9befba4` |
-| DB bump | `DB_VERSION` → 7; wipe-and-reseed forces the new catalog | `src/lib/db/database.ts` |
+| Area                  | Detail                                                                                                                                                                                   | Source                                    |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Full exercise catalog | **72 strength exercises** with cues, muscles, equipment, exercise type, default sets/reps, and weight increments                                                                         | `src/lib/db/seeds/strength-exercises.ts`  |
+| Body-part categories  | `STRENGTH_CATS` changed to **body-part groups**: Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body (replacing the earlier movement-pattern scheme: Hinge/Squat/Push/Pull/…) | `src/lib/db/types.ts`                     |
+| Course programs       | **6 strength programs**                                                                                                                                                                  | `src/lib/db/seeds/strength-programs.ts`   |
+| PWA / service worker  | Installable PWA: `src/service-worker.ts` (SvelteKit `$service-worker`, no Workbox) precaches the app shell; static adapter with SPA fallback                                             | `src/service-worker.ts`, `vite.config.ts` |
+| Insights refactor     | Chart components streamlined (imports/readability)                                                                                                                                       | commit `9befba4`                          |
+| DB bump               | `DB_VERSION` → 7; wipe-and-reseed forces the new catalog                                                                                                                                 | `src/lib/db/database.ts`                  |
 
 ---
 

@@ -12,7 +12,6 @@ export type PracticeGroup = {
 	color: 'lime' | 'lavender';
 };
 
-/** Broad UI buckets that organize plans. Groups are config, not user data. */
 export const practiceGroups: PracticeGroup[] = [
 	{
 		id: WORKOUT_GROUP_ID,
@@ -39,7 +38,8 @@ export function practiceGroupForDiscipline(disciplineId: string): PracticeGroup 
 }
 
 export function sessionRouteForDiscipline(disciplineId: string): string {
-	return disciplineId === BELLYDANCE_DISCIPLINE_ID ? '/practice/dance' : '/workout';
+	if (disciplineId === BELLYDANCE_DISCIPLINE_ID) return '/practice/dance';
+	return '/workout';
 }
 
 export function sessionRouteForProgram(program: Program): string {
@@ -69,7 +69,6 @@ type NextUpInput = {
 	suggestedRoutineForProgram: (programId: string) => Routine | null;
 };
 
-/** Live session → incomplete today → suggested routine. */
 export function computePracticeNextUp(input: NextUpInput): PracticeNextUp {
 	const {
 		activePrograms,
@@ -90,8 +89,9 @@ export function computePracticeNextUp(input: NextUpInput): PracticeNextUp {
 
 	if (liveDisciplineId) {
 		const liveProgram = activePrograms.find((p) => p.disciplineId === liveDisciplineId);
+		const liveHeadline = headlineForLive(liveRoutineName);
 		return {
-			headline: liveRoutineName ? `Live: ${liveRoutineName}` : 'Live session',
+			headline: liveHeadline,
 			detail: countLine(groupCount, planCount),
 			program: liveProgram ?? null,
 			live: true,
@@ -156,9 +156,19 @@ export function computePracticeNextUp(input: NextUpInput): PracticeNextUp {
 	};
 }
 
+function headlineForLive(liveRoutineName: string | null): string {
+	if (liveRoutineName) return `Live: ${liveRoutineName}`;
+	return 'Live session';
+}
+
+function pluralize(count: number, singular: string, plural: string): string {
+	if (count === 1) return singular;
+	return plural;
+}
+
 function countLine(groupCount: number, planCount: number): string {
 	if (planCount === 0) return 'Add a practice to get started.';
-	const groupPart = `${groupCount} ${groupCount === 1 ? 'group' : 'groups'}`;
-	const planPart = `${planCount} active ${planCount === 1 ? 'plan' : 'plans'}`;
+	const groupPart = `${groupCount} ${pluralize(groupCount, 'group', 'groups')}`;
+	const planPart = `${planCount} active ${pluralize(planCount, 'plan', 'plans')}`;
 	return `${groupPart} · ${planPart}`;
 }

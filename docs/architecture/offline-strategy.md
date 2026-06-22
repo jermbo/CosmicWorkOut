@@ -98,7 +98,7 @@ Nothing special. No sync to trigger. Network awareness will only matter for serv
 - **Icons:** [`static/icon.svg`](../../static/icon.svg) is the master (cosmic dumbbell emblem); `icon-192.png` / `icon-512.png` (purpose `any maskable`) and `apple-touch-icon.png` (180px, required by iOS) are rasterized from it. Regenerate the PNGs from the SVG with a one-off `sharp` script if the logo changes.
 - **Meta:** [`src/app.html`](../../src/app.html) links the manifest, icons, and apple-touch-icon alongside the existing mobile-web-app meta tags.
 
-**Notes:** install + service worker require a secure context — works on `localhost` and any HTTPS host, but **not** over plain `http://` LAN (`npm run dev --host`). iOS never shows an install prompt; it's always manual *Share → Add to Home Screen*.
+**Notes:** install + service worker require a secure context — works on `localhost` and any HTTPS host, but **not** over plain `http://` LAN (`npm run dev --host`). iOS never shows an install prompt; it's always manual _Share → Add to Home Screen_.
 
 ---
 

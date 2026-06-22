@@ -12,9 +12,7 @@
 	let { onClose, onCreateNew, disciplineId }: Props = $props();
 
 	let programs = $derived(
-		disciplineId
-			? programStore.programs.filter((p) => p.disciplineId === disciplineId)
-			: programStore.programs,
+		disciplineId ? programStore.programs.filter((p) => p.disciplineId === disciplineId) : programStore.programs,
 	);
 
 	function activate(program: Program) {

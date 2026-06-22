@@ -15,10 +15,10 @@ so that I can see which habits I'm consistent with and which ones need more atte
    a. The chart shall compute the average logged value per habit over the last 45 days.
    b. Each habit shall appear as one axis on the radar. Habits with zero logs shall be included with a value of 0 so all habits are always visible.
    c. Values shall be normalized to a 0–1 scale per habit using the habit's expected range:
-      - `boolean`: 0 or 1 (proportion of days logged as `true`)
-      - `times` / `count` / `minutes`: average ÷ habit target (capped at 1.0)
-      - `mood`: (average + 5) ÷ 10 (maps −5 to 0, +5 to 1)
-   d. The chart shall use habit display names (not raw IDs) as axis labels.
+   - `boolean`: 0 or 1 (proportion of days logged as `true`)
+   - `times` / `count` / `minutes`: average ÷ habit target (capped at 1.0)
+   - `mood`: (average + 5) ÷ 10 (maps −5 to 0, +5 to 1)
+     d. The chart shall use habit display names (not raw IDs) as axis labels.
 
 2. Visual design
    a. The filled area shall use the app accent color at reduced opacity.

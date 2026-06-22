@@ -34,31 +34,42 @@ Chart.register(
 	Tooltip,
 );
 
-// ── Palettes ──────────────────────────────────────────────────────────────────
-// Warm/cool alternating so adjacent doughnut slices never clash.
 export const ACTIVITY_PALETTE = [
-	'#60c6ff', '#b2f042', '#f472b6', '#f59e0b', '#818cf8',
-	'#e55733', '#34d399', '#b286fd', '#4ade80', '#fb923c',
-	'#e879f9', '#94a3b8',
+	'#60c6ff',
+	'#b2f042',
+	'#f472b6',
+	'#f59e0b',
+	'#818cf8',
+	'#e55733',
+	'#34d399',
+	'#b286fd',
+	'#4ade80',
+	'#fb923c',
+	'#e879f9',
+	'#94a3b8',
 ];
 
-// ── Date range types ──────────────────────────────────────────────────────────
 export type RangeKey = 'this-week' | 'last-7' | 'mtd' | 'ytd' | 'custom';
 
 export const RANGE_OPTIONS: { key: RangeKey; label: string }[] = [
 	{ key: 'this-week', label: 'This week' },
-	{ key: 'last-7',    label: 'Last 7d' },
-	{ key: 'mtd',       label: 'MTD' },
-	{ key: 'ytd',       label: 'YTD' },
-	{ key: 'custom',    label: 'Custom' },
+	{ key: 'last-7', label: 'Last 7d' },
+	{ key: 'mtd', label: 'MTD' },
+	{ key: 'ytd', label: 'YTD' },
+	{ key: 'custom', label: 'Custom' },
 ];
 
-// ── Date helpers ──────────────────────────────────────────────────────────────
 export function getMondayOf(dateStr: string): string {
 	const d = new Date(dateStr + 'T00:00:00');
 	const dow = d.getDay();
-	d.setDate(d.getDate() + (dow === 0 ? -6 : 1 - dow));
+	const offsetToMonday = dowOffsetToMonday(dow);
+	d.setDate(d.getDate() + offsetToMonday);
 	return toLocalIso(d);
+}
+
+function dowOffsetToMonday(dow: number): number {
+	if (dow === 0) return -6;
+	return 1 - dow;
 }
 
 export function buildDatesBetween(start: string, end: string): string[] {
@@ -72,16 +83,21 @@ export function buildDatesBetween(start: string, end: string): string[] {
 	return dates;
 }
 
-export function xLabelsFor(dates: string[]): string[] {
-	const step = dates.length <= 14 ? 1 : dates.length <= 90 ? 7 : 30;
-	return dates.map((d, i) => (i % step === 0 ? d.slice(5).replace('-', '/') : ''));
+function labelStepFor(count: number): number {
+	if (count <= 14) return 1;
+	if (count <= 90) return 7;
+	return 30;
 }
 
-export function computeRange(
-	key: RangeKey,
-	cs: string,
-	ce: string,
-): { start: string; end: string } {
+export function xLabelsFor(dates: string[]): string[] {
+	const step = labelStepFor(dates.length);
+	return dates.map((d, i) => {
+		if (i % step === 0) return d.slice(5).replace('-', '/');
+		return '';
+	});
+}
+
+export function computeRange(key: RangeKey, cs: string, ce: string): { start: string; end: string } {
 	const today = new Date();
 	const todayStr = toLocalIso(today);
 	switch (key) {
@@ -101,17 +117,15 @@ export function computeRange(
 	}
 }
 
-// ── CSS var reader ────────────────────────────────────────────────────────────
 export function cssVar(name: string): string {
 	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-// ── Shared chart theme tokens ─────────────────────────────────────────────────
 export function chartTheme() {
-	const accent        = cssVar('--color-accent');
-	const textPrimary   = cssVar('--color-text-primary');
+	const accent = cssVar('--color-accent');
+	const textPrimary = cssVar('--color-text-primary');
 	const textSecondary = cssVar('--color-text-secondary');
-	const borderColor   = cssVar('--color-border');
+	const borderColor = cssVar('--color-border');
 
 	const gridOpts = { color: borderColor };
 	const tickOpts = {

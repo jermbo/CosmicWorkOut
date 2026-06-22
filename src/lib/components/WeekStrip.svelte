@@ -8,11 +8,8 @@
 
 	type Props = {
 		sessions: Session[];
-		/** When true, date changes update context without navigating home. */
 		stayOnPage?: boolean;
-		/** Show mood-colored dots instead of workout-completion dots. */
 		showMoodDots?: boolean;
-		/** Optional multi-indicator dots keyed by ISO date, e.g. habits/workout/activity. */
 		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>>;
 	};
 
@@ -51,7 +48,10 @@
 
 	let weekDays = $derived(getWeekDays(viewWeekStart));
 
-	let weekLabel = $derived(isCurrentWeek ? 'This week' : formatWeekRange(viewWeekStart));
+	let weekLabel = $derived.by(() => {
+		if (isCurrentWeek) return 'This week';
+		return formatWeekRange(viewWeekStart);
+	});
 
 	let weeksAgo = $derived.by(() => {
 		if (isCurrentWeek) return 0;
@@ -64,6 +64,11 @@
 
 	let canGoNextWeek = $derived(viewWeekStart < currentWeekStart);
 	let viewingPastDate = $derived(selectedDate !== todayStr);
+
+	function dayAriaCurrent(day: (typeof weekDays)[number]): 'date' | undefined {
+		if (day.dateStr === selectedDate) return 'date';
+		return undefined;
+	}
 
 	function dayAriaLabel(day: (typeof weekDays)[number]): string {
 		const parts = [`${day.dow} ${day.date}`];
@@ -78,17 +83,23 @@
 		const moodHabit = habitStore.habits.find((h) => h.type === 'mood' && h.active);
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
-		return log !== undefined ? log.value : null;
+		if (log !== undefined) return log.value;
+		return null;
 	}
 
 	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'dance' | 'activity'> {
 		return dayIndicators[dateStr] ?? [];
 	}
 
+	function dateDestination(dateStr: string): string {
+		if (dateStr === todayStr) return '/';
+		return `/?date=${dateStr}`;
+	}
+
 	function navigateToDate(dateStr: string) {
 		loggingContext.setDate(dateStr);
 		if (!stayOnPage) {
-			goto(dateStr === todayStr ? '/' : `/?date=${dateStr}`);
+			goto(dateDestination(dateStr));
 		}
 	}
 
@@ -146,7 +157,7 @@
 				class:week-day--tappable={day.dateStr <= todayStr}
 				disabled={day.dateStr > todayStr}
 				aria-label={dayAriaLabel(day)}
-				aria-current={day.dateStr === selectedDate ? 'date' : undefined}
+				aria-current={dayAriaCurrent(day)}
 				onclick={() => handleDayTap(day.dateStr)}
 			>
 				<span class="week-day__dow">{day.dow}</span>

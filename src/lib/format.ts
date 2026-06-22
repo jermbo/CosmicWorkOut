@@ -5,8 +5,7 @@ type DurationFormatConstructor = new (
 	options?: DurationFormatOptions,
 ) => { format: (duration: DurationInput) => string };
 
-const DurationFormat = (Intl as typeof Intl & { DurationFormat?: DurationFormatConstructor })
-	.DurationFormat;
+const DurationFormat = (Intl as typeof Intl & { DurationFormat?: DurationFormatConstructor }).DurationFormat;
 
 const fmtCompact = new Intl.NumberFormat(undefined, {
 	notation: 'compact',
@@ -24,12 +23,19 @@ const fmtMinutes = new Intl.NumberFormat(undefined, {
 });
 const fmtRelativeWeeks = new Intl.RelativeTimeFormat(undefined, { style: 'long' });
 const pluralRules = new Intl.PluralRules(undefined);
-const fmtDurationLong = DurationFormat ? new DurationFormat(undefined, { style: 'long' }) : null;
-const fmtDurationNarrow = DurationFormat ? new DurationFormat(undefined, { style: 'narrow' }) : null;
+
+function makeDurationFormat(style: DurationFormatOptions['style']) {
+	if (!DurationFormat) {
+		return null;
+	}
+	return new DurationFormat(undefined, { style });
+}
+
+const fmtDurationLong = makeDurationFormat('long');
+const fmtDurationNarrow = makeDurationFormat('narrow');
 
 let minuteUnit: string | undefined;
 
-/** Localized minute unit label, e.g. "min". */
 export function minuteUnitLabel(): string {
 	if (!minuteUnit) {
 		minuteUnit = fmtMinutes.formatToParts(1).find((p) => p.type === 'unit')?.value ?? 'min';
@@ -37,7 +43,6 @@ export function minuteUnitLabel(): string {
 	return minuteUnit;
 }
 
-/** Rounded minutes from seconds. compact: "42m", default: "42 min". */
 export function formatDuration(seconds: number, compact = false): string {
 	const minutes = Math.round(seconds / 60);
 	if (compact && fmtDurationNarrow) {
@@ -46,42 +51,46 @@ export function formatDuration(seconds: number, compact = false): string {
 	if (!compact && fmtDurationLong) {
 		return fmtDurationLong.format({ minutes });
 	}
-	return compact ? `${minutes}m` : fmtMinutes.format(minutes);
+	if (compact) {
+		return `${minutes}m`;
+	}
+	return fmtMinutes.format(minutes);
 }
 
-/** Minute count with locale unit, e.g. "42 min". */
 export function formatMinutes(minutes: number): string {
 	return fmtMinutes.format(minutes);
 }
 
-/** Elapsed seconds as MM:SS. */
 export function formatElapsed(seconds: number): string {
 	const m = Math.floor(seconds / 60);
 	const s = seconds % 60;
 	return `${fmtTwoDigits.format(m)}:${fmtTwoDigits.format(s)}`;
 }
 
-/** Weeks in the past, e.g. "last week" or "3 weeks ago". Empty when weeks <= 0. */
 export function formatWeeksAgo(weeks: number): string {
 	if (weeks <= 0) return '';
 	return fmtRelativeWeeks.format(-weeks, 'week');
 }
 
-/** Integer with optional custom unit label. */
 export function formatCount(value: number, unit?: string): string {
 	const n = fmtInteger.format(value);
-	return unit ? `${n} ${unit}` : n;
+	if (unit) {
+		return `${n} ${unit}`;
+	}
+	return n;
 }
 
-/** e.g. "1 exercise" / "3 exercises" */
 export function formatCountWithWord(count: number, singular: string, plural = `${singular}s`): string {
-	const word = pluralRules.select(count) === 'one' ? singular : plural;
-	return `${fmtInteger.format(count)} ${word}`;
+	const isSingular = pluralRules.select(count) === 'one';
+	if (isSingular) {
+		return `${fmtInteger.format(count)} ${singular}`;
+	}
+	return `${fmtInteger.format(count)} ${plural}`;
 }
 
-/** Compact weight volume. zero: "dash" shows "—", "zero" shows "0". */
 export function formatVolume(volume: number, zero: 'dash' | 'zero' = 'dash'): string {
 	if (volume >= 1000) return fmtCompact.format(volume);
 	if (volume > 0) return fmtInteger.format(volume);
-	return zero === 'zero' ? fmtInteger.format(0) : '—';
+	if (zero === 'zero') return fmtInteger.format(0);
+	return '—';
 }

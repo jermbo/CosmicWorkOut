@@ -49,6 +49,41 @@
 		onClose();
 		goto(path);
 	}
+
+	function durationLabelFor(session: Session): string | null {
+		if (session.durationSeconds) return formatDuration(session.durationSeconds);
+		return null;
+	}
+
+	let habitsActionLabel = $derived.by(() => {
+		if (hasHabits) return 'Edit habits';
+		return 'Log habits';
+	});
+
+	let strengthActionLabel = $derived.by(() => {
+		if (strengthSession) return 'Edit strength session';
+		return 'Log strength workout';
+	});
+
+	let strengthActionDescription = $derived.by(() => {
+		if (strengthSession) return 'Update sets and exercises';
+		return 'Start or record a session';
+	});
+
+	let danceActionLabel = $derived.by(() => {
+		if (danceSession) return 'Edit dance practice';
+		return 'Log dance practice';
+	});
+
+	let danceActionDescription = $derived.by(() => {
+		if (danceSession) return 'Update items and duration';
+		return 'Start or record a practice';
+	});
+
+	let activityActionLabel = $derived.by(() => {
+		if (hasActivities) return 'Add activity';
+		return 'Log activity';
+	});
 </script>
 
 <BottomSheet onclose={onClose}>
@@ -58,14 +93,14 @@
 		{#if strengthSession}
 			<DayActionsWorkoutSummary
 				workoutName={routineName(strengthSession)}
-				durationLabel={strengthSession.durationSeconds ? formatDuration(strengthSession.durationSeconds) : null}
+				durationLabel={durationLabelFor(strengthSession)}
 			/>
 		{/if}
 
 		{#if danceSession}
 			<DayActionsWorkoutSummary
 				workoutName={routineName(danceSession)}
-				durationLabel={danceSession.durationSeconds ? formatDuration(danceSession.durationSeconds) : null}
+				durationLabel={durationLabelFor(danceSession)}
 				variant="dance"
 			/>
 		{/if}
@@ -73,7 +108,7 @@
 		<div class="day-actions__list">
 			<DayActionItem
 				icon="check"
-				label={hasHabits ? 'Edit habits' : 'Log habits'}
+				label={habitsActionLabel}
 				description="Mood, water, meditation, and more"
 				onclick={() => navigate('/habits')}
 			/>
@@ -90,21 +125,21 @@
 
 			<DayActionItem
 				icon="edit"
-				label={strengthSession ? 'Edit strength session' : 'Log strength workout'}
-				description={strengthSession ? 'Update sets and exercises' : 'Start or record a session'}
+				label={strengthActionLabel}
+				description={strengthActionDescription}
 				onclick={() => navigate('/workout')}
 			/>
 
 			<DayActionItem
 				icon="edit"
-				label={danceSession ? 'Edit dance practice' : 'Log dance practice'}
-				description={danceSession ? 'Update items and duration' : 'Start or record a practice'}
+				label={danceActionLabel}
+				description={danceActionDescription}
 				onclick={() => navigate('/practice/dance')}
 			/>
 
 			<DayActionItem
 				icon="plus"
-				label={hasActivities ? 'Add activity' : 'Log activity'}
+				label={activityActionLabel}
 				description="Runs, walks, yoga, and more"
 				onclick={() => navigate('/log')}
 			/>

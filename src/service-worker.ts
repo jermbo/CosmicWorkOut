@@ -22,7 +22,7 @@ self.addEventListener('activate', (event) => {
 				if (key !== CACHE) await caches.delete(key);
 			}
 			await (self as unknown as ServiceWorkerGlobalScope).clients.claim();
-		})()
+		})(),
 	);
 });
 
@@ -60,6 +60,6 @@ self.addEventListener('fetch', (event) => {
 				if (shell) return shell;
 				throw new Error('offline and no cached response');
 			}
-		})()
+		})(),
 	);
 });

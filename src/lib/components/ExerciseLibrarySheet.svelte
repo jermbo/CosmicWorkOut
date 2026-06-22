@@ -30,7 +30,6 @@
 	let query = $state('');
 	let expandedId = $state<string | null>(null);
 	let formExercise = $state<Item | null | undefined>(undefined);
-	// undefined = closed, null = new, Item = editing
 	let confirmDeleteId = $state<string | null>(null);
 	let deleteError = $state<string | null>(null);
 
@@ -49,7 +48,11 @@
 	);
 
 	function toggleExpand(id: string) {
-		expandedId = expandedId === id ? null : id;
+		if (expandedId === id) {
+			expandedId = null;
+		} else {
+			expandedId = id;
+		}
 	}
 
 	async function deleteExercise(ex: Item) {
@@ -63,7 +66,11 @@
 			await programStore.deleteItem(ex.id);
 			if (expandedId === ex.id) expandedId = null;
 		} catch (e) {
-			deleteError = e instanceof Error ? e.message : 'Could not delete exercise.';
+			if (e instanceof Error) {
+				deleteError = e.message;
+			} else {
+				deleteError = 'Could not delete exercise.';
+			}
 		}
 	}
 </script>

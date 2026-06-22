@@ -34,9 +34,9 @@ type Discipline = {
 
 The two shipped Disciplines (`src/lib/discipline.ts`):
 
-| Discipline | id | Sections | Section metrics |
-| --- | --- | --- | --- |
-| Strength | `strength` | `exercises` | `setsReps` |
+| Discipline  | id           | Sections                                        | Section metrics                        |
+| ----------- | ------------ | ----------------------------------------------- | -------------------------------------- |
+| Strength    | `strength`   | `exercises`                                     | `setsReps`                             |
 | Belly Dance | `bellydance` | `warm-up`, `conditioning`, `moves`, `cool-down` | `check`, `measure`, `measure`, `check` |
 
 Belly Dance's `warm-up` and `cool-down` are **bookends** — routines other than A inherit Routine A's bookend items unless they set `overridesBookends`.
@@ -261,8 +261,18 @@ A non-workout physical activity entry.
 
 ```typescript
 type ActivityType =
-	| 'Run' | 'Walk' | 'Bike' | 'Swim' | 'Hike' | 'Pickleball'
-	| 'Tennis' | 'Basketball' | 'Yoga' | 'Stretching' | 'Cardio' | 'Other';
+	| 'Run'
+	| 'Walk'
+	| 'Bike'
+	| 'Swim'
+	| 'Hike'
+	| 'Pickleball'
+	| 'Tennis'
+	| 'Basketball'
+	| 'Yoga'
+	| 'Stretching'
+	| 'Cardio'
+	| 'Other';
 
 type ActivityLog = {
 	id: string;
@@ -317,17 +327,26 @@ erDiagram
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **7**. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content. Version history lives in the `DB_VERSION` comment in `database.ts`.
+DB name `cosmic-workout`, version **7**. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
 
-| Store | Key | Indexes | Contents |
-| --- | --- | --- | --- |
-| `items` | `id` | — | Item library (built-in + custom) |
-| `programs` | `id` | — | All programs |
-| `sessions` | `id` | `by_date` | Completed sessions |
-| `itemLastUsed` | `itemId` | — | Last weight/reps per item |
-| `activities` | `id` | `by_date` | Activity log entries |
-| `habits` | `id` | — | Habit definitions |
-| `habitLogs` | `id` | `by_date`, `by_habit` | Daily habit log values |
+**Version history:**
+
+| Version     | Change                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v4 (v1.4.0) | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines. |
+| v5 (v1.4.0) | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                        |
+| v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                 |
+| v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                            |
+
+| Store          | Key      | Indexes               | Contents                         |
+| -------------- | -------- | --------------------- | -------------------------------- |
+| `items`        | `id`     | —                     | Item library (built-in + custom) |
+| `programs`     | `id`     | —                     | All programs                     |
+| `sessions`     | `id`     | `by_date`             | Completed sessions               |
+| `itemLastUsed` | `itemId` | —                     | Last weight/reps per item        |
+| `activities`   | `id`     | `by_date`             | Activity log entries             |
+| `habits`       | `id`     | —                     | Habit definitions                |
+| `habitLogs`    | `id`     | `by_date`, `by_habit` | Daily habit log values           |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
@@ -335,14 +354,14 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 
 ## localStorage keys
 
-| Key | Contents |
-| --- | --- |
-| `cwout:prefs` | UserPrefs JSON |
-| `cwout:activeSession` | ActiveSession JSON (crash recovery) |
-| `cwout:activeProgramIds` | Active program id per Discipline |
-| `cwout:activeProgramId` | Legacy single active-program id (pre-Discipline; cleared on reset) |
-| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet) |
-| `cwout:habitDay` | Selected day on the habit log |
+| Key                      | Contents                                                           |
+| ------------------------ | ------------------------------------------------------------------ |
+| `cwout:prefs`            | UserPrefs JSON                                                     |
+| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                |
+| `cwout:activeProgramIds` | Active program id per Discipline                                   |
+| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset) |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)              |
+| `cwout:habitDay`         | Selected day on the habit log                                      |
 
 ---
 

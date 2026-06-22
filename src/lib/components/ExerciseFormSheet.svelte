@@ -18,7 +18,6 @@
 
 	const WEIGHT_INCREMENTS = [2.5, 5, 10];
 
-	// Snapshot prop at open time — form fields are intentionally frozen
 	const snap = untrack(() => ({
 		name: exercise?.name ?? '',
 		cue: exercise?.cue ?? '',
@@ -41,6 +40,11 @@
 	let saving = $state(false);
 	let errors = $state<Record<string, string>>({});
 
+	function incrementForUnit(): number | undefined {
+		if (unit === 'lb' || unit === 'kg') return weightIncrement;
+		return undefined;
+	}
+
 	function validate(): boolean {
 		const e: Record<string, string> = {};
 		if (!name.trim()) e.name = 'Name is required';
@@ -54,7 +58,7 @@
 		saving = true;
 
 		let saved: Item;
-		const inc = unit === 'lb' || unit === 'kg' ? weightIncrement : undefined;
+		const inc = incrementForUnit();
 		if (exercise) {
 			const updated: Item = {
 				...exercise,
@@ -91,7 +95,9 @@
 <BottomSheet onclose={onClose} maxHeight="92dvh">
 	<div class="ex-form">
 		<div class="ex-form__header">
-			<h2 class="ex-form__title">{exercise ? 'Edit Exercise' : 'New Exercise'}</h2>
+			<h2 class="ex-form__title">
+				{#if exercise}Edit Exercise{:else}New Exercise{/if}
+			</h2>
 			<button class="ex-form__close" onclick={onClose} aria-label="Close">
 				<svg
 					viewBox="0 0 24 24"
@@ -234,7 +240,7 @@
 			{/if}
 
 			<button type="submit" class="ex-form__submit" disabled={saving} aria-busy={saving}>
-				{saving ? 'Saving…' : exercise ? 'Save changes' : 'Add exercise'}
+				{#if saving}Saving…{:else if exercise}Save changes{:else}Add exercise{/if}
 			</button>
 		</form>
 	</div>

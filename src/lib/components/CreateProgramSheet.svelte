@@ -15,13 +15,11 @@
 	let errors = $state<Record<string, string>>({});
 	let dialog: HTMLDialogElement;
 
-	// Step 1 fields
 	let name = $state('');
 	let description = $state('');
 	let durationWeeks = $state(12);
 	let daysPerWeek = $state(3);
 
-	// Step 2: editable templates seeded when advancing to step 2
 	let templates = $state<{ name: string; focus: string }[]>([]);
 
 	onMount(() => {
@@ -62,7 +60,10 @@
 	}
 
 	function updateTemplate(i: number, field: 'name' | 'focus', value: string) {
-		templates = templates.map((t, idx) => (idx === i ? { ...t, [field]: value } : t));
+		templates = templates.map((t, idx) => {
+			if (idx === i) return { ...t, [field]: value };
+			return t;
+		});
 	}
 </script>
 
@@ -77,7 +78,6 @@
 	aria-modal="true"
 >
 	<div class="create-overlay__inner">
-		<!-- Header -->
 		<div class="create-overlay__top">
 			<div class="create-overlay__bar">
 				{#if step === 'workouts'}
@@ -111,13 +111,13 @@
 				{/if}
 				<div class="create-overlay__titles">
 					<h1 class="create-overlay__title" id="create-title">
-						{step === 'details' ? 'New Program' : 'Name Your Workouts'}
+						{#if step === 'details'}New Program{:else}Name Your Workouts{/if}
 					</h1>
 					<p class="create-overlay__subtitle">
 						{#if step === 'details'}
 							Step 1 of 2 — Program details
 						{:else}
-							Step 2 of 2 — {daysPerWeek} workout{daysPerWeek !== 1 ? 's' : ''}/week
+							Step 2 of 2 — {daysPerWeek} workout{#if daysPerWeek !== 1}s{/if}/week
 						{/if}
 					</p>
 				</div>
@@ -125,13 +125,12 @@
 					<button class="create-overlay__next-btn" onclick={goToWorkouts}> Next → </button>
 				{:else}
 					<button class="create-overlay__next-btn" onclick={handleCreate} disabled={saving} aria-busy={saving}>
-						{saving ? 'Creating…' : 'Create'}
+						{#if saving}Creating…{:else}Create{/if}
 					</button>
 				{/if}
 			</div>
 		</div>
 
-		<!-- Body -->
 		<div class="create-overlay__scroll">
 			{#if step === 'details'}
 				<div class="create-form">
@@ -352,7 +351,6 @@
 		line-height: 1.5;
 	}
 
-	/* Shared form styles */
 	.form-field {
 		display: flex;
 		flex-direction: column;
@@ -487,7 +485,6 @@
 		color: var(--color-accent-ink);
 	}
 
-	/* Workout template rows */
 	.workout-template {
 		display: flex;
 		align-items: flex-start;

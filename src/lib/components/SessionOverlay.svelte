@@ -31,13 +31,13 @@
 	let totalSets = $derived(activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.length, 0));
 
 	let doneSets = $derived(
-		activeItems.reduce(
-			(sum: number, ex: ActiveItem) => sum + ex.sets.filter((s: ActiveSet) => s.completed).length,
-			0,
-		),
+		activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.filter((s: ActiveSet) => s.completed).length, 0),
 	);
 
-	let progressPct = $derived(totalSets > 0 ? (doneSets / totalSets) * 100 : 0);
+	let progressPct = $derived.by(() => {
+		if (totalSets > 0) return (doneSets / totalSets) * 100;
+		return 0;
+	});
 	let allDone = $derived(totalSets > 0 && doneSets === totalSets);
 	let isEditing = $derived(sessionStore.active?.isEditing === true);
 
@@ -64,7 +64,6 @@
 		if (!set) return;
 
 		if (set.completed) {
-			// adjust a completed set
 			sheetTarget = { exerciseIndex, setIndex };
 		} else {
 			const hasWeight =
@@ -74,10 +73,8 @@
 				(typeof set.weight === 'string' && Boolean(set.weight));
 
 			if (hasWeight) {
-				// weight already known — one tap logs it
 				sessionStore.completeSet(exerciseIndex, setIndex);
 			} else {
-				// first time — need to enter a weight
 				sheetTarget = { exerciseIndex, setIndex };
 			}
 		}
@@ -91,20 +88,29 @@
 		sheetTarget = null;
 	}
 
-	let sheetExercise = $derived(
-		sheetTarget
-			? programStore.getItemById(activeItems[sheetTarget.exerciseIndex]?.itemId ?? '')
-			: null,
-	);
+	let sheetExercise = $derived.by(() => {
+		if (!sheetTarget) return null;
+		return programStore.getItemById(activeItems[sheetTarget.exerciseIndex]?.itemId ?? '');
+	});
 
-	let sheetActiveSet = $derived(
-		sheetTarget ? activeItems[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex] : null,
-	);
+	let sheetActiveSet = $derived.by(() => {
+		if (!sheetTarget) return null;
+		return activeItems[sheetTarget.exerciseIndex]?.sets[sheetTarget.setIndex];
+	});
+
+	let abandonTitle = $derived.by(() => {
+		if (isEditing) return 'Discard changes?';
+		return 'End this session?';
+	});
+
+	let abandonConfirmLabel = $derived.by(() => {
+		if (isEditing) return 'Discard';
+		return 'End session';
+	});
 </script>
 
 <BottomSheet onclose={handleAbandonRequest} maxHeight="100dvh" hideHandle fixedHeight>
 	<div class="session-overlay__inner" aria-labelledby="session-title" aria-modal="true">
-		<!-- Header -->
 		<header class="session-overlay__header">
 			<div class="session-overlay__top-row">
 				<button class="session-overlay__back-btn" onclick={handleAbandonRequest} aria-label="End session">
@@ -152,7 +158,6 @@
 			</div>
 		</header>
 
-		<!-- Exercise list -->
 		<div class="session-overlay__exercises">
 			{#if sessionStore.active}
 				{#each activeItems as activeExercise, exerciseIndex}
@@ -164,7 +169,6 @@
 			{/if}
 		</div>
 
-		<!-- Finish bar -->
 		<div class="session-overlay__footer">
 			<button class="session-overlay__finish" class:session-overlay__finish--all-done={allDone} onclick={handleFinish}>
 				{#if isEditing}
@@ -192,8 +196,8 @@
 
 		{#if showAbandonConfirm}
 			<ConfirmDialog
-				title={isEditing ? 'Discard changes?' : 'End this session?'}
-				confirmLabel={isEditing ? 'Discard' : 'End session'}
+				title={abandonTitle}
+				confirmLabel={abandonConfirmLabel}
 				cancelLabel="Keep going"
 				danger
 				onconfirm={handleAbandonConfirm}

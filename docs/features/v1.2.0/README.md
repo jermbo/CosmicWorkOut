@@ -56,10 +56,10 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 These stories were started in v1.2.0 but not finished. Full specs live in the v1.3.0 folder.
 
-| ID     | Title                       | v1.2.0 outcome                                              |
-| ------ | --------------------------- | ----------------------------------------------------------- |
+| ID     | Title                       | v1.2.0 outcome                                                    |
+| ------ | --------------------------- | ----------------------------------------------------------------- |
 | US-009 | Habit Creation & Management | Built-in habits + `/habits` logging shipped; Settings UI → v1.3.0 |
-| US-010 | Habit History in Calendar   | Not started → v1.3.0                                        |
+| US-010 | Habit History in Calendar   | Not started → v1.3.0                                              |
 
 ---
 

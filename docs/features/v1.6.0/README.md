@@ -14,13 +14,13 @@ v1.4.0 proved the Discipline model with a handful of dance items. v1.6.0 makes B
 
 ## What Shipped
 
-| Area | Detail | Source |
-| --- | --- | --- |
-| Full move catalog | **39 belly dance moves** with cues, focus tags, movement type (sharp/smooth/variable), and difficulty | `src/lib/db/seeds/bellydance-moves.ts` |
-| Bookend library | **10 warm-up / cool-down items** (metric `check`) shared across routines | `src/lib/db/seeds/bellydance-bookends.ts` |
-| Course programs | **6 programs** — Beginner 101–103, Intermediate 101–103 | `src/lib/db/seeds/bellydance-programs.ts` |
-| Catalog → Item derivation | Moves and bookends are mapped to `Item`s with section-appropriate metrics (`moves` → `measure`, bookends → `check`) | `src/lib/db/seeds/bellydance-items.ts` |
-| DB bump | `DB_VERSION` → 6; wipe-and-reseed forces the new content | `src/lib/db/database.ts` |
+| Area                      | Detail                                                                                                              | Source                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Full move catalog         | **39 belly dance moves** with cues, focus tags, movement type (sharp/smooth/variable), and difficulty               | `src/lib/db/seeds/bellydance-moves.ts`    |
+| Bookend library           | **10 warm-up / cool-down items** (metric `check`) shared across routines                                            | `src/lib/db/seeds/bellydance-bookends.ts` |
+| Course programs           | **6 programs** — Beginner 101–103, Intermediate 101–103                                                             | `src/lib/db/seeds/bellydance-programs.ts` |
+| Catalog → Item derivation | Moves and bookends are mapped to `Item`s with section-appropriate metrics (`moves` → `measure`, bookends → `check`) | `src/lib/db/seeds/bellydance-items.ts`    |
+| DB bump                   | `DB_VERSION` → 6; wipe-and-reseed forces the new content                                                            | `src/lib/db/database.ts`                  |
 
 ---
 

@@ -1,14 +1,4 @@
-import type {
-	Session,
-	ActivityLog,
-	HabitLog,
-	LoggedItem,
-	LoggedSet,
-	ActivityType,
-	ActivityIntensity,
-} from './types';
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
+import type { Session, ActivityLog, HabitLog, LoggedItem, LoggedSet, ActivityType, ActivityIntensity } from './types';
 
 function rInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -30,8 +20,6 @@ function shiftDays(base: Date, n: number): Date {
 	d.setDate(d.getDate() + n);
 	return d;
 }
-
-// ── Workouts ───────────────────────────────────────────────────────────────────
 
 type WorkoutKey = 'A' | 'B' | 'C';
 
@@ -113,6 +101,16 @@ const ROUTINE_META: Record<WorkoutKey, { id: string; name: string; estMin: numbe
 const DISCIPLINE_ID = 'strength';
 const PROGRAM_ID = 'st-beginner-101';
 
+function startingWeight(unit: string, itemId: string): number {
+	if (unit === 'lb') return lbWeight(itemId);
+	return 0;
+}
+
+function actualRepsFor(unit: string, reps: number): number {
+	if (unit === 'lb') return Math.max(1, reps + rInt(-2, 2));
+	return reps;
+}
+
 function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 	const meta = ROUTINE_META[type];
 	const startedAt = new Date(date);
@@ -127,12 +125,12 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 
 	const items: LoggedItem[] = WORKOUTS[type].map(({ itemId, sets, reps }) => {
 		const unit = ITEM_UNITS[itemId] ?? 'lb';
-		const weight: number | string = unit === 'lb' ? lbWeight(itemId) : 0;
+		const weight: number | string = startingWeight(unit, itemId);
 		const loggedSets: LoggedSet[] = [];
 
 		for (let s = 1; s <= sets; s++) {
 			setTime = new Date(setTime.getTime() + rInt(90, 210) * 1000);
-			const actualReps = unit === 'lb' ? Math.max(1, reps + rInt(-2, 2)) : reps;
+			const actualReps = actualRepsFor(unit, reps);
 			if (unit === 'lb') totalVolume += (weight as number) * actualReps;
 			totalSets++;
 			loggedSets.push({ setNumber: s, weight, reps: actualReps, completedAt: setTime.toISOString() });
@@ -156,8 +154,6 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 		items,
 	};
 }
-
-// ── Activities ─────────────────────────────────────────────────────────────────
 
 const ACTIVITY_DURATION: Partial<Record<ActivityType, [number, number]>> = {
 	Walk: [25, 60],
@@ -191,14 +187,21 @@ const ALL_ACTIVITIES: ActivityType[] = [
 	'Cardio',
 ];
 
+function pickActivityType(light: boolean): ActivityType {
+	if (light) return pick(EASY_ACTIVITIES);
+	return pick(ALL_ACTIVITIES);
+}
+
+function intensityFor(type: ActivityType, light: boolean): ActivityIntensity {
+	if (EASY_ACTIVITIES.includes(type)) return 'Easy';
+	if (light) return pick<ActivityIntensity>(['Easy', 'Moderate']);
+	return pick<ActivityIntensity>(['Easy', 'Moderate', 'Moderate', 'Hard']);
+}
+
 function buildActivity(date: Date, idx: number, light = false): ActivityLog {
-	const type = light ? pick(EASY_ACTIVITIES) : pick(ALL_ACTIVITIES);
+	const type = pickActivityType(light);
 	const [minD, maxD] = ACTIVITY_DURATION[type] ?? [30, 60];
-	const intensity: ActivityIntensity = EASY_ACTIVITIES.includes(type)
-		? 'Easy'
-		: light
-			? pick<ActivityIntensity>(['Easy', 'Moderate'])
-			: pick<ActivityIntensity>(['Easy', 'Moderate', 'Moderate', 'Hard']);
+	const intensity = intensityFor(type, light);
 	return {
 		id: `seed-activity-${idx}`,
 		date: toDateStr(date),
@@ -208,8 +211,6 @@ function buildActivity(date: Date, idx: number, light = false): ActivityLog {
 		createdAt: date.toISOString(),
 	};
 }
-
-// ── Habits ─────────────────────────────────────────────────────────────────────
 
 const HABIT_IDS = [
 	'habit-meditation',
@@ -221,35 +222,57 @@ const HABIT_IDS = [
 	'habit-mood',
 ] as const;
 
+function chance(probability: number): boolean {
+	return Math.random() < probability;
+}
+
+function clampMood(value: number): number {
+	return Math.max(-5, Math.min(5, value));
+}
+
+function meditationValue(workoutDay: boolean): number {
+	if (workoutDay) return rInt(15, 35);
+	if (chance(0.45)) return rInt(0, 15);
+	return rInt(10, 30);
+}
+
+function waterValue(workoutDay: boolean): number {
+	if (workoutDay) return rInt(6, 12);
+	if (chance(0.4)) return rInt(2, 6);
+	return rInt(5, 10);
+}
+
+function moodValue(workoutDay: boolean): number {
+	if (workoutDay) return clampMood(rInt(-1, 5));
+	return clampMood(rInt(-4, 4));
+}
+
 function habitValue(habitId: string, workoutDay: boolean): number {
 	switch (habitId) {
 		case 'habit-meditation':
-			return workoutDay ? rInt(15, 35) : Math.random() < 0.45 ? rInt(0, 15) : rInt(10, 30);
+			return meditationValue(workoutDay);
 		case 'habit-writing':
-			return Math.random() < 0.35 ? rInt(0, 350) : rInt(200, 1000);
+			if (chance(0.35)) return rInt(0, 350);
+			return rInt(200, 1000);
 		case 'habit-reading':
-			return Math.random() < 0.35 ? rInt(0, 12) : rInt(8, 40);
+			if (chance(0.35)) return rInt(0, 12);
+			return rInt(8, 40);
 		case 'habit-water':
-			return workoutDay ? rInt(6, 12) : Math.random() < 0.4 ? rInt(2, 6) : rInt(5, 10);
+			return waterValue(workoutDay);
 		case 'habit-coffee':
 			return pick([0, 1, 1, 2, 2, 3, 3, 3, 4]);
 		case 'habit-alcohol':
-			return Math.random() < 0.18 ? 1 : 0;
+			if (chance(0.18)) return 1;
+			return 0;
 		case 'habit-mood':
-			return workoutDay
-				? Math.max(-5, Math.min(5, rInt(-1, 5)))
-				: Math.max(-5, Math.min(5, rInt(-4, 4)));
+			return moodValue(workoutDay);
 		default:
 			return 0;
 	}
 }
 
-// ── Schedule ───────────────────────────────────────────────────────────────────
-
 const WORKOUT_OFFSETS = [1, 3, 5, 8, 10, 12, 15, 17, 19, 20, 25, 29, 31, 33, 36, 38, 41, 43, 44];
-const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map(
-	(_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3],
-);
+const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map((_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3]);
 
 const DUAL_ACTIVITY_OFFSETS = new Set([3, 12, 19, 31, 41]);
 
@@ -257,7 +280,15 @@ const ACTIVITY_OFFSETS = [
 	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27, 28, 30, 32, 34, 35, 37, 39, 40, 42,
 ];
 
-// ── Main export ────────────────────────────────────────────────────────────────
+function adjustedLogRate(habitId: string, logRate: number): number {
+	if (habitId === 'habit-alcohol' || habitId === 'habit-mood') return logRate * 0.85;
+	return logRate;
+}
+
+function dayLogRate(isWorkoutDay: boolean): number {
+	if (isWorkoutDay) return 0.95;
+	return 0.82;
+}
 
 export function generateDebugSeedData(): {
 	sessions: Session[];
@@ -269,7 +300,6 @@ export function generateDebugSeedData(): {
 	const start = shiftDays(today, -45);
 
 	const workoutOffsetSet = new Set(WORKOUT_OFFSETS);
-	const activityOffsetSet = new Set(ACTIVITY_OFFSETS);
 
 	const sessions: Session[] = WORKOUT_OFFSETS.map((offset, i) =>
 		buildSession(shiftDays(start, offset), WORKOUT_SEQUENCE[i], i),
@@ -290,11 +320,10 @@ export function generateDebugSeedData(): {
 	for (let i = 0; i < 45; i++) {
 		const date = shiftDays(start, i);
 		const isWorkoutDay = workoutOffsetSet.has(i);
-		const logRate = isWorkoutDay ? 0.95 : 0.82;
+		const logRate = dayLogRate(isWorkoutDay);
 
 		for (const habitId of HABIT_IDS) {
-			const adjustedRate =
-				habitId === 'habit-alcohol' || habitId === 'habit-mood' ? logRate * 0.85 : logRate;
+			const adjustedRate = adjustedLogRate(habitId, logRate);
 			if (Math.random() < adjustedRate) {
 				habitLogs.push({
 					id: `seed-hl-${habitId}-${toDateStr(date)}`,

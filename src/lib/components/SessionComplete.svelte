@@ -23,7 +23,6 @@
 
 <BottomSheet onclose={handleBackToToday} maxHeight="100dvh" hideHandle fixedHeight>
 	<div class="session-complete" aria-labelledby="complete-title" aria-modal="true">
-		<!-- Check circle -->
 		<div class="session-complete__graphic" aria-hidden="true">
 			<div class="session-complete__circle">
 				<svg
@@ -40,14 +39,12 @@
 			</div>
 		</div>
 
-		<!-- Title -->
 		<div class="session-complete__text">
 			<p class="session-complete__eyebrow" aria-hidden="true">Filed away.</p>
 			<h2 class="session-complete__title" id="complete-title">Session logged.</h2>
 			<p class="session-complete__subtitle">Nice work today.</p>
 		</div>
 
-		<!-- Stats -->
 		{#if session}
 			<div class="session-complete__stats" role="region" aria-label="Session summary">
 				{#if isDance}
@@ -86,7 +83,6 @@
 			</div>
 		{/if}
 
-		<!-- Actions -->
 		<div class="session-complete__actions">
 			<button class="session-complete__btn session-complete__btn--primary" onclick={handleBackToToday}>
 				Back to today

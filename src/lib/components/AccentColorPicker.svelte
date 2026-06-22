@@ -29,6 +29,13 @@
 		prefsStore.setAccentColor(value);
 		hexError = false;
 	}
+
+	function presetAriaLabel(preset: { label: string; value: string }): string {
+		if (prefsStore.accentColor === preset.value) {
+			return `${preset.label} (selected)`;
+		}
+		return preset.label;
+	}
 </script>
 
 <div class="color-swatches" role="group" aria-label="Accent color presets">
@@ -38,7 +45,7 @@
 			class:color-swatch--active={prefsStore.accentColor === preset.value}
 			style:--swatch={preset.value}
 			onclick={() => selectPreset(preset.value)}
-			aria-label="{preset.label}{prefsStore.accentColor === preset.value ? ' (selected)' : ''}"
+			aria-label={presetAriaLabel(preset)}
 			aria-pressed={prefsStore.accentColor === preset.value}
 		>
 			{#if prefsStore.accentColor === preset.value}

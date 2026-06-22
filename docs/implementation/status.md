@@ -6,59 +6,59 @@ What's built today vs. what's still requirements-only. Verified against the code
 
 ## v1.1.0 — Core Workout Flows
 
-| Feature                                                   | Status   | Notes                                                                          |
-| --------------------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
-| Today view + start session                                | ✅ Built | Home card navigates to `/workout`; workout page handles start/edit             |
-| Session logging — smart tap (instant or first-time entry) | ✅ Built | Instant if weight known; opens sheet for first-time weight entry               |
-| Session logging — adjust completed set                    | ✅ Built | Tap any completed tile to reopen sheet; cascades forward                       |
-| Weight remembered across sessions (`itemLastUsed`)        | ✅ Built | Pre-fills on session start                                                     |
-| Per-item weight increment (2.5 / 5 / 10)                  | ✅ Built | Configured on item form; weights round to nearest increment                    |
-| Finish / abandon session                                  | ✅ Built | Finish saves completed sets only; abandon has confirm dialog                   |
-| Crash recovery                                            | ✅ Built | Resume/discard banner on boot                                                  |
-| Session complete overlay                                  | ✅ Built | Stats + confetti                                                               |
-| Program view + week progress                              | ✅ Built | Routine cards from the current week's templates                                |
-| Workout/routine editor                                    | ✅ Built | Edit items, add new routines                                                   |
-| Item library browser                                      | ✅ Built | Category-filtered sheet in editor                                              |
-| Calendar + day summary                                    | ✅ Built | Month grid, tap completed days                                                 |
-| IndexedDB persistence                                     | ✅ Built | Raw API wrapper, seed data                                                     |
-| Preferences store                                         | ✅ Built | Accent, density, roundness, weight unit                                        |
-| Settings UI                                               | ✅ Built | `/settings` — accent color, weight unit, density, roundness                    |
-| Program selection screen                                  | ✅ Built | Bottom sheet; built-in programs deep-clone before activating                   |
-| Create new program                                        | ✅ Built | 2-step full-screen flow — details then routine names; scaffolds all weeks      |
-| Copy built-in before editing                              | ✅ Built | Guard dialog prompts copy+switch when editing a built-in program               |
-| Custom item CRUD                                          | ✅ Built | Create/edit/delete in the item library; built-in items are read-only           |
-| Browse all program weeks                                  | ✅ Built | Week picker chevrons on program page                                           |
-| Weekly consistency streak                                 | ✅ Built | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar       |
-| Scheduled/skipped day status                              | ✅ Built | Calendar infers training days-of-week from session history                     |
+| Feature                                                   | Status   | Notes                                                                     |
+| --------------------------------------------------------- | -------- | ------------------------------------------------------------------------- |
+| Today view + start session                                | ✅ Built | Home card navigates to `/workout`; workout page handles start/edit        |
+| Session logging — smart tap (instant or first-time entry) | ✅ Built | Instant if weight known; opens sheet for first-time weight entry          |
+| Session logging — adjust completed set                    | ✅ Built | Tap any completed tile to reopen sheet; cascades forward                  |
+| Weight remembered across sessions (`itemLastUsed`)        | ✅ Built | Pre-fills on session start                                                |
+| Per-item weight increment (2.5 / 5 / 10)                  | ✅ Built | Configured on item form; weights round to nearest increment               |
+| Finish / abandon session                                  | ✅ Built | Finish saves completed sets only; abandon has confirm dialog              |
+| Crash recovery                                            | ✅ Built | Resume/discard banner on boot                                             |
+| Session complete overlay                                  | ✅ Built | Stats + confetti                                                          |
+| Program view + week progress                              | ✅ Built | Routine cards from the current week's templates                           |
+| Workout/routine editor                                    | ✅ Built | Edit items, add new routines                                              |
+| Item library browser                                      | ✅ Built | Category-filtered sheet in editor                                         |
+| Calendar + day summary                                    | ✅ Built | Month grid, tap completed days                                            |
+| IndexedDB persistence                                     | ✅ Built | Raw API wrapper, seed data                                                |
+| Preferences store                                         | ✅ Built | Accent, density, roundness, weight unit                                   |
+| Settings UI                                               | ✅ Built | `/settings` — accent color, weight unit, density, roundness               |
+| Program selection screen                                  | ✅ Built | Bottom sheet; built-in programs deep-clone before activating              |
+| Create new program                                        | ✅ Built | 2-step full-screen flow — details then routine names; scaffolds all weeks |
+| Copy built-in before editing                              | ✅ Built | Guard dialog prompts copy+switch when editing a built-in program          |
+| Custom item CRUD                                          | ✅ Built | Create/edit/delete in the item library; built-in items are read-only      |
+| Browse all program weeks                                  | ✅ Built | Week picker chevrons on program page                                      |
+| Weekly consistency streak                                 | ✅ Built | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar  |
+| Scheduled/skipped day status                              | ✅ Built | Calendar infers training days-of-week from session history                |
 
 ---
 
 ## v1.2.0 — Daily Dashboard & Habits
 
-| Feature                             | Status   | Notes                                                                                                                  |
-| ----------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Home screen as overview dashboard   | ✅ Built | Summary cards: Habits, Workout/Practice, Activity                                                                       |
-| Global date context                 | ✅ Built | `loggingContext` store; date picker on home taps to any past day                                                       |
-| Activity log page (`/log`)          | ✅ Built | List, add, edit, delete activities; date-filtered                                                                       |
-| Dedicated workout page (`/workout`) | ✅ Built | Full session UI; back button to home                                                                                   |
-| Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal                                                  |
-| Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid                                                 |
-| Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal                                                                                   |
-| Pre-seeded habits                   | ✅ Built | Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood                                                              |
-| Habit `dailyGoal` migration         | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing built-in habit records missing it                                     |
-| Program complete state              | ✅ Built | Shown on `/workout` with CTA to choose a new program                                                                   |
+| Feature                             | Status   | Notes                                                                              |
+| ----------------------------------- | -------- | ---------------------------------------------------------------------------------- |
+| Home screen as overview dashboard   | ✅ Built | Summary cards: Habits, Workout/Practice, Activity                                  |
+| Global date context                 | ✅ Built | `loggingContext` store; date picker on home taps to any past day                   |
+| Activity log page (`/log`)          | ✅ Built | List, add, edit, delete activities; date-filtered                                  |
+| Dedicated workout page (`/workout`) | ✅ Built | Full session UI; back button to home                                               |
+| Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal             |
+| Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid            |
+| Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal                                              |
+| Pre-seeded habits                   | ✅ Built | Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood                         |
+| Habit `dailyGoal` migration         | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing built-in habit records missing it |
+| Program complete state              | ✅ Built | Shown on `/workout` with CTA to choose a new program                               |
 
 ---
 
 ## v1.3.0 — Habit Management & Calendar History
 
-| Feature                           | Status      | Doc reference |
-| --------------------------------- | ----------- | ------------- |
-| Custom habit CRUD in Settings     | ✅ Built    | US-009        |
-| Habit history heatmap on Calendar | ✅ Built    | US-010        |
-| Activity edit from calendar       | ✅ Built    | US-013        |
-| Journal page                      | ❌ Removed  | Shipped in v1.3 (US-012/US-014), then **removed** in commit `0af33ff` ("remove journal feature components"). No journal route or code remains. |
-| Journal speech input & auto-save  | ❌ Removed  | Removed with the Journal page (US-014). |
+| Feature                           | Status     | Doc reference                                                                                                                                  |
+| --------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom habit CRUD in Settings     | ✅ Built   | US-009                                                                                                                                         |
+| Habit history heatmap on Calendar | ✅ Built   | US-010                                                                                                                                         |
+| Activity edit from calendar       | ✅ Built   | US-013                                                                                                                                         |
+| Journal page                      | ❌ Removed | Shipped in v1.3 (US-012/US-014), then **removed** in commit `0af33ff` ("remove journal feature components"). No journal route or code remains. |
+| Journal speech input & auto-save  | ❌ Removed | Removed with the Journal page (US-014).                                                                                                        |
 
 ---
 
@@ -78,14 +78,14 @@ What's built today vs. what's still requirements-only. Verified against the code
 
 ## v1.5.0 — Insights Hub
 
-| Feature                       | Status   | Doc reference |
-| ----------------------------- | -------- | ------------- |
-| Insights hub (`/insights`)    | ✅ Built | US-022        |
-| Mood × habits chart           | ✅ Built | US-023        |
-| Weekly volume chart           | ✅ Built | US-024        |
-| Activity breakdown chart      | ✅ Built | US-025        |
-| Habit radar chart             | ✅ Built | US-026        |
-| Exercise progress chart       | ✅ Built | US-027        |
+| Feature                    | Status   | Doc reference |
+| -------------------------- | -------- | ------------- |
+| Insights hub (`/insights`) | ✅ Built | US-022        |
+| Mood × habits chart        | ✅ Built | US-023        |
+| Weekly volume chart        | ✅ Built | US-024        |
+| Activity breakdown chart   | ✅ Built | US-025        |
+| Habit radar chart          | ✅ Built | US-026        |
+| Exercise progress chart    | ✅ Built | US-027        |
 
 Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src/lib/chart-utils.ts`).
 
@@ -93,10 +93,10 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 
 ## v1.6.0 — Belly Dance Catalog & Course Programs
 
-| Feature                                  | Status   | Notes |
-| ---------------------------------------- | -------- | ----- |
-| Full belly dance move catalog            | ✅ Built | 39 moves (`bellydance-moves.ts`) + 10 warm-up/cool-down bookends |
-| Six belly dance "course" programs        | ✅ Built | Beginner 101–103, Intermediate 101–103 (`bellydance-programs.ts`); DB v6 |
+| Feature                           | Status   | Notes                                                                    |
+| --------------------------------- | -------- | ------------------------------------------------------------------------ |
+| Full belly dance move catalog     | ✅ Built | 39 moves (`bellydance-moves.ts`) + 10 warm-up/cool-down bookends         |
+| Six belly dance "course" programs | ✅ Built | Beginner 101–103, Intermediate 101–103 (`bellydance-programs.ts`); DB v6 |
 
 > ⚠️ `docs/features/v1.6.0/` does not yet exist — this section is reconstructed from code + git history. A feature folder should be backfilled.
 
@@ -104,11 +104,11 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 
 ## v1.7.0 — Full Strength Catalog & PWA
 
-| Feature                                   | Status   | Notes |
-| ----------------------------------------- | -------- | ----- |
-| Full gym exercise catalog                 | ✅ Built | 72 exercises (`strength-exercises.ts`); categories are **body-part based** (Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body); DB v7 |
-| Six strength "course" programs            | ✅ Built | `strength-programs.ts` |
-| Service worker / PWA                      | ✅ Built | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`) |
+| Feature                        | Status   | Notes                                                                                                                                              |
+| ------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full gym exercise catalog      | ✅ Built | 72 exercises (`strength-exercises.ts`); categories are **body-part based** (Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body); DB v7 |
+| Six strength "course" programs | ✅ Built | `strength-programs.ts`                                                                                                                             |
+| Service worker / PWA           | ✅ Built | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`)                                                                      |
 
 > ⚠️ `docs/features/v1.7.0/` does not yet exist — reconstructed from code + git history. A feature folder should be backfilled.
 
