@@ -9,7 +9,7 @@
 	$effect(() => {
 		if (!canvas || dates.length === 0) return;
 
-		const { accent, textPrimary, borderColor } = chartTheme();
+		const { accent, textPrimary, borderColor, fontBody } = chartTheme();
 		const dateSet = new Set(dates);
 
 		const activeHabits = habitStore.activeHabits;
@@ -60,7 +60,7 @@
 						max: 1,
 						ticks: { display: false },
 						grid: { color: borderColor },
-						pointLabels: { color: textPrimary, font: { family: 'Inter, sans-serif', size: 12 } },
+						pointLabels: { color: textPrimary, font: { family: fontBody, size: 12 } },
 						angleLines: { color: borderColor },
 					},
 				},

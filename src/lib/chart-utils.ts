@@ -126,15 +126,16 @@ export function chartTheme() {
 	const textPrimary = cssVar('--color-text-primary');
 	const textSecondary = cssVar('--color-text-secondary');
 	const borderColor = cssVar('--color-border');
+	const fontBody = cssVar('--font-body');
 
 	const gridOpts = { color: borderColor };
 	const tickOpts = {
 		color: textSecondary,
-		font: { family: 'Inter, sans-serif', size: 11 },
+		font: { family: fontBody, size: 11 },
 		autoSkip: true,
 		maxRotation: 0,
 	};
-	const legendOpts = { color: textPrimary, font: { family: 'Inter, sans-serif', size: 12 } };
+	const legendOpts = { color: textPrimary, font: { family: fontBody, size: 12 } };
 
-	return { accent, textPrimary, textSecondary, borderColor, gridOpts, tickOpts, legendOpts };
+	return { accent, textPrimary, textSecondary, borderColor, fontBody, gridOpts, tickOpts, legendOpts };
 }

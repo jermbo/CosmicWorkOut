@@ -46,9 +46,9 @@ flowchart LR
 
 A service worker ([`src/service-worker.ts`](../../src/service-worker.ts)) precaches the app shell on `install` and serves it offline.
 
-- **Precached** (`$service-worker` `build` + `files`): JS bundles, CSS, icons, manifest, and everything in `static/`. Served **cache-first** — these assets are immutable per build.
-- **Everything else** (including SPA navigations): **network-first**, falling back to cache, then to the cached `/` shell. Cold offline launches boot from the cached fallback shell.
-- **Cross-origin** requests (Google Fonts, etc.) are passed straight to the network — never cached, so we never store opaque responses.
+- **Precached** (`$service-worker` `build` + `files` + `/` / `index.html`): JS bundles, CSS, fonts, icons, manifest, static assets, and the SPA HTML shell. Served **cache-first** — these assets are immutable per build.
+- **SPA navigations** (any other route): **network-first**, falling back to the precached shell when offline so deep links still boot.
+- **Cross-origin** requests are passed straight to the network — never cached.
 - **Versioning:** the cache name embeds the build `version`, so each deploy installs a fresh SW, precaches the new shell, and deletes stale caches on `activate`.
 
 The build emits a single SPA fallback (`adapter-static` with `fallback: 'index.html'`, since `ssr=false`/`prerender=false`), which is what the SW serves for offline navigations.
