@@ -2,7 +2,19 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export type ItemCat = 'Hinge' | 'Squat' | 'Push' | 'Pull' | 'Lateral' | 'Rotational' | 'Power' | 'Carry';
+export const STRENGTH_CATS = [
+	'Chest',
+	'Back',
+	'Shoulders',
+	'Biceps',
+	'Triceps',
+	'Legs',
+	'Core',
+	'Full Body',
+] as const;
+export type ItemCat = (typeof STRENGTH_CATS)[number];
+export type ExerciseType = 'compound' | 'isolation' | 'dynamic' | 'isometric';
+export type CatalogDifficulty = 'beginner' | 'intermediate' | 'advanced';
 export type ActivityType =
 	| 'Run'
 	| 'Walk'
@@ -75,11 +87,13 @@ export interface Item {
 	// Belly dance catalog metadata (optional, dance items only).
 	danceCat?: string;
 	movementType?: DanceMovementType;
-	difficulty?: DanceDifficulty;
+	difficulty?: CatalogDifficulty;
 	// setsReps (strength) fields — optional now that measure/check Items (e.g. belly
 	// dance) live on the same model and don't carry sets/reps/weight (US-016).
 	muscles?: string;
 	cat?: ItemCat;
+	exerciseType?: ExerciseType;
+	equipment?: string[];
 	unit?: WeightUnit;
 	defaultSets?: number;
 	defaultReps?: string;
@@ -88,7 +102,8 @@ export interface Item {
 }
 
 export type DanceMovementType = 'sharp' | 'smooth' | 'variable';
-export type DanceDifficulty = 'beginner' | 'intermediate' | 'advanced';
+/** @deprecated Use CatalogDifficulty */
+export type DanceDifficulty = CatalogDifficulty;
 
 // Focus tags an Item can carry (US-016). Belly dance uses body-part focuses; the
 // list is shared across Disciplines and shown as filter chips in the item library.

@@ -17,7 +17,8 @@ const DB_NAME = 'cosmic-workout';
 // v5 (v1.4.0): belly dance content lands — Belly Dance items + program seed
 // (US-016/US-017). Same wipe-and-reseed policy; bump forces the new seed in.
 // v6: full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).
-const DB_VERSION = 6;
+// v7: full gym exercise catalog + six strength course programs.
+const DB_VERSION = 7;
 
 let dbInstance: IDBDatabase | null = null;
 

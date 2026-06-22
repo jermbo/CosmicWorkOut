@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Item, ItemCat, WeightUnit } from '$lib/db/types';
+	import { STRENGTH_CATS } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
-	const CATS: ItemCat[] = ['Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
+	const CATS: ItemCat[] = [...STRENGTH_CATS];
 	const UNITS: WeightUnit[] = ['lb', 'kg', 'bodyweight', 'band'];
 
 	type Props = {
@@ -22,7 +23,7 @@
 		name: exercise?.name ?? '',
 		cue: exercise?.cue ?? '',
 		muscles: exercise?.muscles ?? '',
-		cat: exercise?.cat ?? ('Push' as ItemCat),
+		cat: exercise?.cat ?? ('Chest' as ItemCat),
 		unit: exercise?.unit ?? ('lb' as WeightUnit),
 		defaultSets: exercise?.defaultSets ?? 3,
 		defaultReps: exercise?.defaultReps ?? '8-10',

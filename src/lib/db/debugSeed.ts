@@ -33,25 +33,43 @@ function shiftDays(base: Date, n: number): Date {
 
 // ── Workouts ───────────────────────────────────────────────────────────────────
 
-type WorkoutKey = 'A' | 'B' | 'C' | 'D';
+type WorkoutKey = 'A' | 'B' | 'C';
 
 const ITEM_UNITS: Record<string, string> = {
-	goblet: 'lb', rdl: 'lb', split: 'lb', 'band-walk': 'band', medball: 'lb', copenhagen: 'bodyweight',
-	'db-bench': 'lb', 'cs-row': 'lb', 'push-press': 'lb', 'face-pull': 'band', pogo: 'bodyweight', pallof: 'band',
-	'trap-dl': 'lb', 'sled-push': 'lb', farmer: 'lb', woodchop: 'lb',
-	'box-jump': 'bodyweight', 'broad-jump': 'bodyweight', 'pull-up': 'bodyweight',
-	'db-ohp': 'lb', 'sl-rdl': 'lb', 'kb-swing': 'lb', 'box-squat': 'lb',
-	landmine: 'lb', 'band-pull': 'band', 'step-up': 'lb', 'good-morn': 'lb',
-	'side-plank': 'bodyweight', 'mb-rainbow': 'lb', 'mb-chest': 'lb', suitcase: 'lb',
+	'st-leg-press': 'lb',
+	'st-lat-pulldown-wide': 'lb',
+	'st-pec-deck': 'lb',
+	'st-leg-curl': 'lb',
+	'st-seated-cable-row': 'lb',
+	'st-plank': 'bodyweight',
+	'st-goblet-squat': 'lb',
+	'st-push-ups': 'bodyweight',
+	'st-lat-pulldown-close': 'lb',
+	'st-db-curl': 'lb',
+	'st-tricep-rope-pushdown': 'lb',
+	'st-side-plank': 'bodyweight',
+	'st-leg-extension': 'lb',
+	'st-machine-row': 'lb',
+	'st-cable-chest-fly': 'lb',
+	'st-reverse-fly-machine': 'lb',
+	'st-cable-crunch': 'lb',
 };
 
 const BASE_WEIGHTS: Record<string, number> = {
-	goblet: 45, rdl: 115, split: 35, medball: 15,
-	'db-bench': 45, 'cs-row': 55, 'push-press': 75,
-	'trap-dl': 175, 'sled-push': 135, farmer: 60, woodchop: 40,
-	'db-ohp': 40, 'sl-rdl': 30, 'kb-swing': 35, 'box-squat': 95,
-	landmine: 45, 'step-up': 25, 'good-morn': 65,
-	'mb-rainbow': 15, 'mb-chest': 15, suitcase: 50,
+	'st-leg-press': 180,
+	'st-lat-pulldown-wide': 100,
+	'st-pec-deck': 80,
+	'st-leg-curl': 70,
+	'st-seated-cable-row': 90,
+	'st-goblet-squat': 40,
+	'st-lat-pulldown-close': 95,
+	'st-db-curl': 25,
+	'st-tricep-rope-pushdown': 50,
+	'st-leg-extension': 80,
+	'st-machine-row': 85,
+	'st-cable-chest-fly': 40,
+	'st-reverse-fly-machine': 50,
+	'st-cable-crunch': 60,
 };
 
 function lbWeight(itemId: string): number {
@@ -60,55 +78,40 @@ function lbWeight(itemId: string): number {
 }
 
 const WORKOUTS: Record<WorkoutKey, Array<{ itemId: string; sets: number; reps: number }>> = {
-	// Lower + Lateral Power
 	A: [
-		{ itemId: 'goblet',     sets: 4, reps: 8  },
-		{ itemId: 'rdl',        sets: 3, reps: 10 },
-		{ itemId: 'split',      sets: 3, reps: 10 },
-		{ itemId: 'band-walk',  sets: 3, reps: 15 },
-		{ itemId: 'medball',    sets: 3, reps: 6  },
-		{ itemId: 'copenhagen', sets: 3, reps: 30 },
+		{ itemId: 'st-leg-press', sets: 4, reps: 10 },
+		{ itemId: 'st-lat-pulldown-wide', sets: 3, reps: 10 },
+		{ itemId: 'st-pec-deck', sets: 3, reps: 12 },
+		{ itemId: 'st-leg-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-seated-cable-row', sets: 3, reps: 10 },
+		{ itemId: 'st-plank', sets: 3, reps: 45 },
 	],
-	// Upper + Reactive
 	B: [
-		{ itemId: 'db-bench',   sets: 4, reps: 8  },
-		{ itemId: 'cs-row',     sets: 4, reps: 10 },
-		{ itemId: 'push-press', sets: 3, reps: 8  },
-		{ itemId: 'face-pull',  sets: 3, reps: 15 },
-		{ itemId: 'band-pull',  sets: 3, reps: 20 },
-		{ itemId: 'pogo',       sets: 3, reps: 20 },
-		{ itemId: 'pallof',     sets: 3, reps: 12 },
+		{ itemId: 'st-goblet-squat', sets: 3, reps: 12 },
+		{ itemId: 'st-push-ups', sets: 3, reps: 12 },
+		{ itemId: 'st-lat-pulldown-close', sets: 3, reps: 10 },
+		{ itemId: 'st-db-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-tricep-rope-pushdown', sets: 3, reps: 12 },
+		{ itemId: 'st-side-plank', sets: 3, reps: 30 },
 	],
-	// Full Body + Conditioning
 	C: [
-		{ itemId: 'trap-dl',    sets: 4, reps: 6  },
-		{ itemId: 'push-press', sets: 3, reps: 8  },
-		{ itemId: 'sled-push',  sets: 4, reps: 20 },
-		{ itemId: 'farmer',     sets: 3, reps: 40 },
-		{ itemId: 'woodchop',   sets: 3, reps: 12 },
-		{ itemId: 'suitcase',   sets: 3, reps: 30 },
-	],
-	// Power + Mobility
-	D: [
-		{ itemId: 'box-jump',   sets: 4, reps: 5  },
-		{ itemId: 'broad-jump', sets: 3, reps: 5  },
-		{ itemId: 'pull-up',    sets: 4, reps: 6  },
-		{ itemId: 'db-ohp',     sets: 3, reps: 10 },
-		{ itemId: 'sl-rdl',     sets: 3, reps: 8  },
-		{ itemId: 'kb-swing',   sets: 4, reps: 15 },
-		{ itemId: 'side-plank', sets: 3, reps: 30 },
+		{ itemId: 'st-leg-extension', sets: 3, reps: 12 },
+		{ itemId: 'st-machine-row', sets: 3, reps: 10 },
+		{ itemId: 'st-cable-chest-fly', sets: 3, reps: 12 },
+		{ itemId: 'st-reverse-fly-machine', sets: 3, reps: 12 },
+		{ itemId: 'st-leg-curl', sets: 3, reps: 12 },
+		{ itemId: 'st-cable-crunch', sets: 3, reps: 15 },
 	],
 };
 
 const ROUTINE_META: Record<WorkoutKey, { id: string; name: string; estMin: number }> = {
-	A: { id: 'w1-lower',        name: 'Lower + Lateral Power',   estMin: 45 },
-	B: { id: 'w1-upper',        name: 'Upper + Reactive',         estMin: 40 },
-	C: { id: 'w1-conditioning', name: 'Full Body + Conditioning', estMin: 55 },
-	D: { id: 'w2-lower',        name: 'Power + Mobility',         estMin: 50 },
+	A: { id: 'st-beginner-101-w1-a', name: 'Machine Full Body', estMin: 45 },
+	B: { id: 'st-beginner-101-w1-b', name: 'Bodyweight & Cables', estMin: 40 },
+	C: { id: 'st-beginner-101-w1-c', name: 'Isolation Focus', estMin: 42 },
 };
 
 const DISCIPLINE_ID = 'strength';
-const PROGRAM_ID = 'strength-foundation';
+const PROGRAM_ID = 'st-beginner-101';
 
 function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 	const meta = ROUTINE_META[type];
@@ -157,25 +160,35 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 // ── Activities ─────────────────────────────────────────────────────────────────
 
 const ACTIVITY_DURATION: Partial<Record<ActivityType, [number, number]>> = {
-	Walk:       [25, 60 ],
-	Run:        [20, 50 ],
-	Bike:       [30, 75 ],
-	Swim:       [25, 45 ],
-	Hike:       [60, 120],
-	Pickleball: [60, 90 ],
-	Tennis:     [45, 90 ],
-	Basketball: [45, 75 ],
-	Yoga:       [30, 60 ],
-	Stretching: [15, 30 ],
-	Cardio:     [20, 45 ],
+	Walk: [25, 60],
+	Run: [20, 50],
+	Bike: [30, 75],
+	Swim: [25, 45],
+	Hike: [60, 120],
+	Pickleball: [60, 90],
+	Tennis: [45, 90],
+	Basketball: [45, 75],
+	Yoga: [30, 60],
+	Stretching: [15, 30],
+	Cardio: [20, 45],
 };
 
 const EASY_ACTIVITIES: ActivityType[] = ['Yoga', 'Stretching', 'Walk'];
 const ALL_ACTIVITIES: ActivityType[] = [
-	'Walk', 'Walk', 'Run', 'Run',
-	'Bike', 'Swim', 'Hike',
-	'Pickleball', 'Pickleball', 'Tennis', 'Basketball',
-	'Yoga', 'Stretching', 'Cardio',
+	'Walk',
+	'Walk',
+	'Run',
+	'Run',
+	'Bike',
+	'Swim',
+	'Hike',
+	'Pickleball',
+	'Pickleball',
+	'Tennis',
+	'Basketball',
+	'Yoga',
+	'Stretching',
+	'Cardio',
 ];
 
 function buildActivity(date: Date, idx: number, light = false): ActivityLog {
@@ -232,26 +245,16 @@ function habitValue(habitId: string, workoutDay: boolean): number {
 }
 
 // ── Schedule ───────────────────────────────────────────────────────────────────
-//
-// Fixed offsets from day 0 (= today − 45) for predictable edge-case coverage:
-//   Week 1 (days  0- 6): 3 sessions — baseline
-//   Week 2 (days  7-13): 3 sessions
-//   Week 3 (days 14-20): 4 sessions — heavy week
-//   Week 4 (days 21-27): 1 session  — rest/recovery (streak break for graphs)
-//   Week 5 (days 28-34): 3 sessions
-//   Week 6 (days 35-41): 3 sessions
-//   Partial (days 42-44): 2 sessions
 
 const WORKOUT_OFFSETS = [1, 3, 5, 8, 10, 12, 15, 17, 19, 20, 25, 29, 31, 33, 36, 38, 41, 43, 44];
-const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map((_, i) => (['A', 'B', 'C', 'D'] as WorkoutKey[])[i % 4]);
+const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map(
+	(_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3],
+);
 
-// Workout days that also get a short light activity (morning session + evening walk)
 const DUAL_ACTIVITY_OFFSETS = new Set([3, 12, 19, 31, 41]);
 
-// Non-workout days that get an activity
 const ACTIVITY_OFFSETS = [
-	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27,
-	28, 30, 32, 34, 35, 37, 39, 40, 42,
+	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27, 28, 30, 32, 34, 35, 37, 39, 40, 42,
 ];
 
 // ── Main export ────────────────────────────────────────────────────────────────

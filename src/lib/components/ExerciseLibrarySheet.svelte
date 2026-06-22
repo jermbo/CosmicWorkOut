@@ -1,21 +1,22 @@
 <script lang="ts">
 	import type { Item } from '$lib/db/types';
+	import { STRENGTH_CATS } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
 
 	const CAT_COLORS: Record<string, string> = {
-		Hinge: 'var(--color-lime)',
-		Squat: 'var(--color-lime)',
-		Push: 'var(--color-lavender)',
-		Pull: 'var(--color-sky)',
-		Lateral: 'var(--color-red)',
-		Rotational: 'var(--color-red)',
-		Power: 'var(--color-lime)',
-		Carry: 'var(--color-lavender)',
+		Chest: 'var(--color-red)',
+		Back: 'var(--color-sky)',
+		Shoulders: 'var(--color-lavender)',
+		Biceps: 'var(--color-lime)',
+		Triceps: 'var(--color-lime)',
+		Legs: 'var(--color-lime)',
+		Core: 'var(--color-red)',
+		'Full Body': 'var(--color-lavender)',
 	};
 
-	const CATS = ['All', 'Hinge', 'Squat', 'Push', 'Pull', 'Lateral', 'Rotational', 'Power', 'Carry'];
+	const CATS = ['All', ...STRENGTH_CATS];
 
 	type Props = {
 		exercises: Item[];
