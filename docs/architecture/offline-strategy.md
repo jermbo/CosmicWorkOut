@@ -17,28 +17,28 @@ The app must be fully functional from the moment it launches, regardless of netw
 ```mermaid
 flowchart LR
     subgraph idb ["IndexedDB — persistent"]
-        E[exercises<br/>boot upsert]
+        E[items<br/>boot upsert]
         P[programs<br/>editor save]
         S[sessions<br/>session finish]
-        ELU[exerciseLastUsed<br/>each set confirm]
+        ELU[itemLastUsed<br/>each set confirm]
     end
 
     subgraph ls ["localStorage — synchronous"]
         PREFS[cwout:prefs<br/>pref change]
         ACTIVE[cwout:activeSession<br/>each set confirm]
-        PROGID[cwout:activeProgramId<br/>program load]
+        PROGID[cwout:activeProgramIds<br/>program load]
     end
 ```
 
-| Store                   | Technology   | Written When                                |
-| ----------------------- | ------------ | ------------------------------------------- |
-| `exercises`             | IndexedDB    | On boot (upsert built-ins) + workout editor |
-| `programs`              | IndexedDB    | On workout save in editor                   |
-| `sessions`              | IndexedDB    | On session finish                           |
-| `exerciseLastUsed`      | IndexedDB    | On each set confirm                         |
-| `cwout:prefs`           | localStorage | On every preference change                  |
-| `cwout:activeSession`   | localStorage | On every set confirm (crash recovery)       |
-| `cwout:activeProgramId` | localStorage | On program load (auto-select first)         |
+| Store                    | Technology   | Written When                                |
+| ------------------------ | ------------ | ------------------------------------------- |
+| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor |
+| `programs`               | IndexedDB    | On routine save in editor                   |
+| `sessions`               | IndexedDB    | On session finish                           |
+| `itemLastUsed`           | IndexedDB    | On each set confirm                         |
+| `cwout:prefs`            | localStorage | On every preference change                  |
+| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
+| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
 
 ---
 
@@ -79,7 +79,7 @@ Implemented in `sessionStore.checkForRecovery()` and the recovery banner in `+la
 ## Data Integrity (Implemented)
 
 - `SessionLog` is finalized on session finish — in-progress state lives only in `activeSession`
-- `exerciseLastUsed` is written per-set, always reflects the most recent log
+- `itemLastUsed` is written per-set, always reflects the most recent log
 - Completed sets within an active session survive browser close via localStorage
 
 ---

@@ -57,8 +57,7 @@ Accessibility: uses semantic `<fieldset>/<legend>/<label>/<input>` patterns thro
 | `SetTile`         | Set button — shows "+" until logged, then weight × reps        |
 | `LogSetSheet`     | Stepper/numpad input for weight and reps                       |
 | `ProgressRing`    | Circular progress indicator on exercise card                   |
-| `SessionComplete` | Post-workout stats overlay                                     |
-| `Confetti`        | Celebration particles (respects `completionFeel`)              |
+| `SessionComplete` | Post-workout stats overlay with confetti celebration           |
 
 ---
 

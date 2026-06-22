@@ -84,11 +84,11 @@ Reference tokens also exist in the [inspiration package](../_inspiration/packet/
 All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db/database.ts` — **not Dexie.js**.
 
 ```typescript
-// DB name: 'cosmic-workout', version 1
-// Stores: exercises, programs, sessions (indexed by date), exerciseLastUsed
+// DB name: 'cosmic-workout', version 7
+// Stores: items, programs, sessions (indexed by date), itemLastUsed, activities, habits, habitLogs
 ```
 
-Built-in exercises are upserted on every boot (so new fields land on old records). Programs seed only on first run.
+Built-in items and programs are upserted on every boot (so new fields land on old records). Habits seed only on first run.
 
 ---
 

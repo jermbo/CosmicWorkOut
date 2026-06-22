@@ -88,7 +88,7 @@ Both clear the in-progress session from local storage.
 
 ### After finish
 
-A completion overlay shows duration, volume, and set count. Confetti appears unless `completionFeel` is set to `subtle`. You can return to Today or jump to Calendar.
+A completion overlay shows duration, volume, and set count, with a confetti celebration. You can return to Today or jump to Calendar.
 
 ---
 
@@ -154,7 +154,7 @@ flowchart TB
     IDB --- Prog[programs]
     IDB --- Ex[exercises]
     IDB --- Logs[sessions]
-    IDB --- Last[exerciseLastUsed]
+    IDB --- Last[itemLastUsed]
 ```
 
 - **Programs & exercises** — IndexedDB, seeded on first launch
@@ -163,7 +163,7 @@ flowchart TB
 - **In-progress session** — localStorage, updated each set
 - **Preferences** — localStorage, loaded at boot
 
-No service worker yet — offline works after first browser load, but the app isn't installable as a PWA.
+A service worker (`src/service-worker.ts`) precaches the app shell, so the app works offline and is installable as a PWA (secure context only).
 
 ---
 
@@ -171,37 +171,29 @@ No service worker yet — offline works after first browser load, but the app is
 
 All preferences are editable via the **Settings tab** (`/settings`). Stored in `cwout:prefs` (localStorage).
 
-| Pref             | Default       | Effect                        |
-| ---------------- | ------------- | ----------------------------- |
-| `accentColor`    | `#b2f042`     | UI accent + ink color         |
-| `completionFeel` | `full`        | Confetti on/off               |
-| `density`        | `comfortable` | Tile height, card gaps        |
-| `roundness`      | `default`     | Border radius scale           |
-| `weightUnit`     | `lb`          | Display label on tiles/sheets |
+| Pref          | Default       | Effect                        |
+| ------------- | ------------- | ----------------------------- |
+| `accentColor` | `#b2f042`     | UI accent + ink color         |
+| `density`     | `comfortable` | Tile height, card gaps        |
+| `roundness`   | `default`     | Border radius scale           |
+| `weightUnit`  | `lb`          | Display label on tiles/sheets |
 
-**Per-exercise weight increment** (2.5 / 5 / 10 lb) is set on the exercise itself, not in global prefs. Defaults to 5.
+**Per-item weight increment** (2.5 / 5 / 10) is set on the item itself, not in global prefs. Defaults to 5.
 
 ---
 
 ## Built-In Content
 
-- **1 program:** Strength Foundation — 12 weeks, 3 days/week, workouts A/B/C
-- **31 exercises** across 8 categories, pickleball-strength focused
-- On boot: exercises always upserted (field updates propagate); programs seed only if database is empty
+- **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103)
+- **121 items:** 72 strength exercises + 39 belly dance moves + 10 warm-up/cool-down bookends
+- **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood
+- On boot: items and programs always upserted (built-in field updates propagate, user records untouched); habits seed only on first run
 
 ---
 
 ## What's Not Built
 
-See [Implementation Status](status.md) for the full checklist. The biggest gaps:
-
-- Settings UI
-- Program selection / switching
-- Create new program from scratch
-- Custom exercise CRUD
-- PWA / service worker
-- Calendar schedule projection (scheduled/rest/skipped)
-- Proper streak logic (consecutive weeks)
+See [Implementation Status](status.md) for the full checklist. The app's core flows, Discipline model, insights, and PWA are all shipped; the Journal page was built in v1.3 and later removed. Remaining ideas are tracked per-version in [`docs/features/`](../features/).
 
 ---
 

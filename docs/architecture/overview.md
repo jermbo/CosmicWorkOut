@@ -9,11 +9,11 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 ```mermaid
 flowchart TB
     subgraph browser ["Browser"]
-        UI["SvelteKit UI\n8 routes + overlays"]
-        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · loggingContext"]
-        IDB[("IndexedDB\nexercises · programs · sessions\nhabits · habitLogs · activities")]
-        LS[("localStorage\nprefs · activeSession · activeProgramId · lastActivityType")]
-        SW["Service Worker\nplanned — not built"]
+        UI["SvelteKit UI\n11 routes + overlays"]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · loggingContext · toast"]
+        IDB[("IndexedDB v7\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities")]
+        LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
+        SW["Service Worker\nprecaches app shell"]
     end
 
     UI <--> Stores
@@ -22,7 +22,7 @@ flowchart TB
     UI -.-> SW
 ```
 
-After the first page load the app runs entirely in the browser. A service worker for offline shell caching is **planned but not yet implemented** — see [Offline Strategy](offline-strategy.md).
+After the first page load the app runs entirely in the browser. A service worker (`src/service-worker.ts`) precaches the app shell for offline launch and PWA install — see [Offline Strategy](offline-strategy.md).
 
 ---
 
@@ -30,21 +30,21 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-Eight routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
+Eleven routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
 
-The UI reads and writes through six Svelte stores — no REST, no server state.
+The UI reads and writes through the Svelte stores — no REST, no server state.
 
 See [App Structure](../implementation/app-structure.md) and [Tech Stack](tech-stack.md).
 
 ### Data Layer — IndexedDB + localStorage
 
-Persistent data in IndexedDB (version 2) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, and last-used activity type in localStorage for synchronous access.
+Persistent data in IndexedDB (version 7) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, per-Discipline active programs, and last-used activity type in localStorage for synchronous access.
 
 See [Data Model](data-model.md) and [State Management](../implementation/state.md).
 
-### Service Worker — Planned
+### Service Worker — Implemented
 
-Not built yet. When added, it will cache the app shell for offline launch and PWA install. Core functionality already works offline after first load in a normal browser tab.
+`src/service-worker.ts` (SvelteKit's `$service-worker` module, no Workbox) precaches the app shell and serves a cached fallback for offline navigations, enabling PWA install. Requires a secure context (HTTPS or `localhost`).
 
 ---
 
@@ -62,7 +62,7 @@ sequenceDiagram
 
     User->>Tile: tap set
     Tile->>SS: completeSet() or logSet()
-    SS->>IDB: put exerciseLastUsed
+    SS->>IDB: put itemLastUsed
     SS->>LS: persist activeSession
     SS-->>Tile: reactive update
     Tile-->>User: completed animation
