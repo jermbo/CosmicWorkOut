@@ -8,8 +8,8 @@ declare const self: ServiceWorkerGlobalScope;
 // service worker activates and evicts the previous shell automatically.
 const CACHE = `cwout-cache-${version}`;
 
-// App shell: the built JS/CSS bundles, static assets, and the SPA HTML entry.
-const SHELL = ['/', '/index.html'];
+// SPA shell entry — `/` only; dev has no `/index.html` file (static build does).
+const SHELL = ['/'];
 const PRECACHE = [...build, ...files, ...SHELL];
 
 async function serveShell(cache: Cache): Promise<Response | undefined> {
