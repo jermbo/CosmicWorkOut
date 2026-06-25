@@ -78,7 +78,7 @@ User preferences. Loaded once at boot, saved on every change.
 | `roundness`   | `default`     | `data-roundness` on `<html>`         |
 | `weightUnit`  | `lb`          | Display in SetTile, LogSetSheet      |
 
-All settings are editable via `/settings`.
+All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 
 ---
 
@@ -158,6 +158,34 @@ This store has **no persistence** — it resets to today on every page load. The
 
 ---
 
+## healthStore 🟡 _(planned — US-029)_
+
+**File:** `src/lib/stores/health.svelte.ts` _(not yet created)_
+
+Owns optional body measurement readings (weight, blood pressure). Gated by `prefsStore.healthMetricsEnabled`.
+
+| State      | Source    | Purpose              |
+| ---------- | --------- | -------------------- |
+| `readings` | IndexedDB | All health readings  |
+
+**Key derived values:**
+
+- `weightForDate(date)` — single weight reading or null
+- `bpReadingsForDate(date)` — all BP readings for a date, sorted by `recordedAt`
+- `hasAnyReadingForDate(date)` — drives calendar / home week indicators
+- `dailyBpAverages(dates)` — systolic/diastolic averages for Insights charts
+
+**Key actions:**
+
+- `load()` — boot-time data load
+- `upsertWeight(date, value)` — one weight per date
+- `addBpReading(date, values)` — new BP row with auto `recordedAt`
+- `updateReading(reading)` / `deleteReading(id)` — corrections
+
+Reads `loggingContext.date` for the active logging date (same as `habitStore` and `activityStore`).
+
+---
+
 ## Data Flow Diagram
 
 ```mermaid
@@ -169,6 +197,7 @@ flowchart TB
     PR[prefsStore]
     HS[habitStore]
     AS[activityStore]
+    HeS[healthStore 🟡]
     LC[loggingContext]
     UI[Svelte UI]
 
@@ -176,17 +205,20 @@ flowchart TB
     IDB <-->|put on finish| SS
     IDB <-->|load / put| HS
     IDB <-->|load / put| AS
+    IDB <-->|load / put| HeS
     LS <-->|persist activeSession| SS
     LS <-->|read/write prefs| PR
     LS <-->|lastActivityType| AS
     LC -->|date| HS
     LC -->|date| AS
+    LC -->|date| HeS
     LC -->|date + workoutId| PS
     PS -->|suggestedWorkout, sessions| UI
     SS -->|isActive / isComplete| UI
     HS -->|activeHabits, logs| UI
     AS -->|activitiesByDate| UI
-    PR -->|accent, density, roundness| UI
+    HeS -->|readings, charts| UI
+    PR -->|accent, density, roundness, healthMetricsEnabled| UI
 ```
 
 ---
@@ -197,3 +229,4 @@ flowchart TB
 - [Data Model](../architecture/data-model.md) — Type definitions
 - [Program Progression](program-progression.md) — Schedule derivation
 - [Session Logging](../requirements/session-logging.md) — User-facing flow
+- [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Planned health store

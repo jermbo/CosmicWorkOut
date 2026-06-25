@@ -2,6 +2,8 @@ import type { Habit, HabitLog, HabitType } from '$lib/db/types';
 import { MOOD_SCALE } from '$lib/db/types';
 import { formatCount, formatMinutes } from '$lib/format';
 
+export const MOOD_HABIT_ID = 'habit-mood';
+
 export const HABIT_TYPES: { value: HabitType; label: string; desc: string }[] = [
 	{ value: 'times', label: 'Times', desc: 'Tap to increment — no unit (e.g. coffee, supplements)' },
 	{ value: 'minutes', label: 'Minutes', desc: 'Numeric duration input (e.g. meditation)' },
@@ -11,14 +13,19 @@ export const HABIT_TYPES: { value: HabitType; label: string; desc: string }[] = 
 ];
 
 export const HABIT_PRESETS: { name: string; type: HabitType; unit: string }[] = [
+	{ name: 'Water', type: 'count', unit: 'cups' },
+	{ name: 'Coffee', type: 'count', unit: 'cups' },
 	{ name: 'Meditation', type: 'minutes', unit: '' },
 	{ name: 'Writing', type: 'count', unit: 'words' },
-	{ name: 'Reading', type: 'count', unit: 'pages' },
-	{ name: 'Water', type: 'count', unit: 'glasses' },
-	{ name: 'Coffee', type: 'times', unit: '' },
-	{ name: 'Alcohol', type: 'boolean', unit: '' },
-	{ name: 'Mood', type: 'mood', unit: '' },
+	{ name: 'Reading', type: 'minutes', unit: '' },
 ];
+
+/** Mood is always on — not user-created and not deactivatable. */
+export function isProtectedHabit(habit: Habit): boolean {
+	return habit.type === 'mood';
+}
+
+export const CREATABLE_HABIT_TYPES = HABIT_TYPES.filter((t) => t.value !== 'mood');
 
 export function habitTypeLabel(type: HabitType): string {
 	return HABIT_TYPES.find((t) => t.value === type)?.label ?? type;

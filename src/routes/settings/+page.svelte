@@ -42,7 +42,13 @@
 	let draggingId = $state<string | null>(null);
 	let dragOverId = $state<string | null>(null);
 
-	let sortedHabits = $derived([...habitStore.habits].sort((a, b) => a.sortOrder - b.sortOrder));
+	let sortedHabits = $derived(
+		[...habitStore.habits].sort((a, b) => {
+			if (a.type === 'mood') return 1;
+			if (b.type === 'mood') return -1;
+			return a.sortOrder - b.sortOrder;
+		}),
+	);
 
 	function openNewHabit() {
 		editingHabit = null;
@@ -64,6 +70,8 @@
 	}
 
 	function onDragStart(e: DragEvent, id: string) {
+		const habit = sortedHabits.find((h) => h.id === id);
+		if (habit?.type === 'mood') return;
 		draggingId = id;
 		if (e.dataTransfer) {
 			e.dataTransfer.effectAllowed = 'move';
@@ -88,7 +96,7 @@
 			dragOverId = null;
 			return;
 		}
-		const reordered = [...sortedHabits];
+		const reordered = sortedHabits.filter((h) => h.type !== 'mood');
 		const fromIdx = reordered.findIndex((h) => h.id === draggingId);
 		const toIdx = reordered.findIndex((h) => h.id === targetId);
 		if (fromIdx < 0 || toIdx < 0) return;

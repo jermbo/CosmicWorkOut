@@ -26,7 +26,7 @@
 
 	const MOOD_SCALE_ASC = [...MOOD_SCALE].reverse();
 
-	let moodHabit = $derived(habitStore.habits.find((h) => h.type === 'mood' && h.active));
+	let moodHabit = $derived(habitStore.habits.find((h) => h.type === 'mood'));
 
 	let currentMoodValue = $derived.by(() => {
 		if (!moodHabit) return null;

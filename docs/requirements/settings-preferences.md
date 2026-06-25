@@ -19,6 +19,32 @@ User-configurable behavior and appearance.
 | Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
 | Clear workout data (settings)                | ✅ Built | Wipes IndexedDB + session state; keeps prefs  |
 | Reset preferences to defaults (settings)     | ✅ Built | Resets `cwout:prefs`; workout data untouched  |
+| Health metrics master toggle               | ❌ Planned | [US-029](../features/v1.7.0/US-029-health-metrics.md) — inline on Settings hub |
+| Settings hub restructure                   | ❌ Planned | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — sub-routes for appearance, habits, data |
+
+---
+
+## Settings Information Architecture
+
+> **Planned — [US-030](../features/v1.7.0/US-030-settings-restructure.md).** Replaces the current single long scroll.
+
+| Route | Contents |
+| ----- | -------- |
+| `/settings` | **Hub** — navigation rows + health metrics toggle |
+| `/settings/appearance` | Accent, weight unit, density, roundness |
+| `/settings/habits` | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md)) |
+| `/settings/data` | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), reset prefs, clear data, debug seed |
+
+```mermaid
+flowchart LR
+    Hub["/settings"]
+    Hub --> App["/settings/appearance"]
+    Hub --> Hab["/settings/habits"]
+    Hub --> Data["/settings/data"]
+    Hub -->|toggle| Health[healthMetricsEnabled]
+```
+
+The hub stays short; destructive and infrequent actions live on **Data & backup**.
 
 ---
 
@@ -34,7 +60,8 @@ flowchart LR
     Apply --> CSS["--color-accent on :root"]
     Apply --> Data["data-density / data-roundness"]
     Apply --> Feel[completionFeel → Confetti]
-    Apply --> Unit[weightUnit → SetTile / LogSetSheet]
+    Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight 🟡]
+    Apply --> Health[healthMetricsEnabled → home / health / insights 🟡]
 ```
 
 ---
@@ -118,3 +145,4 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 - [Data Model — UserPrefs](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — Where weight increment and completion feel are applied
 - [Design Principles](../vision/principles.md) — Why dark-only and small surface area
+- [US-030 — Settings Hub Restructure](../features/v1.7.0/US-030-settings-restructure.md)

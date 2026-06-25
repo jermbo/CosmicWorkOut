@@ -80,7 +80,7 @@
 
 	function moodForDay(dateStr: string): number | null {
 		if (!showMoodDots) return null;
-		const moodHabit = habitStore.habits.find((h) => h.type === 'mood' && h.active);
+		const moodHabit = habitStore.habits.find((h) => h.type === 'mood');
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
 		if (log !== undefined) return log.value;

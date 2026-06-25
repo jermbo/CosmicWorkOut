@@ -13,7 +13,7 @@ so that I can understand my patterns over time and spot trends across weeks and 
 
 1. Calendar day detail
    a. When the user taps a past day on the Calendar, the day summary shall include the habit values logged for that day.
-   b. Each habit entry shall show the habit name and the value logged (e.g., "Water · 6 glasses", "Mood · Energized", "Alcohol · No").
+   b. Each habit entry shall show the habit name and the value logged (e.g., "Water · 6 cups", "Mood · Energized", "Reading · 25 min").
    c. If no habits were logged for a day, the habit section in the day summary shall be omitted.
 
 2. Heat map

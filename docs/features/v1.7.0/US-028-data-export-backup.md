@@ -28,6 +28,7 @@ The app is client-only ([Design Principles](../../vision/principles.md)). Backup
 | `activities` | IndexedDB | Yes | Activity log |
 | `habits` | IndexedDB | Yes | Custom habits + edits to built-ins |
 | `habitLogs` | IndexedDB | Yes | Habit history |
+| `healthReadings` | IndexedDB | Yes | Health metric readings ([US-029](./US-029-health-metrics.md)) |
 | `cwout:prefs` | localStorage | Optional | User may choose to include preferences |
 | `cwout:activeProgramIds` | localStorage | Yes | Per-Discipline active program |
 | `cwout:lastActivityType` | localStorage | Yes | Last-used activity type |
@@ -54,7 +55,8 @@ Versioned JSON envelope — one file, human-readable, diffable in git if the use
     "itemLastUsed": [],
     "activities": [],
     "habits": [],
-    "habitLogs": []
+    "habitLogs": [],
+    "healthReadings": []
   },
   "localStorage": {
     "cwout:prefs": {},
@@ -72,7 +74,7 @@ Versioned JSON envelope — one file, human-readable, diffable in git if the use
 
 ## Phase 1 — JSON File Export & Restore
 
-Simplest path. Lives in Settings → Data.
+Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US-030](./US-030-settings-restructure.md)).
 
 ### Export
 
@@ -99,12 +101,12 @@ Merge-on-import is deferred to Phase 2 (device sync). A one-time file restore is
 ### Requirements (Phase 1)
 
 1. Export
-   a. Settings shall expose an **Export backup** action that downloads a JSON file.
+   a. `/settings/data` shall expose an **Export backup** action that downloads a JSON file.
    b. Export shall include all IndexedDB stores in the table above except transient keys.
    c. Export shall succeed offline with no network calls.
 
 2. Restore
-   a. Settings shall expose a **Restore from backup** action that opens a file picker.
+   a. `/settings/data` shall expose a **Restore from backup** action that opens a file picker.
    b. Restore shall validate `format` and `version` before writing anything.
    c. Restore shall require explicit confirmation; the dialog shall state that existing workout data will be replaced.
    d. On success, the app shall reload so stores reflect imported data.
@@ -125,7 +127,7 @@ Merge-on-import is deferred to Phase 2 (device sync). A one-time file restore is
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.
-- UI: two buttons in the existing Data section of `src/routes/settings/+page.svelte`.
+- UI: export / restore on `/settings/data` ([US-030](./US-030-settings-restructure.md)); not on the hub.
 
 ---
 
@@ -151,8 +153,8 @@ sequenceDiagram
 
 ### Sync flow (both directions)
 
-1. **Device A:** Settings → **Sync with another device** → shows QR (pairing payload + local endpoint).
-2. **Device B:** Settings → **Sync from device** → camera scans QR → connects on same Wi‑Fi (or WebRTC).
+1. **Device A:** Settings → **Data & backup** → **Sync with another device** → shows QR (pairing payload + local endpoint).
+2. **Device B:** Settings → **Data & backup** → **Sync from device** → camera scans QR → connects on same Wi‑Fi (or WebRTC).
 3. **Device A** sends a snapshot (same envelope as Phase 1, plus sync metadata).
 4. **Device B** runs the merge engine, shows a summary, reloads.
 5. Reverse sync uses the same flow with roles swapped.
@@ -193,6 +195,7 @@ On supported mobile browsers, after building the export blob, offer **Share** (`
 | **Session** | `programId` + `date` | No — one per program per day | See below |
 | **HabitLog** | `habitId` + `date` (id = `habitId:date`) | No | See below |
 | **ActivityLog** | `id` | Yes — many per day | Union by `id`; same id → newer `createdAt` |
+| **HealthReading** | `id` | Yes — many per day (BP); weight upserts one per `metricId` + `date` | Union by `id`; same id → newer `recordedAt` |
 | **Item / Program / Habit** | `id` | N/A | Last-write-wins by `updatedAt` (add field when building sync) |
 | **ItemLastUsed** | `itemId` | N/A | Value from the newer session that touched the item |
 | **Prefs** | singleton | One blob | Receiving device keeps its prefs unless user opts in |
@@ -240,10 +243,12 @@ flowchart TD
     C -->|Session programId+date| W1[Later finishedAt wins]
     C -->|HabitLog habitId+date| W2[Type-specific rule]
     C -->|Activity same id| W3[Newer createdAt wins]
+    C -->|HealthReading same id| W5[Newer recordedAt wins]
     C -->|Definition same id| W4[Newer updatedAt wins]
     W1 --> R[Recompute progression from merged sessions]
     W2 --> R
     W3 --> R
+    W5 --> R
     W4 --> R
 ```
 
@@ -280,3 +285,5 @@ flowchart TD
 - [Data Model](../../architecture/data-model.md) — Entities and stores
 - [Program Progression](../../implementation/program-progression.md) — Why session merge must not duplicate `programId` + `date`
 - [Settings & Preferences](../../requirements/settings-preferences.md)
+- [US-029 — Health Metrics](./US-029-health-metrics.md)
+- [US-030 — Settings Hub Restructure](./US-030-settings-restructure.md)

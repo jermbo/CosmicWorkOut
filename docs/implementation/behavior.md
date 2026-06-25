@@ -169,7 +169,7 @@ A service worker (`src/service-worker.ts`) precaches the app shell, so the app w
 
 ## Preferences
 
-All preferences are editable via the **Settings tab** (`/settings`). Stored in `cwout:prefs` (localStorage).
+All preferences are editable via **Settings** (`/settings` hub and sub-routes per [US-030](../features/v1.7.0/US-030-settings-restructure.md)). Stored in `cwout:prefs` (localStorage).
 
 | Pref          | Default       | Effect                        |
 | ------------- | ------------- | ----------------------------- |
@@ -186,7 +186,7 @@ All preferences are editable via the **Settings tab** (`/settings`). Stored in `
 
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103)
 - **121 items:** 72 strength exercises + 39 belly dance moves + 10 warm-up/cool-down bookends
-- **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood
+- **6 trackable habits + mood (always on):** Water, Coffee, Meditation, Writing, Reading, Mood
 - On boot: items and programs always upserted (built-in field updates propagate, user records untouched); habits seed only on first run
 
 ---

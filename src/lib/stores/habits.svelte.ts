@@ -13,6 +13,9 @@ class HabitStore {
 
 	activeHabits = $derived([...this.habits].filter((h) => h.active).sort((a, b) => a.sortOrder - b.sortOrder));
 
+	/** Active habits shown in grids and completion counts — mood is tracked separately. */
+	trackableHabits = $derived(this.activeHabits.filter((h) => h.type !== 'mood'));
+
 	todayStr(): string {
 		return todayIso();
 	}
@@ -44,11 +47,11 @@ class HabitStore {
 	}
 
 	loggedCountForDate(date: string): number {
-		return this.activeHabits.filter((h) => this.isComplete(h, date)).length;
+		return this.trackableHabits.filter((h) => this.isComplete(h, date)).length;
 	}
 
 	completionRatioForDate(date: string): number {
-		const total = this.activeHabits.length;
+		const total = this.trackableHabits.length;
 		if (total === 0) return 0;
 		return this.loggedCountForDate(date) / total;
 	}
@@ -62,6 +65,11 @@ class HabitStore {
 		this.habits = normalized.sort((a, b) => a.sortOrder - b.sortOrder);
 		this.logs = logs;
 		this.loaded = true;
+
+		const mood = this.habits.find((h) => h.type === 'mood');
+		if (mood && !mood.active) {
+			await this.updateHabit({ ...mood, active: true });
+		}
 
 		localStorage.setItem(TODAY_KEY, this.todayStr());
 	}
@@ -93,7 +101,7 @@ class HabitStore {
 
 	async toggleActive(id: string): Promise<void> {
 		const habit = this.habits.find((h) => h.id === id);
-		if (!habit) return;
+		if (!habit || habit.type === 'mood') return;
 		await this.updateHabit({ ...habit, active: !habit.active });
 	}
 
@@ -108,6 +116,8 @@ class HabitStore {
 	}
 
 	async deleteHabit(id: string): Promise<void> {
+		const habit = this.habits.find((h) => h.id === id);
+		if (!habit || habit.type === 'mood') return;
 		await db.habits.remove(id);
 		this.habits = this.habits.filter((h) => h.id !== id);
 	}

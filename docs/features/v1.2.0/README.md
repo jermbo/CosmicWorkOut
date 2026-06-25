@@ -35,7 +35,7 @@ Every interaction must be completable with minimal taps. The home screen tells y
 | +1    | Content   |
 | 0     | Normal    |
 | -1    | Tired     |
-| -2    | Lonely    |
+| -2    | Agitated  |
 | -3    | Sad       |
 | -4    | Angry     |
 | -5    | Stressed  |

@@ -213,12 +213,11 @@ function buildActivity(date: Date, idx: number, light = false): ActivityLog {
 }
 
 const HABIT_IDS = [
+	'habit-water',
+	'habit-coffee',
 	'habit-meditation',
 	'habit-writing',
 	'habit-reading',
-	'habit-water',
-	'habit-coffee',
-	'habit-alcohol',
 	'habit-mood',
 ] as const;
 
@@ -255,15 +254,12 @@ function habitValue(habitId: string, workoutDay: boolean): number {
 			if (chance(0.35)) return rInt(0, 350);
 			return rInt(200, 1000);
 		case 'habit-reading':
-			if (chance(0.35)) return rInt(0, 12);
-			return rInt(8, 40);
+			if (chance(0.35)) return rInt(0, 15);
+			return rInt(15, 60);
 		case 'habit-water':
 			return waterValue(workoutDay);
 		case 'habit-coffee':
 			return pick([0, 1, 1, 2, 2, 3, 3, 3, 4]);
-		case 'habit-alcohol':
-			if (chance(0.18)) return 1;
-			return 0;
 		case 'habit-mood':
 			return moodValue(workoutDay);
 		default:
@@ -281,7 +277,7 @@ const ACTIVITY_OFFSETS = [
 ];
 
 function adjustedLogRate(habitId: string, logRate: number): number {
-	if (habitId === 'habit-alcohol' || habitId === 'habit-mood') return logRate * 0.85;
+	if (habitId === 'habit-mood') return logRate * 0.85;
 	return logRate;
 }
 

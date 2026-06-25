@@ -12,7 +12,9 @@ The app must be fully functional from the moment it launches, regardless of netw
 
 ---
 
-## Storage Map (Implemented)
+## Storage Map
+
+🟡 = planned ([US-029](../features/v1.7.0/US-029-health-metrics.md)), not yet in code.
 
 ```mermaid
 flowchart LR
@@ -21,6 +23,7 @@ flowchart LR
         P[programs<br/>editor save]
         S[sessions<br/>session finish]
         ELU[itemLastUsed<br/>each set confirm]
+        HR[healthReadings<br/>each reading 🟡]
     end
 
     subgraph ls ["localStorage — synchronous"]
@@ -36,6 +39,7 @@ flowchart LR
 | `programs`               | IndexedDB    | On routine save in editor                   |
 | `sessions`               | IndexedDB    | On session finish                           |
 | `itemLastUsed`           | IndexedDB    | On each set confirm                         |
+| `healthReadings` 🟡      | IndexedDB    | On each health log / edit / delete (US-029)  |
 | `cwout:prefs`            | localStorage | On every preference change                  |
 | `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
 | `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
@@ -106,8 +110,17 @@ Nothing special. No sync to trigger. Network awareness will only matter for serv
 
 No export or restore is implemented yet. Planned in [US-028](../features/v1.7.0/US-028-data-export-backup.md):
 
-- **Phase 1:** JSON file download + file-picker restore from Settings (replace-all, fully offline).
-- **Phase 2:** QR-paired device sync over LAN with merge rules per entity natural key (sessions: `programId` + `date`; habit logs: `habitId` + `date`).
+- **Phase 1:** JSON file download + file-picker restore from Settings (replace-all, fully offline). Includes `healthReadings` when [US-029](../features/v1.7.0/US-029-health-metrics.md) ships.
+- **Phase 2:** QR-paired device sync over LAN with merge rules per entity natural key (sessions: `programId` + `date`; habit logs: `habitId` + `date`; health readings: `id`).
+
+---
+
+## Health Metrics — Planned
+
+Optional body measurements (weight, blood pressure). See [US-029](../features/v1.7.0/US-029-health-metrics.md):
+
+- Readings write immediately to `healthReadings` on log, edit, or delete.
+- `healthMetricsEnabled` in `cwout:prefs` gates UI only — data persists when the toggle is off.
 
 ---
 
@@ -118,3 +131,4 @@ No export or restore is implemented yet. Planned in [US-028](../features/v1.7.0/
 - [State Management](../implementation/state.md) — Store write paths
 - [Design Principles](../vision/principles.md) — Why offline is non-negotiable
 - [US-028 — Data Export, Backup & Device Sync](../features/v1.7.0/US-028-data-export-backup.md)
+- [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md)

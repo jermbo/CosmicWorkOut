@@ -34,13 +34,19 @@ This version does for Strength what v1.6.0 did for Belly Dance — expands a sta
 | ID | Title | Status | Notes |
 | -- | ----- | ------ | ----- |
 | [US-028](./US-028-data-export-backup.md) | Data Export, Backup & Device Sync | ❌ Planned | Phase 1: JSON file export/import in Settings. Phase 2: QR-paired LAN sync with merge rules. No cloud. |
+| [US-029](./US-029-health-metrics.md) | Health Metrics | ❌ Planned | Weight + blood pressure; optional Settings toggle; `/health` + Insights charts. Not habits. |
+| [US-030](./US-030-settings-restructure.md) | Settings Hub Restructure | ❌ Planned | Hub `/settings` + sub-routes for appearance, habits, data. Room for US-028/029. |
+| [US-031](./US-031-default-habits-tweak.md) | Default Habits & Mood Scale | ✅ Shipped | Water/Coffee first; remove Alcohol; Reading → minutes; mood always on; −2 Agitated. |
 
 ---
 
 ## Related
 
 - [Data Model — Item](../../architecture/data-model.md#item)
+- [Data Model — HealthReading](../../architecture/data-model.md#healthreading)
 - [Offline Strategy](../../architecture/offline-strategy.md)
 - [Tech Stack — Offline / PWA](../../architecture/tech-stack.md)
 - [Implementation Status](../../implementation/status.md)
 - [US-028 — Data Export, Backup & Device Sync](./US-028-data-export-backup.md)
+- [US-029 — Health Metrics](./US-029-health-metrics.md)
+- [US-030 — Settings Hub Restructure](./US-030-settings-restructure.md)

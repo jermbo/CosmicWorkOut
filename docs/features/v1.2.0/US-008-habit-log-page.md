@@ -47,7 +47,7 @@ When logging a mood habit, the selector shall display all 11 states as tappable 
 | +1    | Content   |
 | 0     | Normal    |
 | -1    | Tired     |
-| -2    | Lonely    |
+| -2    | Agitated  |
 | -3    | Sad       |
 | -4    | Angry     |
 | -5    | Stressed  |

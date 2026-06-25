@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Habit, HabitType } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { HABIT_TYPES, HABIT_PRESETS, habitTypeLabel } from '$lib/habits';
+	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '$lib/habits';
 
 	type Props = {
 		editing?: Habit | null;
@@ -95,7 +95,7 @@
 			<div class="hf-field">
 				<span class="hf-label">Type</span>
 				<div class="hf-types">
-					{#each HABIT_TYPES as ht}
+					{#each CREATABLE_HABIT_TYPES as ht}
 						<button
 							class="hf-type-btn"
 							class:hf-type-btn--active={type === ht.value}

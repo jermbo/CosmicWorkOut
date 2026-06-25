@@ -10,8 +10,8 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 flowchart TB
     subgraph browser ["Browser"]
         UI["SvelteKit UI\n11 routes + overlays"]
-        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · loggingContext · toast"]
-        IDB[("IndexedDB v7\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities")]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · health 🟡 · loggingContext · toast"]
+        IDB[("IndexedDB v7 → v8 🟡\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities\nhealthReadings 🟡")]
         LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
         SW["Service Worker\nprecaches app shell"]
     end
@@ -30,7 +30,7 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-Eleven routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
+Eleven routes today; **`/health` planned** ([US-029](../features/v1.7.0/US-029-health-metrics.md)): **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
 
 The UI reads and writes through the Svelte stores — no REST, no server state.
 

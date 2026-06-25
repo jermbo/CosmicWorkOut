@@ -121,7 +121,21 @@ A daily trackable behavior with a **type** (`times · minutes · count · boolea
 
 ### Habit log ✅
 
-One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale.
+One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)).
+
+---
+
+## Health metrics 🟡
+
+> **Not a fourth movement archetype.** Body measurements (weight, blood pressure) are optional wellness tracking — separate from Structured, Quick-log, and Habit. Planned in [US-029](features/v1.7.0/US-029-health-metrics.md).
+
+### Health metric 🟡
+
+An app-defined measurement type in the catalog (`weight`, `bloodPressure`, …). Definitions live in code (`src/lib/health/metrics.ts`), not IndexedDB. New types ship with app updates — users do not create custom metrics.
+
+### Health reading 🟡
+
+One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight: at most one per date. Blood pressure: many per date, each with `recordedAt`. Gated by `UserPrefs.healthMetricsEnabled`.
 
 ---
 
@@ -129,7 +143,7 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 | Term                    | Status | Meaning                                                                                                                                    |
 | ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Global date context** | ✅     | The selected date that Today, habits, and practice all read from. Backdating requires confirmation.                                        |
+| **Global date context** | ✅     | The selected date that Today, habits, health metrics, and practice all read from. Backdating requires confirmation.                         |
 | **Active session**      | ✅     | An in-progress session held in memory + localStorage for crash recovery. Becomes a Session on finish.                                      |
 | **Linear progression**  | ✅     | "Today's routine" is chosen by count of completed sessions, **not** the calendar: `index = completedCount % routineCount`, per Discipline. |
 | **Built-in vs custom**  | ✅     | Built-in content is seeded and read-only (edit = copy-first); custom is user-created and fully editable.                                   |
@@ -155,4 +169,5 @@ The v1.4.0 generalization renamed the strength-only entities. These old names no
 
 - [North Star](vision/north-star.md) — product identity
 - [Data Model](architecture/data-model.md) — the entities behind these terms
+- [US-029 — Health Metrics](features/v1.7.0/US-029-health-metrics.md) — planned body measurements
 - [v1.4.0 — Belly Dance](features/v1.4.0/README.md) — first Discipline beyond strength

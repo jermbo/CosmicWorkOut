@@ -22,7 +22,7 @@ What's built today vs. what's still requirements-only. Verified against the code
 | Calendar + day summary                                    | ✅ Built | Month grid, tap completed days                                            |
 | IndexedDB persistence                                     | ✅ Built | Raw API wrapper, seed data                                                |
 | Preferences store                                         | ✅ Built | Accent, density, roundness, weight unit                                   |
-| Settings UI                                               | ✅ Built | `/settings` — accent color, weight unit, density, roundness               |
+| Settings UI                                               | ✅ Built | `/settings` today — US-030 will split into hub + sub-routes |
 | Program selection screen                                  | ✅ Built | Bottom sheet; built-in programs deep-clone before activating              |
 | Create new program                                        | ✅ Built | 2-step full-screen flow — details then routine names; scaffolds all weeks |
 | Copy built-in before editing                              | ✅ Built | Guard dialog prompts copy+switch when editing a built-in program          |
@@ -44,7 +44,7 @@ What's built today vs. what's still requirements-only. Verified against the code
 | Habit log page (`/habits`)          | ✅ Built | Progress rings, stepped +/− inputs, boolean toggles, exact-value modal             |
 | Mood tracking                       | ✅ Built | Inline always-visible mood strip on `/habits`; separate from habit grid            |
 | Habit progress rings                | ✅ Built | SVG rings fill based on logged / goal                                              |
-| Pre-seeded habits                   | ✅ Built | Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood                         |
+| Pre-seeded habits                   | ✅ Built | Water, Coffee, Meditation, Writing, Reading, Mood ([US-031](../features/v1.7.0/US-031-default-habits-tweak.md)) |
 | Habit `dailyGoal` migration         | ✅ Built | `initDB()` patches `dailyGoal` onto pre-existing built-in habit records missing it |
 | Program complete state              | ✅ Built | Shown on `/workout` with CTA to choose a new program                               |
 
@@ -110,8 +110,10 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 | Six strength "course" programs | ✅ Built   | `strength-programs.ts`                                                                                                                             |
 | Service worker / PWA           | ✅ Built   | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`)                                                                      |
 | Data export / backup / sync    | ❌ Planned | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — Phase 1: JSON file; Phase 2: QR + LAN merge                                          |
+| Health metrics (weight, BP)    | ❌ Planned | [US-029](../features/v1.7.0/US-029-health-metrics.md) — optional toggle; `/health` + Insights; DB v8                                               |
+| Settings hub restructure       | ❌ Planned | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/appearance`, `/habits`, `/data`                                     |
 
-> `docs/features/v1.7.0/` — README backfilled from git history; US-028 added for planned export/sync work.
+> `docs/features/v1.7.0/` — README backfilled from git history; US-028, US-029, and US-030 added for planned work.
 
 ---
 
@@ -120,7 +122,7 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
 - **121 items:** 72 strength exercises + 39 belly dance moves + 10 bookend (warm-up/cool-down) items, all derived from catalog seeds (`db/seeds/`).
 - **8 strength categories** (body-part): Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body.
-- **7 habits:** Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood.
+- **6 built-in trackable habits** + mood (always on): Water, Coffee, Meditation, Writing, Reading, Mood.
 - Items and programs are **upserted on every boot**; habits seed on first run only. Content updates ride the `DB_VERSION` bump (wipe + re-seed). See [Data Model](../architecture/data-model.md).
 
 ---

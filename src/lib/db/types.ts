@@ -30,7 +30,7 @@ export const MOOD_SCALE = [
 	{ value: 1, label: 'Content' },
 	{ value: 0, label: 'Normal' },
 	{ value: -1, label: 'Tired' },
-	{ value: -2, label: 'Lonely' },
+	{ value: -2, label: 'Agitated' },
 	{ value: -3, label: 'Sad' },
 	{ value: -4, label: 'Angry' },
 	{ value: -5, label: 'Stressed' },

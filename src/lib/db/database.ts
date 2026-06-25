@@ -174,6 +174,13 @@ async function upsertBuiltInRecords<T extends { id: string; isBuiltIn: boolean }
 	}
 }
 
+async function seedHabitsIfEmpty(): Promise<void> {
+	const habits = await getAll<Habit>('habits');
+	if (habits.length === 0) {
+		await putAllRecords('habits', builtInHabits);
+	}
+}
+
 export async function initDB(): Promise<void> {
 	const items = await getAll<Item>('items');
 	await upsertBuiltInRecords('items', items, builtInItems);
@@ -181,25 +188,7 @@ export async function initDB(): Promise<void> {
 	const programs = await getAll<Program>('programs');
 	await upsertBuiltInRecords('programs', programs, builtInPrograms);
 
-	const habits = await getAll<Habit>('habits');
-	if (habits.length === 0) {
-		await putAllRecords('habits', builtInHabits);
-	} else {
-		const goalMap: Record<string, number> = {
-			'habit-meditation': 20,
-			'habit-writing': 500,
-			'habit-reading': 20,
-			'habit-water': 8,
-			'habit-coffee': 3,
-		};
-		const toUpdate = habits.filter((h) => goalMap[h.id] !== undefined && h.dailyGoal === undefined);
-		if (toUpdate.length > 0) {
-			await putAllRecords(
-				'habits',
-				toUpdate.map((h) => ({ ...h, dailyGoal: goalMap[h.id] })),
-			);
-		}
-	}
+	await seedHabitsIfEmpty();
 }
 
 export const db = {

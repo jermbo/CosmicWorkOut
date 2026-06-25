@@ -4,7 +4,7 @@
 >
 > **Shipped in v1.2.0:**
 >
-> - 7 built-in habits pre-seeded (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood)
+> - 6 built-in habits pre-seeded (Water, Coffee, Meditation, Writing, Reading, Mood) — see [US-031](../v1.7.0/US-031-default-habits-tweak.md)
 > - Full habit logging on `/habits` (progress rings, stepped inputs, boolean toggles, mood strip)
 > - Habit data layer in IndexedDB with `dailyGoal` migration
 > - Store methods for reorder and value correction
@@ -33,7 +33,7 @@ so that the habits I track reflect exactly what matters to me and feed into my l
      c. Habit types shall not be changeable after creation — changing type would corrupt historical data.
 
 2. Creating a habit
-   a. The user shall be able to create a new habit from the Settings page.
+   a. The user shall be able to create a new habit from **Settings → Habits** (`/settings/habits` after [US-030](../v1.7.0/US-030-settings-restructure.md)).
    b. The creation form shall require: a name (max 40 characters) and a type selection.
    c. For Count type, the user shall also enter a unit label (e.g. "glasses", "pages", "words") — max 20 characters.
    d. For Times, Minutes, and Count types, the user shall optionally set a daily goal (positive integer).
@@ -42,20 +42,18 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 
 3. Managing habits
    a. The user shall be able to edit a habit's name, unit label (Count only), and daily goal. The type shall not be editable.
-   b. The user shall be able to toggle a habit between active and inactive. Inactive habits do not appear on the habit log page.
-   c. The user shall be able to reorder habits by dragging them in the Settings list. The new order shall be reflected on the habit log page immediately.
+   b. The user shall be able to toggle a habit between active and inactive. Inactive habits do not appear on the habit log page. **Mood cannot be deactivated** — users may turn off every other habit ([US-031](../v1.7.0/US-031-default-habits-tweak.md)).
+   c. The user shall be able to reorder habits by dragging them in the Settings habits list (`/settings/habits`). The new order shall be reflected on the habit log page immediately.
    d. The user shall be able to delete a habit. Deletion shall preserve all historical log data for that habit — it will remain visible in calendar and graph views for past dates.
 
 4. Built-in habit presets
    a. The app shall offer the following presets as starting points when creating a new habit. Selecting a preset pre-fills the name and type; the user may edit before saving:
+   - Water (Count — cups)
+   - Coffee (Count — cups)
    - Meditation (Minutes)
    - Writing (Count — words)
-   - Reading (Count — pages)
-   - Water (Count — glasses)
-   - Coffee (Times)
-   - Alcohol (Yes/No)
-   - Mood (Mood)
-     b. Presets are suggestions only — the user is not required to use them and may create habits from scratch.
+   - Reading (Minutes)
+     b. Presets are suggestions only — the user is not required to use them and may create habits from scratch. **Mood is not a preset** — it ships built-in and always on.
 
 ---
 
@@ -92,3 +90,4 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
 - [Data Model](../../architecture/data-model.md)
 - [Settings & Preferences Requirements](../../requirements/settings-preferences.md)
+- [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md)

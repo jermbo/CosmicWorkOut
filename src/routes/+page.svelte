@@ -26,7 +26,7 @@
 
 	let contextDate = $derived(loggingContext.date);
 
-	let habitsTotal = $derived(habitStore.activeHabits.length);
+	let habitsTotal = $derived(habitStore.trackableHabits.length);
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
@@ -64,7 +64,7 @@
 			add(activity.date, 'activity');
 		}
 
-		const activeHabitIds = new Set(habitStore.activeHabits.map((habit) => habit.id));
+		const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
 		for (const log of habitStore.logs) {
 			if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
 		}
