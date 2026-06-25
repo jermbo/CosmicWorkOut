@@ -2,13 +2,18 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { toLocalIso } from '$lib/date';
+	import { healthStore } from '$lib/stores/health.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { todayIso } from '$lib/date';
+	import { rollingBpAverage } from '$lib/health/metrics';
 	import { type RangeKey, computeRange, buildDatesBetween, xLabelsFor } from '$lib/chart-utils';
 	import RangeBar from '$lib/components/insights/RangeBar.svelte';
 	import ChartMoodHabits from '$lib/components/insights/ChartMoodHabits.svelte';
 	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
 	import ChartActivityMix from '$lib/components/insights/ChartActivityMix.svelte';
 	import ChartHabitRadar from '$lib/components/insights/ChartHabitRadar.svelte';
+	import ChartHealthWeight from '$lib/components/insights/ChartHealthWeight.svelte';
+	import ChartHealthBP from '$lib/components/insights/ChartHealthBP.svelte';
 
 	let rangeKey = $state<RangeKey>('last-7');
 	let customStart = $state('');
@@ -50,7 +55,14 @@
 	let hasActivities = $derived(activityStore.activities.length > 0);
 	let hasHabitLogs = $derived(habitStore.logs.length > 0);
 	let hasHabits = $derived(habitStore.activeHabits.length > 0);
-	let hasAnyData = $derived(hasSessions || hasActivities || hasHabitLogs);
+
+	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
+	let hasWeight = $derived(healthEnabled && healthStore.readings.some((r) => r.metricId === 'weight'));
+	let hasBp = $derived(healthEnabled && healthStore.readings.some((r) => r.metricId === 'bloodPressure'));
+	let latestWeight = $derived(healthStore.latestWeight());
+	let bp7day = $derived(rollingBpAverage(healthStore.readings, 7, todayIso()));
+
+	let hasAnyData = $derived(hasSessions || hasActivities || hasHabitLogs || hasWeight || hasBp);
 </script>
 
 <div class="insights-page">
@@ -103,6 +115,48 @@
 					<p class="chart-section__desc">Average habit consistency over the selected period.</p>
 					<div class="chart-wrap chart-wrap--radar">
 						<ChartHabitRadar {dates} />
+					</div>
+				</section>
+			{/if}
+
+			{#if healthEnabled && (hasWeight || hasBp)}
+				<section class="chart-section chart-section--full">
+					<h2 class="chart-section__title">Health Summary</h2>
+					<div class="health-summary">
+						{#if latestWeight}
+							<div class="health-summary__stat">
+								<span class="health-summary__num"
+									>{latestWeight.values.value}<span class="health-summary__unit">{prefsStore.weightUnit}</span></span
+								>
+								<span class="health-summary__label">Latest weight</span>
+							</div>
+						{/if}
+						{#if bp7day}
+							<div class="health-summary__stat">
+								<span class="health-summary__num">{bp7day.systolic}/{bp7day.diastolic}</span>
+								<span class="health-summary__label">7-day avg BP</span>
+							</div>
+						{/if}
+					</div>
+				</section>
+			{/if}
+
+			{#if hasWeight}
+				<section class="chart-section">
+					<h2 class="chart-section__title">Weight Trend</h2>
+					<p class="chart-section__desc">Body weight over the selected period.</p>
+					<div class="chart-wrap">
+						<ChartHealthWeight {dates} {xLabels} />
+					</div>
+				</section>
+			{/if}
+
+			{#if hasBp}
+				<section class="chart-section">
+					<h2 class="chart-section__title">Blood Pressure</h2>
+					<p class="chart-section__desc">Daily average systolic and diastolic.</p>
+					<div class="chart-wrap">
+						<ChartHealthBP {dates} {xLabels} />
 					</div>
 				</section>
 			{/if}
@@ -174,6 +228,43 @@
 		border: 1px solid var(--color-border);
 		border-radius: var(--r-xl);
 		padding: var(--space-5);
+	}
+
+	@container app (inline-size >= 720px) {
+		.chart-section--full {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.health-summary {
+		display: flex;
+		gap: var(--space-8);
+		margin-block-start: var(--space-3);
+	}
+
+	.health-summary__stat {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.health-summary__num {
+		font-family: var(--font-mono);
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+	}
+
+	.health-summary__unit {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-text-muted);
+		margin-inline-start: 4px;
+	}
+
+	.health-summary__label {
+		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
 	}
 
 	.chart-section__title {

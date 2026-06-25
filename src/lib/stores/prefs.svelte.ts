@@ -7,6 +7,7 @@ const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
+	healthMetricsEnabled: false,
 };
 
 class PrefsStore {
@@ -14,6 +15,7 @@ class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 
 	load(): void {
 		const stored = localStorage.getItem(PREFS_KEY);
@@ -23,6 +25,7 @@ class PrefsStore {
 			this.density = parsed.density ?? DEFAULTS.density;
 			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+			this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
 		}
 
 		this.applyAccentColor();
@@ -36,8 +39,14 @@ class PrefsStore {
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
+			healthMetricsEnabled: this.healthMetricsEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+	}
+
+	setHealthMetricsEnabled(enabled: boolean): void {
+		this.healthMetricsEnabled = enabled;
+		this.save();
 	}
 
 	private applyDensity(): void {

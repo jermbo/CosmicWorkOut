@@ -6,19 +6,19 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 
 ## Routes
 
-| Route       | File                           | Purpose                                             |
-| ----------- | ------------------------------ | --------------------------------------------------- |
-| `/`         | `routes/+page.svelte`          | Today — overview dashboard with summary cards       |
-| `/habits`   | `routes/habits/+page.svelte`   | Habit log — progress rings, mood strip, date picker |
-| `/workout`  | `routes/workout/+page.svelte`  | Workout — full session start/edit UI                |
-| `/log`      | `routes/log/+page.svelte`      | Activity log — list and log non-workout activities  |
-| `/program`  | `routes/program/+page.svelte`  | Program — workout cards, editor entry               |
-| `/calendar` | `routes/calendar/+page.svelte` | History — month grid, stats, day summary            |
-| `/health` 🟡 | `routes/health/+page.svelte`   | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md)) |
-| `/settings` | `routes/settings/+page.svelte` | Settings **hub** — navigation to sub-pages ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| `/settings/appearance` 🟡 | `routes/settings/appearance/+page.svelte` | Accent, weight unit, density, roundness |
-| `/settings/habits` 🟡 | `routes/settings/habits/+page.svelte` | Habit CRUD and reorder (moved from hub) |
-| `/settings/data` 🟡 | `routes/settings/data/+page.svelte` | Backup, clear data, reset prefs, debug seed |
+| Route                     | File                                      | Purpose                                                                                                  |
+| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `/`                       | `routes/+page.svelte`                     | Today — overview dashboard with summary cards                                                            |
+| `/habits`                 | `routes/habits/+page.svelte`              | Habit log — progress rings, mood strip, date picker                                                      |
+| `/workout`                | `routes/workout/+page.svelte`             | Workout — full session start/edit UI                                                                     |
+| `/log`                    | `routes/log/+page.svelte`                 | Activity log — list and log non-workout activities                                                       |
+| `/program`                | `routes/program/+page.svelte`             | Program — workout cards, editor entry                                                                    |
+| `/calendar`               | `routes/calendar/+page.svelte`            | History — month grid, stats, day summary                                                                 |
+| `/health` 🟡              | `routes/health/+page.svelte`              | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))             |
+| `/settings`               | `routes/settings/+page.svelte`            | Settings **hub** — navigation to sub-pages ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `/settings/appearance` 🟡 | `routes/settings/appearance/+page.svelte` | Accent, weight unit, density, roundness                                                                  |
+| `/settings/habits` 🟡     | `routes/settings/habits/+page.svelte`     | Habit CRUD and reorder (moved from hub)                                                                  |
+| `/settings/data` 🟡       | `routes/settings/data/+page.svelte`       | Backup, clear data, reset prefs, debug seed                                                              |
 
 Navigation via `BottomNav` (Today · Habits · Workout · History · Settings). Program is accessible from the Workout page.
 

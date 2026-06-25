@@ -1,8 +1,10 @@
 # US-029 — Health Metrics
 
-> **Status: ❌ Planned — v1.7.0**
+> **Status: ✅ Shipped — v1.7.0**
 >
 > Personal body measurements (weight, blood pressure) tracked over time. Optional feature toggled in Settings. Not a medical device — no clinical ranges, alerts, or diagnoses.
+>
+> **As built:** `healthReadings` store added at **DB_VERSION 8** (indexes `by_date`, `by_metric`); catalog + aggregation in `src/lib/health/metrics.ts`; `healthStore` in `src/lib/stores/health.svelte.ts`; `healthMetricsEnabled` added to `UserPrefs`/`prefsStore`. Surfaces: `/health` (weight + BP sheets), home `HomeHealthCard`, Insights summary row + `ChartHealthWeight` / `ChartHealthBP`, calendar dot + day-detail summary, all gated by the toggle. Week/calendar `health` indicator dot uses `--color-red`.
 
 As a **health-conscious user**, I want to log body measurements like weight and blood pressure and see trends over time
 so that I can monitor my overall health alongside my workouts and habits without leaving the app.
@@ -19,19 +21,19 @@ CosmicWorkOut is a personal fitness journal, not clinical software. Health metri
 
 ## Key Decisions
 
-| Topic | Decision |
-| ----- | -------- |
-| **Not habits** | Separate **Health metrics** domain — habits are one value/day with tap-counter UX; BP needs multiple readings/day and compound values |
-| **Catalog** | **App-defined metric types only** (Weight, Blood Pressure in v1). New types ship in app updates — no user-created metrics |
-| **Settings** | One master toggle: `healthMetricsEnabled`. Off = hide all UI; **data stays in IndexedDB** |
-| **Surfaces** | Home summary card → `/health`; Insights charts + summary stats; Calendar combined indicator |
-| **Weight** | Once per day (upsert by date); reuses existing **`weightUnit`** pref (`lb` / `kg`) |
-| **Blood pressure** | Multiple readings per day; **systolic + diastolic + optional pulse**; trend charts use **daily averages** |
-| **Date** | Follows **global date context** (same as habits) — backdating uses the selected Today date |
-| **Corrections** | Edit and delete individual readings |
-| **Calendar** | One combined **Health** dot if **any** health reading exists that day (not per-metric dots) |
-| **Insights (v1)** | Two charts (weight trend; BP daily-average systolic/diastolic lines) **plus** summary stats (latest weight, 7-day BP average) |
-| **Backup** | Include `healthReadings` in [US-028](./US-028-data-export-backup.md) export envelope when both ship |
+| Topic              | Decision                                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **Not habits**     | Separate **Health metrics** domain — habits are one value/day with tap-counter UX; BP needs multiple readings/day and compound values |
+| **Catalog**        | **App-defined metric types only** (Weight, Blood Pressure in v1). New types ship in app updates — no user-created metrics             |
+| **Settings**       | One master toggle: `healthMetricsEnabled`. Off = hide all UI; **data stays in IndexedDB**                                             |
+| **Surfaces**       | Home summary card → `/health`; Insights charts + summary stats; Calendar combined indicator                                           |
+| **Weight**         | Once per day (upsert by date); reuses existing **`weightUnit`** pref (`lb` / `kg`)                                                    |
+| **Blood pressure** | Multiple readings per day; **systolic + diastolic + optional pulse**; trend charts use **daily averages**                             |
+| **Date**           | Follows **global date context** (same as habits) — backdating uses the selected Today date                                            |
+| **Corrections**    | Edit and delete individual readings                                                                                                   |
+| **Calendar**       | One combined **Health** dot if **any** health reading exists that day (not per-metric dots)                                           |
+| **Insights (v1)**  | Two charts (weight trend; BP daily-average systolic/diastolic lines) **plus** summary stats (latest weight, 7-day BP average)         |
+| **Backup**         | Include `healthReadings` in [US-028](./US-028-data-export-backup.md) export envelope when both ship                                   |
 
 ---
 
@@ -52,10 +54,10 @@ Stretching habits would lose individual BP readings or corrupt historical data. 
 
 Definitions live in `src/lib/health/metrics.ts` — **not** IndexedDB. The catalog is versioned with the app.
 
-| `metricId` | Label | Cardinality | Values | Unit |
-| ---------- | ----- | ----------- | ------ | ---- |
-| `weight` | Weight | **Once per day** | `{ value: number }` | User's `weightUnit` (`lb` / `kg`) |
-| `bloodPressure` | Blood Pressure | **Multiple per day** | `{ systolic: number; diastolic: number; pulse?: number }` | mmHg (pulse: bpm) |
+| `metricId`      | Label          | Cardinality          | Values                                                    | Unit                              |
+| --------------- | -------------- | -------------------- | --------------------------------------------------------- | --------------------------------- |
+| `weight`        | Weight         | **Once per day**     | `{ value: number }`                                       | User's `weightUnit` (`lb` / `kg`) |
+| `bloodPressure` | Blood Pressure | **Multiple per day** | `{ systolic: number; diastolic: number; pulse?: number }` | mmHg (pulse: bpm)                 |
 
 **Future types** (out of v1 scope): resting heart rate, sleep duration, etc. — add a row to the catalog + reading shape; no schema fork.
 
@@ -212,19 +214,19 @@ b. Restore shall re-import health readings with the rest of workout data.
 
 ## Implementation Notes
 
-| Area | Files / modules |
-| ---- | ---------------- |
-| Catalog | `src/lib/health/metrics.ts` — definitions + aggregation helpers |
-| Types | `src/lib/db/types.ts` — `HealthReading`, `HealthMetricId`, extend `UserPrefs` |
-| DB | `src/lib/db/database.ts` — store `healthReadings`, `DB_VERSION` 8 |
-| Store | `src/lib/stores/health.svelte.ts` — load, upsert weight, add/update/delete BP |
-| Route | `src/routes/health/+page.svelte` |
-| Home | `src/lib/components/HomeHealthCard.svelte`; week indicators in `routes/+page.svelte` |
+| Area     | Files / modules                                                                             |
+| -------- | ------------------------------------------------------------------------------------------- |
+| Catalog  | `src/lib/health/metrics.ts` — definitions + aggregation helpers                             |
+| Types    | `src/lib/db/types.ts` — `HealthReading`, `HealthMetricId`, extend `UserPrefs`               |
+| DB       | `src/lib/db/database.ts` — store `healthReadings`, `DB_VERSION` 8                           |
+| Store    | `src/lib/stores/health.svelte.ts` — load, upsert weight, add/update/delete BP               |
+| Route    | `src/routes/health/+page.svelte`                                                            |
+| Home     | `src/lib/components/HomeHealthCard.svelte`; week indicators in `routes/+page.svelte`        |
 | Insights | `src/lib/components/insights/ChartHealthWeight.svelte`, `ChartHealthBP.svelte`, summary row |
-| Calendar | indicator + day panel in `routes/calendar/+page.svelte` |
-| Settings | inline toggle on Settings hub ([US-030](./US-030-settings-restructure.md)) |
-| Boot | `healthStore.load()` in `routes/+layout.svelte` after `initDB()` |
-| Backup | `src/lib/db/backup.ts` — include `healthReadings` (coordinate with US-028) |
+| Calendar | indicator + day panel in `routes/calendar/+page.svelte`                                     |
+| Settings | inline toggle on Settings hub ([US-030](./US-030-settings-restructure.md))                  |
+| Boot     | `healthStore.load()` in `routes/+layout.svelte` after `initDB()`                            |
+| Backup   | `src/lib/db/backup.ts` — include `healthReadings` (coordinate with US-028)                  |
 
 **Suggested build order:** [US-030](./US-030-settings-restructure.md) hub first (or in parallel) → data layer + store → health toggle on hub → `/health` → home card → Insights → calendar → export.
 
@@ -232,15 +234,15 @@ b. Restore shall re-import health readings with the rest of workout data.
 
 ## Out of Scope (v1)
 
-| Item | Notes |
-| ---- | ----- |
-| User-defined custom metrics | Catalog is app-defined only |
-| Per-metric enable toggles | Master switch controls all catalog metrics |
-| Clinical ranges / "high BP" alerts | Not a medical device |
-| Habit integration | Separate domain by design |
-| Separate body-weight unit | Reuses lifting `weightUnit` |
-| Apple Health / Google Fit sync | Client-only; no external APIs |
-| CSV export | Covered by US-028 JSON backup if needed |
+| Item                               | Notes                                      |
+| ---------------------------------- | ------------------------------------------ |
+| User-defined custom metrics        | Catalog is app-defined only                |
+| Per-metric enable toggles          | Master switch controls all catalog metrics |
+| Clinical ranges / "high BP" alerts | Not a medical device                       |
+| Habit integration                  | Separate domain by design                  |
+| Separate body-weight unit          | Reuses lifting `weightUnit`                |
+| Apple Health / Google Fit sync     | Client-only; no external APIs              |
+| CSV export                         | Covered by US-028 JSON backup if needed    |
 
 ---
 

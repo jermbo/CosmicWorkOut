@@ -1,8 +1,10 @@
 # US-028 — Data Export, Backup & Device Sync
 
-> **Status: ❌ Planned — v1.7.0**
+> **Status: 🟡 Phase 1 shipped — v1.7.0** (Phase 2 device sync still planned)
 >
 > Offline-first data portability. Phase 1 is JSON file export/import; Phase 2 adds QR-paired device-to-device sync with merge rules. No cloud accounts, no backend.
+>
+> **As built (Phase 1):** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope; `putAllRecords` and `itemLastUsed.getAll` were exposed from `database.ts`. Export/Restore live on `settings/data` — restore is **Replace-only**, validates `format`/`version`, confirms via dialog, then wipes + writes + re-seeds built-ins + reloads. Parse/validation errors surface as toasts and leave data untouched. Phase 2 (QR/LAN sync + merge engine) is unbuilt.
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -19,21 +21,21 @@ The app is client-only ([Design Principles](../../vision/principles.md)). Backup
 
 ## What Gets Backed Up
 
-| Store | Technology | Include in backup? | Notes |
-| ----- | ---------- | ------------------ | ----- |
-| `items` | IndexedDB | Yes | User-created / user-edited; built-ins re-seed on boot |
-| `programs` | IndexedDB | Yes | Same |
-| `sessions` | IndexedDB | Yes | Core history |
-| `itemLastUsed` | IndexedDB | Yes | Weight/rep memory |
-| `activities` | IndexedDB | Yes | Activity log |
-| `habits` | IndexedDB | Yes | Custom habits + edits to built-ins |
-| `habitLogs` | IndexedDB | Yes | Habit history |
-| `healthReadings` | IndexedDB | Yes | Health metric readings ([US-029](./US-029-health-metrics.md)) |
-| `cwout:prefs` | localStorage | Optional | User may choose to include preferences |
-| `cwout:activeProgramIds` | localStorage | Yes | Per-Discipline active program |
-| `cwout:lastActivityType` | localStorage | Yes | Last-used activity type |
-| `cwout:activeSession` | localStorage | **No** | Transient crash-recovery state |
-| `cwout:habitDay` | localStorage | **No** | Ephemeral UI cache |
+| Store                    | Technology   | Include in backup? | Notes                                                         |
+| ------------------------ | ------------ | ------------------ | ------------------------------------------------------------- |
+| `items`                  | IndexedDB    | Yes                | User-created / user-edited; built-ins re-seed on boot         |
+| `programs`               | IndexedDB    | Yes                | Same                                                          |
+| `sessions`               | IndexedDB    | Yes                | Core history                                                  |
+| `itemLastUsed`           | IndexedDB    | Yes                | Weight/rep memory                                             |
+| `activities`             | IndexedDB    | Yes                | Activity log                                                  |
+| `habits`                 | IndexedDB    | Yes                | Custom habits + edits to built-ins                            |
+| `habitLogs`              | IndexedDB    | Yes                | Habit history                                                 |
+| `healthReadings`         | IndexedDB    | Yes                | Health metric readings ([US-029](./US-029-health-metrics.md)) |
+| `cwout:prefs`            | localStorage | Optional           | User may choose to include preferences                        |
+| `cwout:activeProgramIds` | localStorage | Yes                | Per-Discipline active program                                 |
+| `cwout:lastActivityType` | localStorage | Yes                | Last-used activity type                                       |
+| `cwout:activeSession`    | localStorage | **No**             | Transient crash-recovery state                                |
+| `cwout:habitDay`         | localStorage | **No**             | Ephemeral UI cache                                            |
 
 Built-in items, programs, and habits ship in code (`src/lib/db/seed.ts`) and are upserted on every boot via `initDB()`. A backup may include built-in records for a complete snapshot, but restore does not depend on them.
 
@@ -45,24 +47,24 @@ Versioned JSON envelope — one file, human-readable, diffable in git if the use
 
 ```json
 {
-  "format": "cosmic-workout-backup",
-  "version": 1,
-  "exportedAt": "2026-06-23T12:00:00.000Z",
-  "db": {
-    "items": [],
-    "programs": [],
-    "sessions": [],
-    "itemLastUsed": [],
-    "activities": [],
-    "habits": [],
-    "habitLogs": [],
-    "healthReadings": []
-  },
-  "localStorage": {
-    "cwout:prefs": {},
-    "cwout:activeProgramIds": {},
-    "cwout:lastActivityType": "walk"
-  }
+	"format": "cosmic-workout-backup",
+	"version": 1,
+	"exportedAt": "2026-06-23T12:00:00.000Z",
+	"db": {
+		"items": [],
+		"programs": [],
+		"sessions": [],
+		"itemLastUsed": [],
+		"activities": [],
+		"habits": [],
+		"habitLogs": [],
+		"healthReadings": []
+	},
+	"localStorage": {
+		"cwout:prefs": {},
+		"cwout:activeProgramIds": {},
+		"cwout:lastActivityType": "walk"
+	}
 }
 ```
 
@@ -92,8 +94,8 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 
 **Restore modes for v1:**
 
-| Mode | Behavior |
-| ---- | -------- |
+| Mode                  | Behavior                                                                    |
+| --------------------- | --------------------------------------------------------------------------- |
 | **Replace** (default) | Wipe local workout data, import file wholesale. Simplest and safest for v1. |
 
 Merge-on-import is deferred to Phase 2 (device sync). A one-time file restore is intentionally all-or-nothing.
@@ -169,10 +171,10 @@ sequenceDiagram
 
 ```json
 {
-  "sync": {
-    "deviceId": "abc123",
-    "lastSyncAt": "2026-06-23T10:00:00.000Z"
-  }
+	"sync": {
+		"deviceId": "abc123",
+		"lastSyncAt": "2026-06-23T10:00:00.000Z"
+	}
 }
 ```
 
@@ -190,16 +192,16 @@ On supported mobile browsers, after building the export blob, offer **Share** (`
 
 ### Entity summary
 
-| Entity | Natural key | Multiple per day? | Conflict rule |
-| ------ | ----------- | ----------------- | ------------- |
-| **Session** | `programId` + `date` | No — one per program per day | See below |
-| **HabitLog** | `habitId` + `date` (id = `habitId:date`) | No | See below |
-| **ActivityLog** | `id` | Yes — many per day | Union by `id`; same id → newer `createdAt` |
-| **HealthReading** | `id` | Yes — many per day (BP); weight upserts one per `metricId` + `date` | Union by `id`; same id → newer `recordedAt` |
-| **Item / Program / Habit** | `id` | N/A | Last-write-wins by `updatedAt` (add field when building sync) |
-| **ItemLastUsed** | `itemId` | N/A | Value from the newer session that touched the item |
-| **Prefs** | singleton | One blob | Receiving device keeps its prefs unless user opts in |
-| **activeProgramIds** | per `disciplineId` | One per Discipline | Merge per discipline key |
+| Entity                     | Natural key                              | Multiple per day?                                                   | Conflict rule                                                 |
+| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Session**                | `programId` + `date`                     | No — one per program per day                                        | See below                                                     |
+| **HabitLog**               | `habitId` + `date` (id = `habitId:date`) | No                                                                  | See below                                                     |
+| **ActivityLog**            | `id`                                     | Yes — many per day                                                  | Union by `id`; same id → newer `createdAt`                    |
+| **HealthReading**          | `id`                                     | Yes — many per day (BP); weight upserts one per `metricId` + `date` | Union by `id`; same id → newer `recordedAt`                   |
+| **Item / Program / Habit** | `id`                                     | N/A                                                                 | Last-write-wins by `updatedAt` (add field when building sync) |
+| **ItemLastUsed**           | `itemId`                                 | N/A                                                                 | Value from the newer session that touched the item            |
+| **Prefs**                  | singleton                                | One blob                                                            | Receiving device keeps its prefs unless user opts in          |
+| **activeProgramIds**       | per `disciplineId`                       | One per Discipline                                                  | Merge per discipline key                                      |
 
 Strength and belly dance sessions on the **same calendar date** are **not** a conflict — different `programId` / `disciplineId`.
 
@@ -219,12 +221,12 @@ After merge, program progression (`completedSessionCount`) must be recomputed fr
 
 Same `habitId` + `date` → one slot.
 
-| Habit type | Rule |
-| ---------- | ---- |
+| Habit type              | Rule                                                        |
+| ----------------------- | ----------------------------------------------------------- |
 | Counter (water, coffee) | **Max `value`** — avoids double-counting offline increments |
-| Minutes / words | **Max `value`** or newer import timestamp |
-| Mood (1–5) | **Newer wins** — point-in-time choice |
-| Checkbox | `value > 0` wins, or newer |
+| Minutes / words         | **Max `value`** or newer import timestamp                   |
+| Mood (1–5)              | **Newer wins** — point-in-time choice                       |
+| Checkbox                | `value > 0` wins, or newer                                  |
 
 ### Post-sync summary
 
@@ -256,14 +258,14 @@ flowchart TD
 
 ## Out of Scope
 
-| Item | Notes |
-| ---- | ----- |
-| Cloud sync (iCloud, Dropbox, Firebase) | Violates client-only constraint |
-| User accounts / auth | No backend |
-| CSV export as backup | Cannot round-trip; optional analytics export is a separate story |
-| QR-only full backup (no LAN) | Impractical at real data sizes; chunked QR sequences are a last resort |
-| Automatic background sync | Manual export/sync only for v1 |
-| File System Access API auto-backup | Extra permissions; defer |
+| Item                                   | Notes                                                                  |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| Cloud sync (iCloud, Dropbox, Firebase) | Violates client-only constraint                                        |
+| User accounts / auth                   | No backend                                                             |
+| CSV export as backup                   | Cannot round-trip; optional analytics export is a separate story       |
+| QR-only full backup (no LAN)           | Impractical at real data sizes; chunked QR sequences are a last resort |
+| Automatic background sync              | Manual export/sync only for v1                                         |
+| File System Access API auto-backup     | Extra permissions; defer                                               |
 
 ---
 

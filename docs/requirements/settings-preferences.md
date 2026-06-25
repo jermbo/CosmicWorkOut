@@ -8,19 +8,19 @@ User-configurable behavior and appearance.
 
 ## Implementation Status
 
-| Story                                        | Status   |
-| -------------------------------------------- | -------- | --------------------------------------------- |
-| Preferences store + localStorage persistence | ✅ Built |
-| Settings UI / route (`/settings`)            | ✅ Built |
-| Accent color (presets + custom hex)          | ✅ Built |
-| Density / roundness via data attributes      | ✅ Built |
-| Completion feel toggles confetti             | ✅ Built |
-| Weight unit in display/input                 | ✅ Built |
-| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
-| Clear workout data (settings)                | ✅ Built | Wipes IndexedDB + session state; keeps prefs  |
-| Reset preferences to defaults (settings)     | ✅ Built | Resets `cwout:prefs`; workout data untouched  |
-| Health metrics master toggle               | ❌ Planned | [US-029](../features/v1.7.0/US-029-health-metrics.md) — inline on Settings hub |
-| Settings hub restructure                   | ❌ Planned | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — sub-routes for appearance, habits, data |
+| Story                                        | Status     |
+| -------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| Preferences store + localStorage persistence | ✅ Built   |
+| Settings UI / route (`/settings`)            | ✅ Built   |
+| Accent color (presets + custom hex)          | ✅ Built   |
+| Density / roundness via data attributes      | ✅ Built   |
+| Completion feel toggles confetti             | ✅ Built   |
+| Weight unit in display/input                 | ✅ Built   |
+| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built   | Set on the exercise form, not in global prefs                                                         |
+| Clear workout data (settings)                | ✅ Built   | Wipes IndexedDB + session state; keeps prefs                                                          |
+| Reset preferences to defaults (settings)     | ✅ Built   | Resets `cwout:prefs`; workout data untouched                                                          |
+| Health metrics master toggle                 | ❌ Planned | [US-029](../features/v1.7.0/US-029-health-metrics.md) — inline on Settings hub                        |
+| Settings hub restructure                     | ❌ Planned | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — sub-routes for appearance, habits, data |
 
 ---
 
@@ -28,12 +28,12 @@ User-configurable behavior and appearance.
 
 > **Planned — [US-030](../features/v1.7.0/US-030-settings-restructure.md).** Replaces the current single long scroll.
 
-| Route | Contents |
-| ----- | -------- |
-| `/settings` | **Hub** — navigation rows + health metrics toggle |
-| `/settings/appearance` | Accent, weight unit, density, roundness |
-| `/settings/habits` | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md)) |
-| `/settings/data` | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), reset prefs, clear data, debug seed |
+| Route                  | Contents                                                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `/settings`            | **Hub** — navigation rows + health metrics toggle                                                                 |
+| `/settings/appearance` | Accent, weight unit, density, roundness                                                                           |
+| `/settings/habits`     | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))                        |
+| `/settings/data`       | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), reset prefs, clear data, debug seed |
 
 ```mermaid
 flowchart LR

@@ -132,12 +132,12 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Settings (`/settings`)
 
-| Component           | Purpose                                                      |
-| ------------------- | ------------------------------------------------------------ |
-| `AccentColorPicker` | Accent-color swatch picker; writes `prefsStore.accentColor`. |
-| `SettingsRow` 🟡    | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| `SettingsToggleRow` 🟡 | Hub row with inline switch (e.g. health metrics) |
-| `SettingsGroup` 🟡  | Section header + grouped rows on hub |
+| Component              | Purpose                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
+| `SettingsRow` 🟡       | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `SettingsToggleRow` 🟡 | Hub row with inline switch (e.g. health metrics)                                                            |
+| `SettingsGroup` 🟡     | Section header + grouped rows on hub                                                                        |
 
 Habit management components (`HabitRow`, `HabitForm`) move to `/settings/habits` with US-030.
 

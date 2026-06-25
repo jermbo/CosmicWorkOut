@@ -164,9 +164,9 @@ This store has **no persistence** — it resets to today on every page load. The
 
 Owns optional body measurement readings (weight, blood pressure). Gated by `prefsStore.healthMetricsEnabled`.
 
-| State      | Source    | Purpose              |
-| ---------- | --------- | -------------------- |
-| `readings` | IndexedDB | All health readings  |
+| State      | Source    | Purpose             |
+| ---------- | --------- | ------------------- |
+| `readings` | IndexedDB | All health readings |
 
 **Key derived values:**
 

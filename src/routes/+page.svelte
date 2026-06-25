@@ -6,6 +6,8 @@
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
+	import { healthStore } from '$lib/stores/health.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { todayIso } from '$lib/date';
 	import { BELLYDANCE_DISCIPLINE_ID, STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 	import { computePracticeNextUp } from '$lib/practice';
@@ -14,6 +16,7 @@
 	import HomeHabitsCard from '$lib/components/HomeHabitsCard.svelte';
 	import HomePracticeHubCard from '$lib/components/HomePracticeHubCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
+	import HomeHealthCard from '$lib/components/HomeHealthCard.svelte';
 
 	const todayStr = todayIso();
 
@@ -29,6 +32,10 @@
 	let habitsTotal = $derived(habitStore.trackableHabits.length);
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
+
+	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
+	let dateWeight = $derived(healthStore.weightForDate(contextDate));
+	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
 
 	let liveDiscipline = $derived.by(() => {
 		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
@@ -47,9 +54,9 @@
 	);
 
 	let weekIndicators = $derived.by(() => {
-		const indicators: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>> = {};
+		const indicators: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>> = {};
 
-		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity') {
+		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'health') {
 			if (!indicators[date]) indicators[date] = [];
 			if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
 		}
@@ -67,6 +74,12 @@
 		const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
 		for (const log of habitStore.logs) {
 			if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+		}
+
+		if (healthEnabled) {
+			for (const reading of healthStore.readings) {
+				add(reading.date, 'health');
+			}
 		}
 
 		return indicators;
@@ -95,6 +108,9 @@
 			detail={practiceNextUp.detail}
 		/>
 		<HomeActivityCard activities={dateActivities} />
+		{#if healthEnabled}
+			<HomeHealthCard weight={dateWeight} latestBp={dateLatestBp} />
+		{/if}
 	</div>
 </div>
 

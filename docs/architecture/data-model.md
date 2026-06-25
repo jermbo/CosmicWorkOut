@@ -370,18 +370,18 @@ DB name `cosmic-workout`, version **7** today (**8** planned with [US-029](../fe
 | v5 (v1.4.0) | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                        |
 | v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                 |
 | v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                            |
-| v8 (v1.7.0) | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                 |
+| v8 (v1.7.0) | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                      |
 
-| Store            | Key  | Indexes               | Contents                         |
-| ---------------- | ---- | --------------------- | -------------------------------- |
-| `items`          | `id` | —                     | Item library (built-in + custom) |
-| `programs`       | `id` | —                     | All programs                     |
-| `sessions`       | `id` | `by_date`             | Completed sessions               |
-| `itemLastUsed`   | `itemId` | —                 | Last weight/reps per item        |
-| `activities`     | `id` | `by_date`             | Activity log entries             |
-| `habits`         | `id` | —                     | Habit definitions                |
-| `habitLogs`      | `id` | `by_date`, `by_habit` | Daily habit log values           |
-| `healthReadings` 🟡 | `id` | `by_date`, `by_metric` | Health metric readings (US-029) |
+| Store               | Key      | Indexes                | Contents                         |
+| ------------------- | -------- | ---------------------- | -------------------------------- |
+| `items`             | `id`     | —                      | Item library (built-in + custom) |
+| `programs`          | `id`     | —                      | All programs                     |
+| `sessions`          | `id`     | `by_date`              | Completed sessions               |
+| `itemLastUsed`      | `itemId` | —                      | Last weight/reps per item        |
+| `activities`        | `id`     | `by_date`              | Activity log entries             |
+| `habits`            | `id`     | —                      | Habit definitions                |
+| `habitLogs`         | `id`     | `by_date`, `by_habit`  | Daily habit log values           |
+| `healthReadings` 🟡 | `id`     | `by_date`, `by_metric` | Health metric readings (US-029)  |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 

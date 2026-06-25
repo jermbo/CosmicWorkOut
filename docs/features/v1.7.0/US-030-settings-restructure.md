@@ -1,8 +1,10 @@
 # US-030 — Settings Hub Restructure
 
-> **Status: ❌ Planned — v1.7.0**
+> **Status: ✅ Shipped — v1.7.0**
 >
 > Replace the long single-page Settings scroll with a compact **hub** and focused **sub-routes**. Makes room for [US-028](./US-028-data-export-backup.md) (backup) and [US-029](./US-029-health-metrics.md) (health toggle) without more scroll fatigue.
+>
+> **As built:** Hub at `/settings` uses new `SettingsGroup` / `SettingsRow` / `SettingsToggleRow` components plus a shared `SettingsSubHeader` for back navigation. Sub-routes `settings/appearance`, `settings/habits`, `settings/data`. The Appearance row shows an accent swatch + density preview; Habits shows active count; Health metrics is an inline toggle on the hub. `BottomNav` already matched `/settings*`, so no nav change was needed.
 
 As a **user**, I want Settings to be easy to scan and navigate
 so that I can find appearance options, habit management, and data actions without scrolling through one long page.
@@ -21,11 +23,11 @@ Settings is a **launcher**, not a dump of every control. Simple toggles that sta
 
 Today's `/settings` is one scrolling page with:
 
-| Block | Issue |
-| ----- | ----- |
-| Accent, weight unit, density, roundness | Four separate sections — related but spread out |
-| Habits | Full drag-reorder list + CRUD — dominates page height |
-| Data | Three actions with long explanatory copy |
+| Block                                   | Issue                                                 |
+| --------------------------------------- | ----------------------------------------------------- |
+| Accent, weight unit, density, roundness | Four separate sections — related but spread out       |
+| Habits                                  | Full drag-reorder list + CRUD — dominates page height |
+| Data                                    | Three actions with long explanatory copy              |
 
 Adding **health metrics toggle** (US-029) and **export / restore** (US-028) on the same page would push it further past useful length.
 
@@ -46,12 +48,12 @@ flowchart TB
 
 A single-column list of **rows**, grouped under short section headers. No segmented controls on this page.
 
-| Section | Row | Behavior |
-| ------- | --- | -------- |
-| **Look & feel** | Appearance | Navigate → `/settings/appearance`. Trailing preview: current accent swatch + density label (e.g. "Comfortable") |
-| **Tracking** | Habits | Navigate → `/settings/habits`. Trailing: active count (e.g. "6 active") |
-| **Tracking** | Health metrics | **Inline toggle** (`healthMetricsEnabled`, US-029). One line + short subtitle; no sub-route |
-| **Data** | Data & backup | Navigate → `/settings/data` |
+| Section         | Row            | Behavior                                                                                                        |
+| --------------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Look & feel** | Appearance     | Navigate → `/settings/appearance`. Trailing preview: current accent swatch + density label (e.g. "Comfortable") |
+| **Tracking**    | Habits         | Navigate → `/settings/habits`. Trailing: active count (e.g. "6 active")                                         |
+| **Tracking**    | Health metrics | **Inline toggle** (`healthMetricsEnabled`, US-029). One line + short subtitle; no sub-route                     |
+| **Data**        | Data & backup  | Navigate → `/settings/data`                                                                                     |
 
 Hub fits on one screen on typical phones without scrolling (or one short scroll).
 
@@ -79,13 +81,13 @@ Use `PageHeader` title **Habits** with back → `/settings`. This is the same su
 
 Constructive actions first, destructive last:
 
-| Order | Action | Notes |
-| ----- | ------ | ----- |
-| 1 | Export backup | US-028 Phase 1 |
-| 2 | Restore from backup | US-028 Phase 1 |
-| 3 | Reset preferences | Secondary button; keeps workout data |
-| 4 | Clear workout data | Danger; existing confirm dialog |
-| 5 | Load debug data | **Advanced** — visually de-emphasized (smaller type, bottom of page). Dev/demo only |
+| Order | Action              | Notes                                                                               |
+| ----- | ------------------- | ----------------------------------------------------------------------------------- |
+| 1     | Export backup       | US-028 Phase 1                                                                      |
+| 2     | Restore from backup | US-028 Phase 1                                                                      |
+| 3     | Reset preferences   | Secondary button; keeps workout data                                                |
+| 4     | Clear workout data  | Danger; existing confirm dialog                                                     |
+| 5     | Load debug data     | **Advanced** — visually de-emphasized (smaller type, bottom of page). Dev/demo only |
 
 Copy on this page can stay longer than the hub; users opt in by navigating here.
 
@@ -93,26 +95,26 @@ Copy on this page can stay longer than the hub; users opt in by navigating here.
 
 ## Key Decisions
 
-| Topic | Decision |
-| ----- | -------- |
-| **Hub vs scroll** | Hub list on `/settings`; detail on sub-routes |
-| **Habits** | Own route — biggest length win |
-| **Health toggle** | Stays on hub (single boolean, US-029) |
-| **Backup** | Lives on `/settings/data`, not hub |
-| **Instant apply** | No Save button anywhere — unchanged |
-| **Bottom nav** | Settings tab still highlights for all `/settings/*` routes |
+| Topic               | Decision                                                                   |
+| ------------------- | -------------------------------------------------------------------------- |
+| **Hub vs scroll**   | Hub list on `/settings`; detail on sub-routes                              |
+| **Habits**          | Own route — biggest length win                                             |
+| **Health toggle**   | Stays on hub (single boolean, US-029)                                      |
+| **Backup**          | Lives on `/settings/data`, not hub                                         |
+| **Instant apply**   | No Save button anywhere — unchanged                                        |
+| **Bottom nav**      | Settings tab still highlights for all `/settings/*` routes                 |
 | **Back navigation** | Sub-pages use `PageHeader` back → hub (same pattern as `/workout`, `/log`) |
-| **URL structure** | Flat siblings under `settings/` — no nested depth beyond one level |
+| **URL structure**   | Flat siblings under `settings/` — no nested depth beyond one level         |
 
 ---
 
 ## New / Shared Components
 
-| Component | Purpose |
-| --------- | ------- |
-| `SettingsRow` | Tappable navigable row: `label`, optional `detail`, optional `preview` slot, chevron |
-| `SettingsToggleRow` | `label`, optional `description`, `checked`, `onchange` — for hub toggles |
-| `SettingsGroup` | Section header + vertical list of rows (spacing, divider) |
+| Component           | Purpose                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| `SettingsRow`       | Tappable navigable row: `label`, optional `detail`, optional `preview` slot, chevron |
+| `SettingsToggleRow` | `label`, optional `description`, `checked`, `onchange` — for hub toggles             |
+| `SettingsGroup`     | Section header + vertical list of rows (spacing, divider)                            |
 
 Extract from `settings/+page.svelte` during implementation; keep styles consistent with existing `settings-section` tokens.
 
@@ -183,16 +185,16 @@ b. Deep links to `/settings` continue to work (hub). No external links to sub-ro
 
 ## Implementation Notes
 
-| Step | Work |
-| ---- | ---- |
-| 1 | Add `SettingsRow`, `SettingsToggleRow`, `SettingsGroup` |
-| 2 | Create hub `settings/+page.svelte` (replace current content) |
-| 3 | Move appearance blocks → `settings/appearance/+page.svelte` |
-| 4 | Move habits block → `settings/habits/+page.svelte` |
-| 5 | Move data block → `settings/data/+page.svelte` |
-| 6 | Update `BottomNav` active check: `pathname.startsWith('/settings')` if not already |
-| 7 | Wire US-029 toggle on hub when implementing health metrics |
-| 8 | Wire US-028 buttons on data page when implementing backup |
+| Step | Work                                                                               |
+| ---- | ---------------------------------------------------------------------------------- |
+| 1    | Add `SettingsRow`, `SettingsToggleRow`, `SettingsGroup`                            |
+| 2    | Create hub `settings/+page.svelte` (replace current content)                       |
+| 3    | Move appearance blocks → `settings/appearance/+page.svelte`                        |
+| 4    | Move habits block → `settings/habits/+page.svelte`                                 |
+| 5    | Move data block → `settings/data/+page.svelte`                                     |
+| 6    | Update `BottomNav` active check: `pathname.startsWith('/settings')` if not already |
+| 7    | Wire US-029 toggle on hub when implementing health metrics                         |
+| 8    | Wire US-028 buttons on data page when implementing backup                          |
 
 **Suggested order relative to other v1.7.0 work:** implement **US-030 first** (or in parallel with US-029/US-028) so new features land on the right surfaces.
 
@@ -200,12 +202,12 @@ b. Deep links to `/settings` continue to work (hub). No external links to sub-ro
 
 ## Out of Scope
 
-| Item | Notes |
-| ---- | ----- |
-| Settings search | Unnecessary at current scale |
-| Nested settings beyond one level | Flat `settings/*` only |
-| Moving health metrics to its own settings page | Single toggle stays on hub |
-| Account / profile section | Client-only app |
+| Item                                           | Notes                        |
+| ---------------------------------------------- | ---------------------------- |
+| Settings search                                | Unnecessary at current scale |
+| Nested settings beyond one level               | Flat `settings/*` only       |
+| Moving health metrics to its own settings page | Single toggle stays on hub   |
+| Account / profile section                      | Client-only app              |
 
 ---
 

@@ -143,7 +143,7 @@ One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight:
 
 | Term                    | Status | Meaning                                                                                                                                    |
 | ----------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Global date context** | ✅     | The selected date that Today, habits, health metrics, and practice all read from. Backdating requires confirmation.                         |
+| **Global date context** | ✅     | The selected date that Today, habits, health metrics, and practice all read from. Backdating requires confirmation.                        |
 | **Active session**      | ✅     | An in-progress session held in memory + localStorage for crash recovery. Becomes a Session on finish.                                      |
 | **Linear progression**  | ✅     | "Today's routine" is chosen by count of completed sessions, **not** the calendar: `index = completedCount % routineCount`, per Discipline. |
 | **Built-in vs custom**  | ✅     | Built-in content is seeded and read-only (edit = copy-first); custom is user-created and fully editable.                                   |

@@ -1,4 +1,4 @@
-import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog } from './types';
+import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';
 import { toastStore } from '$lib/stores/toast.svelte';
@@ -9,7 +9,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -45,6 +45,10 @@ function openDB(): Promise<IDBDatabase> {
 			const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
 			hlStore.createIndex('by_date', 'date');
 			hlStore.createIndex('by_habit', 'habitId');
+
+			const hrStore = db.createObjectStore('healthReadings', { keyPath: 'id' });
+			hrStore.createIndex('by_date', 'date');
+			hrStore.createIndex('by_metric', 'metricId');
 		};
 
 		request.onsuccess = (event) => {
@@ -97,7 +101,7 @@ async function putRecord<T>(storeName: string, value: T): Promise<void> {
 	});
 }
 
-async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
+export async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
 	const db = await openDB();
 	return new Promise((resolve, reject) => {
 		const tx = db.transaction(storeName, 'readwrite');
@@ -214,6 +218,7 @@ export const db = {
 	},
 
 	itemLastUsed: {
+		getAll: () => getAll<ItemLastUsed>('itemLastUsed'),
 		get: (itemId: string) => getOne<ItemLastUsed>('itemLastUsed', itemId),
 		put: (record: ItemLastUsed) => putRecord('itemLastUsed', record),
 	},
@@ -234,5 +239,11 @@ export const db = {
 		getAll: () => getAll<HabitLog>('habitLogs'),
 		put: (log: HabitLog) => putRecord('habitLogs', log),
 		remove: (id: string) => removeRecord('habitLogs', id),
+	},
+
+	healthReadings: {
+		getAll: () => getAll<HealthReading>('healthReadings'),
+		put: (reading: HealthReading) => putRecord('healthReadings', reading),
+		remove: (id: string) => removeRecord('healthReadings', id),
 	},
 };

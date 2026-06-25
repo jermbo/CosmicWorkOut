@@ -11,7 +11,7 @@
 		showBack?: boolean;
 		backHref?: string;
 		showMoodDots?: boolean;
-		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity'>>;
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
 	};

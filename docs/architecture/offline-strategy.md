@@ -39,7 +39,7 @@ flowchart LR
 | `programs`               | IndexedDB    | On routine save in editor                   |
 | `sessions`               | IndexedDB    | On session finish                           |
 | `itemLastUsed`           | IndexedDB    | On each set confirm                         |
-| `healthReadings` 🟡      | IndexedDB    | On each health log / edit / delete (US-029)  |
+| `healthReadings` 🟡      | IndexedDB    | On each health log / edit / delete (US-029) |
 | `cwout:prefs`            | localStorage | On every preference change                  |
 | `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
 | `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
