@@ -148,10 +148,11 @@ export async function clearWorkoutData(): Promise<void> {
 }
 
 export async function loadDebugSeedData(): Promise<void> {
-	const { sessions, activities, habitLogs } = generateDebugSeedData();
+	const { sessions, activities, habitLogs, healthReadings } = generateDebugSeedData();
 	await putAllRecords('sessions', sessions);
 	await putAllRecords('activities', activities);
 	await putAllRecords('habitLogs', habitLogs);
+	await putAllRecords('healthReadings', healthReadings);
 	location.reload();
 }
 

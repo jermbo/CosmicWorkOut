@@ -4,7 +4,9 @@
 >
 > Replace the long single-page Settings scroll with a compact **hub** and focused **sub-routes**. Makes room for [US-028](./US-028-data-export-backup.md) (backup) and [US-029](./US-029-health-metrics.md) (health toggle) without more scroll fatigue.
 >
-> **As built:** Hub at `/settings` uses new `SettingsGroup` / `SettingsRow` / `SettingsToggleRow` components plus a shared `SettingsSubHeader` for back navigation. Sub-routes `settings/appearance`, `settings/habits`, `settings/data`. The Appearance row shows an accent swatch + density preview; Habits shows active count; Health metrics is an inline toggle on the hub. `BottomNav` already matched `/settings*`, so no nav change was needed.
+> **As built:** Hub at `/settings` uses new `SettingsGroup` / `SettingsRow` / `SettingsToggleRow` components plus a shared `SettingsSubHeader` for back navigation. Sub-routes `settings/habits` and `settings/data`. Habits shows active count; Health metrics is an inline toggle on the hub. `BottomNav` already matched `/settings*`, so no nav change was needed.
+>
+> **Post-ship simplification:** The **Appearance** sub-route was removed (single-user app). Accent color, weight unit, density, and roundness now stay at their fixed defaults (lime accent, `lb`, comfortable, default) — `prefsStore` still applies them on boot but exposes no UI. The "Reset preferences" action was dropped with it (it only reset those appearance prefs). Orphaned `AccentColorPicker` and `SegmentedControl` components were deleted.
 
 As a **user**, I want Settings to be easy to scan and navigate
 so that I can find appearance options, habit management, and data actions without scrolling through one long page.

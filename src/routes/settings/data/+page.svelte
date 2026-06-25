@@ -7,14 +7,12 @@
 		BackupValidationError,
 		type BackupEnvelope,
 	} from '$lib/db/backup';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
 
 	let showClearDataConfirm = $state(false);
-	let showResetPrefsConfirm = $state(false);
 	let showSeedConfirm = $state(false);
 	let clearDataError = $state<string | null>(null);
 	let clearingData = $state(false);
@@ -94,11 +92,6 @@
 		seedingData = true;
 		await loadDebugSeedData();
 	}
-
-	function handleResetPreferences() {
-		prefsStore.resetToDefaults();
-		showResetPrefsConfirm = false;
-	}
 </script>
 
 <svelte:head>
@@ -145,21 +138,11 @@
 	</section>
 
 	<section class="settings-section">
-		<h2 class="settings-section__title">Reset</h2>
+		<h2 class="settings-section__title">Clear</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Reset accent color, weight unit, completion feel, density, and roundness to their defaults. Workout data is not
-				affected.
-			</p>
-			<button class="data-action__btn data-action__btn--secondary" onclick={() => (showResetPrefsConfirm = true)}>
-				Reset preferences
-			</button>
-		</div>
-
-		<div class="data-action">
-			<p class="data-action__desc">
-				Remove session history, custom programs and exercises, weight memory, and any in-progress session. Your
-				appearance preferences are kept.
+				Remove session history, custom programs and exercises, weight memory, health readings, and any in-progress
+				session.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--danger"
@@ -177,8 +160,8 @@
 		<h2 class="settings-section__title">Advanced</h2>
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
-				Load 45 days of realistic debug data — workout sessions, activities, and habit logs — for testing graphs and
-				visualizations. Existing data is kept. Remove with "Clear workout data" above.
+				Load 45 days of realistic debug data — workout sessions, activities, habit logs, and health readings — for
+				testing graphs and visualizations. Existing data is kept. Remove with "Clear workout data" above.
 			</p>
 			<button class="data-action__btn data-action__btn--ghost" onclick={() => (showSeedConfirm = true)}>
 				Load debug data
@@ -234,20 +217,8 @@
 		onconfirm={handleLoadSeedData}
 		oncancel={() => (showSeedConfirm = false)}
 	>
-		Adds 45 days of randomized workout sessions, activities, and habit logs. Your existing data is not removed. The page
-		will reload when done.
-	</ConfirmDialog>
-{/if}
-
-{#if showResetPrefsConfirm}
-	<ConfirmDialog
-		title="Reset preferences?"
-		confirmLabel="Reset preferences"
-		danger
-		onconfirm={handleResetPreferences}
-		oncancel={() => (showResetPrefsConfirm = false)}
-	>
-		Reset accent color, weight unit, completion feel, density, and roundness to defaults?
+		Adds 45 days of randomized workout sessions, activities, habit logs, and health readings. Your existing data is not
+		removed. The page will reload when done.
 	</ConfirmDialog>
 {/if}
 

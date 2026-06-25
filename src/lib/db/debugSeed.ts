@@ -1,4 +1,13 @@
-import type { Session, ActivityLog, HabitLog, LoggedItem, LoggedSet, ActivityType, ActivityIntensity } from './types';
+import type {
+	Session,
+	ActivityLog,
+	HabitLog,
+	LoggedItem,
+	LoggedSet,
+	ActivityType,
+	ActivityIntensity,
+	HealthReading,
+} from './types';
 
 function rInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -286,10 +295,54 @@ function dayLogRate(isWorkoutDay: boolean): number {
 	return 0.82;
 }
 
+function round1(n: number): number {
+	return Math.round(n * 10) / 10;
+}
+
+/** Weight readings: a gentle downward trend with daily noise, logged most days. */
+function buildWeightReading(date: Date, dayIndex: number): HealthReading | null {
+	if (!chance(0.78)) return null;
+	const trend = 165 - (dayIndex / 44) * 7; // ~165 → ~158 over the window
+	const value = round1(trend + (Math.random() * 1.6 - 0.8));
+	const recordedAt = new Date(date);
+	recordedAt.setHours(7, rInt(0, 45), 0, 0);
+	return {
+		id: `seed-health-weight-${toDateStr(date)}`,
+		metricId: 'weight',
+		date: toDateStr(date),
+		recordedAt: recordedAt.toISOString(),
+		values: { value },
+	};
+}
+
+/** Blood pressure: logged on most days, occasionally twice (morning + evening). */
+function buildBpReadings(date: Date): HealthReading[] {
+	if (!chance(0.6)) return [];
+	const readings: HealthReading[] = [];
+	const times = chance(0.3) ? [8, 20] : [pick([8, 9, 20, 21])];
+	times.forEach((hour, i) => {
+		const recordedAt = new Date(date);
+		recordedAt.setHours(hour, rInt(0, 55), 0, 0);
+		const systolic = rInt(116, 130);
+		const diastolic = rInt(74, 84);
+		const values: HealthReading['values'] = { systolic, diastolic };
+		if (chance(0.7)) (values as { pulse?: number }).pulse = rInt(58, 78);
+		readings.push({
+			id: `seed-health-bp-${toDateStr(date)}-${i}`,
+			metricId: 'bloodPressure',
+			date: toDateStr(date),
+			recordedAt: recordedAt.toISOString(),
+			values,
+		});
+	});
+	return readings;
+}
+
 export function generateDebugSeedData(): {
 	sessions: Session[];
 	activities: ActivityLog[];
 	habitLogs: HabitLog[];
+	healthReadings: HealthReading[];
 } {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -331,5 +384,13 @@ export function generateDebugSeedData(): {
 		}
 	}
 
-	return { sessions, activities, habitLogs };
+	const healthReadings: HealthReading[] = [];
+	for (let i = 0; i < 45; i++) {
+		const date = shiftDays(start, i);
+		const weight = buildWeightReading(date, i);
+		if (weight) healthReadings.push(weight);
+		healthReadings.push(...buildBpReadings(date));
+	}
+
+	return { sessions, activities, habitLogs, healthReadings };
 }
