@@ -104,13 +104,14 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 
 ## v1.7.0 — Full Strength Catalog & PWA
 
-| Feature                        | Status   | Notes                                                                                                                                              |
-| ------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Full gym exercise catalog      | ✅ Built | 72 exercises (`strength-exercises.ts`); categories are **body-part based** (Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body); DB v7 |
-| Six strength "course" programs | ✅ Built | `strength-programs.ts`                                                                                                                             |
-| Service worker / PWA           | ✅ Built | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`)                                                                      |
+| Feature                        | Status     | Notes                                                                                                                                              |
+| ------------------------------ | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full gym exercise catalog      | ✅ Built   | 72 exercises (`strength-exercises.ts`); categories are **body-part based** (Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body); DB v7 |
+| Six strength "course" programs | ✅ Built   | `strength-programs.ts`                                                                                                                             |
+| Service worker / PWA           | ✅ Built   | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`)                                                                      |
+| Data export / backup / sync    | ❌ Planned | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — Phase 1: JSON file; Phase 2: QR + LAN merge                                          |
 
-> ⚠️ `docs/features/v1.7.0/` does not yet exist — reconstructed from code + git history. A feature folder should be backfilled.
+> `docs/features/v1.7.0/` — README backfilled from git history; US-028 added for planned export/sync work.
 
 ---
 

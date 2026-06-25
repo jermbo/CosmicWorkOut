@@ -29,9 +29,18 @@ This version does for Strength what v1.6.0 did for Belly Dance — expands a sta
 - **No Workbox.** Use SvelteKit's built-in `$service-worker` module to keep the dependency surface minimal — precache the shell, cached fallback for offline navigations.
 - **Secure-context caveat.** Install + service worker require HTTPS or `localhost`; they do **not** work over plain `http://` LAN (`npm run dev --host`). iOS install is always manual (Share → Add to Home Screen).
 
+## Planned
+
+| ID | Title | Status | Notes |
+| -- | ----- | ------ | ----- |
+| [US-028](./US-028-data-export-backup.md) | Data Export, Backup & Device Sync | ❌ Planned | Phase 1: JSON file export/import in Settings. Phase 2: QR-paired LAN sync with merge rules. No cloud. |
+
+---
+
 ## Related
 
 - [Data Model — Item](../../architecture/data-model.md#item)
 - [Offline Strategy](../../architecture/offline-strategy.md)
 - [Tech Stack — Offline / PWA](../../architecture/tech-stack.md)
 - [Implementation Status](../../implementation/status.md)
+- [US-028 — Data Export, Backup & Device Sync](./US-028-data-export-backup.md)
