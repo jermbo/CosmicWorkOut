@@ -231,6 +231,8 @@
 		text-align: center;
 		color: var(--color-text-primary);
 		outline: none;
+		-moz-appearance: textfield;
+		appearance: textfield;
 		transition: border-color var(--duration-fast) var(--ease-out);
 
 		&:focus {
@@ -238,6 +240,12 @@
 		}
 		&::placeholder {
 			color: var(--color-text-muted);
+		}
+
+		&::-webkit-inner-spin-button,
+		&::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
 		}
 	}
 

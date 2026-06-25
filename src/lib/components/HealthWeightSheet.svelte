@@ -170,27 +170,39 @@
 
 	.wt-stepper__val {
 		flex: 1;
+		align-self: stretch;
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		justify-content: center;
-		gap: 4px;
+		gap: 6px;
 		min-inline-size: 0;
+		padding-inline: var(--space-2);
 	}
 
 	.wt-stepper__input {
-		inline-size: 100%;
-		min-inline-size: 0;
+		inline-size: 5ch;
+		field-sizing: content;
+		min-inline-size: 2ch;
+		max-inline-size: 100%;
 		background: transparent;
 		border: none;
 		outline: none;
-		text-align: end;
+		text-align: center;
 		font-family: var(--font-mono);
 		font-size: 1.75rem;
 		font-weight: 700;
 		color: var(--color-text-primary);
+		-moz-appearance: textfield;
+		appearance: textfield;
 
 		&::placeholder {
 			color: var(--color-text-muted);
+		}
+
+		&::-webkit-inner-spin-button,
+		&::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
 		}
 	}
 
