@@ -163,7 +163,7 @@
 			<div class="form-field">
 				<span class="form-field__label" id="ex-cat-label">Category</span>
 				<div class="cat-chips" role="radiogroup" aria-labelledby="ex-cat-label">
-					{#each CATS as c}
+					{#each CATS as c (c)}
 						<button
 							type="button"
 							class="cat-chip"
@@ -180,7 +180,7 @@
 				<div class="form-field">
 					<span class="form-field__label" id="ex-unit-label">Weight type</span>
 					<div class="seg-control" role="radiogroup" aria-labelledby="ex-unit-label">
-						{#each UNITS as u}
+						{#each UNITS as u (u)}
 							<button
 								type="button"
 								class="seg-control__btn"
@@ -225,7 +225,7 @@
 				<div class="form-field">
 					<span class="form-field__label" id="ex-increment-label">Weight increment ({unit})</span>
 					<div class="seg-control" role="radiogroup" aria-labelledby="ex-increment-label">
-						{#each WEIGHT_INCREMENTS as inc}
+						{#each WEIGHT_INCREMENTS as inc (inc)}
 							<button
 								type="button"
 								class="seg-control__btn"

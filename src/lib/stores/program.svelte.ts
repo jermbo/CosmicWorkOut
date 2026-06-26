@@ -5,6 +5,7 @@ import { todayIso } from '$lib/date';
 import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
 import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
 import { practiceGroups, practiceGroupById } from '$lib/practice';
+import { SvelteMap } from 'svelte/reactivity';
 
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
 const LEGACY_ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
@@ -19,7 +20,7 @@ class ProgramStore {
 	loaded = $state(false);
 
 	itemMap = $derived.by(() => {
-		const map = new Map<string, Item>();
+		const map = new SvelteMap<string, Item>();
 		for (const item of this.items) {
 			map.set(item.id, item);
 		}

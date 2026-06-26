@@ -2,15 +2,13 @@
 	import HomeCard from './HomeCard.svelte';
 
 	type Props = {
-		groupCount: number;
-		planCount: number;
 		completedCount: number;
 		live: boolean;
 		headline: string;
 		detail: string;
 	};
 
-	let { groupCount, planCount, completedCount, live, headline, detail }: Props = $props();
+	let { completedCount, live, headline, detail }: Props = $props();
 
 	let badge = $derived.by<'live' | 'done' | null>(() => {
 		if (live) return 'live';
@@ -30,10 +28,8 @@
 	active={live}
 	{badge}
 >
-	{#snippet children()}
-		<p class="home-practice-card__headline">{headline}</p>
-		<p class="home-practice-card__detail">{detail}</p>
-	{/snippet}
+	<p class="home-practice-card__headline">{headline}</p>
+	<p class="home-practice-card__detail">{detail}</p>
 </HomeCard>
 
 <style>

@@ -16,28 +16,26 @@
 </script>
 
 <HomeCard href="/health" title="Health" {ariaLabel} variant="log">
-	{#snippet children()}
-		{#if !hasAny}
-			<p class="home-health-card__empty">Not logged</p>
-		{:else}
-			<div class="home-health-card__stats">
-				{#if weight}
-					<span class="home-health-card__stat">
-						<span class="home-health-card__num"
-							>{weight.values.value}<span class="home-health-card__unit">{prefsStore.weightUnit}</span></span
-						>
-						<span class="home-health-card__label">Weight</span>
-					</span>
-				{/if}
-				{#if latestBp}
-					<span class="home-health-card__stat">
-						<span class="home-health-card__num">{latestBp.values.systolic}/{latestBp.values.diastolic}</span>
-						<span class="home-health-card__label">Blood pressure</span>
-					</span>
-				{/if}
-			</div>
-		{/if}
-	{/snippet}
+	{#if !hasAny}
+		<p class="home-health-card__empty">Not logged</p>
+	{:else}
+		<div class="home-health-card__stats">
+			{#if weight}
+				<span class="home-health-card__stat">
+					<span class="home-health-card__num"
+						>{weight.values.value}<span class="home-health-card__unit">{prefsStore.weightUnit}</span></span
+					>
+					<span class="home-health-card__label">Weight</span>
+				</span>
+			{/if}
+			{#if latestBp}
+				<span class="home-health-card__stat">
+					<span class="home-health-card__num">{latestBp.values.systolic}/{latestBp.values.diastolic}</span>
+					<span class="home-health-card__label">Blood pressure</span>
+				</span>
+			{/if}
+		</div>
+	{/if}
 </HomeCard>
 
 <style>

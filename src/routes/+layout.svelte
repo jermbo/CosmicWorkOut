@@ -14,7 +14,7 @@
 	import DanceSessionOverlay from '$lib/components/DanceSessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
 	import Toaster from '$lib/components/Toaster.svelte';
-	import { STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
+	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 
 	let { children } = $props();
 

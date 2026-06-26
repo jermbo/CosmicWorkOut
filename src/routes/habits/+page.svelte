@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { Habit } from '$lib/db/types';
 	import { MOOD_SCALE } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -114,7 +115,7 @@
 			</div>
 			<fieldset class="mood-scale" aria-labelledby="mood-label">
 				<legend class="sr-only">How are you feeling? (use arrow keys to navigate)</legend>
-				{#each MOOD_SCALE_ASC as item}
+				{#each MOOD_SCALE_ASC as item (item.value)}
 					<label
 						class="mood-scale__item"
 						class:mood-scale__item--pos={item.value > 0}
@@ -141,7 +142,7 @@
 	{#if gridHabits.length === 0}
 		<div class="empty-state">
 			<p>No habits configured.</p>
-			<a href="/settings">Go to Settings to add habits</a>
+			<a href={resolve('/settings')}>Go to Settings to add habits</a>
 		</div>
 	{:else}
 		<div class="habit-grid">

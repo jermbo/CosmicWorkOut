@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { RANGE_OPTIONS, type RangeKey } from '$lib/chart-utils';
 	import { toLocalIso } from '$lib/date';
+	import { SvelteDate } from 'svelte/reactivity';
 
 	let {
 		rangeKey = $bindable<RangeKey>('last-7'),
@@ -12,13 +13,13 @@
 		customEnd?: string;
 	} = $props();
 
-	const todayStr = toLocalIso(new Date());
+	const todayStr = toLocalIso(new SvelteDate());
 
 	function handleSelect(key: RangeKey) {
 		if (key === 'custom' && !customStart) {
-			const today = new Date();
+			const today = new SvelteDate();
 			customEnd = toLocalIso(today);
-			const s = new Date(today);
+			const s = new SvelteDate(today);
 			s.setDate(s.getDate() - 29);
 			customStart = toLocalIso(s);
 		}
@@ -28,7 +29,7 @@
 
 <div class="range-bar">
 	<div class="range-chips" role="group" aria-label="Date range">
-		{#each RANGE_OPTIONS as opt}
+		{#each RANGE_OPTIONS as opt (opt.key)}
 			<button
 				class="range-chip"
 				class:range-chip--active={rangeKey === opt.key}

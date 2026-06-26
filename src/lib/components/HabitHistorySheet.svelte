@@ -33,7 +33,7 @@
 			<p class="hh-sheet__empty">No habits logged on this day.</p>
 		{:else}
 			<ul class="hh-sheet__list" role="list">
-				{#each habitRows as row}
+				{#each habitRows as row (row.habit.id)}
 					<li class="hh-sheet__item">
 						<span class="hh-sheet__name">{row.habit.name}</span>
 						<span class="hh-sheet__value">{row.label}</span>

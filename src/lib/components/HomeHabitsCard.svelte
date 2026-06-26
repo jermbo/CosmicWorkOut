@@ -15,21 +15,19 @@
 </script>
 
 <HomeCard href="/habits" title="Habits" {ariaLabel} variant="habits">
-	{#snippet children()}
-		{#if total === 0}
-			<p class="home-habits-card__empty">Add habits in Settings to get started.</p>
-		{:else}
-			<div class="home-habits-card__summary">
-				<span class="home-habits-card__count">{logged}</span>
-				<span class="home-habits-card__sep">/</span>
-				<span class="home-habits-card__total">{total}</span>
-				<span class="home-habits-card__label">habits logged</span>
-			</div>
-			{#if logged === total}
-				<p class="home-habits-card__done-note">All done today!</p>
-			{/if}
+	{#if total === 0}
+		<p class="home-habits-card__empty">Add habits in Settings to get started.</p>
+	{:else}
+		<div class="home-habits-card__summary">
+			<span class="home-habits-card__count">{logged}</span>
+			<span class="home-habits-card__sep">/</span>
+			<span class="home-habits-card__total">{total}</span>
+			<span class="home-habits-card__label">habits logged</span>
+		</div>
+		{#if logged === total}
+			<p class="home-habits-card__done-note">All done today!</p>
 		{/if}
-	{/snippet}
+	{/if}
 </HomeCard>
 
 <style>

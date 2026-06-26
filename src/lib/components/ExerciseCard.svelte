@@ -89,7 +89,7 @@
 	</header>
 
 	<div class="exercise-card__sets" role="group" aria-label={`Sets for ${exercise.name}`}>
-		{#each activeExercise.sets as set, setIndex}
+		{#each activeExercise.sets as set, setIndex (setIndex)}
 			<SetTile {set} onTap={() => onSetTap(exerciseIndex, setIndex)} />
 		{/each}
 	</div>

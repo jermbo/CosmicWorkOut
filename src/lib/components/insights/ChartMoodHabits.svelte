@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { Chart, chartTheme } from '$lib/chart-utils';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
 
@@ -15,9 +16,9 @@
 		const coffeeHabit = habitStore.habits.find((h) => h.name.toLowerCase().includes('coffee'));
 		const waterHabit = habitStore.habits.find((h) => h.name.toLowerCase().includes('water'));
 
-		const logMap = new Map<string, Map<string, number>>();
+		const logMap = new SvelteMap<string, SvelteMap<string, number>>();
 		for (const log of habitStore.logs) {
-			if (!logMap.has(log.habitId)) logMap.set(log.habitId, new Map());
+			if (!logMap.has(log.habitId)) logMap.set(log.habitId, new SvelteMap());
 			logMap.get(log.habitId)!.set(log.date, log.value);
 		}
 

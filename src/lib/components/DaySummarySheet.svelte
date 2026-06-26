@@ -135,7 +135,7 @@
 		{#if habitEntries.length > 0}
 			<div class="day-summary__habits">
 				<p class="day-summary__habits-title">Habits</p>
-				{#each habitEntries as entry}
+				{#each habitEntries as entry (entry.name)}
 					<div class="day-summary__habit-row">
 						<span class="day-summary__habit-name">{entry.name}</span>
 						<span class="day-summary__habit-value">{entry.valueStr}</span>

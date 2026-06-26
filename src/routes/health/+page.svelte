@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HealthReading, BloodPressureValues } from '$lib/db/types';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -10,7 +11,7 @@
 
 	// Feature is gated — bounce out if it was disabled while navigating here.
 	$effect(() => {
-		if (!prefsStore.healthMetricsEnabled) goto('/');
+		if (!prefsStore.healthMetricsEnabled) goto(resolve('/'));
 	});
 
 	let contextDate = $derived(loggingContext.date);

@@ -314,7 +314,7 @@
 
 						{#if displayItemsForRoutine(workout).length > 0}
 							<div class="workout-card__chips" role="list" aria-label="Items in {workout.name}">
-								{#each displayItemsForRoutine(workout) as we}
+								{#each displayItemsForRoutine(workout) as we (we.itemId)}
 									{@const ex = programStore.itemMap.get(we.itemId)}
 									{#if ex}
 										<span class="workout-card__chip" role="listitem">{ex.name}</span>

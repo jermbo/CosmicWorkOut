@@ -2,7 +2,7 @@
 	import { onMount, untrack } from 'svelte';
 	import type { Program, Routine, RoutineItem, RoutineSection, Item } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { disciplineById, routineALetter, effectiveSectionItems } from '$lib/discipline';
+	import { disciplineById, routineALetter } from '$lib/discipline';
 	import ItemLibrarySheet from './ItemLibrarySheet.svelte';
 	import Icon from './Icon.svelte';
 
@@ -101,7 +101,11 @@
 				items: [],
 			};
 			if (!inheritsBookend) {
-				section.items = s.items.map(({ _key, ...rest }) => rest);
+				section.items = s.items.map((item) => {
+					const { _key: _itemKey, ...rest } = item;
+					void _itemKey;
+					return rest;
+				});
 			}
 			if (overrides) {
 				section.overridesBookends = true;

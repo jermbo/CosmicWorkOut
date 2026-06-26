@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
@@ -92,7 +93,7 @@
 <div class="page page--wide workout-page">
 	<PageHeader title="Workout" showBack>
 		{#snippet trailing()}
-			<a href="/program" class="workout-page__programs-link">Programs</a>
+			<a href={resolve('/program')} class="workout-page__programs-link">Programs</a>
 		{/snippet}
 	</PageHeader>
 
@@ -110,7 +111,7 @@
 	{:else if !viewingProgram}
 		<div class="workout-page__no-program">
 			<p>No plan selected.</p>
-			<a href="/practice/workout" class="workout-page__choose-btn"> Choose a plan </a>
+			<a href={resolve('/practice/workout')} class="workout-page__choose-btn"> Choose a plan </a>
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<div class="session-done">
@@ -155,7 +156,7 @@
 	{:else}
 		<div class="workout-page__no-program">
 			<p>No workout scheduled for this week.</p>
-			<a href="/program" class="workout-page__program-link">View program</a>
+			<a href={resolve('/program')} class="workout-page__program-link">View program</a>
 		</div>
 	{/if}
 </div>

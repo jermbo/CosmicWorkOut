@@ -70,4 +70,4 @@
 	});
 </script>
 
-<canvas bind:this={canvas} role="img" aria-label="Radar chart: average consistency per habit"></canvas>
+<canvas bind:this={canvas} aria-label="Radar chart: average consistency per habit"></canvas>

@@ -2,6 +2,7 @@ import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
+import { SvelteMap } from 'svelte/reactivity';
 
 const LAST_TYPE_KEY = 'cwout:lastActivityType';
 
@@ -20,7 +21,7 @@ class ActivityStore {
 	});
 
 	activitiesByDate = $derived.by(() => {
-		const map = new Map<string, ActivityLog[]>();
+		const map = new SvelteMap<string, ActivityLog[]>();
 		for (const a of this.activities) {
 			const list = map.get(a.date) ?? [];
 			list.push(a);

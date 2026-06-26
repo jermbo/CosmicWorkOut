@@ -1,4 +1,6 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic href props use resolveHref() */
+	import { resolveHref } from '$lib/navigation';
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
 
@@ -12,7 +14,7 @@
 	let { href, label, detail, preview }: Props = $props();
 </script>
 
-<a {href} class="settings-row">
+<a href={resolveHref(href)} class="settings-row">
 	<span class="settings-row__label">{label}</span>
 	<span class="settings-row__trailing">
 		{#if preview}

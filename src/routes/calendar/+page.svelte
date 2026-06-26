@@ -24,6 +24,7 @@
 	import HabitHistorySheet from '$lib/components/HabitHistorySheet.svelte';
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import { SvelteDate, SvelteMap } from 'svelte/reactivity';
 
 	const WEEKDAY_HEADERS = weekdayHeadersMondayFirst(2);
 
@@ -33,11 +34,10 @@
 	let habitHistoryDate = $state<string | null>(null);
 	let editingActivity = $state<ActivityLog | null>(null);
 
-	const today = new Date();
 	const todayStr = todayIso();
 
 	let sessionsByDate = $derived.by(() => {
-		const map = new Map<string, Session[]>();
+		const map = new SvelteMap<string, Session[]>();
 		for (const s of programStore.sessions) {
 			const list = map.get(s.date) ?? [];
 			list.push(s);
@@ -93,13 +93,13 @@
 	}
 
 	function prevMonth() {
-		const d = new Date(viewDate);
+		const d = new SvelteDate(viewDate);
 		d.setMonth(d.getMonth() - 1);
 		viewDate = d;
 	}
 
 	function nextMonth() {
-		const d = new Date(viewDate);
+		const d = new SvelteDate(viewDate);
 		d.setMonth(d.getMonth() + 1);
 		viewDate = d;
 	}
@@ -188,9 +188,7 @@
 		return loggedDays;
 	});
 
-	let isAtCurrentMonth = $derived(
-		viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth(),
-	);
+	let isAtCurrentMonth = $derived(monthIsoKey(viewDate) === todayStr.slice(0, 7));
 
 	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
 		const base = formatMonthDayLong(viewDate, dayNum);
@@ -245,13 +243,13 @@
 
 		<div class="calendar-month__grid" role="grid" aria-label={formatMonthYear(viewDate)}>
 			<div class="calendar-month__weekdays" role="row">
-				{#each WEEKDAY_HEADERS as day}
+				{#each WEEKDAY_HEADERS as day (day)}
 					<div class="calendar-month__weekday" role="columnheader" aria-label={day}>{day}</div>
 				{/each}
 			</div>
 
 			<div class="calendar-month__days" role="rowgroup">
-				{#each calendarDays as cell}
+				{#each calendarDays as cell (cell.date ?? cell.dayNum)}
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
 						{@const hasStrength = hasStrengthSession(cell.date)}

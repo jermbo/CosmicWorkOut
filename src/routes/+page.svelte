@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
@@ -9,7 +10,7 @@
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { todayIso } from '$lib/date';
-	import { BELLYDANCE_DISCIPLINE_ID, STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import { computePracticeNextUp } from '$lib/practice';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import WeekStreakBadge from '$lib/components/WeekStreakBadge.svelte';
@@ -91,7 +92,11 @@
 </svelte:head>
 
 <div class="page page--wide home-page">
-	<PageHeader title="Overview" dayIndicators={weekIndicators} onDateChange={() => goto('/', { replaceState: true })}>
+	<PageHeader
+		title="Overview"
+		dayIndicators={weekIndicators}
+		onDateChange={() => goto(resolve('/'), { replaceState: true })}
+	>
 		{#snippet trailing()}
 			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
 		{/snippet}
@@ -100,8 +105,6 @@
 	<div class="home-cards">
 		<HomeHabitsCard logged={habitsLogged} total={habitsTotal} />
 		<HomePracticeHubCard
-			groupCount={practiceNextUp.groupCount}
-			planCount={practiceNextUp.planCount}
 			completedCount={practiceNextUp.completedCount}
 			live={practiceNextUp.live}
 			headline={practiceNextUp.headline}

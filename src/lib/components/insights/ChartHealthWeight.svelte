@@ -3,6 +3,7 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { isWeightReading } from '$lib/health/metrics';
 	import { Chart, chartTheme } from '$lib/chart-utils';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
 
@@ -14,7 +15,7 @@
 		const { accent, textSecondary, gridOpts, tickOpts } = chartTheme();
 		const unit = prefsStore.weightUnit;
 
-		const byDate = new Map<string, number>();
+		const byDate = new SvelteMap<string, number>();
 		for (const r of healthStore.readings) {
 			if (isWeightReading(r)) byDate.set(r.date, r.values.value);
 		}

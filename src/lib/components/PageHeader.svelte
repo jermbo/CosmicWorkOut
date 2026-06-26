@@ -1,6 +1,8 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import type { Snippet } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { resolveHref } from '$lib/navigation';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { formatWeekdayShortDate, todayIso } from '$lib/date';
@@ -53,7 +55,7 @@
 		<div class="page-header__text">
 			<div class="page-header__eyebrow-row">
 				{#if showBack}
-					<button class="page-header__back" onclick={() => goto(backHref)} aria-label="Back">
+					<button class="page-header__back" onclick={() => goto(resolveHref(backHref))} aria-label="Back">
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"

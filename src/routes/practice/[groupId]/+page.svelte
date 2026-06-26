@@ -1,4 +1,6 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- program route helper uses resolveHref() */
+	import { resolveHref } from '$lib/navigation';
 	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
@@ -86,7 +88,9 @@
 
 		<div class="group-page__toolbar">
 			<button class="group-page__add" type="button" onclick={() => (showAddPractice = true)}> Add plan </button>
-			<a class="group-page__manage" href={programRouteForDiscipline(group.disciplineIds[0])}> Manage plans </a>
+			<a class="group-page__manage" href={resolveHref(programRouteForDiscipline(group.disciplineIds[0]))}>
+				Manage plans
+			</a>
 		</div>
 
 		{#if activePlans.length === 0}
@@ -109,12 +113,10 @@
 							active={info.live}
 							badge={planBadge(info)}
 						>
-							{#snippet children()}
-								<p class="group-plan__name">{info.name}</p>
-								{#if info.meta}
-									<p class="group-plan__meta">{info.meta}</p>
-								{/if}
-							{/snippet}
+							<p class="group-plan__name">{info.name}</p>
+							{#if info.meta}
+								<p class="group-plan__meta">{info.meta}</p>
+							{/if}
 						</HomeCard>
 						<div class="group-plan__actions">
 							<button

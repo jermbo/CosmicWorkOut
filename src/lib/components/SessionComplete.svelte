@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { formatDuration, formatVolume, formatCountWithWord } from '$lib/format';
+	import { resolve } from '$app/paths';
+	import { formatDuration, formatVolume } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
@@ -12,7 +13,7 @@
 
 	async function handleSeeCalendar() {
 		sessionStore.dismissComplete();
-		await goto('/calendar');
+		await goto(resolve('/calendar'));
 	}
 
 	let session = $derived(sessionStore.completedSession);

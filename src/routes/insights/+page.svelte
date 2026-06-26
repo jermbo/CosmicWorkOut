@@ -94,7 +94,7 @@
 					<h2 class="chart-section__title">Weekly Volume</h2>
 					<p class="chart-section__desc">Total pounds lifted per week.</p>
 					<div class="chart-wrap">
-						<ChartWeeklyVolume {dates} {xLabels} />
+						<ChartWeeklyVolume {dates} />
 					</div>
 				</section>
 			{/if}

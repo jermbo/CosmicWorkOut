@@ -1,10 +1,13 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- week date navigation uses resolveHref() */
 	import type { Session } from '$lib/db/types';
 	import { goto } from '$app/navigation';
+	import { resolveHref } from '$lib/navigation';
 	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
 	import { formatWeeksAgo } from '$lib/format';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { SvelteDate } from 'svelte/reactivity';
 
 	type Props = {
 		sessions: Session[];
@@ -22,7 +25,7 @@
 		const monday = fromIso(weekStartStr);
 
 		for (let i = 0; i < 7; i++) {
-			const d = new Date(monday);
+			const d = new SvelteDate(monday);
 			d.setDate(monday.getDate() + i);
 			const dateStr = toLocalIso(d);
 
@@ -99,7 +102,7 @@
 	function navigateToDate(dateStr: string) {
 		loggingContext.setDate(dateStr);
 		if (!stayOnPage) {
-			goto(dateDestination(dateStr));
+			goto(resolveHref(dateDestination(dateStr)));
 		}
 	}
 
@@ -146,7 +149,7 @@
 	</div>
 
 	<div class="week-strip__days" aria-label="Days in {weekLabel}">
-		{#each weekDays as day}
+		{#each weekDays as day (day.dateStr)}
 			<button
 				type="button"
 				class="week-day"
@@ -174,7 +177,7 @@
 					></span>
 				{:else if indicatorsForDay(day.dateStr).length > 0}
 					<span class="week-day__indicators" aria-hidden="true">
-						{#each indicatorsForDay(day.dateStr) as indicator}
+						{#each indicatorsForDay(day.dateStr) as indicator (indicator)}
 							<span class="week-day__indicator-dot week-day__indicator-dot--{indicator}"></span>
 						{/each}
 					</span>

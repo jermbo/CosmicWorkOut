@@ -88,7 +88,7 @@
 			<p class="add-practice__lead">Turn plans on or off. History is always kept when you pause.</p>
 
 			<div class="add-practice__filters" role="tablist" aria-label="Plan filter">
-				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label]}
+				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
 					<button
 						type="button"
 						class="add-practice__filter"

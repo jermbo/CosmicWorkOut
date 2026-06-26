@@ -160,7 +160,7 @@
 
 		<div class="session-overlay__exercises">
 			{#if sessionStore.active}
-				{#each activeItems as activeExercise, exerciseIndex}
+				{#each activeItems as activeExercise, exerciseIndex (activeExercise.itemId)}
 					{@const exercise = programStore.getItemById(activeExercise.itemId)}
 					{#if exercise}
 						<ExerciseCard {activeExercise} {exercise} {exerciseIndex} onSetTap={handleSetTap} />

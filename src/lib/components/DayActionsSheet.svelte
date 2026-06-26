@@ -1,5 +1,7 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- day action routes use resolveHref() */
 	import { goto } from '$app/navigation';
+	import { resolveHref } from '$lib/navigation';
 	import type { Session, ActivityLog } from '$lib/db/types';
 	import { formatLongDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
@@ -49,7 +51,7 @@
 
 	function navigate(path: string) {
 		onClose();
-		goto(path);
+		goto(resolveHref(path));
 	}
 
 	function durationLabelFor(session: Session): string | null {
