@@ -1,6 +1,6 @@
 # US-030 — Settings Hub Restructure
 
-> **Status: ✅ Shipped — v1.7.0**
+> **Status: Shipped — v1.7.0**
 >
 > Replace the long single-page Settings scroll with a compact **hub** and focused **sub-routes**. Makes room for [US-028](./US-028-data-export-backup.md) (backup) and [US-029](./US-029-health-metrics.md) (health toggle) without more scroll fatigue.
 >

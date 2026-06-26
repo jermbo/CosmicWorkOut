@@ -1,6 +1,6 @@
 # US-010 — Habit History in Calendar
 
-> **Status: ✅ Shipped — v1.3.0**
+> **Status: Shipped — v1.3.0**
 >
 > Carried from v1.2.0. Habit log data is stored and queryable by date; Calendar integration has not been started.
 

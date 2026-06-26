@@ -1,6 +1,6 @@
 # US-023 — Mood vs Coffee & Water Chart
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > A multi-axis line chart plotting mood alongside coffee and water intake over the last 45 days. The most personal chart in the set — reveals whether caffeine or hydration correlate with how the user feels.
 

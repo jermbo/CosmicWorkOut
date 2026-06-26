@@ -2,7 +2,7 @@
 
 > **Current phase:** Use the app, gather feedback. Versions v1.1–v1.7 are shipped; new work waits on what we learn from real usage.
 
-Ideas that were deferred, cut, or only partially built live here — not scattered as "Out of Scope" tables in shipped feature folders. When something ships, move it back to a feature story and mark it ✅ in [Implementation Status](../implementation/status.md).
+Ideas that were deferred, cut, or only partially built live here — not scattered as "Out of Scope" tables in shipped feature folders. When something ships, move it back to a feature story and mark it Built in [Implementation Status](../implementation/status.md).
 
 ---
 

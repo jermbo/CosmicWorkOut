@@ -39,12 +39,12 @@ Implement in order — US-022 (hub + nav) must land first; charts can be built i
 
 | ID                                             | Title                         | Status  | Depends on |
 | ---------------------------------------------- | ----------------------------- | ------- | ---------- |
-| [US-022](./US-022-insights-hub.md)             | Insights Hub & Navigation     | ✅ Done | —          |
-| [US-023](./US-023-mood-habits-chart.md)        | Mood vs Coffee & Water Chart  | ✅ Done | US-022     |
-| [US-024](./US-024-weekly-volume-chart.md)      | Weekly Training Volume Chart  | ✅ Done | US-022     |
-| [US-025](./US-025-activity-breakdown-chart.md) | Activity Type Breakdown Chart | ✅ Done | US-022     |
-| [US-026](./US-026-habit-radar-chart.md)        | Habit Balance Radar Chart     | ✅ Done | US-022     |
-| [US-027](./US-027-exercise-progress-chart.md)  | Top Exercise Progress Chart   | ✅ Done | US-022     |
+| [US-022](./US-022-insights-hub.md)             | Insights Hub & Navigation     | Done    | —          |
+| [US-023](./US-023-mood-habits-chart.md)        | Mood vs Coffee & Water Chart  | Done    | US-022     |
+| [US-024](./US-024-weekly-volume-chart.md)      | Weekly Training Volume Chart  | Done    | US-022     |
+| [US-025](./US-025-activity-breakdown-chart.md) | Activity Type Breakdown Chart | Done    | US-022     |
+| [US-026](./US-026-habit-radar-chart.md)        | Habit Balance Radar Chart     | Done    | US-022     |
+| [US-027](./US-027-exercise-progress-chart.md)  | Top Exercise Progress Chart   | Done    | US-022     |
 
 ---
 

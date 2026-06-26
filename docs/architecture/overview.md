@@ -9,9 +9,9 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 ```mermaid
 flowchart TB
     subgraph browser ["Browser"]
-        UI["SvelteKit UI\n11 routes + overlays"]
-        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · health 🟡 · loggingContext · toast"]
-        IDB[("IndexedDB v7 → v8 🟡\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities\nhealthReadings 🟡")]
+        UI["SvelteKit UI\nroutes + overlays"]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · health · loggingContext · toast"]
+        IDB[("IndexedDB v8\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities\nhealthReadings")]
         LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
         SW["Service Worker\nprecaches app shell"]
     end
@@ -20,6 +20,15 @@ flowchart TB
     Stores <--> IDB
     Stores <--> LS
     UI -.-> SW
+
+    classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef state fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef store fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef worker fill:#465569,stroke:#28313e,color:#ffffff;
+    class UI ui;
+    class Stores state;
+    class IDB,LS store;
+    class SW worker;
 ```
 
 After the first page load the app runs entirely in the browser. A service worker (`src/service-worker.ts`) precaches the app shell for offline launch and PWA install — see [Offline Strategy](offline-strategy.md).
@@ -30,7 +39,7 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-Eleven routes today; **`/health` planned** ([US-029](../features/v1.7.0/US-029-health-metrics.md)): **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), **Settings** (`/settings`), plus global overlays (active session, completion screen, crash recovery) in the root layout.
+The shipped routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `appearance` / `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout.
 
 The UI reads and writes through the Svelte stores — no REST, no server state.
 
@@ -38,7 +47,7 @@ See [App Structure](../implementation/app-structure.md) and [Tech Stack](tech-st
 
 ### Data Layer — IndexedDB + localStorage
 
-Persistent data in IndexedDB (version 7) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, per-Discipline active programs, and last-used activity type in localStorage for synchronous access.
+Persistent data in IndexedDB (version 8) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, per-Discipline active programs, and last-used activity type in localStorage for synchronous access.
 
 See [Data Model](data-model.md) and [State Management](../implementation/state.md).
 
@@ -81,7 +90,7 @@ sequenceDiagram
     participant Sess as sessionStore
     participant UI as Today view
 
-    Layout->>DB: open IndexedDB v2, seed data, run migrations
+    Layout->>DB: open IndexedDB v8, seed data, run migrations
     Layout->>Prefs: load() + apply CSS vars
     Layout->>Prog: load() programs, exercises, sessions
     Layout->>Hab: load() habits, habit logs
@@ -158,6 +167,6 @@ See [Program Progression](../implementation/program-progression.md).
 - [How It Works](../implementation/behavior.md) — Mental model for the whole app
 - [Data Model](data-model.md) — What gets stored
 - [Tech Stack](tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
-- [Offline Strategy](offline-strategy.md) — What's built vs planned
+- [Offline Strategy](offline-strategy.md) — Local-first persistence and caching
 - [Implementation Status](../implementation/status.md) — Feature checklist
 - [North Star](../vision/north-star.md) — Why this architecture

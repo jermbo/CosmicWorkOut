@@ -1,6 +1,6 @@
 # US-031 — Default Habits & Mood Scale Tweak
 
-> **Status: ✅ Shipped — v1.7.0**
+> **Status: Shipped — v1.7.0**
 >
 > Adjusts built-in habits, default order, mood scale label, and mood immutability.
 

@@ -51,15 +51,15 @@ US-015 introduces the Discipline engine and these generalized entities (and re-s
 
 Implement in order — each story builds on the previous.
 
-| ID                                                 | Title                                       | Status   | Depends on |
-| -------------------------------------------------- | ------------------------------------------- | -------- | ---------- |
-| [US-015](./US-015-discipline-engine-foundation.md) | Discipline Engine Foundation                | ✅ Built | —          |
-| [US-016](./US-016-practice-item-library.md)        | Item Library (Discipline-scoped)            | ✅ Built | US-015     |
-| [US-017](./US-017-belly-dance-program-routines.md) | Belly Dance Discipline, Program & Routines  | ✅ Built | US-016     |
-| [US-018](./US-018-practice-hub-navigation.md)      | Practice Hub & Navigation                   | ✅ Built | US-017     |
-| [US-019](./US-019-dance-session-flow.md)           | Dance Session Flow                          | ✅ Built | US-018     |
-| [US-020](./US-020-practice-streaks-calendar.md)    | Cross-Discipline Streaks & Calendar History | ✅ Built | US-019     |
-| [US-021](./US-021-practice-groups-plans.md)        | Practice Groups & Plans                     | ✅ Built | US-018     |
+| ID                                                 | Title                                       | Status | Depends on |
+| -------------------------------------------------- | ------------------------------------------- | ------ | ---------- |
+| [US-015](./US-015-discipline-engine-foundation.md) | Discipline Engine Foundation                | Built  | —          |
+| [US-016](./US-016-practice-item-library.md)        | Item Library (Discipline-scoped)            | Built  | US-015     |
+| [US-017](./US-017-belly-dance-program-routines.md) | Belly Dance Discipline, Program & Routines  | Built  | US-016     |
+| [US-018](./US-018-practice-hub-navigation.md)      | Practice Hub & Navigation                   | Built  | US-017     |
+| [US-019](./US-019-dance-session-flow.md)           | Dance Session Flow                          | Built  | US-018     |
+| [US-020](./US-020-practice-streaks-calendar.md)    | Cross-Discipline Streaks & Calendar History | Built  | US-019     |
+| [US-021](./US-021-practice-groups-plans.md)        | Practice Groups & Plans                     | Built  | US-018     |
 
 ---
 

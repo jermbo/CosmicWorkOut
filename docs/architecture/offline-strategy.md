@@ -1,6 +1,6 @@
 # Offline Strategy
 
-Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers what's **implemented today** and what's **planned**.
+Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers how local-first persistence and offline caching work today. Deferred portability work (device-to-device sync) lives on the [roadmap](../roadmap/device-sync.md).
 
 ---
 
@@ -14,8 +14,6 @@ The app must be fully functional from the moment it launches, regardless of netw
 
 ## Storage Map
 
-🟡 = planned ([US-029](../features/v1.7.0/US-029-health-metrics.md)), not yet in code.
-
 ```mermaid
 flowchart LR
     subgraph idb ["IndexedDB — persistent"]
@@ -23,7 +21,7 @@ flowchart LR
         P[programs<br/>editor save]
         S[sessions<br/>session finish]
         ELU[itemLastUsed<br/>each set confirm]
-        HR[healthReadings<br/>each reading 🟡]
+        HR[healthReadings<br/>each reading]
     end
 
     subgraph ls ["localStorage — synchronous"]
@@ -31,6 +29,11 @@ flowchart LR
         ACTIVE[cwout:activeSession<br/>each set confirm]
         PROGID[cwout:activeProgramIds<br/>program load]
     end
+
+    classDef persistent fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef sync fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    class E,P,S,ELU,HR persistent;
+    class PREFS,ACTIVE,PROGID sync;
 ```
 
 | Store                    | Technology   | Written When                                |
@@ -39,7 +42,7 @@ flowchart LR
 | `programs`               | IndexedDB    | On routine save in editor                   |
 | `sessions`               | IndexedDB    | On session finish                           |
 | `itemLastUsed`           | IndexedDB    | On each set confirm                         |
-| `healthReadings` 🟡      | IndexedDB    | On each health log / edit / delete (US-029) |
+| `healthReadings`         | IndexedDB    | On each health log / edit / delete (US-029) |
 | `cwout:prefs`            | localStorage | On every preference change                  |
 | `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
 | `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
@@ -74,6 +77,13 @@ flowchart TD
     Banner -->|Discard| Clear[Clear activeSession]
     Finish[Session finish] --> Clear
     Abandon[Session abandon] --> Clear
+
+    classDef start fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef decision fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class Boot,Finish,Abandon start;
+    class Check,Today decision;
+    class Ready,Banner,Restore,Clear,Discard done;
 ```
 
 Implemented in `sessionStore.checkForRecovery()` and the recovery banner in `+layout.svelte`.
@@ -126,7 +136,7 @@ Optional body measurements (weight, blood pressure). See [US-029](../features/v1
 ## Related
 
 - [Data Model](data-model.md) — What's being stored
-- [Tech Stack](tech-stack.md) — IndexedDB wrapper, planned Workbox
+- [Tech Stack](tech-stack.md) — IndexedDB wrapper, service worker (no Workbox)
 - [State Management](../implementation/state.md) — Store write paths
 - [Design Principles](../vision/principles.md) — Why offline is non-negotiable
 - [US-028 — Data Export, Backup & Device Sync](../features/v1.7.0/US-028-data-export-backup.md)

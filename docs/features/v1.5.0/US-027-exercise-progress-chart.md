@@ -1,6 +1,6 @@
 # US-027 — Top Exercise Progress Chart
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > A multi-line chart showing max weight lifted per session for the top exercises by frequency. The clearest signal of strength progress over time.
 

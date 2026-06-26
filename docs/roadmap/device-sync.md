@@ -1,8 +1,8 @@
 # Device-to-Device Sync
 
-> **Status:** 📋 Roadmap — not started  
+> **Status:** Roadmap — not started  
 > **Origin:** [US-028 Phase 2](../features/v1.7.0/US-028-data-export-backup.md)  
-> **Depends on:** Phase 1 file export/import (✅ shipped on Settings → Data)
+> **Depends on:** Phase 1 file export/import (shipped on Settings → Data)
 
 Ongoing sync between phone and computer (or two phones) without cloud services. Phase 1 covers one-shot JSON backup files; this doc covers QR-paired peer sync with merge rules.
 
@@ -137,6 +137,15 @@ flowchart TD
     W3 --> R
     W5 --> R
     W4 --> R
+
+    classDef input fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef engine fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef rule fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef result fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class A,B input;
+    class M,C engine;
+    class U,W1,W2,W3,W4,W5 rule;
+    class R result;
 ```
 
 ---

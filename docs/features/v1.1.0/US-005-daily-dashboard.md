@@ -1,6 +1,6 @@
 # US-005 — Daily Dashboard
 
-> **Status: ✅ Shipped — superseded by v1.2.0**
+> **Status: Shipped — superseded by v1.2.0**
 >
 > The three-section dashboard (Workout, Habits, Activity) shipped in v1.1.0. v1.2.0 [US-007](../v1.2.0/US-007-home-screen-redesign.md) replaced it with overview cards routing to dedicated pages. Program-complete state shipped in v1.2.0 [US-011](../v1.2.0/US-011-program-complete-state.md).
 

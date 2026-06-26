@@ -16,6 +16,13 @@ flowchart TB
     P4 --> UI[Components + animations]
     P5 --> Scope[Feature scope decisions]
     P6 --> TS[Tech Stack]
+
+    classDef root fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef principle fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef outcome fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    class NS root;
+    class P1,P2,P3,P4,P5,P6 principle;
+    class SL,OS,PM,UI,Scope,TS outcome;
 ```
 
 ---

@@ -12,12 +12,12 @@ Defining, selecting, and editing fitness programs.
 
 | Area                         | Status   |
 | ---------------------------- | -------- |
-| Program picker / switching   | ✅ Built |
-| Create program from scratch  | ✅ Built |
-| Copy built-in before editing | ✅ Built |
-| Custom item CRUD             | ✅ Built |
-| Browse all program weeks     | ✅ Built |
-| Multi-plan activation        | ✅ Built | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
+| Program picker / switching   | Built |                                                                                |
+| Create program from scratch  | Built |                                                                                |
+| Copy built-in before editing | Built |                                                                                |
+| Custom item CRUD             | Built |                                                                                |
+| Browse all program weeks     | Built |                                                                                |
+| Multi-plan activation        | Built | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
 
 **Roadmap:** week-by-week schedule preview in program picker — [roadmap](../roadmap/README.md#ux-polish).
 
@@ -35,12 +35,21 @@ flowchart TB
     Prog --> Wdot["..."]
     Prog --> W12[Week 12]
 
-    W1 --> WA["Workout A<br/>Lower + Lateral"]
-    W1 --> WB["Workout B<br/>Upper + Reactive"]
-    W1 --> WC["Workout C<br/>Full + Conditioning"]
+    W1 --> WA["Routine A<br/>Lower + Lateral"]
+    W1 --> WB["Routine B<br/>Upper + Reactive"]
+    W1 --> WC["Routine C<br/>Full + Conditioning"]
 
-    WA --> WE1[WorkoutExercise]
-    WE1 --> Ex[Exercise in library]
+    WA --> WE1[RoutineItem]
+    WE1 --> Ex[Item in library]
+
+    classDef program fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef week fill:#465569,stroke:#28313e,color:#ffffff;
+    classDef routine fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef item fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    class Prog program;
+    class W1,W2,Wdot,W12 week;
+    class WA,WB,WC routine;
+    class WE1,Ex item;
 ```
 
 ---
@@ -49,11 +58,9 @@ flowchart TB
 
 The app ships with a small set of ready-to-use programs. These act as starting points — users should be able to copy and modify them, not just run them as-is.
 
-Currently shipped:
+Currently shipped: **12 built-in "course" programs** — 6 Strength and 6 Belly Dance (Beginner/Intermediate 101–103 each), seeded from `src/lib/db/seed.ts`.
 
-- **Strength Foundation (12 weeks, 3 days/week)** — workouts A (Lower + Lateral), B (Upper + Reactive), C (Full + Conditioning). Seeded from `src/lib/db/seed.ts`.
-
-Built-in programs are intended to be read-only with copy-to-edit, but today they are editable in-place via the workout editor.
+Built-in programs are read-only: editing one prompts a copy-first guard that clones the program before any change is saved.
 
 ---
 
@@ -63,9 +70,7 @@ Built-in programs are intended to be read-only with copy-to-edit, but today they
 
 > As a user, I want to see what programs are available and activate one, so I know what to do each week.
 
-**Built today:** First program in IndexedDB auto-selected on boot and stored in `cwout:activeProgramId`. No selection UI.
-
-**Target:** Program picker screen; ability to switch programs while preserving history.
+**Built today:** A `ProgramSelectSheet` lists programs per Discipline; activating one stores its id in `cwout:activeProgramIds` (one active plan per Discipline). Switching programs preserves all history. Built-in programs deep-clone before activating where needed.
 
 ---
 
@@ -75,13 +80,10 @@ Built-in programs are intended to be read-only with copy-to-edit, but today they
 
 **Built today:**
 
-- Week 1 workout templates (A/B/C) shown as cards with exercise chips
+- Routine cards (A/B/C) for the selected week, shown with item chips
 - Week progress bar (derived from session count)
-- Today / done / scheduled badges on workout cards
-
-**Target (not yet):**
-
-- Navigate and browse all weeks individually
+- Today / done / scheduled badges on routine cards
+- Week picker chevrons to browse every week individually
 
 ---
 
@@ -104,18 +106,17 @@ Built-in programs are intended to be read-only with copy-to-edit, but today they
 sequenceDiagram
     actor User
     participant Prog as Program page
-    participant Editor as WorkoutEditor
-    participant Lib as ExerciseLibrarySheet
+    participant Editor as Routine editor
+    participant Lib as Item library sheet
     participant Store as programStore
     participant IDB as IndexedDB
 
-    User->>Prog: tap Edit on workout card
+    User->>Prog: tap Edit on routine card
     Prog->>Editor: open full-screen editor
-    User->>Editor: add/remove/reorder exercises
-    User->>Lib: browse exercise library
-    Lib-->>Editor: select exercise
+    User->>Editor: add/remove/reorder items
+    User->>Lib: browse item library
+    Lib-->>Editor: select item
     User->>Editor: save
-    Editor->>Store: saveWorkoutExercises(name, exercises)
     Store->>IDB: put program (all weeks updated)
 ```
 
@@ -148,14 +149,14 @@ sequenceDiagram
 
 ## Answered by Current Behavior
 
-- **One active program at a time.** Stored in `cwout:activeProgramId`. Auto-selects first program on boot.
-- **Skipping days doesn't shift the schedule.** Next open always shows the next workout in linear sequence.
-- **Editing mid-cycle doesn't change history.** Completed SessionLogs keep their original data; edits affect future sessions only.
+- **One active program per Discipline.** Active plan ids stored in `cwout:activeProgramIds`; a Strength and a Belly Dance plan can run concurrently.
+- **Skipping days doesn't shift the schedule.** Next open always shows the next routine in linear sequence.
+- **Editing mid-cycle doesn't change history.** Completed Sessions keep their original data; edits affect future sessions only.
 
 ---
 
 ## Related
 
-- [Data Model](../architecture/data-model.md) — Program, Week, Workout, Exercise types
+- [Data Model](../architecture/data-model.md) — Program, Week, Routine, Item types
 - [Session Logging](session-logging.md) — How programs drive the logging flow
 - [History & Calendar](history-calendar.md) — How program completion is visualized

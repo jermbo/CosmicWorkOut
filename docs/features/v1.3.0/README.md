@@ -12,11 +12,11 @@ Habits should be fully personalizable in Settings. Historical data — habits, w
 
 ## User Stories
 
-| ID                                           | Title                       | Status   | Origin                 |
-| -------------------------------------------- | --------------------------- | -------- | ---------------------- |
-| [US-009](./US-009-habit-creation.md)         | Habit Creation & Management | ✅ Built | Carried from v1.2.0    |
-| [US-010](./US-010-habit-calendar-history.md) | Habit History in Calendar   | ✅ Built | Carried from v1.2.0    |
-| [US-013](./US-013-activity-calendar-edit.md) | Activity Edit from Calendar | ✅ Built | Gap from v1.1.0 US-003 |
+| ID                                           | Title                       | Status | Origin                 |
+| -------------------------------------------- | --------------------------- | ------ | ---------------------- |
+| [US-009](./US-009-habit-creation.md)         | Habit Creation & Management | Built  | Carried from v1.2.0    |
+| [US-010](./US-010-habit-calendar-history.md) | Habit History in Calendar   | Built  | Carried from v1.2.0    |
+| [US-013](./US-013-activity-calendar-edit.md) | Activity Edit from Calendar | Built  | Gap from v1.1.0 US-003 |
 
 ---
 

@@ -10,19 +10,19 @@ The core action of the app — recording a completed workout.
 
 | Story                                                   | Status   | Notes                                        |
 | ------------------------------------------------------- | -------- | -------------------------------------------- |
-| Start session from Today                                | ✅ Built |                                              |
-| Smart tap: instant if weight known, sheet if first time | ✅ Built |                                              |
-| First-time weight entry (number input)                  | ✅ Built | Autofocuses, rounds to nearest 2.5           |
-| Weight carries forward within session                   | ✅ Built | Cascades to uncompleted sets                 |
-| Weight remembered across sessions                       | ✅ Built | Via `exerciseLastUsed`                       |
-| Tap completed set to adjust                             | ✅ Built | Sheet reopens; cascades to remaining sets    |
-| Per-exercise weight increment (2.5 / 5 / 10)            | ✅ Built | Set on exercise, default 5                   |
-| Exercise completion animation + haptics                 | ✅ Built |                                              |
-| Finish session + completion overlay                     | ✅ Built | No confirm dialog; saves completed sets only |
-| Abandon session                                         | ✅ Built | Back arrow → confirm; nothing saved          |
-| Crash recovery (resume/discard)                         | ✅ Built |                                              |
-| Set tile shows weight before log                        | ❌       | Shows "+" only until completed               |
-| Haptic on set tap                                       | ❌       | Haptic only on exercise completion           |
+| Start session from Today                                | Built     |                                              |
+| Smart tap: instant if weight known, sheet if first time | Built     |                                              |
+| First-time weight entry (number input)                  | Built     | Autofocuses, rounds to nearest 2.5           |
+| Weight carries forward within session                   | Built     | Cascades to uncompleted sets                 |
+| Weight remembered across sessions                       | Built     | Via `itemLastUsed`                           |
+| Tap completed set to adjust                             | Built     | Sheet reopens; cascades to remaining sets    |
+| Per-item weight increment (2.5 / 5 / 10)                | Built     | Set on item, default 5                       |
+| Exercise completion animation + haptics                 | Built     |                                              |
+| Finish session + completion overlay                     | Built     | No confirm dialog; saves completed sets only |
+| Abandon session                                         | Built     | Back arrow → confirm; nothing saved          |
+| Crash recovery (resume/discard)                         | Built     |                                              |
+| Set tile shows weight before log                        | Not built | Shows "+" only until completed               |
+| Haptic on set tap                                       | Not built | Haptic only on exercise completion           |
 
 ---
 
@@ -44,7 +44,7 @@ stateDiagram-v2
     Complete --> Idle: Dismiss overlay
     Active --> Active: Resume (crash recovery)
     note right of Active: activeSession in localStorage
-    note right of Complete: SessionLog in IndexedDB
+    note right of Complete: Session in IndexedDB
 ```
 
 ---
@@ -77,7 +77,16 @@ flowchart TD
     Sheet2 --> Confirm
     Instant --> Cascade[Cascade weight to remaining sets]
     Confirm --> Cascade
-    Cascade --> Persist[Write exerciseLastUsed + activeSession]
+    Cascade --> Persist[Write itemLastUsed + activeSession]
+
+    classDef trigger fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef decision fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef action fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class Tap trigger;
+    class Done,Known decision;
+    class Sheet,Sheet2,Confirm,Instant,Cascade action;
+    class Persist done;
 ```
 
 **Weight known** = exercise has `lb/kg` weight > 0, or `band`/`bodyweight` (no numeric weight needed).
@@ -120,7 +129,7 @@ When the last set for an exercise is logged:
 - Footer button always visible — label changes to "Finish early · X/Y sets" when incomplete
 - **No confirmation dialog** — tap finishes immediately
 - Only completed sets are saved; unlogged sets are silently dropped
-- SessionLog written to IndexedDB, activeSession cleared, completion overlay shown
+- Session written to IndexedDB, activeSession cleared, completion overlay shown
 
 **Target (not yet):**
 
@@ -134,7 +143,7 @@ When the last set for an exercise is logged:
 
 - Back arrow in session header triggers "End this session?" confirmation
 - Nothing is saved to IndexedDB
-- On confirm: `activeSession` cleared, SessionLog not written to permanent storage
+- On confirm: `activeSession` cleared, Session not written to permanent storage
 - Partial session data is lost — this is intentional and expected
 
 ---
@@ -169,7 +178,7 @@ Deferred items on [roadmap](../roadmap/README.md): rest timer, progressive overl
 ## Related
 
 - [How It Works](../implementation/behavior.md) — Actual session behavior today
-- [Data Model — SessionLog, LoggedSet](../architecture/data-model.md)
+- [Data Model — Session, LoggedSet](../architecture/data-model.md)
 - [Offline Strategy — Crash Recovery](../architecture/offline-strategy.md)
 - [Program Management](program-management.md) — Where the workout definition comes from
 - [Settings & Preferences](settings-preferences.md) — Completion feel, weight unit

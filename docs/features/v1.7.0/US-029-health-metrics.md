@@ -1,6 +1,6 @@
 # US-029 — Health Metrics
 
-> **Status: ✅ Shipped — v1.7.0**
+> **Status: Shipped — v1.7.0**
 >
 > Personal body measurements (weight, blood pressure) tracked over time. Optional feature toggled in Settings. Not a medical device — no clinical ranges, alerts, or diagnoses.
 >

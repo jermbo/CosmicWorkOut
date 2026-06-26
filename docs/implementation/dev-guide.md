@@ -41,6 +41,13 @@ flowchart TB
     src --> routes[routes/ — pages]
     src --> lib[lib/ — components, stores, db]
     src --> appcss[app.css — design tokens]
+
+    classDef root fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef folder fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef leaf fill:#465569,stroke:#28313e,color:#ffffff;
+    class root root;
+    class docs,src,static folder;
+    class pkg,vite,wiki,routes,lib,appcss leaf;
 ```
 
 ---

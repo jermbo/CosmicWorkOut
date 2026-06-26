@@ -1,6 +1,6 @@
 # US-028 — Data Export, Backup & Device Sync
 
-> **Status: ✅ Shipped (Phase 1) — v1.7.0**
+> **Status: Shipped (Phase 1) — v1.7.0**
 >
 > Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
 >

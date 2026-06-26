@@ -1,6 +1,6 @@
 # US-009 — Habit Creation & Management
 
-> **Status: ✅ Shipped — v1.3.0**
+> **Status: Shipped — v1.3.0**
 
 As a **health-conscious user**, I want to create, configure, and manage my personal habits
 so that the habits I track reflect exactly what matters to me and feed into my long-term data.

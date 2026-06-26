@@ -1,6 +1,6 @@
 # US-004 — Habit Tracking
 
-> **Status: ✅ Shipped (v1.1.0 / v1.2.0)**
+> **Status: Shipped (v1.1.0 / v1.2.0)**
 >
 > **Shipped:**
 >

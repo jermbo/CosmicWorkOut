@@ -1,6 +1,6 @@
 # US-001 — Program Library & Selection
 
-> **Status: ✅ Shipped**
+> **Status: Shipped**
 > All core requirements implemented. Week-by-week schedule preview in the program picker is on the [roadmap](../../roadmap/README.md#ux-polish).
 
 As a **fitness user**, I want to browse and select from a library of curated workout programs

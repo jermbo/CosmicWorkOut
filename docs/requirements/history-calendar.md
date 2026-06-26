@@ -12,14 +12,14 @@ Viewing past sessions and tracking progress over time.
 
 | Area                              | Status   |
 | --------------------------------- | -------- |
-| Monthly calendar + navigation     | ✅ Built |
-| Completed day highlighting        | ✅ Built |
-| Day summary sheet                 | ✅ Built |
-| Edit/delete sessions & activities | ✅ Built |
-| Habit heatmap on calendar         | ✅ Built |
-| Week strip on home                | ✅ Built |
-| Weekly consistency streak         | ✅ Built | Per active program / discipline |
-| Backfill past days                | ✅ Built | Date picker + calendar tap      |
+| Monthly calendar + navigation     | Built |                                 |
+| Completed day highlighting        | Built |                                 |
+| Day summary sheet                 | Built |                                 |
+| Edit/delete sessions & activities | Built |                                 |
+| Habit heatmap on calendar         | Built |                                 |
+| Week strip on home                | Built |                                 |
+| Weekly consistency streak         | Built | Per active program / discipline |
+| Backfill past days                | Built | Date picker + calendar tap      |
 
 Insights charts (volume trends, etc.) shipped in v1.5.0 — see [/insights](../implementation/app-structure.md).
 
@@ -37,11 +37,20 @@ Users can look back at their workout history to see what they've done, confirm t
 flowchart TD
     Day[Calendar day] --> Today{date === today?}
     Today -->|yes| StatusToday[today — outlined]
-    Today -->|no| HasSession{SessionLog exists<br/>for date + program?}
+    Today -->|no| HasSession{Session exists<br/>for date + program?}
     HasSession -->|yes| StatusDone[completed — accent fill, tappable]
     HasSession -->|no| Future{date > today?}
     Future -->|yes| StatusFuture[future — muted]
     Future -->|no| StatusDefault[past, no session — default]
+
+    classDef start fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef decision fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    classDef muted fill:#465569,stroke:#28313e,color:#ffffff;
+    class Day start;
+    class Today,HasSession,Future decision;
+    class StatusDone done;
+    class StatusToday,StatusFuture,StatusDefault muted;
 ```
 
 Scheduled, rest, and skipped **calendar cell styles** beyond completed/today/past are not implemented — see [roadmap](../roadmap/README.md) if needed after user testing.
@@ -90,15 +99,15 @@ sequenceDiagram
 
     User->>Cal: tap completed day
     Cal->>Store: getSessionForDay(date)
-    Store-->>Cal: SessionLog
-    Cal->>Sheet: open with session + exerciseMap
-    Sheet-->>User: workout name, volume, sets/reps/weight
+    Store-->>Cal: Session
+    Cal->>Sheet: open with session + itemMap
+    Sheet-->>User: routine name, volume, sets/reps/weight
     User->>Sheet: close
 ```
 
 - Tapping a completed day opens a summary sheet
-- Summary shows: workout name, date, total volume, exercises logged with sets/reps/weight
-- I cannot edit a past session from this view (read-only in v1)
+- Summary shows: routine name, date, total volume, items logged with sets/reps/weight
+- Past sessions and activities can be edited or deleted from this view
 
 ---
 
@@ -106,9 +115,7 @@ sequenceDiagram
 
 > As a user, I want to know how many weeks I've trained consistently, so I stay motivated.
 
-**Target:** Consecutive weeks where all scheduled workouts were completed.
-
-**Built today:** Placeholder streak indicators with different logic on Today vs Calendar — see table above.
+**Built today:** A week streak (`computeWeekStreak`) counts consecutive weeks with sessions meeting `daysPerWeek`, shown on the home header; the Practice hub shows a combined cross-discipline streak when multiple plans are active — see table above.
 
 ---
 
@@ -135,6 +142,6 @@ Volume trends and export shipped in v1.5.0 Insights and v1.7.0 backup. Other def
 ## Related
 
 - [How It Works](../implementation/behavior.md) — Calendar and streak behavior
-- [Data Model — SessionLog](../architecture/data-model.md)
+- [Data Model — Session](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — How sessions are created
 - [Program Management](program-management.md) — Where the schedule comes from

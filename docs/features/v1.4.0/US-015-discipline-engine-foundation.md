@@ -1,6 +1,6 @@
 # US-015 — Discipline Engine Foundation
 
-> **Status: ✅ Shipped — v1.4.0**
+> **Status: Shipped — v1.4.0**
 >
 > The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model--planned-v140).
 

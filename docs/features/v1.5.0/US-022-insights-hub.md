@@ -1,6 +1,6 @@
 # US-022 — Insights Hub & Navigation
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > Adds the `/insights` route and nav entry that all v1.5.0 charts live inside. Must be built first; chart stories (US-023–027) slot into it.
 

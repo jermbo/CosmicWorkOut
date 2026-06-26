@@ -1,6 +1,6 @@
 # State Management
 
-Six Svelte 5 class stores hold all application state. No external state library.
+Seven Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
 
 ---
 
@@ -8,12 +8,12 @@ Six Svelte 5 class stores hold all application state. No external state library.
 
 **File:** `src/lib/stores/program.svelte.ts`
 
-Owns the long-lived workout data — programs, exercises, sessions, and derived schedule logic.
+Owns the long-lived workout data — programs, items, sessions, and derived schedule logic.
 
 | State           | Source                   | Purpose                  |
 | --------------- | ------------------------ | ------------------------ |
 | `programs`      | IndexedDB                | All programs             |
-| `exercises`     | IndexedDB                | Exercise library         |
+| `items`         | IndexedDB                | Item library             |
 | `sessions`      | IndexedDB                | Completed session logs   |
 | `activeProgram` | IndexedDB + localStorage | Currently active program |
 
@@ -23,7 +23,7 @@ Owns the long-lived workout data — programs, exercises, sessions, and derived 
 - `workoutsForCurrentWeek` — all workouts for the current week (for WorkoutPicker)
 - `sessionForDate(date)` — completed session for a given date (if any)
 - `currentWeekNumber` — derived from session count
-- `exerciseMap` — `Map<id, Exercise>` for fast lookups
+- `itemMap` — `Map<id, Item>` for fast lookups
 - `isProgramComplete` — true when all sessions are logged
 - `weekStreak` — consecutive weeks meeting daysPerWeek target
 
@@ -158,11 +158,11 @@ This store has **no persistence** — it resets to today on every page load. The
 
 ---
 
-## healthStore 🟡 _(planned — US-029)_
+## healthStore
 
-**File:** `src/lib/stores/health.svelte.ts` _(not yet created)_
+**File:** `src/lib/stores/health.svelte.ts`
 
-Owns optional body measurement readings (weight, blood pressure). Gated by `prefsStore.healthMetricsEnabled`.
+Owns optional body measurement readings — weight and blood pressure ([US-029](../features/v1.7.0/US-029-health-metrics.md)). Gated by `prefsStore.healthMetricsEnabled`.
 
 | State      | Source    | Purpose             |
 | ---------- | --------- | ------------------- |
@@ -197,7 +197,7 @@ flowchart TB
     PR[prefsStore]
     HS[habitStore]
     AS[activityStore]
-    HeS[healthStore 🟡]
+    HeS[healthStore]
     LC[loggingContext]
     UI[Svelte UI]
 
@@ -219,6 +219,13 @@ flowchart TB
     AS -->|activitiesByDate| UI
     HeS -->|readings, charts| UI
     PR -->|accent, density, roundness, healthMetricsEnabled| UI
+
+    classDef storage fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    class IDB,LS storage;
+    class PS,SS,PR,HS,AS,HeS,LC store;
+    class UI ui;
 ```
 
 ---
@@ -229,4 +236,4 @@ flowchart TB
 - [Data Model](../architecture/data-model.md) — Type definitions
 - [Program Progression](program-progression.md) — Schedule derivation
 - [Session Logging](../requirements/session-logging.md) — User-facing flow
-- [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Planned health store
+- [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health store

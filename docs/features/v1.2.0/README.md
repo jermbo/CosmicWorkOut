@@ -2,7 +2,7 @@
 
 This version reshapes the home screen into a unified daily dashboard of overview cards, each acting as a gateway to its own route. It introduces a dedicated Habit Log page with a mood tracking type, and a date context that flows from the home screen across all pages.
 
-**Status: ✅ Shipped** — incomplete stories migrated to [v1.3.0](../v1.3.0/README.md).
+**Status: Shipped** — incomplete stories migrated to [v1.3.0](../v1.3.0/README.md).
 
 ## Design North Star
 
@@ -44,11 +44,11 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 ## User Stories
 
-| ID                                           | Title                    | Status  |
-| -------------------------------------------- | ------------------------ | ------- |
-| [US-007](./US-007-home-screen-redesign.md)   | Home Screen Redesign     | ✅ Done |
-| [US-008](./US-008-habit-log-page.md)         | Habit Log Page           | ✅ Done |
-| [US-011](./US-011-program-complete-state.md) | Program Completion State | ✅ Done |
+| ID                                           | Title                    | Status |
+| -------------------------------------------- | ------------------------ | ------ |
+| [US-007](./US-007-home-screen-redesign.md)   | Home Screen Redesign     | Done   |
+| [US-008](./US-008-habit-log-page.md)         | Habit Log Page           | Done   |
+| [US-011](./US-011-program-complete-state.md) | Program Completion State | Done   |
 
 ---
 
@@ -67,8 +67,8 @@ These stories were started in v1.2.0 but not finished. Full specs live in the v1
 
 | Origin        | Requirement                            | Resolved in |
 | ------------- | -------------------------------------- | ----------- |
-| US-004 req 2f | Count habit correction UI on dashboard | US-008 ✅   |
-| US-005 req 2f | Program-complete state on home screen  | US-011 ✅   |
+| US-004 req 2f | Count habit correction UI on dashboard | US-008      |
+| US-005 req 2f | Program-complete state on home screen  | US-011      |
 
 Items still open from v1.1.0 are tracked in [v1.3.0](../v1.3.0/README.md).
 

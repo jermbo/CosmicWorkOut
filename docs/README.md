@@ -1,6 +1,6 @@
 # CosmicWorkOut — Project Wiki
 
-> A simple, offline-first fitness tracking app built for people who want to follow a structured program without the noise.
+> A simple, offline-first tracker for following a structured movement practice — and logging the rest of your day — without the noise.
 
 ---
 
@@ -59,6 +59,15 @@ flowchart TB
     ST --> AS & SM & PP & CO & DG
     PM --> PP
     SL --> SM & CO
+
+    classDef vision fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef arch fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef req fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef impl fill:#465569,stroke:#28313e,color:#ffffff;
+    class NS,DP vision;
+    class SO,DM,TS,OS arch;
+    class PM,SL,HC,SP req;
+    class HW,ST,AS,SM,PP,CO,DG impl;
 ```
 
 **New here?** Start with [North Star](vision/north-star.md) → [How It Works](implementation/behavior.md) → [System Overview](architecture/overview.md).
@@ -71,10 +80,16 @@ flowchart TB
 
 **These docs are the project's memory.** There is no separate notebook, ticket system, or AI "memory" that outlives a session — if it isn't written here, it doesn't persist. So:
 
-- When a decision is locked, record it in the relevant doc (a feature `README`, an architecture doc, or the [Glossary](glossary.md)) and mark shipped work ✅ in [Implementation Status](implementation/status.md).
-- When something is **not** being built yet but might later, add it to the [Roadmap](roadmap/README.md) — not as `❌ Planned` on a shipped version.
+- When a decision is locked, record it in the relevant doc (a feature `README`, an architecture doc, or the [Glossary](glossary.md)) and mark shipped work **Built** in [Implementation Status](implementation/status.md).
+- When something is **not** being built yet but might later, add it to the [Roadmap](roadmap/README.md) — not as **Planned** on a shipped version.
 - When behavior changes, update the doc that described the old behavior in the same change — don't let docs and code drift.
 - Contributors (human or AI) should treat this wiki as the source of truth and **not** stash project knowledge in tool-specific memory stores. See the [Working Agreement](implementation/dev-guide.md#conventions-working-agreement).
+
+### Documentation conventions
+
+- **No emojis** in the docs — they read as unprofessional and don't survive every renderer. Use words.
+- **Status labels** are plain text: **Built** / **Shipped** / **Done** (in code today), **Planned** (agreed, not yet built — keep these on the [Roadmap](roadmap/README.md)), **Removed** (was built, then taken out), **Not built** (a gap).
+- **Diagrams use [mermaid](https://mermaid.js.org/)**. When a diagram uses color, every node sets a **dark fill with `color:#ffffff`** so text always has strong contrast (never light-on-light or dark-on-dark). The shared palette: vision `#3b3f8c`, architecture/stores `#1f6f6f`, requirements/data `#7a4f9e`, implementation/neutral `#465569`, shipped/done `#2f7d4f`, planned/triggers `#9a6a1f`.
 
 ---
 
@@ -117,7 +132,23 @@ flowchart TB
 
 ## Shipped Features
 
-Version stories (v1.1–v1.7) in [features/](features/) — historical record of what shipped and when.
+The [Features index](features/README.md) is the historical record of what shipped and when — one folder per release, each with a README and its user stories.
+
+- [v1.1.0 — Core Workout Flows](features/v1.1.0/README.md)
+- [v1.2.0 — Daily Dashboard & Habits](features/v1.2.0/README.md)
+- [v1.3.0 — Habit Management & Calendar History](features/v1.3.0/README.md)
+- [v1.4.0 — Belly Dance & the Discipline Model](features/v1.4.0/README.md)
+- [v1.5.0 — Insights Hub](features/v1.5.0/README.md)
+- [v1.6.0 — Belly Dance Catalog & Course Programs](features/v1.6.0/README.md)
+- [v1.7.0 — Full Strength Catalog, PWA, Health & Backup](features/v1.7.0/README.md)
+
+See [Implementation Status](implementation/status.md) for the current built-vs-deferred checklist.
+
+---
+
+## Standards
+
+- [User Story Standards](standards/user-story-standards.md) — Personas, story format, and the acceptance-criteria template used in feature docs.
 
 ---
 
