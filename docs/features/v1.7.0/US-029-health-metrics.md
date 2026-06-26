@@ -130,7 +130,7 @@ type UserPrefs = {
 - Header with global date (inherited from `loggingContext`).
 - **Weight block:** numeric entry (stepper or numpad consistent with app patterns); shows today's value or empty.
 - **Blood pressure block:** systolic / diastolic inputs; optional pulse field; list of today's readings with time; tap to edit/delete.
-- **History:** scrollable list or section for past dates on the selected day (readings for context date only on main view; optional "view history" link deferred unless needed for v1).
+- **History:** context-date readings on main view ship today; extended history view on [roadmap](../../roadmap/README.md#ux-polish).
 
 ### Insights (`/insights`)
 

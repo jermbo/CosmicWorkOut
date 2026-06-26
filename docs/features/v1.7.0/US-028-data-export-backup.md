@@ -1,10 +1,10 @@
 # US-028 — Data Export, Backup & Device Sync
 
-> **Status: 🟡 Phase 1 shipped — v1.7.0** (Phase 2 device sync still planned)
+> **Status: ✅ Shipped (Phase 1) — v1.7.0**
 >
-> Offline-first data portability. Phase 1 is JSON file export/import; Phase 2 adds QR-paired device-to-device sync with merge rules. No cloud accounts, no backend.
+> Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
 >
-> **As built (Phase 1):** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope; `putAllRecords` and `itemLastUsed.getAll` were exposed from `database.ts`. Export/Restore live on `settings/data` — restore is **Replace-only**, validates `format`/`version`, confirms via dialog, then wipes + writes + re-seeds built-ins + reloads. Parse/validation errors surface as toasts and leave data untouched. Phase 2 (QR/LAN sync + merge engine) is unbuilt.
+> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope; `putAllRecords` and `itemLastUsed.getAll` were exposed from `database.ts`. Export/Restore live on `settings/data` — restore is **Replace-only**, validates `format`/`version`, confirms via dialog, then wipes + writes + re-seeds built-ins + reloads. Parse/validation errors surface as toasts and leave data untouched.
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -98,7 +98,7 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 | --------------------- | --------------------------------------------------------------------------- |
 | **Replace** (default) | Wipe local workout data, import file wholesale. Simplest and safest for v1. |
 
-Merge-on-import is deferred to Phase 2 (device sync). A one-time file restore is intentionally all-or-nothing.
+Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time file restore is intentionally all-or-nothing.
 
 ### Requirements (Phase 1)
 
@@ -133,155 +133,15 @@ Merge-on-import is deferred to Phase 2 (device sync). A one-time file restore is
 
 ---
 
-## Phase 2 — Device-to-Device Sync (QR + Local Transfer)
+## Phase 2 — Device sync
 
-Ongoing sync between phone and computer (or two phones) without cloud services.
-
-### Why QR alone is not enough
-
-A single QR code holds roughly **2–4 KB**. Months of session history is often **tens to hundreds of KB**. QR is the **pairing handshake**, not the data pipe.
-
-```mermaid
-sequenceDiagram
-    participant A as Device A (e.g. phone)
-    participant B as Device B (e.g. laptop)
-    A->>A: Build sync offer (deviceId, nonce, LAN URL)
-    A->>B: Display QR code
-    B->>B: Scan QR, open local connection
-    A->>B: Send JSON snapshot over LAN / WebRTC
-    B->>B: Merge into IndexedDB
-    B->>A: Ack + optional reverse delta
-```
-
-### Sync flow (both directions)
-
-1. **Device A:** Settings → **Data & backup** → **Sync with another device** → shows QR (pairing payload + local endpoint).
-2. **Device B:** Settings → **Data & backup** → **Sync from device** → camera scans QR → connects on same Wi‑Fi (or WebRTC).
-3. **Device A** sends a snapshot (same envelope as Phase 1, plus sync metadata).
-4. **Device B** runs the merge engine, shows a summary, reloads.
-5. Reverse sync uses the same flow with roles swapped.
-
-**Constraints:**
-
-- Requires secure context (HTTPS or `localhost`) — same as PWA install.
-- Same Wi‑Fi is the expected happy path; WebRTC is a fallback for direct peer transfer.
-- No cloud relay, no accounts.
-
-### Sync metadata (appended to envelope)
-
-```json
-{
-	"sync": {
-		"deviceId": "abc123",
-		"lastSyncAt": "2026-06-23T10:00:00.000Z"
-	}
-}
-```
-
-Future syncs may send only records changed since `lastSyncAt` to keep payloads small.
-
-### Optional: Web Share API
-
-On supported mobile browsers, after building the export blob, offer **Share** (`navigator.share({ files })`) so the user can save to Files or AirDrop without hunting Downloads. Falls back to download where Share is unavailable. Still fully offline.
-
----
-
-## Merge Rules (Phase 2)
-
-"Same date" is not one rule — each entity has a **natural key**. The merge engine unions non-overlapping records and applies conflict rules when keys collide.
-
-### Entity summary
-
-| Entity                     | Natural key                              | Multiple per day?                                                   | Conflict rule                                                 |
-| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **Session**                | `programId` + `date`                     | No — one per program per day                                        | See below                                                     |
-| **HabitLog**               | `habitId` + `date` (id = `habitId:date`) | No                                                                  | See below                                                     |
-| **ActivityLog**            | `id`                                     | Yes — many per day                                                  | Union by `id`; same id → newer `createdAt`                    |
-| **HealthReading**          | `id`                                     | Yes — many per day (BP); weight upserts one per `metricId` + `date` | Union by `id`; same id → newer `recordedAt`                   |
-| **Item / Program / Habit** | `id`                                     | N/A                                                                 | Last-write-wins by `updatedAt` (add field when building sync) |
-| **ItemLastUsed**           | `itemId`                                 | N/A                                                                 | Value from the newer session that touched the item            |
-| **Prefs**                  | singleton                                | One blob                                                            | Receiving device keeps its prefs unless user opts in          |
-| **activeProgramIds**       | per `disciplineId`                       | One per Discipline                                                  | Merge per discipline key                                      |
-
-Strength and belly dance sessions on the **same calendar date** are **not** a conflict — different `programId` / `disciplineId`.
-
-### Sessions (critical)
-
-Both devices logged a workout for the **same program on the same date** → only one can survive (app invariant: `sessionForProgramDate`).
-
-**Default policy (v1 sync):**
-
-1. Keep the session with the **later `finishedAt`** timestamp.
-2. On tie → keep the session with **more `totalSets`** (more complete).
-3. If still tied → flag for user resolution (Phase 2b).
-
-After merge, program progression (`completedSessionCount`) must be recomputed from the merged session list — never duplicate-count the same `programId` + `date`.
-
-### Habit logs
-
-Same `habitId` + `date` → one slot.
-
-| Habit type              | Rule                                                        |
-| ----------------------- | ----------------------------------------------------------- |
-| Counter (water, coffee) | **Max `value`** — avoids double-counting offline increments |
-| Minutes / words         | **Max `value`** or newer import timestamp                   |
-| Mood (1–5)              | **Newer wins** — point-in-time choice                       |
-| Checkbox                | `value > 0` wins, or newer                                  |
-
-### Post-sync summary
-
-Show a brief report: e.g. _"3 new sessions added, 1 session updated, 2 habit conflicts resolved, 5 new activities."_
-
-### Conflict UI (Phase 2b — optional)
-
-Silent auto-merge for v1 sync. Later: surface conflicts only when both sides edited the **same natural key** and tie-breakers fail — e.g. "Mon Jun 23 — Phone vs Laptop" with a one-tap pick.
-
-```mermaid
-flowchart TD
-    A[Device A snapshot] --> M[Merge engine]
-    B[Device B snapshot] --> M
-    M --> U[Union: key only on one side → keep]
-    M --> C{Same natural key?}
-    C -->|Session programId+date| W1[Later finishedAt wins]
-    C -->|HabitLog habitId+date| W2[Type-specific rule]
-    C -->|Activity same id| W3[Newer createdAt wins]
-    C -->|HealthReading same id| W5[Newer recordedAt wins]
-    C -->|Definition same id| W4[Newer updatedAt wins]
-    W1 --> R[Recompute progression from merged sessions]
-    W2 --> R
-    W3 --> R
-    W5 --> R
-    W4 --> R
-```
-
----
-
-## Out of Scope
-
-| Item                                   | Notes                                                                  |
-| -------------------------------------- | ---------------------------------------------------------------------- |
-| Cloud sync (iCloud, Dropbox, Firebase) | Violates client-only constraint                                        |
-| User accounts / auth                   | No backend                                                             |
-| CSV export as backup                   | Cannot round-trip; optional analytics export is a separate story       |
-| QR-only full backup (no LAN)           | Impractical at real data sizes; chunked QR sequences are a last resort |
-| Automatic background sync              | Manual export/sync only for v1                                         |
-| File System Access API auto-backup     | Extra permissions; defer                                               |
-
----
-
-## Key Decisions
-
-- **Phase 1 before Phase 2.** File export/import delivers 80% of the value with minimal complexity (~100–150 LOC + Settings UI).
-- **Replace on file restore; merge on device sync.** One-time restore is all-or-nothing; ongoing sync needs merge rules.
-- **QR is pairing, not payload.** Data transfers over LAN or WebRTC after scan.
-- **Session conflicts use `finishedAt`, not import order.** Progression correctness depends on getting sessions right.
-- **Habit log ids are deterministic** (`habitId:date`) — merge is straightforward.
-- **Skip `activeSession` on export.** Crash-recovery state must not leak across devices.
+Moved to the [roadmap](../../roadmap/device-sync.md): QR pairing, LAN/WebRTC transfer, merge engine, and optional conflict UI.
 
 ---
 
 ## Related Docs
 
+- [Roadmap — device sync](../../roadmap/device-sync.md)
 - [v1.7.0 README](./README.md)
 - [Offline Strategy](../../architecture/offline-strategy.md) — Storage map
 - [Data Model](../../architecture/data-model.md) — Entities and stores

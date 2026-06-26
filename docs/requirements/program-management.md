@@ -8,18 +8,18 @@ Defining, selecting, and editing fitness programs.
 
 ## Implementation Status
 
-| Story                               | Status                                   |
-| ----------------------------------- | ---------------------------------------- |
-| View active program + workout cards | ✅ Built                                 |
-| Edit workout exercises              | ✅ Built                                 |
-| Add new workout to program          | ✅ Built                                 |
-| Week progress bar                   | ✅ Built                                 |
-| Select/switch programs              | ❌ Auto-selects first                    |
-| Create program from scratch         | ❌ Not built                             |
-| Copy built-in before editing        | ❌ Edits in-place                        |
-| Custom exercise CRUD                | ❌ Library is read-only in UI            |
-| Browse all weeks                    | ❌ Week 1 templates only on Program page |
-| Rename existing workout             | ⚠️ Title change doesn't persist on save  |
+> **See [Implementation Status](../implementation/status.md)** for the full checklist. Summary below.
+
+| Area                         | Status   |
+| ---------------------------- | -------- |
+| Program picker / switching   | ✅ Built |
+| Create program from scratch  | ✅ Built |
+| Copy built-in before editing | ✅ Built |
+| Custom item CRUD             | ✅ Built |
+| Browse all program weeks     | ✅ Built |
+| Multi-plan activation        | ✅ Built | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
+
+**Roadmap:** week-by-week schedule preview in program picker — [roadmap](../roadmap/README.md#ux-polish).
 
 ---
 
@@ -133,8 +133,7 @@ sequenceDiagram
 - I can create a custom exercise: name, unit (lb/kg/band/bodyweight), default sets/reps
 - I can edit or delete custom exercises
 - Built-in exercises cannot be deleted (but can be excluded from programs)
-- When adding exercises to a workout, I can browse, search, and filter the library by category (built)
-- Creating/editing/deleting custom exercises is not built — library is seeded exercises only
+- When adding exercises to a workout, I can browse, search, and filter the library by category
 
 ---
 

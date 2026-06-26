@@ -1,19 +1,6 @@
 # US-009 — Habit Creation & Management
 
-> **Status: 🚧 Partial — v1.3.0**
->
-> **Shipped in v1.2.0:**
->
-> - 6 built-in habits pre-seeded (Water, Coffee, Meditation, Writing, Reading, Mood) — see [US-031](../v1.7.0/US-031-default-habits-tweak.md)
-> - Full habit logging on `/habits` (progress rings, stepped inputs, boolean toggles, mood strip)
-> - Habit data layer in IndexedDB with `dailyGoal` migration
-> - Store methods for reorder and value correction
->
-> **Remaining for v1.3.0:**
->
-> - Settings UI to add, edit, delete, and reorder habits
-> - Active/inactive toggle in Settings
-> - Creation form with type presets
+> **Status: ✅ Shipped — v1.3.0**
 
 As a **health-conscious user**, I want to create, configure, and manage my personal habits
 so that the habits I track reflect exactly what matters to me and feed into my long-term data.

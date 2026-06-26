@@ -1,6 +1,6 @@
 # US-017 — Belly Dance Discipline, Program & Routines
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: ✅ Shipped — v1.4.0**
 >
 > Defines the **Belly Dance Discipline** and its program structure, rotating routines, bookend inheritance, and routine editor — all on the generalized Discipline engine (US-015), using Items from the library (US-016). Strength is the other Discipline on the same engine. See the [Glossary](../../glossary.md).
 

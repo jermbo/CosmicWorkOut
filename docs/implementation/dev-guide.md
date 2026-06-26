@@ -74,7 +74,7 @@ How code gets written in this repo — for any contributor, human or AI.
 - **No new dependencies.** Solve it with what's already in `package.json` unless there's a compelling, discussed reason to add a package.
 - **Small, focused components.** Prefer composition over large multi-purpose components — see [Components](components.md).
 - **Implement, then review.** For a multi-step task, work through the whole thing and present it for review at the end rather than stopping for sign-off between steps. Surface a question mid-stream only when a decision is genuinely blocking and ambiguous.
-- **Docs are the project's memory.** When a decision is locked or behavior changes, update the relevant doc in `docs/` so it reflects reality — see [Documenting decisions](../README.md#documenting-decisions).
+- **Docs are the project's memory.** When a decision is locked or behavior changes, update the relevant doc in `docs/` so it reflects reality — see [Documenting decisions](../README.md#documenting-decisions). Deferred ideas go on the [roadmap](../roadmap/README.md).
 
 ---
 

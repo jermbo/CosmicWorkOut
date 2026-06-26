@@ -15,7 +15,7 @@ The charts don't introduce new data — they reveal patterns in what you're alre
 - **Chart.js only.** Already in the project at v4.5.1. No additional charting dependency.
 - **Insights is a new nav tab.** History/Calendar stays focused on the date-grid view. Insights gets its own route (`/insights`) and a nav slot.
 - **45-day rolling window by default.** Aligns with the debug seed data range and gives enough data for meaningful patterns without overwhelming the UI. Not user-configurable in this version.
-- **No chart customization in v1.5.0.** Users cannot change date ranges, filter by exercise, or toggle series. Read-only visualization first; interactivity is a future version.
+- **Date range chips shipped** (45d, week, MTD, YTD, custom). Chart drill-down / series filtering is on the [roadmap](../../roadmap/README.md#activity--insights).
 - **Responsive canvas.** Charts use `responsive: true` and `maintainAspectRatio: false` inside fixed-height containers so they work on both mobile and tablet.
 - **Dark/light theme aware.** Charts read CSS custom properties for colors so they adapt to the app's accent color and surface tokens.
 
@@ -56,10 +56,4 @@ Implement in order — US-022 (hub + nav) must land first; charts can be built i
 
 ## Out of Scope for v1.5.0
 
-| Item                             | Notes                                                            |
-| -------------------------------- | ---------------------------------------------------------------- |
-| Chart drill-down / interactivity | Tap-on-bar, zoom, filter — future version                        |
-| Export / share                   | Screenshot only via OS                                           |
-| Per-discipline chart filtering   | All sessions shown regardless of discipline                      |
-| Distance / pace metrics          | Activity logging doesn't carry distance yet (deferred in v1.4.0) |
-| Nutrition tracking               | Out of scope for this app                                        |
+Deferred items are on the [roadmap](../../roadmap/README.md) (chart interactivity, per-discipline filtering, activity distance/pace, nutrition).

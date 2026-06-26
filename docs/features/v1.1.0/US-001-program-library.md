@@ -1,7 +1,7 @@
 # US-001 — Program Library & Selection
 
 > **Status: ✅ Shipped**
-> All core requirements implemented. Minor gap: the program selection sheet shows name, duration, and frequency only — the full week-by-week schedule preview (req 1c) was not built. Noted for a future pass if needed.
+> All core requirements implemented. Week-by-week schedule preview in the program picker is on the [roadmap](../../roadmap/README.md#ux-polish).
 
 As a **fitness user**, I want to browse and select from a library of curated workout programs
 so that I can follow a professionally designed training plan without having to build one from scratch.

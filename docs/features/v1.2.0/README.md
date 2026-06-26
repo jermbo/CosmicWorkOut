@@ -16,7 +16,7 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 - **One global date** — set on the home screen, flows to all pages (`/habits`, `/log`, etc.). No per-page date pickers. Calendar and graphs are for historical browsing.
 - **Each section is its own route** — home cards are summaries; detail and interaction happen on dedicated pages.
-- **No icons on habits (yet)** — clean, text-first. Icons are a future expansion.
+- **No icons on habits** — clean, text-first. Icons on [roadmap](../../roadmap/README.md#ux-polish).
 - **Fixed habit order** — habits display in the order set in Settings regardless of completion state. Consistency over smart sorting.
 - **Mood is a first-class habit type** — stored as an integer (-5 to +5) with named labels. Logged via large radio-button tap targets inline on the habits page (not in the grid).
 - **No custom unit types** — habits use named presets only: Times, Minutes, Count, Yes/No, Mood.

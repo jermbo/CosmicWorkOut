@@ -134,9 +134,7 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 
 ## Out of Scope for v1
 
-- Per-exercise rest timer duration
-- Notification settings (rest timer alerts)
-- Theme beyond dark mode (no light mode — see [Design Principles](../vision/principles.md))
+Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications, light mode (dark-only by design — see [Design Principles](../vision/principles.md)).
 
 ---
 

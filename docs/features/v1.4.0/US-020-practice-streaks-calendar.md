@@ -1,6 +1,6 @@
 # US-020 — Cross-Discipline Streaks & Calendar History
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: ✅ Shipped — v1.4.0**
 >
 > Combined cross-Discipline streak on Today, per-Discipline breakdown in History, dance sessions in calendar day detail. See the [Glossary](../../glossary.md).
 

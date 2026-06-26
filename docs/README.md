@@ -14,6 +14,8 @@ Docs are organized by **altitude**. Start high to understand _why_, work down to
 | 15k    | [architecture/](architecture/)     | System structure, data, tech, offline    |
 | 5k     | [requirements/](requirements/)     | User stories per feature area            |
 | Ground | [implementation/](implementation/) | Code map, stores, components, status     |
+| —      | [features/](features/)             | Shipped version stories (v1.1–v1.7)      |
+| —      | [roadmap/](roadmap/)               | Deferred ideas — post–user-testing work  |
 
 Each doc is one complete thought — readable in ~60 seconds. Follow links to go deeper. Diagrams use **mermaid** for architecture, flows, entity relationships, and component trees.
 
@@ -69,7 +71,8 @@ flowchart TB
 
 **These docs are the project's memory.** There is no separate notebook, ticket system, or AI "memory" that outlives a session — if it isn't written here, it doesn't persist. So:
 
-- When a decision is locked, record it in the relevant doc (a feature `README`, an architecture doc, or the [Glossary](glossary.md)) and mark anything not-yet-built with a clear status (`❌ Planned` / `🟡`).
+- When a decision is locked, record it in the relevant doc (a feature `README`, an architecture doc, or the [Glossary](glossary.md)) and mark shipped work ✅ in [Implementation Status](implementation/status.md).
+- When something is **not** being built yet but might later, add it to the [Roadmap](roadmap/README.md) — not as `❌ Planned` on a shipped version.
 - When behavior changes, update the doc that described the old behavior in the same change — don't let docs and code drift.
 - Contributors (human or AI) should treat this wiki as the source of truth and **not** stash project knowledge in tool-specific memory stores. See the [Working Agreement](implementation/dev-guide.md#conventions-working-agreement).
 
@@ -109,6 +112,18 @@ flowchart TB
 - [Program Progression](implementation/program-progression.md) — How "today's workout" is chosen
 - [Components](implementation/components.md) — UI component inventory
 - [Dev Guide](implementation/dev-guide.md) — Run locally, key files
+
+---
+
+## Shipped Features
+
+Version stories (v1.1–v1.7) in [features/](features/) — historical record of what shipped and when.
+
+---
+
+## Roadmap
+
+**Current phase:** use the app, gather feedback. New ideas and deferred work live in [roadmap/](roadmap/README.md).
 
 ---
 

@@ -106,16 +106,15 @@ Nothing special. No sync to trigger. Network awareness will only matter for serv
 
 ---
 
-## Data Export & Backup — Planned
+## Data Export & Backup — Phase 1 Shipped
 
-No export or restore is implemented yet. Planned in [US-028](../features/v1.7.0/US-028-data-export-backup.md):
+JSON file export and replace-only restore on Settings → Data. See [US-028](../features/v1.7.0/US-028-data-export-backup.md).
 
-- **Phase 1:** JSON file download + file-picker restore from Settings (replace-all, fully offline). Includes `healthReadings` when [US-029](../features/v1.7.0/US-029-health-metrics.md) ships.
-- **Phase 2:** QR-paired device sync over LAN with merge rules per entity natural key (sessions: `programId` + `date`; habit logs: `habitId` + `date`; health readings: `id`).
+Device-to-device sync (QR + LAN merge) is on the [roadmap](../roadmap/device-sync.md).
 
 ---
 
-## Health Metrics — Planned
+## Health Metrics — Shipped
 
 Optional body measurements (weight, blood pressure). See [US-029](../features/v1.7.0/US-029-health-metrics.md):
 

@@ -1,6 +1,8 @@
 # Implementation Status
 
-What's built today vs. what's still requirements-only. Verified against the code on branch `feature/v1.6.0` (June 2026).
+What's built today. **Current phase:** user testing and feedback — new work starts on the [roadmap](../roadmap/README.md).
+
+Verified against the codebase (June 2026).
 
 ---
 
@@ -57,7 +59,7 @@ What's built today vs. what's still requirements-only. Verified against the code
 | Custom habit CRUD in Settings     | ✅ Built   | US-009                                                                                                                                         |
 | Habit history heatmap on Calendar | ✅ Built   | US-010                                                                                                                                         |
 | Activity edit from calendar       | ✅ Built   | US-013                                                                                                                                         |
-| Journal page                      | ❌ Removed | Shipped in v1.3 (US-012/US-014), then **removed** in commit `0af33ff` ("remove journal feature components"). No journal route or code remains. |
+| Journal page                      | ❌ Removed | Shipped in v1.3 (US-012/US-014), then **removed** in commit `0af33ff`. Not on [roadmap](../roadmap/README.md) unless feedback demands it.       |
 | Journal speech input & auto-save  | ❌ Removed | Removed with the Journal page (US-014).                                                                                                        |
 
 ---
@@ -87,7 +89,7 @@ What's built today vs. what's still requirements-only. Verified against the code
 | Habit radar chart          | ✅ Built | US-026        |
 | Exercise progress chart    | ✅ Built | US-027        |
 
-Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src/lib/chart-utils.ts`).
+Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src/lib/chart-utils.ts`). Date-range chips shipped beyond original v1.5.0 scope.
 
 ---
 
@@ -98,22 +100,21 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 | Full belly dance move catalog     | ✅ Built | 39 moves (`bellydance-moves.ts`) + 10 warm-up/cool-down bookends         |
 | Six belly dance "course" programs | ✅ Built | Beginner 101–103, Intermediate 101–103 (`bellydance-programs.ts`); DB v6 |
 
-> ⚠️ `docs/features/v1.6.0/` does not yet exist — this section is reconstructed from code + git history. A feature folder should be backfilled.
+See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 ---
 
 ## v1.7.0 — Full Strength Catalog & PWA
 
-| Feature                        | Status     | Notes                                                                                                                                                                          |
-| ------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Full gym exercise catalog      | ✅ Built   | 72 exercises (`strength-exercises.ts`); categories are **body-part based** (Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body); DB v7                             |
-| Six strength "course" programs | ✅ Built   | `strength-programs.ts`                                                                                                                                                         |
-| Service worker / PWA           | ✅ Built   | `src/service-worker.ts`; static adapter + PWA capabilities (commit `86ea3b0`)                                                                                                  |
-| Data export / backup / sync    | 🟡 Phase 1 | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON file export/import (Replace-only) on `settings/data` via `db/backup.ts`; Phase 2 QR + LAN merge still planned |
-| Health metrics (weight, BP)    | ✅ Built   | [US-029](../features/v1.7.0/US-029-health-metrics.md) — optional toggle; `/health` + home card + Insights + calendar; DB v8                                                    |
-| Settings hub restructure       | ✅ Built   | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/appearance`, `/habits`, `/data`                                                                 |
-
-> `docs/features/v1.7.0/` — README backfilled from git history; US-028 (Phase 1), US-029, and US-030 now shipped.
+| Feature                     | Status    | Notes                                                                                                                                       |
+| --------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full gym exercise catalog   | ✅ Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                         |
+| Six strength "course" programs | ✅ Built | `strength-programs.ts`                                                                                                                      |
+| Service worker / PWA        | ✅ Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                  |
+| Data export / backup        | ✅ Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) Phase 1 — JSON export/import on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
+| Health metrics (weight, BP) | ✅ Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                  |
+| Settings hub restructure    | ✅ Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/appearance`, `/habits`, `/data`                              |
+| Default habits tweak        | ✅ Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                 |
 
 ---
 
@@ -129,6 +130,7 @@ Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src
 
 ## Related
 
+- [Roadmap](../roadmap/README.md) — Deferred and future ideas
 - [How It Works](behavior.md) — Full behavioral mental model
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout

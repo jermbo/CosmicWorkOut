@@ -65,11 +65,7 @@ These foundations exist — v1.3.0 adds the missing UI and calendar integration 
 
 ## Out of Scope for v1.3.0
 
-| Item                 | Notes                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| Service worker / PWA | Infrastructure — tracked in [Offline Strategy](../../architecture/offline-strategy.md) |
-| Habit icons          | Text-first habits remain; icons are a future expansion                                 |
-| Volume trend graphs  | v2 — see [History & Calendar](../../requirements/history-calendar.md)                  |
+See [roadmap](../../roadmap/README.md) for deferred ideas (e.g. habit icons). Volume trend graphs were superseded by the v1.5.0 Insights hub.
 
 ---
 

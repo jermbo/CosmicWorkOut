@@ -162,10 +162,7 @@ See [Offline Strategy — Crash Recovery](../architecture/offline-strategy.md).
 
 ## Out of Scope for v1
 
-- Rest timer between sets (designed as v2 feature in inspiration)
-- Progressive overload nudge (v2)
-- Personal record detection (v2)
-- Post-session notes beyond what's in the log
+Deferred items on [roadmap](../roadmap/README.md): rest timer, progressive overload nudges, PR detection, per-item session notes.
 
 ---
 

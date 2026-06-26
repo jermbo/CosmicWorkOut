@@ -1,6 +1,6 @@
 # US-015 — Discipline Engine Foundation
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: ✅ Shipped — v1.4.0**
 >
 > The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model--planned-v140).
 
@@ -82,7 +82,7 @@ These were decided up front so the engine doesn't grow scope it doesn't need. Th
 
 - **Concurrent Disciplines, one active program each.** Strength and belly dance run side by side; active program is tracked per `disciplineId`. The user runs them on whatever days they like — strength some days, dance others — with no enforced schedule. (Requirement 6.)
 - **No day-of-week scheduling.** Progression stays **count-driven**: the recommended routine is `completedSessionCount % routineCount` per Discipline (log A → B is recommended next). The app never says "Tuesday is a dance day."
-- **No load periodization / progression scheme.** Weeks are not auto-progressed (no light → heavy → deload engine). Carrying weight forward is the existing per-item **last-used prefill**, which the user adjusts manually. A progression engine is explicitly deferred — see [v1.4.0 Out of Scope](./README.md#out-of-scope-for-v140).
+- **No load periodization / progression scheme.** Weeks are not auto-progressed (no light → heavy → deload engine). Carrying weight forward is the existing per-item **last-used prefill**, which the user adjusts manually. A progression engine is on the [roadmap](../../roadmap/README.md#training-intelligence).
 - **Streaks unchanged in this story.** The existing weekly strength streak keeps working as-is; the cross-Discipline streak rethink is [US-020](./US-020-practice-streaks-calendar.md), not US-015.
 
 ---

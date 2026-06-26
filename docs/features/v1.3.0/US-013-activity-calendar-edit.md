@@ -1,6 +1,6 @@
 # US-013 — Activity Edit from Calendar
 
-> **Status: ❌ Planned — v1.3.0**
+> **Status: ✅ Shipped — v1.3.0**
 >
 > Activity logging is shipped (v1.1.0 US-003). Calendar day detail supports viewing and deleting activities, but not editing. Edit is only available from the `/log` page.
 

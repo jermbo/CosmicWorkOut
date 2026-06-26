@@ -193,7 +193,9 @@ All preferences are editable via **Settings** (`/settings` hub and sub-routes pe
 
 ## What's Not Built
 
-See [Implementation Status](status.md) for the full checklist. The app's core flows, Discipline model, insights, and PWA are all shipped; the Journal page was built in v1.3 and later removed. Remaining ideas are tracked per-version in [`docs/features/`](../features/).
+All scoped v1.1–v1.7 features are shipped. Deferred ideas and the next portability work (device sync) live on the [roadmap](../roadmap/README.md). The Journal page was built in v1.3 and later removed — it is not on the roadmap unless feedback brings it back.
+
+See [Implementation Status](status.md) for the full checklist.
 
 ---
 
