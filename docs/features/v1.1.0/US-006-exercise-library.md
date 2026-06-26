@@ -1,6 +1,6 @@
 # US-006 — Exercise Library
 
-> **Status: ✅ Shipped**
+> **Status: Shipped**
 > Browse, search, category filter, custom exercise create/edit/delete (with in-use guard), built-in exercises read-only — all implemented.
 
 As a **fitness user**, I want to browse, search, and manage exercises

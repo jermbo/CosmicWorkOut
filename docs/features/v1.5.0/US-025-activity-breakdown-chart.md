@@ -1,6 +1,6 @@
 # US-025 — Activity Type Breakdown Chart
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > A doughnut chart showing the count of each activity type logged over the last 45 days. Quick, colorful, and a fun summary of movement variety outside the gym.
 

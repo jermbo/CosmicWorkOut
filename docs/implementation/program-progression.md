@@ -10,11 +10,14 @@ The app does **not** map workouts to calendar days. Instead, it walks through th
 
 ```mermaid
 flowchart LR
-    S0["Session 0<br/>Workout A"] --> S1["Session 1<br/>Workout B"]
-    S1 --> S2["Session 2<br/>Workout C"]
-    S2 --> S3["Session 3<br/>Workout A (wk 2)"]
+    S0["Session 0<br/>Routine A"] --> S1["Session 1<br/>Routine B"]
+    S1 --> S2["Session 2<br/>Routine C"]
+    S2 --> S3["Session 3<br/>Routine A (wk 2)"]
     S3 --> Sdot["..."]
     Sdot --> S36["Session 36<br/>wraps to index 0"]
+
+    classDef step fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    class S0,S1,S2,S3,Sdot,S36 step;
 ```
 
 ```
@@ -55,14 +58,21 @@ Position within the current week cycle, independent of which workout template is
 
 ```mermaid
 flowchart TD
-    Open[Open Today page] --> Done{SessionLog for<br/>today + active program?}
-    Done -->|yes| Complete[Show 'Workout complete']
+    Open[Open Today page] --> Done{Session for<br/>today + active program?}
+    Done -->|yes| Complete[Show 'complete for today']
     Done -->|no| Active{sessionStore.isActive?}
     Active -->|yes| Overlay[Session overlay open]
-    Active -->|no| Start[Show workout card + Start button]
+    Active -->|no| Start[Show routine card + Start button]
+
+    classDef start fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef decision fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class Open start;
+    class Done,Active decision;
+    class Complete,Overlay,Start done;
 ```
 
-If a `SessionLog` exists for today's date + active program, the Today page shows a "Workout complete" state instead of the start button. You cannot log two sessions on the same day.
+If a `Session` exists for today's date + active program, the Today page shows a "complete for today" state instead of the start button. You cannot log two sessions on the same day.
 
 ---
 
@@ -90,7 +100,7 @@ Workout edits via `saveWorkoutExercises()` propagate to **all weeks** by matchin
 
 ---
 
-## Per-Discipline progression 🟡 (v1.4.0)
+## Per-Discipline progression (v1.4.0)
 
 The logic above is unchanged — it just runs **per Discipline**. v1.4.0 tracks one active program per Discipline, so strength and belly dance each compute their own `todaysRoutine`, `currentWeek`, and streak from their own session counts. Two deliberate non-goals, locked in [US-015](../features/v1.4.0/US-015-discipline-engine-foundation.md#decisions--non-goals-locked):
 
@@ -102,6 +112,6 @@ The logic above is unchanged — it just runs **per Discipline**. v1.4.0 tracks 
 ## Related
 
 - [How It Works](behavior.md) — Plain-language mental model
-- [Data Model](../architecture/data-model.md) — Program, Workout, SessionLog types
+- [Data Model](../architecture/data-model.md) — Program, Routine, Session types
 - [Program Management](../requirements/program-management.md) — Editing requirements
 - [State Management](state.md) — `programStore` derived values

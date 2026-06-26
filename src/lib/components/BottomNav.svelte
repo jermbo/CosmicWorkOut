@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	let { pathname }: { pathname: string } = $props();
 
 	const navItems = [
@@ -7,7 +9,7 @@
 		{ href: '/calendar', label: 'History', exact: false },
 		{ href: '/insights', label: 'Insights', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
-	];
+	] as const;
 
 	function isActive(item: (typeof navItems)[number]): boolean {
 		if (item.href === '/practice') {
@@ -27,10 +29,10 @@
 
 <nav class="bottom-nav" aria-label="Main navigation">
 	<ul class="bottom-nav__list" role="list">
-		{#each navItems as item}
+		{#each navItems as item (item.href)}
 			<li class="bottom-nav__item">
 				<a
-					href={item.href}
+					href={resolve(item.href)}
 					class="bottom-nav__link"
 					class:bottom-nav__link--active={isActive(item)}
 					aria-current={ariaCurrentFor(item)}

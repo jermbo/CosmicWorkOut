@@ -145,7 +145,7 @@
 				<div class="dance-session__progress-fill" style:inline-size="{progressPct}%"></div>
 			</div>
 			<div class="dance-session__sections" role="tablist" aria-label="Routine sections">
-				{#each sections as section, i}
+				{#each sections as section, i (section.key)}
 					<button
 						class="dance-session__sec-tab"
 						class:dance-session__sec-tab--active={i === sectionIdx}
@@ -160,7 +160,7 @@
 		</header>
 
 		<div class="dance-session__items">
-			{#each sectionItems as { item, index, def }}
+			{#each sectionItems as { item, index, def } (item.itemId)}
 				{#if def}
 					<div class="dance-item" class:dance-item--done={isItemDone(item)}>
 						{#if item.metric === 'check'}

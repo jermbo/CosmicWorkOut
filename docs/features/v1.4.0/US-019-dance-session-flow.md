@@ -1,6 +1,6 @@
 # US-019 — Dance Session Flow
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: Shipped — v1.4.0**
 >
 > The in-session experience: guided section flow, mixed logging modes, finish/edit/abandon. Mirrors strength session patterns.
 

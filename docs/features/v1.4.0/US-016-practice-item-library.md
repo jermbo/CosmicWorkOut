@@ -1,6 +1,6 @@
 # US-016 — Item Library (Discipline-scoped)
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: Shipped — v1.4.0**
 >
 > Builds on the Discipline engine (US-015): the library of **Items** (the generalized Exercise). Belly dance items ship as the first non-strength instance; strength exercises are Items of the Strength Discipline. See the [Glossary](../../glossary.md).
 

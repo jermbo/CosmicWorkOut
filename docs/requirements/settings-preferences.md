@@ -8,17 +8,49 @@ User-configurable behavior and appearance.
 
 ## Implementation Status
 
-| Story                                        | Status   |
-| -------------------------------------------- | -------- | --------------------------------------------- |
-| Preferences store + localStorage persistence | ✅ Built |
-| Settings UI / route (`/settings`)            | ✅ Built |
-| Accent color (presets + custom hex)          | ✅ Built |
-| Density / roundness via data attributes      | ✅ Built |
-| Completion feel toggles confetti             | ✅ Built |
-| Weight unit in display/input                 | ✅ Built |
-| Per-exercise weight increment (2.5 / 5 / 10) | ✅ Built | Set on the exercise form, not in global prefs |
-| Clear workout data (settings)                | ✅ Built | Wipes IndexedDB + session state; keeps prefs  |
-| Reset preferences to defaults (settings)     | ✅ Built | Resets `cwout:prefs`; workout data untouched  |
+| Story                                         | Status    | Notes                                                                                       |
+| --------------------------------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| Preferences store + localStorage persistence  | Built     | `prefsStore` ↔ `cwout:prefs`                                                                |
+| Settings hub + sub-routes (`/settings`)       | Shipped   | Hub + `/settings/habits`, `/settings/data` ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| Health metrics master toggle                  | Shipped   | On the Settings hub ([US-029](../features/v1.7.0/US-029-health-metrics.md))                 |
+| Weight unit applied in display/input          | Built     | Default `lb`; applied throughout                                                            |
+| Accent / density / roundness applied on boot  | Built     | Read from stored prefs and applied; see appearance-UI note below                            |
+| Appearance settings page                      | Removed   | `/settings/appearance` UI dropped in US-030; prefs keep applying their stored/default values |
+| Completion feel toggle                        | Not built | No `completionFeel` pref; the completion confetti always plays                              |
+| Per-item weight increment (2.5 / 5 / 10)      | Built     | Set on the item form, not in global prefs                                                   |
+| Clear workout data                            | Built     | On `/settings/data`; wipes IndexedDB + session state                                        |
+| Reset preferences to defaults                 | Built     | `prefsStore.resetToDefaults()`                                                              |
+
+> **Appearance UI note:** `accentColor`, `density`, `roundness`, and `weightUnit` all exist in `prefsStore` and apply on boot, but the dedicated appearance page was removed in US-030 — there is currently no in-app UI to change them, so they use their stored/default values. The accent-color and completion-feel user stories below describe the **target** UX, not what is currently surfaced.
+
+---
+
+## Settings Information Architecture
+
+Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a short hub with sub-routes instead of one long scroll.
+
+| Route              | Contents                                                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `/settings`        | **Hub** — navigation rows + health metrics toggle                                                                 |
+| `/settings/habits` | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))                        |
+| `/settings/data`   | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed             |
+
+```mermaid
+flowchart LR
+    Hub["/settings"]
+    Hub --> Hab["/settings/habits"]
+    Hub --> Data["/settings/data"]
+    Hub -->|toggle| Health[healthMetricsEnabled]
+
+    classDef hub fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef toggle fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class Hub hub;
+    class Hab,Data route;
+    class Health toggle;
+```
+
+The hub stays short; destructive and infrequent actions live on **Data & backup**. There is no appearance page — see the Appearance UI note above.
 
 ---
 
@@ -33,8 +65,15 @@ flowchart LR
     Store --> Apply{Apply immediately}
     Apply --> CSS["--color-accent on :root"]
     Apply --> Data["data-density / data-roundness"]
-    Apply --> Feel[completionFeel → Confetti]
-    Apply --> Unit[weightUnit → SetTile / LogSetSheet]
+    Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight]
+    Apply --> Health[healthMetricsEnabled → home / health / insights]
+
+    classDef trigger fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef effect fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    class Change trigger;
+    class Store,LS,Apply store;
+    class CSS,Data,Unit,Health effect;
 ```
 
 ---
@@ -107,9 +146,7 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 
 ## Out of Scope for v1
 
-- Per-exercise rest timer duration
-- Notification settings (rest timer alerts)
-- Theme beyond dark mode (no light mode — see [Design Principles](../vision/principles.md))
+Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications, light mode (dark-only by design — see [Design Principles](../vision/principles.md)).
 
 ---
 
@@ -118,3 +155,4 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 - [Data Model — UserPrefs](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — Where weight increment and completion feel are applied
 - [Design Principles](../vision/principles.md) — Why dark-only and small surface area
+- [US-030 — Settings Hub Restructure](../features/v1.7.0/US-030-settings-restructure.md)

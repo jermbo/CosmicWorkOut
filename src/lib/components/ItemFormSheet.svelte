@@ -143,7 +143,7 @@
 			<div class="form-field">
 				<span class="form-field__label" id="item-section-label">Section</span>
 				<div class="chips" role="radiogroup" aria-labelledby="item-section-label">
-					{#each sections as s}
+					{#each sections as s (s.key)}
 						<button
 							type="button"
 							class="chip"
@@ -162,7 +162,7 @@
 			<div class="form-field" class:form-field--error={errors.focus}>
 				<span class="form-field__label" id="item-focus-label">Focus</span>
 				<div class="chips" role="group" aria-labelledby="item-focus-label">
-					{#each FOCUS_TAGS as tag}
+					{#each FOCUS_TAGS as tag (tag)}
 						<button
 							type="button"
 							class="chip"

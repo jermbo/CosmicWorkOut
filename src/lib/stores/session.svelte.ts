@@ -14,6 +14,7 @@ import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { effectiveSections } from '$lib/discipline';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
@@ -172,8 +173,8 @@ class SessionStore {
 		program: Program,
 		log: Session,
 	): Array<{ itemId: string; template?: RoutineItem; logged: LoggedItem; metric: Metric; section: string }> {
-		const loggedById = new Map(log.items.map((e) => [e.itemId, e]));
-		const seen = new Set<string>();
+		const loggedById = new SvelteMap(log.items.map((e) => [e.itemId, e]));
+		const seen = new SvelteSet<string>();
 		const result: Array<{
 			itemId: string;
 			template?: RoutineItem;

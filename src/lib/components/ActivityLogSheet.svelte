@@ -125,7 +125,7 @@
 			<div class="act-field">
 				<span class="act-field__label">Activity</span>
 				<div class="act-type-grid" role="radiogroup" aria-label="Activity type">
-					{#each ACTIVITY_TYPES as type}
+					{#each ACTIVITY_TYPES as type (type)}
 						<button
 							class="act-type-btn"
 							class:act-type-btn--active={selectedType === type}
@@ -161,7 +161,7 @@
 			<div class="act-field">
 				<span class="act-field__label">Intensity</span>
 				<div class="act-intensity" role="radiogroup" aria-label="Intensity">
-					{#each INTENSITIES as lvl}
+					{#each INTENSITIES as lvl (lvl)}
 						<button
 							class="act-intensity-btn"
 							class:act-intensity-btn--active={intensity === lvl}

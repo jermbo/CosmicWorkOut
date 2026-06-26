@@ -253,7 +253,7 @@ type HabitLog = {
 };
 ```
 
-Seven built-in habits ship in `seed.ts` (Meditation, Writing, Reading, Water, Coffee, Alcohol, Mood), seeded on first run only. A boot-time migration in `initDB()` patches `dailyGoal` onto pre-existing built-in habit records that lack it.
+Six built-in trackable habits plus **Mood** (always on) ship in `seed.ts`. Seeded when the `habits` store is empty on first run — no habit field migration; use a `DB_VERSION` wipe when built-ins change. See [US-031](../features/v1.7.0/US-031-default-habits-tweak.md).
 
 ### ActivityLog
 
@@ -285,6 +285,36 @@ type ActivityLog = {
 };
 ```
 
+### HealthReading
+
+> **Shipped — [US-029](../features/v1.7.0/US-029-health-metrics.md).** Optional body measurements (weight, blood pressure). Not a movement archetype — see [Glossary](../glossary.md#health-metrics).
+
+Metric **definitions** live in code (`src/lib/health/metrics.ts`), not IndexedDB. Only **readings** are stored.
+
+```typescript
+type HealthMetricId = 'weight' | 'bloodPressure';
+
+type WeightValues = { value: number };
+
+type BloodPressureValues = {
+	systolic: number;
+	diastolic: number;
+	pulse?: number;
+};
+
+type HealthReading = {
+	id: string;
+	metricId: HealthMetricId;
+	date: string; // ISO date — global logging date
+	recordedAt: string; // ISO datetime — orders multiple BP readings per day
+	values: WeightValues | BloodPressureValues;
+};
+```
+
+- **Weight:** at most one reading per `date` (upsert).
+- **Blood pressure:** many readings per `date`; Insights charts use daily averages of systolic/diastolic (and pulse when present).
+- **Feature gate:** `UserPrefs.healthMetricsEnabled` (default `false`). When off, UI is hidden; readings remain in IndexedDB.
+
 ### UserPrefs
 
 Stored in localStorage (`cwout:prefs`).
@@ -294,7 +324,8 @@ type UserPrefs = {
 	accentColor: string; // hex, default "#b2f042"
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
-	weightUnit: 'lb' | 'kg';
+	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
+	healthMetricsEnabled?: boolean; // default false — US-029
 };
 ```
 
@@ -323,11 +354,13 @@ erDiagram
     HabitLog }o--|| Habit : "daily value for"
 ```
 
+**Health readings** (`HealthReading`) are standalone rows keyed by `metricId` + `date` (+ `recordedAt` for blood pressure). Metric definitions are code-only — see [US-029](../features/v1.7.0/US-029-health-metrics.md).
+
 ---
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **7**. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
+DB name `cosmic-workout`, version **8** today. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
 
 **Version history:**
 
@@ -337,16 +370,18 @@ DB name `cosmic-workout`, version **7**. The upgrade path is **wipe-and-reseed**
 | v5 (v1.4.0) | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                        |
 | v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                 |
 | v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                            |
+| v8 (v1.7.0) | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                      |
 
-| Store          | Key      | Indexes               | Contents                         |
-| -------------- | -------- | --------------------- | -------------------------------- |
-| `items`        | `id`     | —                     | Item library (built-in + custom) |
-| `programs`     | `id`     | —                     | All programs                     |
-| `sessions`     | `id`     | `by_date`             | Completed sessions               |
-| `itemLastUsed` | `itemId` | —                     | Last weight/reps per item        |
-| `activities`   | `id`     | `by_date`             | Activity log entries             |
-| `habits`       | `id`     | —                     | Habit definitions                |
-| `habitLogs`    | `id`     | `by_date`, `by_habit` | Daily habit log values           |
+| Store               | Key      | Indexes                | Contents                         |
+| ------------------- | -------- | ---------------------- | -------------------------------- |
+| `items`             | `id`     | —                      | Item library (built-in + custom) |
+| `programs`          | `id`     | —                      | All programs                     |
+| `sessions`          | `id`     | `by_date`              | Completed sessions               |
+| `itemLastUsed`      | `itemId` | —                      | Last weight/reps per item        |
+| `activities`        | `id`     | `by_date`              | Activity log entries             |
+| `habits`            | `id`     | —                      | Habit definitions                |
+| `habitLogs`         | `id`     | `by_date`, `by_habit`  | Daily habit log values           |
+| `healthReadings`    | `id`     | `by_date`, `by_metric` | Health metric readings (US-029)  |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
@@ -370,3 +405,4 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 - [Offline Strategy](offline-strategy.md) — When each store is written
 - [State Management](../implementation/state.md) — How stores read/write these types
 - [Program Progression](../implementation/program-progression.md) — How sessions advance the schedule
+- [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health readings store

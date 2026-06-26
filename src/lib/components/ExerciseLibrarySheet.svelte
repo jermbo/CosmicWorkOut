@@ -134,7 +134,7 @@
 		</div>
 
 		<div class="lib-sheet__cats" role="group" aria-label="Filter by category">
-			{#each CATS as cat}
+			{#each CATS as cat (cat)}
 				<button
 					class="lib-cat-chip"
 					class:lib-cat-chip--active={activeCat === cat}

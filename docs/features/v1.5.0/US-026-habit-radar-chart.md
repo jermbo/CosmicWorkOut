@@ -1,6 +1,6 @@
 # US-026 — Habit Balance Radar Chart
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > A radar chart showing average logged value per habit over the last 45 days. Visualizes balance (or imbalance) across the user's habit set at a glance.
 

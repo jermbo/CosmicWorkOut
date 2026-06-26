@@ -18,13 +18,11 @@
 </script>
 
 <HomeCard href="/practice/{group.id}" title={group.label} ariaLabel="{group.label}: {summary}" {variant}>
-	{#snippet children()}
-		<p class="practice-group-card__summary">{summary}</p>
-		<p class="practice-group-card__meta">{meta}</p>
-		<p class="practice-group-card__count">
-			{planCount} active {#if planCount === 1}plan{:else}plans{/if}
-		</p>
-	{/snippet}
+	<p class="practice-group-card__summary">{summary}</p>
+	<p class="practice-group-card__meta">{meta}</p>
+	<p class="practice-group-card__count">
+		{planCount} active {#if planCount === 1}plan{:else}plans{/if}
+	</p>
 </HomeCard>
 
 <style>

@@ -71,21 +71,17 @@
 		showLibrary = false;
 	}
 
-	function updateExerciseSets(i: number, sets: number, reps: string) {
-		exercises = exercises.map((e, idx) => {
-			if (idx === i) return { ...e, sets, reps };
-			return e;
-		});
-		editingIndex = null;
-	}
-
 	async function handleSave() {
 		if (saving) {
 			return;
 		}
 		saving = true;
 
-		const clean: RoutineItem[] = exercises.map(({ _key, ...rest }) => rest);
+		const clean: RoutineItem[] = exercises.map((item) => {
+			const { _key: _itemKey, ...rest } = item;
+			void _itemKey;
+			return rest;
+		});
 
 		if (isNew) {
 			await programStore.addRoutine({

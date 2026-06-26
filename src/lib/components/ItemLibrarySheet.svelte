@@ -146,7 +146,7 @@
 				onclick={() => (activeSection = 'all')}
 				aria-pressed={activeSection === 'all'}>All</button
 			>
-			{#each sections as s}
+			{#each sections as s (s.key)}
 				<button
 					class="lib-chip"
 					class:lib-chip--active={activeSection === s.key}
@@ -163,7 +163,7 @@
 				onclick={() => (activeFocus = null)}
 				aria-pressed={activeFocus === null}>Any focus</button
 			>
-			{#each FOCUS_TAGS as tag}
+			{#each FOCUS_TAGS as tag (tag)}
 				<button
 					class="lib-chip lib-chip--focus"
 					class:lib-chip--active={activeFocus === tag}

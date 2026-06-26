@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { Chart, chartTheme, ACTIVITY_PALETTE } from '$lib/chart-utils';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 	let { dates, rangeLabel }: { dates: string[]; rangeLabel: string } = $props();
 
@@ -8,8 +9,8 @@
 
 	let activityBreakdown = $derived.by(() => {
 		if (dates.length === 0) return [];
-		const dateSet = new Set(dates);
-		const counts = new Map<string, number>();
+		const dateSet = new SvelteSet(dates);
+		const counts = new SvelteMap<string, number>();
 		for (const a of activityStore.activities) {
 			if (!dateSet.has(a.date)) continue;
 			counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
@@ -92,7 +93,7 @@
 		<tr><th scope="col">Activity</th><th scope="col">Count</th><th scope="col">Share</th></tr>
 	</thead>
 	<tbody>
-		{#each activityBreakdown as { type, count }}
+		{#each activityBreakdown as { type, count } (type)}
 			<tr>
 				<td>{type}</td>
 				<td>{count}</td>

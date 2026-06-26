@@ -8,18 +8,20 @@ Viewing past sessions and tracking progress over time.
 
 ## Implementation Status
 
-| Story                                  | Status         |
-| -------------------------------------- | -------------- | ------------------------------------------------------- |
-| Monthly calendar with navigation       | ✅ Built       |
-| Completed day highlighting             | ✅ Built       |
-| Day summary sheet (read-only)          | ✅ Built       |
-| Month stats (sessions, volume, streak) | ✅ Built       |
-| Week strip on Today page               | ✅ Built       |
-| Scheduled/rest/skipped day status      | ❌ Not built   |
-| Weekly consistency streak              | ⚠️ Wrong logic | See "Streak behavior" below                             |
-| Week strip program filter              | ⚠️ Partial     | Shows all sessions, not active-program only             |
-| Edit past sessions                     | ✅ Built       | Edit + delete from DaySummarySheet                      |
-| Backfill missed days                   | ✅ Built       | Tap past/skipped days on calendar → Today with date set |
+> **See [Implementation Status](../implementation/status.md)** for the full checklist.
+
+| Area                              | Status   |
+| --------------------------------- | -------- |
+| Monthly calendar + navigation     | Built |                                 |
+| Completed day highlighting        | Built |                                 |
+| Day summary sheet                 | Built |                                 |
+| Edit/delete sessions & activities | Built |                                 |
+| Habit heatmap on calendar         | Built |                                 |
+| Week strip on home                | Built |                                 |
+| Weekly consistency streak         | Built | Per active program / discipline |
+| Backfill past days                | Built | Date picker + calendar tap      |
+
+Insights charts (volume trends, etc.) shipped in v1.5.0 — see [/insights](../implementation/app-structure.md).
 
 ---
 
@@ -35,29 +37,34 @@ Users can look back at their workout history to see what they've done, confirm t
 flowchart TD
     Day[Calendar day] --> Today{date === today?}
     Today -->|yes| StatusToday[today — outlined]
-    Today -->|no| HasSession{SessionLog exists<br/>for date + program?}
+    Today -->|no| HasSession{Session exists<br/>for date + program?}
     HasSession -->|yes| StatusDone[completed — accent fill, tappable]
     HasSession -->|no| Future{date > today?}
     Future -->|yes| StatusFuture[future — muted]
     Future -->|no| StatusDefault[past, no session — default]
+
+    classDef start fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef decision fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    classDef muted fill:#465569,stroke:#28313e,color:#ffffff;
+    class Day start;
+    class Today,HasSession,Future decision;
+    class StatusDone done;
+    class StatusToday,StatusFuture,StatusDefault muted;
 ```
 
-Scheduled, rest, and skipped statuses are **not yet implemented** — see open questions below.
+Scheduled, rest, and skipped **calendar cell styles** beyond completed/today/past are not implemented — see [roadmap](../roadmap/README.md) if needed after user testing.
 
 ---
 
 ## Streak Behavior (Built Today)
 
-Two different streak calculations exist — neither matches the target spec:
+| Location         | What it shows | How it works                                                              |
+| ---------------- | ------------- | ------------------------------------------------------------------------- |
+| **Home header**  | Week streak   | `computeWeekStreak` — consecutive weeks with sessions ≥ `daysPerWeek`     |
+| **Practice hub** | Combined streak | Cross-discipline streak when multiple plans are active                  |
 
-| Location           | What it shows | How it works                                                                 |
-| ------------------ | ------------- | ---------------------------------------------------------------------------- |
-| **Today header**   | "X wk streak" | Count of distinct ISO weeks containing any session (all programs, all time)  |
-| **Calendar stats** | "Day streak"  | Consecutive days with any session, walking backward from today (max 90 days) |
-
-Target spec: consecutive weeks where all scheduled workouts were completed. Not built.
-
-The **week strip** on Today shows this week's activity but does **not** filter by active program.
+See `programStore.weekStreakFor` and `combinedWeekStreak` in [State Management](../implementation/state.md).
 
 ---
 
@@ -92,15 +99,15 @@ sequenceDiagram
 
     User->>Cal: tap completed day
     Cal->>Store: getSessionForDay(date)
-    Store-->>Cal: SessionLog
-    Cal->>Sheet: open with session + exerciseMap
-    Sheet-->>User: workout name, volume, sets/reps/weight
+    Store-->>Cal: Session
+    Cal->>Sheet: open with session + itemMap
+    Sheet-->>User: routine name, volume, sets/reps/weight
     User->>Sheet: close
 ```
 
 - Tapping a completed day opens a summary sheet
-- Summary shows: workout name, date, total volume, exercises logged with sets/reps/weight
-- I cannot edit a past session from this view (read-only in v1)
+- Summary shows: routine name, date, total volume, items logged with sets/reps/weight
+- Past sessions and activities can be edited or deleted from this view
 
 ---
 
@@ -108,9 +115,7 @@ sequenceDiagram
 
 > As a user, I want to know how many weeks I've trained consistently, so I stay motivated.
 
-**Target:** Consecutive weeks where all scheduled workouts were completed.
-
-**Built today:** Placeholder streak indicators with different logic on Today vs Calendar — see table above.
+**Built today:** A week streak (`computeWeekStreak`) counts consecutive weeks with sessions meeting `daysPerWeek`, shown on the home header; the Practice hub shows a combined cross-discipline streak when multiple plans are active — see table above.
 
 ---
 
@@ -124,24 +129,19 @@ sequenceDiagram
 
 ## Open Questions
 
-- Should the calendar show the full program schedule (future scheduled days) or only past + today? **Today: only actual logged sessions.**
-- Program switching is not built yet — calendar filters completed days by active program only.
-- Skipped days are not implemented.
+Resolved for now — revisit after user testing. Add items to [roadmap](../roadmap/README.md) if feedback demands them.
 
 ---
 
-## Out of Scope for v1
+## Out of Scope
 
-- Volume trend graphs / sparklines (v2)
-- Personal records (v2)
-- Program completion percentage progress bar (v2)
-- Export or sharing session data
+Volume trends and export shipped in v1.5.0 Insights and v1.7.0 backup. Other deferred ideas: [roadmap](../roadmap/README.md).
 
 ---
 
 ## Related
 
 - [How It Works](../implementation/behavior.md) — Calendar and streak behavior
-- [Data Model — SessionLog](../architecture/data-model.md)
+- [Data Model — Session](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — How sessions are created
 - [Program Management](program-management.md) — Where the schedule comes from

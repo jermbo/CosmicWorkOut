@@ -1,6 +1,6 @@
 # US-003 — Activity Logging
 
-> **Status: ✅ Shipped**
+> **Status: Shipped**
 > Full logging flow (type, duration, intensity, date, custom name), last-used type pre-selection, and calendar integration with activity dots all built. Edit is available from the `/log` page. Calendar day detail edit is tracked in [v1.3.0 US-013](../v1.3.0/US-013-activity-calendar-edit.md).
 
 As an **active user**, I want to log physical activities that are outside my structured workout program

@@ -9,10 +9,10 @@
 	$effect(() => {
 		if (!canvas || dates.length === 0) return;
 
-		const { accent, textPrimary, borderColor } = chartTheme();
+		const { accent, textPrimary, borderColor, fontBody } = chartTheme();
 		const dateSet = new Set(dates);
 
-		const activeHabits = habitStore.activeHabits;
+		const activeHabits = habitStore.trackableHabits;
 		const logsByHabit = new Map(activeHabits.map((h) => [h.id, [] as number[]]));
 		for (const log of habitStore.logs) {
 			if (!dateSet.has(log.date)) continue;
@@ -24,7 +24,6 @@
 			const vals = logsByHabit.get(h.id) ?? [];
 			if (vals.length === 0) return 0;
 			const avg = vals.reduce((s, v) => s + v, 0) / vals.length;
-			if (h.type === 'mood') return Math.min(1, Math.max(0, (avg + 5) / 10));
 			if (h.type === 'boolean') return avg;
 			if (h.dailyGoal) return Math.min(1, avg / h.dailyGoal);
 			if (avg > 0) return 1;
@@ -60,7 +59,7 @@
 						max: 1,
 						ticks: { display: false },
 						grid: { color: borderColor },
-						pointLabels: { color: textPrimary, font: { family: 'Inter, sans-serif', size: 12 } },
+						pointLabels: { color: textPrimary, font: { family: fontBody, size: 12 } },
 						angleLines: { color: borderColor },
 					},
 				},
@@ -71,4 +70,4 @@
 	});
 </script>
 
-<canvas bind:this={canvas} role="img" aria-label="Radar chart: average consistency per habit"></canvas>
+<canvas bind:this={canvas} aria-label="Radar chart: average consistency per habit"></canvas>

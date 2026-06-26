@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
@@ -108,7 +109,7 @@
 <div class="page page--wide dance-page">
 	<PageHeader title="Belly Dance" showBack backHref="/practice">
 		{#snippet trailing()}
-			<a href="/program?discipline=bellydance" class="dance-page__programs-link">Program</a>
+			<a href={resolve('/program?discipline=bellydance')} class="dance-page__programs-link">Program</a>
 		{/snippet}
 	</PageHeader>
 
@@ -165,7 +166,7 @@
 					<p class="routine-preview__focus">{selectedRoutine.focus}</p>
 				{/if}
 				<ul class="routine-preview__sections">
-					{#each sectionPreview as section}
+					{#each sectionPreview as section (section.key)}
 						<li class="routine-preview__section">
 							<span class="routine-preview__section-label">{section.label}</span>
 							<span class="routine-preview__section-count">{section.items.length} items</span>
@@ -183,7 +184,7 @@
 	{:else}
 		<div class="dance-page__no-program">
 			<p>No routine scheduled for this week.</p>
-			<a href="/program?discipline=bellydance" class="dance-page__program-link">View program</a>
+			<a href={resolve('/program?discipline=bellydance')} class="dance-page__program-link">View program</a>
 		</div>
 	{/if}
 </div>

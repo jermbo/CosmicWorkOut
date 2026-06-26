@@ -1,6 +1,6 @@
 # US-002 — Custom Program Creation
 
-> **Status: ✅ Shipped**
+> **Status: Shipped**
 > Program creation flow, workout editing (add/remove/reorder exercises via up/down buttons), rename workouts, remove workout slots, delete programs, and copy built-in programs all implemented.
 
 As a **fitness user**, I want to create my own workout program

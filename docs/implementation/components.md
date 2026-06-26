@@ -2,7 +2,7 @@
 
 Inventory of the **52** UI components in `src/lib/components/` (plus `components/insights/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Generated against the code on branch `feature/v1.6.0`.
 
-> ⚠️ **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](maintenance/audit-2026-06.md).
+> **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](../maintenance/audit-2026-06.md).
 
 ---
 
@@ -47,9 +47,9 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 | `HomeHabitsCard`      | Habit-progress summary card.                                            |
 | `HomePracticeHubCard` | Practice/plans entry card.                                              |
 | `PracticeGroupCard`   | A practice group (Workout / Dance) tile on the home/practice surface.   |
-| `HabitWidgets`        | ⚠️ **Dead** (297 LOC, no imports) — scrollable habit mini-card strip.   |
-| `HomeDanceCard`       | ⚠️ **Dead** (86 LOC, no imports) — dance summary card.                  |
-| `HomeWorkoutCard`     | ⚠️ **Dead** (90 LOC, no imports) — workout summary card.                |
+| `HabitWidgets`        | **Dead** (297 LOC, no imports) — scrollable habit mini-card strip.      |
+| `HomeDanceCard`       | **Dead** (86 LOC, no imports) — dance summary card.                     |
+| `HomeWorkoutCard`     | **Dead** (90 LOC, no imports) — workout summary card.                   |
 
 ---
 
@@ -132,9 +132,14 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Settings (`/settings`)
 
-| Component           | Purpose                                                      |
-| ------------------- | ------------------------------------------------------------ |
-| `AccentColorPicker` | Accent-color swatch picker; writes `prefsStore.accentColor`. |
+| Component              | Purpose                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
+| `SettingsRow`          | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `SettingsToggleRow`    | Hub row with inline switch (e.g. health metrics)                                                            |
+| `SettingsGroup`        | Section header + grouped rows on hub                                                                        |
+
+Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits` with US-030.
 
 ---
 
@@ -206,6 +211,19 @@ flowchart TB
     DAS --> DAI & DAAL & DAWS
     PH --> WeekStrip
     LS & EFS & ILS & IFS & ELS & DAS --> BS
+
+    classDef layout fill:#465569,stroke:#28313e,color:#ffffff;
+    classDef shared fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef strength fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef editor fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef dance fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef day fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class BN,SO,DSO,SC,TO layout;
+    class BS,IC,CD,PH shared;
+    class EC,ST,LS,PR strength;
+    class WE,ELS,EFS editor;
+    class DRE,ILS,IFS dance;
+    class DAS,DAI,DAAL,DAWS day;
 ```
 
 ---
@@ -239,5 +257,5 @@ flowchart TB
 
 - [How It Works](behavior.md) — What each screen does
 - [App Structure](app-structure.md) — Where components are mounted
-- [June 2026 Audit](maintenance/audit-2026-06.md) — Dead-code + reuse findings
+- [June 2026 Audit](../maintenance/audit-2026-06.md) — Dead-code + reuse findings
 - [Design tokens](../../src/app.css) — CSS custom properties

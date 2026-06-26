@@ -1,9 +1,13 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- day action routes use resolveHref() */
 	import { goto } from '$app/navigation';
+	import { resolveHref } from '$lib/navigation';
 	import type { Session, ActivityLog } from '$lib/db/types';
 	import { formatLongDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { healthStore } from '$lib/stores/health.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import DayActionItem from './DayActionItem.svelte';
 	import DayActionsActivityList from './DayActionsActivityList.svelte';
@@ -47,7 +51,7 @@
 
 	function navigate(path: string) {
 		onClose();
-		goto(path);
+		goto(resolveHref(path));
 	}
 
 	function durationLabelFor(session: Session): string | null {
@@ -83,6 +87,21 @@
 	let activityActionLabel = $derived.by(() => {
 		if (hasActivities) return 'Add activity';
 		return 'Log activity';
+	});
+
+	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
+	let dayWeight = $derived(healthStore.weightForDate(date));
+	let dayBp = $derived(healthStore.bloodPressureForDate(date));
+	let hasHealth = $derived(dayWeight !== undefined || dayBp.length > 0);
+
+	let healthActionLabel = $derived(hasHealth ? 'Edit health metrics' : 'Log health metrics');
+
+	let healthSummary = $derived.by(() => {
+		const parts: string[] = [];
+		if (dayWeight) parts.push(`${dayWeight.values.value} ${prefsStore.weightUnit}`);
+		for (const r of dayBp) parts.push(`${r.values.systolic}/${r.values.diastolic}`);
+		if (parts.length === 0) return 'Weight and blood pressure';
+		return parts.join(' · ');
 	});
 </script>
 
@@ -143,6 +162,15 @@
 				description="Runs, walks, yoga, and more"
 				onclick={() => navigate('/log')}
 			/>
+
+			{#if healthEnabled}
+				<DayActionItem
+					icon={hasHealth ? 'edit' : 'plus'}
+					label={healthActionLabel}
+					description={healthSummary}
+					onclick={() => navigate('/health')}
+				/>
+			{/if}
 
 			{#if strengthSession && onViewStrengthSession}
 				<DayActionItem

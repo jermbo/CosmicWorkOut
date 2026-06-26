@@ -64,7 +64,7 @@
 	<h2 class="packet-card__title">{workout.name}</h2>
 
 	<div class="packet-card__meta">
-		{#each focusChips as chip}
+		{#each focusChips as chip (chip)}
 			<span class="packet-card__chip">
 				<span class="packet-card__chip-dot" aria-hidden="true"></span>
 				{chip}
@@ -89,7 +89,7 @@
 	</div>
 
 	<ul class="packet-card__exercises" role="list" aria-label="Exercises in this workout">
-		{#each flattenItems(workout) as we, i}
+		{#each flattenItems(workout) as we, i (we.itemId)}
 			{@const exercise = exerciseMap.get(we.itemId)}
 			{#if exercise}
 				<li class="packet-card__exercise">

@@ -51,15 +51,15 @@ US-015 introduces the Discipline engine and these generalized entities (and re-s
 
 Implement in order — each story builds on the previous.
 
-| ID                                                 | Title                                       | Status   | Depends on |
-| -------------------------------------------------- | ------------------------------------------- | -------- | ---------- |
-| [US-015](./US-015-discipline-engine-foundation.md) | Discipline Engine Foundation                | ✅ Built | —          |
-| [US-016](./US-016-practice-item-library.md)        | Item Library (Discipline-scoped)            | ✅ Built | US-015     |
-| [US-017](./US-017-belly-dance-program-routines.md) | Belly Dance Discipline, Program & Routines  | ✅ Built | US-016     |
-| [US-018](./US-018-practice-hub-navigation.md)      | Practice Hub & Navigation                   | ✅ Built | US-017     |
-| [US-019](./US-019-dance-session-flow.md)           | Dance Session Flow                          | ✅ Built | US-018     |
-| [US-020](./US-020-practice-streaks-calendar.md)    | Cross-Discipline Streaks & Calendar History | ✅ Built | US-019     |
-| [US-021](./US-021-practice-groups-plans.md)        | Practice Groups & Plans                     | 🟡 Built | US-018     |
+| ID                                                 | Title                                       | Status | Depends on |
+| -------------------------------------------------- | ------------------------------------------- | ------ | ---------- |
+| [US-015](./US-015-discipline-engine-foundation.md) | Discipline Engine Foundation                | Built  | —          |
+| [US-016](./US-016-practice-item-library.md)        | Item Library (Discipline-scoped)            | Built  | US-015     |
+| [US-017](./US-017-belly-dance-program-routines.md) | Belly Dance Discipline, Program & Routines  | Built  | US-016     |
+| [US-018](./US-018-practice-hub-navigation.md)      | Practice Hub & Navigation                   | Built  | US-017     |
+| [US-019](./US-019-dance-session-flow.md)           | Dance Session Flow                          | Built  | US-018     |
+| [US-020](./US-020-practice-streaks-calendar.md)    | Cross-Discipline Streaks & Calendar History | Built  | US-019     |
+| [US-021](./US-021-practice-groups-plans.md)        | Practice Groups & Plans                     | Built  | US-018     |
 
 ---
 
@@ -90,18 +90,7 @@ Exact catalog contents are defined during US-016 implementation.
 
 ## Out of Scope for v1.4.0
 
-| Item                                      | Notes                                                                                                                                                                   |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Per-item session notes                    | Deferred — log during session without a notes field in MVP                                                                                                              |
-| Additional Disciplines                    | Beyond strength + belly dance — engine supports them; only these two ship                                                                                               |
-| Cardio/sports as Disciplines              | Stay on the Activity quick-log path — not in scope to restructure                                                                                                       |
-| Activity distance / pace fields           | Deferred — enriching ActivityLog (e.g. distance for bike/run) is the likely _next_ version; confirms cardio stays on the Activity path, not a Discipline                |
-| Prescribed targets on dance routine items | Routines are ordered lists; values entered during the session                                                                                                           |
-| Load periodization / progression engine   | No auto light → heavy → deload cycle; weeks aren't auto-progressed. Weight carries forward via last-used prefill, adjusted manually. Deferred — a likely future version |
-| Day-of-week scheduling                    | Progression is count-driven; the app never binds a Discipline to specific weekdays. User picks what to log each day                                                     |
-| Separate Dance nav tab                    | Today + Practice destination covers alternating-day usage                                                                                                               |
-| Data migration                            | Pre-beta — wipe and re-seed instead of migrating shipped records                                                                                                        |
-| Service worker / PWA                      | Infrastructure — tracked in [Offline Strategy](../../architecture/offline-strategy.md)                                                                                  |
+Deferred items moved to the [roadmap](../../roadmap/README.md) (session notes, activity distance/pace, load periodization, additional Disciplines, etc.). Cardio/sports stay on the Activity path — not Disciplines.
 
 ---
 

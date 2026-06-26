@@ -1,6 +1,6 @@
 # US-018 — Practice Hub & Navigation
 
-> **Status: ❌ Planned — v1.4.0**
+> **Status: Shipped — v1.4.0**
 >
 > Implements Option C: Today as the hub, bottom nav evolves to Practice, belly dance gets a home card and session entry point.
 

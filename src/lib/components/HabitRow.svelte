@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
-	import { habitTypeLabel } from '$lib/habits';
+	import { habitTypeLabel, isProtectedHabit } from '$lib/habits';
 	import Icon from './Icon.svelte';
 
 	type Props = {
@@ -35,7 +35,10 @@
 		oncanceldelete,
 	}: Props = $props();
 
+	let locked = $derived(isProtectedHabit(habit));
+
 	let meta = $derived.by(() => {
+		if (locked) return 'Always on';
 		const parts = [habitTypeLabel(habit.type)];
 		let goalUnitSuffix = '';
 		if (habit.unit) goalUnitSuffix = ` ${habit.unit}`;
@@ -57,7 +60,7 @@
 	class="habit-row"
 	class:habit-row--dragging={dragging}
 	class:habit-row--dragover={dragover}
-	draggable="true"
+	draggable={!locked}
 	{ondragstart}
 	{ondragover}
 	{ondragleave}
@@ -66,35 +69,39 @@
 	role="listitem"
 >
 	<div class="habit-row__drag-handle" aria-hidden="true">
-		<Icon name="drag" size={16} />
+		{#if !locked}
+			<Icon name="drag" size={16} />
+		{/if}
 	</div>
 	<div class="habit-row__info">
 		<span class="habit-row__name">{habit.name}</span>
 		<span class="habit-row__meta">{meta}</span>
 	</div>
 	<div class="habit-row__actions">
-		<button
-			class="habit-row__toggle"
-			class:habit-row__toggle--active={habit.active}
-			onclick={ontoggle}
-			aria-label={toggleAriaLabel()}
-			role="switch"
-			aria-checked={habit.active}
-		>
-			<span class="habit-row__toggle-thumb"></span>
-		</button>
-		<button class="habit-row__btn" onclick={onedit} aria-label="Edit {habit.name}">
-			<Icon name="edit" size={14} />
-		</button>
-		{#if confirmingDelete}
-			<button class="habit-row__btn habit-row__btn--confirm" onclick={ondelete}>Sure?</button>
-			<button class="habit-row__btn" onclick={oncanceldelete} aria-label="Cancel">
-				<Icon name="close" size={14} />
+		{#if !locked}
+			<button
+				class="habit-row__toggle"
+				class:habit-row__toggle--active={habit.active}
+				onclick={ontoggle}
+				aria-label={toggleAriaLabel()}
+				role="switch"
+				aria-checked={habit.active}
+			>
+				<span class="habit-row__toggle-thumb"></span>
 			</button>
-		{:else}
-			<button class="habit-row__btn habit-row__btn--delete" onclick={ondelete} aria-label="Delete {habit.name}">
-				<Icon name="trash" size={14} />
+			<button class="habit-row__btn" onclick={onedit} aria-label="Edit {habit.name}">
+				<Icon name="edit" size={14} />
 			</button>
+			{#if confirmingDelete}
+				<button class="habit-row__btn habit-row__btn--confirm" onclick={ondelete}>Sure?</button>
+				<button class="habit-row__btn" onclick={oncanceldelete} aria-label="Cancel">
+					<Icon name="close" size={14} />
+				</button>
+			{:else}
+				<button class="habit-row__btn habit-row__btn--delete" onclick={ondelete} aria-label="Delete {habit.name}">
+					<Icon name="trash" size={14} />
+				</button>
+			{/if}
 		{/if}
 	</div>
 </div>

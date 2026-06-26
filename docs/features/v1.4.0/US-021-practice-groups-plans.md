@@ -1,6 +1,6 @@
 # US-021 — Practice Groups & Plans
 
-> **Status: 🟡 In progress — v1.4.0**
+> **Status: Shipped — v1.4.0**
 
 As a **user**, I want to choose which practice groups and plans are active for me
 so that Practice stays focused on what I actually use, without noise from paused or unused areas.

@@ -18,27 +18,25 @@
 </script>
 
 <HomeCard href="/log" title="Activity" {ariaLabel} variant="log">
-	{#snippet children()}
-		{#if activities.length === 0}
-			<p class="home-activity-card__empty">No activities yet.</p>
-		{:else}
-			<p class="home-activity-card__summary">
-				{formatCountWithWord(activities.length, 'activity', 'activities')} logged
-			</p>
-			<div class="home-activity-card__chips">
-				{#each activities.slice(0, 3) as activity (activity.id)}
-					<span class="home-activity-card__chip">
-						{formatActivityChip(activity)}
-					</span>
-				{/each}
-				{#if activities.length > 3}
-					<span class="home-activity-card__chip home-activity-card__chip--more">
-						+{activities.length - 3} more
-					</span>
-				{/if}
-			</div>
-		{/if}
-	{/snippet}
+	{#if activities.length === 0}
+		<p class="home-activity-card__empty">No activities yet.</p>
+	{:else}
+		<p class="home-activity-card__summary">
+			{formatCountWithWord(activities.length, 'activity', 'activities')} logged
+		</p>
+		<div class="home-activity-card__chips">
+			{#each activities.slice(0, 3) as activity (activity.id)}
+				<span class="home-activity-card__chip">
+					{formatActivityChip(activity)}
+				</span>
+			{/each}
+			{#if activities.length > 3}
+				<span class="home-activity-card__chip home-activity-card__chip--more">
+					+{activities.length - 3} more
+				</span>
+			{/if}
+		</div>
+	{/if}
 </HomeCard>
 
 <style>

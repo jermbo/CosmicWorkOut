@@ -26,7 +26,7 @@ flowchart TB
         TS[TypeScript]
     end
 
-    subgraph planned ["Planned"]
+    subgraph offline ["Offline"]
         SW[Service Worker + PWA]
     end
 
@@ -36,6 +36,17 @@ flowchart TB
     SS --> LS
     Vite --> SK
     SV -.-> SW
+
+    classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
+    classDef state fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
+    classDef data fill:#7a4f9e,stroke:#46295c,color:#ffffff;
+    classDef build fill:#465569,stroke:#28313e,color:#ffffff;
+    classDef offline fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
+    class SK,SV,CSS ui;
+    class PS,SS,PR state;
+    class IDB,LS data;
+    class Vite,TS build;
+    class SW offline;
 ```
 
 ---
@@ -44,7 +55,7 @@ flowchart TB
 
 **Svelte 5** with runes (`$state`, `$derived`, `$effect`) for reactive state. **SvelteKit** for routing, layout, and build tooling.
 
-Three file-based routes plus a root layout that owns global overlays (session, completion, recovery banner). SSR is disabled (`ssr = false`) — the app is fully client-rendered.
+File-based routes plus a root layout that owns global overlays (session, completion, recovery banner). SSR is disabled (`ssr = false`) — the app is fully client-rendered. See [App Structure](../implementation/app-structure.md) for the full route list.
 
 ```typescript
 // src/routes/+layout.ts
@@ -84,8 +95,9 @@ Reference tokens also exist in the [inspiration package](../_inspiration/packet/
 All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db/database.ts` — **not Dexie.js**.
 
 ```typescript
-// DB name: 'cosmic-workout', version 7
-// Stores: items, programs, sessions (indexed by date), itemLastUsed, activities, habits, habitLogs
+// DB name: 'cosmic-workout', version 8
+// Stores: items, programs, sessions (indexed by date), itemLastUsed,
+//         activities, habits, habitLogs, healthReadings
 ```
 
 Built-in items and programs are upserted on every boot (so new fields land on old records). Habits seed only on first run.
@@ -94,15 +106,19 @@ Built-in items and programs are upserted on every boot (so new fields land on ol
 
 ## State Management — Svelte Stores
 
-Three class-based stores using Svelte 5 runes:
+Class-based stores using Svelte 5 runes. The core ones:
 
-| Store          | File                | Responsibility                                 |
-| -------------- | ------------------- | ---------------------------------------------- |
-| `programStore` | `program.svelte.ts` | Programs, exercises, sessions, today's workout |
-| `sessionStore` | `session.svelte.ts` | Active session, set logging, finish/abandon    |
-| `prefsStore`   | `prefs.svelte.ts`   | User preferences, accent color, density        |
+| Store             | File                  | Responsibility                                  |
+| ----------------- | --------------------- | ----------------------------------------------- |
+| `programStore`    | `program.svelte.ts`   | Programs, items, sessions, today's routine      |
+| `sessionStore`    | `session.svelte.ts`   | Active session, set logging, finish/abandon     |
+| `prefsStore`      | `prefs.svelte.ts`     | User preferences, accent color, density         |
+| `habitStore`      | `habits.svelte.ts`    | Habit definitions, daily logs, mood             |
+| `activityStore`   | `activities.svelte.ts`   | Quick-log activity entries                   |
+| `healthStore`     | `health.svelte.ts`       | Weight + blood pressure readings (US-029)    |
+| `loggingContext`  | `loggingContext.svelte.ts` | Global selected/logging date               |
 
-See [State Management](../implementation/state.md).
+See [State Management](../implementation/state.md) for the complete list and data flow.
 
 ---
 
@@ -150,5 +166,5 @@ No server, database backend, API, or auth. See [System Overview](overview.md).
 
 - [System Overview](overview.md) — How pieces fit together
 - [Data Model](data-model.md) — IndexedDB stores
-- [Offline Strategy](offline-strategy.md) — Caching plan
+- [Offline Strategy](offline-strategy.md) — Caching strategy
 - [Dev Guide](../implementation/dev-guide.md) — Running locally

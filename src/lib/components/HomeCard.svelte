@@ -1,4 +1,6 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic href props use resolveHref() */
+	import { resolveHref } from '$lib/navigation';
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
 
@@ -19,7 +21,7 @@
 </script>
 
 <a
-	{href}
+	href={resolveHref(href)}
 	class="home-card"
 	class:home-card--habits={variant === 'habits'}
 	class:home-card--workout={variant === 'workout'}

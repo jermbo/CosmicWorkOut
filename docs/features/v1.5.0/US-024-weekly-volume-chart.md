@@ -1,6 +1,6 @@
 # US-024 — Weekly Training Volume Chart
 
-> **Status: ✅ Done — v1.5.0**
+> **Status: Done — v1.5.0**
 >
 > A bar chart showing total pounds lifted per week over the last 45 days. The clearest signal of training load — deload weeks and heavy weeks stand out immediately.
 

@@ -185,7 +185,7 @@
 					<div class="form-field" class:form-field--error={errors.days}>
 						<span class="form-field__label" id="days-label">Days per week</span>
 						<div class="days-chips" role="radiogroup" aria-labelledby="days-label">
-							{#each [1, 2, 3, 4, 5, 6, 7] as d}
+							{#each [1, 2, 3, 4, 5, 6, 7] as d (d)}
 								<button
 									type="button"
 									class="days-chip"
@@ -202,7 +202,7 @@
 			{:else}
 				<div class="create-form">
 					<p class="create-form__hint">Give each workout a name. You can add exercises after the program is created.</p>
-					{#each templates as tmpl, i}
+					{#each templates as tmpl, i (i)}
 						<div class="workout-template">
 							<span class="workout-template__letter">{String.fromCharCode(65 + i)}</span>
 							<div class="workout-template__fields">

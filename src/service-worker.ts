@@ -1,42 +1,46 @@
 /// <reference types="@sveltejs/kit" />
+/// <reference lib="webworker" />
 import { build, files, version } from '$service-worker';
+
+declare const self: ServiceWorkerGlobalScope;
 
 // Unique cache name per deploy — `version` changes on every build, so a new
 // service worker activates and evicts the previous shell automatically.
 const CACHE = `cwout-cache-${version}`;
 
-// App shell: the built JS/CSS bundles plus anything in static/ (icons, manifest…).
-const PRECACHE = [...build, ...files];
+// SPA shell entry — `/` only; dev has no `/index.html` file (static build does).
+const SHELL = ['/'];
+const PRECACHE = [...build, ...files, ...SHELL];
+
+async function serveShell(cache: Cache): Promise<Response | undefined> {
+	return (await cache.match('/')) ?? (await cache.match('/index.html')) ?? undefined;
+}
 
 self.addEventListener('install', (event) => {
-	const e = event as ExtendableEvent;
-	e.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)));
-	(self as unknown as ServiceWorkerGlobalScope).skipWaiting();
+	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)));
+	self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-	const e = event as ExtendableEvent;
-	e.waitUntil(
+	event.waitUntil(
 		(async () => {
 			for (const key of await caches.keys()) {
 				if (key !== CACHE) await caches.delete(key);
 			}
-			await (self as unknown as ServiceWorkerGlobalScope).clients.claim();
+			await self.clients.claim();
 		})(),
 	);
 });
 
 self.addEventListener('fetch', (event) => {
-	const e = event as FetchEvent;
-	const { request } = e;
+	const { request } = event;
 
-	// Only handle same-origin GETs. Cross-origin (Google Fonts, etc.) falls
-	// through to the network so we never cache opaque third-party responses.
+	// Only handle same-origin GETs.
 	if (request.method !== 'GET') return;
 	const url = new URL(request.url);
 	if (url.origin !== location.origin) return;
 
-	e.respondWith(
+	event.respondWith(
 		(async () => {
 			const cache = await caches.open(CACHE);
 
@@ -54,9 +58,13 @@ self.addEventListener('fetch', (event) => {
 				if (response.ok) cache.put(request, response.clone());
 				return response;
 			} catch {
+				if (request.mode === 'navigate') {
+					const shell = await serveShell(cache);
+					if (shell) return shell;
+				}
 				const cached = await cache.match(request);
 				if (cached) return cached;
-				const shell = await cache.match('/');
+				const shell = await serveShell(cache);
 				if (shell) return shell;
 				throw new Error('offline and no cached response');
 			}

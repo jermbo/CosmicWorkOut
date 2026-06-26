@@ -30,7 +30,7 @@ export const MOOD_SCALE = [
 	{ value: 1, label: 'Content' },
 	{ value: 0, label: 'Normal' },
 	{ value: -1, label: 'Tired' },
-	{ value: -2, label: 'Lonely' },
+	{ value: -2, label: 'Agitated' },
 	{ value: -3, label: 'Sad' },
 	{ value: -4, label: 'Angry' },
 	{ value: -5, label: 'Stressed' },
@@ -176,6 +176,7 @@ export interface UserPrefs {
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
+	healthMetricsEnabled: boolean;
 }
 
 export interface ActiveSet {
@@ -239,4 +240,24 @@ export interface HabitLog {
 	habitId: string;
 	date: string;
 	value: number;
+}
+
+export type HealthMetricId = 'weight' | 'bloodPressure';
+
+export interface WeightValues {
+	value: number;
+}
+
+export interface BloodPressureValues {
+	systolic: number;
+	diastolic: number;
+	pulse?: number;
+}
+
+export interface HealthReading {
+	id: string;
+	metricId: HealthMetricId;
+	date: string; // ISO date YYYY-MM-DD — global logging date
+	recordedAt: string; // ISO datetime — orders multiple readings per day
+	values: WeightValues | BloodPressureValues;
 }

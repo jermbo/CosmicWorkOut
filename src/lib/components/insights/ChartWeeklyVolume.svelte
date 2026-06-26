@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { programStore } from '$lib/stores/program.svelte';
 	import { Chart, chartTheme, getMondayOf } from '$lib/chart-utils';
+	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
-	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
+	let { dates }: { dates: string[] } = $props();
 
 	let canvas: HTMLCanvasElement = $state()!;
 
@@ -10,7 +11,7 @@
 		if (!canvas || dates.length === 0) return;
 
 		const { accent, textSecondary, gridOpts, tickOpts } = chartTheme();
-		const dateSet = new Set(dates);
+		const dateSet = new SvelteSet(dates);
 
 		const barFill = (volume: number) => {
 			if (volume === 0) return accent + '33';
@@ -28,7 +29,7 @@
 		const sessionsInWindow = programStore.sessions.filter((s) => dateSet.has(s.date));
 
 		const weekMondays: string[] = [];
-		const seenMondays = new Set<string>();
+		const seenMondays = new SvelteSet<string>();
 		for (const d of dates) {
 			const monday = getMondayOf(d);
 			if (!seenMondays.has(monday)) {
@@ -37,8 +38,8 @@
 			}
 		}
 
-		const volumeByWeek = new Map(weekMondays.map((m) => [m, 0]));
-		const countByWeek = new Map(weekMondays.map((m) => [m, 0]));
+		const volumeByWeek = new SvelteMap(weekMondays.map((m) => [m, 0]));
+		const countByWeek = new SvelteMap(weekMondays.map((m) => [m, 0]));
 		for (const s of sessionsInWindow) {
 			const monday = getMondayOf(s.date);
 			volumeByWeek.set(monday, (volumeByWeek.get(monday) ?? 0) + s.totalVolume);
@@ -94,5 +95,4 @@
 	});
 </script>
 
-<canvas bind:this={canvas} role="img" aria-label="Bar chart: total pounds lifted per week over the selected period"
-></canvas>
+<canvas bind:this={canvas} aria-label="Bar chart: total pounds lifted per week over the selected period"></canvas>
