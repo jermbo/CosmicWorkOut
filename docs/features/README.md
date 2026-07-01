@@ -17,6 +17,7 @@ New stories follow the [User Story Standards](../standards/user-story-standards.
 | [v1.5.0](v1.5.0/README.md) | Insights hub                   | US-022 – US-027    |
 | [v1.6.0](v1.6.0/README.md) | Belly dance catalog & course programs | Backfilled (no per-story files) |
 | [v1.7.0](v1.7.0/README.md) | Full strength catalog, PWA, health & backup | US-028 – US-031 |
+| [v1.8.0](v1.8.0/README.md) | Granular data clearing         | US-032             |
 
 ```mermaid
 flowchart LR
@@ -26,9 +27,10 @@ flowchart LR
     V14 --> V15["v1.5.0<br/>Insights"]
     V15 --> V16["v1.6.0<br/>Dance catalog"]
     V16 --> V17["v1.7.0<br/>Strength + PWA + Health"]
+    V17 --> V18["v1.8.0<br/>Data clearing"]
 
     classDef rel fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
-    class V11,V12,V13,V14,V15,V16,V17 rel;
+    class V11,V12,V13,V14,V15,V16,V17,V18 rel;
 ```
 
 ---

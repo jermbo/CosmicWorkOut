@@ -14,7 +14,7 @@ Docs are organized by **altitude**. Start high to understand _why_, work down to
 | 15k    | [architecture/](architecture/)     | System structure, data, tech, offline    |
 | 5k     | [requirements/](requirements/)     | User stories per feature area            |
 | Ground | [implementation/](implementation/) | Code map, stores, components, status     |
-| —      | [features/](features/)             | Shipped version stories (v1.1–v1.7)      |
+| —      | [features/](features/)             | Shipped version stories (v1.1–v1.8)      |
 | —      | [roadmap/](roadmap/)               | Deferred ideas — post–user-testing work  |
 
 Each doc is one complete thought — readable in ~60 seconds. Follow links to go deeper. Diagrams use **mermaid** for architecture, flows, entity relationships, and component trees.
@@ -141,6 +141,7 @@ The [Features index](features/README.md) is the historical record of what shippe
 - [v1.5.0 — Insights Hub](features/v1.5.0/README.md)
 - [v1.6.0 — Belly Dance Catalog & Course Programs](features/v1.6.0/README.md)
 - [v1.7.0 — Full Strength Catalog, PWA, Health & Backup](features/v1.7.0/README.md)
+- [v1.8.0 — Granular Data Clearing](features/v1.8.0/README.md)
 
 See [Implementation Status](implementation/status.md) for the current built-vs-deferred checklist.
 

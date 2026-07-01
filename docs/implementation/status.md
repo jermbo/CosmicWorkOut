@@ -118,6 +118,16 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 ---
 
+## v1.8.0 — Granular Data Clearing
+
+| Feature                | Status  | Notes                                                                                                            |
+| ----------------------- | ------- | ------------------------------------------------------------------------------------------------------------- |
+| Per-section data clear | Planned | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) — independent Custom exercises / Custom programs / Workout log / Habits / Health clears, plus a "clear everything" action, on `settings/data` |
+
+See [v1.8.0 feature README](../features/v1.8.0/README.md).
+
+---
+
 ## Built-In Content
 
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
