@@ -249,7 +249,7 @@
 			</div>
 
 			<div class="calendar-month__days" role="rowgroup">
-				{#each calendarDays as cell (cell.date ?? cell.dayNum)}
+				{#each calendarDays as cell, i (cell.date ?? `pad-${i}`)}
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
 						{@const hasStrength = hasStrengthSession(cell.date)}

@@ -235,7 +235,7 @@
 						</div>
 						<span class="editor-row__index">{i + 1}</span>
 						<div class="editor-row__info">
-							<span class="editor-row__name">{exercise?.name ?? ex.itemId}</span>
+							<span class="editor-row__name">{exercise?.name ?? 'Missing exercise'}</span>
 							<span class="editor-row__muscles">{exercise?.muscles ?? ''}</span>
 						</div>
 						<button
@@ -247,7 +247,7 @@
 									editingIndex = i;
 								}
 							}}
-							aria-label="Edit sets and reps for {exercise?.name}"
+							aria-label="Edit sets and reps for {exercise?.name ?? 'missing exercise'}"
 						>
 							<span class="editor-row__sets-label">{ex.sets}×{ex.reps}</span>
 							<svg

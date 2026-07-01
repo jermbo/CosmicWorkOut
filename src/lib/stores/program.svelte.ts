@@ -573,10 +573,21 @@ class ProgramStore {
 		});
 	}
 
-	isItemInUse(id: string): boolean {
-		return this.programs.some((p) =>
+	programsUsingItem(id: string): Program[] {
+		return this.programs.filter((p) =>
 			p.weeks.some((w) => w.routines.some((r) => flattenItems(r).some((ri) => ri.itemId === id))),
 		);
+	}
+
+	isItemInUse(id: string): boolean {
+		return this.programsUsingItem(id).length > 0;
+	}
+
+	customItemsInUse(): Array<{ item: Item; programs: Program[] }> {
+		return this.items
+			.filter((i) => !i.isBuiltIn)
+			.map((item) => ({ item, programs: this.programsUsingItem(item.id) }))
+			.filter((entry) => entry.programs.length > 0);
 	}
 
 	async deleteItem(id: string): Promise<void> {

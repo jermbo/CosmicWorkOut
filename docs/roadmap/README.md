@@ -18,6 +18,7 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 | Merge-on-import | File restore stays replace-only; merge belongs with device sync | [device-sync.md](device-sync.md) |
 | CSV export | Analytics-only; cannot round-trip | — |
 | Automatic background backup | File System Access API or scheduled export | — |
+| Per-date workout log clearing | Delete a single day's logged session, not the whole store. Activities and habit logs already support per-entry removal; workout sessions don't | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) |
 
 **Shipped:** JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md).
 

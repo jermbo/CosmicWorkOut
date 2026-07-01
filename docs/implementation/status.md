@@ -122,7 +122,7 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 | Feature                | Status  | Notes                                                                                                            |
 | ----------------------- | ------- | ------------------------------------------------------------------------------------------------------------- |
-| Per-section data clear | Planned | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) — independent Custom exercises / Custom programs / Workout log / Habits / Health clears, plus a "clear everything" action, on `settings/data` |
+| Per-section data clear | Planned | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) — independent Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health clears, plus a "clear everything" action, on `settings/data` |
 
 See [v1.8.0 feature README](../features/v1.8.0/README.md).
 

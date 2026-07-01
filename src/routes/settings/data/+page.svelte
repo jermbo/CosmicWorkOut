@@ -1,5 +1,14 @@
 <script lang="ts">
-	import { resetWorkoutData, loadDebugSeedData } from '$lib/db/database';
+	import {
+		clearCustomExercises,
+		clearCustomPrograms,
+		clearWorkoutSessions,
+		clearActivityLog,
+		clearHabitsData,
+		clearHealthData,
+		clearEverything,
+		loadDebugSeedData,
+	} from '$lib/db/database';
 	import {
 		downloadBackup,
 		parseBackup,
@@ -8,15 +17,32 @@
 		type BackupEnvelope,
 	} from '$lib/db/backup';
 	import { sessionStore } from '$lib/stores/session.svelte';
+	import { programStore } from '$lib/stores/program.svelte';
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
+	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
 
-	let showClearDataConfirm = $state(false);
+	type ClearAction = 'exercises' | 'programs' | 'workoutSessions' | 'activityLog' | 'habits' | 'health' | 'everything';
+
+	const clearFns: Record<ClearAction, () => Promise<void>> = {
+		exercises: clearCustomExercises,
+		programs: clearCustomPrograms,
+		workoutSessions: clearWorkoutSessions,
+		activityLog: clearActivityLog,
+		habits: clearHabitsData,
+		health: clearHealthData,
+		everything: clearEverything,
+	};
+
+	let activeDialog = $state<ClearAction | null>(null);
 	let showSeedConfirm = $state(false);
-	let clearDataError = $state<string | null>(null);
+	let clearError = $state<string | null>(null);
 	let clearingData = $state(false);
 	let seedingData = $state(false);
+
+	let itemsInUse = $derived(programStore.customItemsInUse());
 
 	let exporting = $state(false);
 	let fileInput = $state<HTMLInputElement>();
@@ -73,17 +99,19 @@
 		}
 	}
 
-	async function handleClearWorkoutData() {
+	function openClearDialog(action: ClearAction) {
+		clearError = null;
+		activeDialog = action;
+	}
+
+	async function handleClearConfirm() {
+		if (!activeDialog) return;
 		clearingData = true;
-		clearDataError = null;
+		clearError = null;
 		try {
-			await resetWorkoutData();
+			await clearFns[activeDialog]();
 		} catch (err) {
-			if (err instanceof Error) {
-				clearDataError = err.message;
-			} else {
-				clearDataError = 'Could not clear data. Please try again.';
-			}
+			clearError = err instanceof Error ? err.message : 'Could not clear data. Please try again.';
 			clearingData = false;
 		}
 	}
@@ -137,21 +165,48 @@
 		</div>
 	</section>
 
+	<SettingsGroup title="Clear">
+		<SettingsActionRow
+			label="Custom exercises"
+			description="Built-in exercises are kept. Your workout log stays in place."
+			onclick={() => openClearDialog('exercises')}
+		/>
+		<SettingsActionRow
+			label="Custom programs"
+			description="Built-in programs are kept. Your workout log and exercises stay in place."
+			onclick={() => openClearDialog('programs')}
+		/>
+		<SettingsActionRow
+			label="Workout sessions"
+			description="Session history and weight memory. Activities, programs, and exercises stay in place."
+			onclick={() => openClearDialog('workoutSessions')}
+		/>
+		<SettingsActionRow
+			label="Activity log"
+			description="Logged runs, walks, and other activities. Workout sessions stay in place."
+			onclick={() => openClearDialog('activityLog')}
+		/>
+		<SettingsActionRow
+			label="Habits"
+			description="Habits and habit logs. Built-in habits are restored afterward."
+			onclick={() => openClearDialog('habits')}
+		/>
+		<SettingsActionRow
+			label="Health data"
+			description="Weight and blood pressure readings."
+			onclick={() => openClearDialog('health')}
+		/>
+	</SettingsGroup>
+
 	<section class="settings-section">
-		<h2 class="settings-section__title">Clear</h2>
+		<h2 class="settings-section__title">Danger zone</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Remove session history, custom programs and exercises, weight memory, health readings, and any in-progress
-				session.
+				Remove everything above at once — exercises, programs, workout sessions, activities, habits, and health
+				data. Built-in content is restored.
 			</p>
-			<button
-				class="data-action__btn data-action__btn--danger"
-				onclick={() => {
-					clearDataError = null;
-					showClearDataConfirm = true;
-				}}
-			>
-				Clear workout data
+			<button class="data-action__btn data-action__btn--danger" onclick={() => openClearDialog('everything')}>
+				Clear everything
 			</button>
 		</div>
 	</section>
@@ -161,7 +216,8 @@
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
 				Load 45 days of realistic debug data — workout sessions, activities, habit logs, and health readings — for
-				testing graphs and visualizations. Existing data is kept. Remove with "Clear workout data" above.
+				testing graphs and visualizations. Existing data is kept. Remove with "Workout sessions" and "Activity log"
+				above.
 			</p>
 			<button class="data-action__btn data-action__btn--ghost" onclick={() => (showSeedConfirm = true)}>
 				Load debug data
@@ -189,19 +245,112 @@
 	</ConfirmDialog>
 {/if}
 
-{#if showClearDataConfirm}
+{#if activeDialog === 'exercises'}
 	<ConfirmDialog
-		title="Clear workout data?"
-		confirmLabel="Clear workout data"
+		title="Clear custom exercises?"
+		confirmLabel="Clear exercises"
 		confirmBusyLabel="Clearing…"
 		danger
 		busy={clearingData}
-		error={clearDataError}
-		onconfirm={handleClearWorkoutData}
-		oncancel={() => (showClearDataConfirm = false)}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
 	>
-		This removes session history, custom programs and exercises, weight memory, and any in-progress session. Built-in
-		content will be restored. This cannot be undone.
+		This removes your custom exercises. Built-in exercises are kept. This cannot be undone.
+		{#if itemsInUse.length > 0}
+			<br /><br /><strong>Some of these exercises are used in a program:</strong>
+			<ul class="confirm-list">
+				{#each itemsInUse as entry (entry.item.id)}
+					<li>{entry.item.name} — used in {entry.programs.map((p) => p.name).join(', ')}</li>
+				{/each}
+			</ul>
+			Those programs will show the exercise as missing afterward.
+		{/if}
+	</ConfirmDialog>
+{:else if activeDialog === 'programs'}
+	<ConfirmDialog
+		title="Clear custom programs?"
+		confirmLabel="Clear programs"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes your custom programs. Built-in programs are kept, and your exercises and workout log are unaffected.
+		This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'workoutSessions'}
+	<ConfirmDialog
+		title="Clear workout sessions?"
+		confirmLabel="Clear sessions"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes session history and weight memory. Activities, programs, and exercises are unaffected. This cannot
+		be undone.
+		{#if sessionStore.isActive}
+			<br /><br />You have a session in progress — it will be discarded.
+		{/if}
+	</ConfirmDialog>
+{:else if activeDialog === 'activityLog'}
+	<ConfirmDialog
+		title="Clear activity log?"
+		confirmLabel="Clear activity log"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes all logged activities (runs, walks, and other movement you've logged). Workout sessions are
+		unaffected. This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'habits'}
+	<ConfirmDialog
+		title="Clear habits?"
+		confirmLabel="Clear habits"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes all habits and habit logs. The default habit set will be restored. This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'health'}
+	<ConfirmDialog
+		title="Clear health data?"
+		confirmLabel="Clear health data"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes all weight and blood pressure readings. This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'everything'}
+	<ConfirmDialog
+		title="Clear everything?"
+		confirmLabel="Clear everything"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes session history, activities, custom programs and exercises, habits, health readings, and any
+		in-progress session. Built-in content will be restored. This cannot be undone.
 		{#if sessionStore.isActive}
 			<br /><br />You have a session in progress — it will be discarded.
 		{/if}
@@ -223,6 +372,11 @@
 {/if}
 
 <style>
+	.confirm-list {
+		margin-block: var(--space-2);
+		padding-inline-start: var(--space-4);
+	}
+
 	.settings-section {
 		margin-block-end: var(--space-6);
 	}
