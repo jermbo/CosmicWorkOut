@@ -1,8 +1,11 @@
 <script lang="ts">
+	import type { Habit } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { formatHabitLogValue } from '$lib/habits';
 	import { formatLongDate } from '$lib/date';
 	import BottomSheet from './BottomSheet.svelte';
+	import HabitCard from './HabitCard.svelte';
+	import ValueDialog from './ValueDialog.svelte';
+	import { minuteUnitLabel } from '$lib/format';
 
 	type Props = {
 		date: string;
@@ -11,38 +14,89 @@
 
 	let { date, onClose }: Props = $props();
 
-	let logs = $derived(habitStore.logsForDate(date));
+	const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
 
-	let habitRows = $derived.by(() => {
-		return logs
-			.map((log) => {
-				const habit = habitStore.habits.find((h) => h.id === log.habitId);
-				if (!habit) return null;
-				return { habit, value: log.value, label: formatHabitLogValue(habit, log.value) };
-			})
-			.filter((r) => r !== null);
-	});
+	function getStep(habit: Habit): number {
+		if (habit.type === 'minutes') return 5;
+		const goal = habit.dailyGoal ?? 10;
+		const raw = goal / 10;
+		return NICE_STEPS.find((s) => s >= raw) ?? 1;
+	}
+
+	let gridHabits = $derived(habitStore.activeHabits.filter((h) => h.type !== 'mood'));
+
+	async function handleAdd(habit: Habit) {
+		const current = habitStore.valueFor(habit, date);
+		await habitStore.correctValue(habit.id, current + getStep(habit), date);
+	}
+
+	async function handleSubtract(habit: Habit) {
+		const current = habitStore.valueFor(habit, date);
+		await habitStore.correctValue(habit.id, Math.max(0, current - getStep(habit)), date);
+	}
+
+	async function handleToggle(habit: Habit) {
+		await habitStore.toggle(habit.id, date);
+	}
+
+	let exactTarget = $state<Habit | null>(null);
+
+	function openExact(habit: Habit) {
+		exactTarget = habit;
+	}
+
+	function exactUnit(): string {
+		if (!exactTarget) return '';
+		if (exactTarget.type === 'minutes') return minuteUnitLabel();
+		return exactTarget.unit || '';
+	}
+
+	async function saveExact(value: number) {
+		if (!exactTarget) return;
+		if (exactTarget.type === 'minutes') {
+			await habitStore.setMinutes(exactTarget.id, value, date);
+		} else {
+			await habitStore.correctValue(exactTarget.id, value, date);
+		}
+	}
 </script>
 
 <BottomSheet onclose={onClose}>
 	<div class="hh-sheet">
 		<p class="hh-sheet__date">{formatLongDate(date)}</p>
-		<p class="hh-sheet__heading">Habits logged</p>
+		<p class="hh-sheet__heading">Habits</p>
 
-		{#if habitRows.length === 0}
-			<p class="hh-sheet__empty">No habits logged on this day.</p>
+		{#if gridHabits.length === 0}
+			<p class="hh-sheet__empty">No habits configured.</p>
 		{:else}
-			<ul class="hh-sheet__list" role="list">
-				{#each habitRows as row (row.habit.id)}
-					<li class="hh-sheet__item">
-						<span class="hh-sheet__name">{row.habit.name}</span>
-						<span class="hh-sheet__value">{row.label}</span>
-					</li>
+			<div class="hh-sheet__grid">
+				{#each gridHabits as habit (habit.id)}
+					<HabitCard
+						{habit}
+						value={habitStore.valueFor(habit, date)}
+						pct={habitStore.progressPct(habit, date)}
+						done={habitStore.isComplete(habit, date)}
+						step={getStep(habit)}
+						onadd={() => handleAdd(habit)}
+						onsubtract={() => handleSubtract(habit)}
+						ontoggle={() => handleToggle(habit)}
+						oneditexact={() => openExact(habit)}
+					/>
 				{/each}
-			</ul>
+			</div>
 		{/if}
 	</div>
 </BottomSheet>
+
+{#if exactTarget}
+	<ValueDialog
+		title={exactTarget.name}
+		unit={exactUnit()}
+		initialValue={habitStore.valueFor(exactTarget, date)}
+		onsave={saveExact}
+		onclose={() => (exactTarget = null)}
+	/>
+{/if}
 
 <style>
 	.hh-sheet {
@@ -71,31 +125,9 @@
 		color: var(--color-text-muted);
 	}
 
-	.hh-sheet__list {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.hh-sheet__item {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-	}
-
-	.hh-sheet__name {
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
-	}
-
-	.hh-sheet__value {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		font-weight: 500;
+	.hh-sheet__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+		gap: var(--space-4);
 	}
 </style>

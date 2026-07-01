@@ -30,7 +30,7 @@ so that I can quickly check off or record each habit for the active date and mov
 
 5. Daily reset
    a. On a new day, all habit rows shall show their default empty state (count = 0, minutes = 0, yes/no = incomplete, mood = unset).
-   b. Viewing a past date shall show the values logged on that date, read-only if the date is more than one day ago.
+   b. Viewing a past date shall show the values logged on that date. Past-date values remain fully editable (backfill/correction), consistent with sessions and activities elsewhere in History — see [History & Calendar](../../requirements/history-calendar.md).
 
 ---
 
@@ -79,7 +79,7 @@ Each option shall be large enough to tap comfortably with a finger. The currentl
 
 5. Daily reset
    a. Given the user logged habits on June 10, when they view the habit log for June 11, then all rows show empty/default values.
-   b. Given the user views June 10 two days later, when the page loads, then June 10's values are shown and the inputs are read-only.
+   b. Given the user views June 10 two days later, when the page loads, then June 10's values are shown and the inputs remain editable (add, subtract, toggle, enter exact value).
 
 ---
 
