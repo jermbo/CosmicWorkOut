@@ -60,7 +60,7 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 | `HabitCard`         | A single habit with progress ring, +/− stepper, boolean toggle. |
 | `HabitRow`          | Compact habit row variant.                                      |
 | `HabitForm`         | Create / edit a custom habit (Settings).                        |
-| `HabitHistorySheet` | Per-habit history sheet (calendar heatmap detail).              |
+| `HabitHistorySheet` | Editable habit sheet for a past calendar day (add/subtract/toggle/exact-value, same controls as `/habits`). |
 
 ---
 

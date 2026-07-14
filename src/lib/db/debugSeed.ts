@@ -375,7 +375,10 @@ export function generateDebugSeedData(): {
 			const adjustedRate = adjustedLogRate(habitId, logRate);
 			if (Math.random() < adjustedRate) {
 				habitLogs.push({
-					id: `seed-hl-${habitId}-${toDateStr(date)}`,
+					// Must match the live id scheme (`${habitId}:${date}`) from habits.svelte.ts's
+					// logValue() — otherwise editing a seeded day creates a second row instead of
+					// overwriting the seed, and reads silently keep returning the stale seed value.
+					id: `${habitId}:${toDateStr(date)}`,
 					habitId,
 					date: toDateStr(date),
 					value: habitValue(habitId, isWorkoutDay),

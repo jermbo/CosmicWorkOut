@@ -124,6 +124,7 @@ sequenceDiagram
 - History supports edit and delete from the day summary sheet
 - Calendar must work fully offline — all data comes from IndexedDB
 - Performance: month rendering should not be slow even if IndexedDB has years of sessions
+- **No date-based edit lock, anywhere.** Any past date is editable exactly like today — this applies to every trackable domain (habit logs, workout/practice sessions, activities, health readings) and to any domain added later. There is no "read-only after N days" rule, no built-in cutoff, and no per-feature exception. If a date-based restriction is ever proposed, it must be re-approved explicitly here before being implemented; it should never be added incidentally as part of an unrelated feature.
 
 ---
 

@@ -147,6 +147,41 @@ export async function clearWorkoutData(): Promise<void> {
 	});
 }
 
+async function clearStores(storeNames: string[]): Promise<void> {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeNames, 'readwrite');
+		for (const name of storeNames) {
+			tx.objectStore(name).clear();
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
+	});
+}
+
+async function clearNonBuiltIn(storeName: string): Promise<void> {
+	const all = await getAll<{ id: string; isBuiltIn: boolean }>(storeName);
+	const customIds = all.filter((r) => !r.isBuiltIn).map((r) => r.id);
+	if (customIds.length === 0) return;
+
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeName, 'readwrite');
+		const store = tx.objectStore(storeName);
+		for (const id of customIds) {
+			store.delete(id);
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
+	});
+}
+
 export async function loadDebugSeedData(): Promise<void> {
 	const { sessions, activities, habitLogs, healthReadings } = generateDebugSeedData();
 	await putAllRecords('sessions', sessions);
@@ -156,7 +191,40 @@ export async function loadDebugSeedData(): Promise<void> {
 	location.reload();
 }
 
-export async function resetWorkoutData(): Promise<void> {
+export async function clearCustomExercises(): Promise<void> {
+	await clearNonBuiltIn('items');
+	location.reload();
+}
+
+export async function clearCustomPrograms(): Promise<void> {
+	await clearNonBuiltIn('programs');
+	location.reload();
+}
+
+export async function clearWorkoutSessions(): Promise<void> {
+	await clearStores(['sessions', 'itemLastUsed']);
+	localStorage.removeItem('cwout:activeSession');
+	localStorage.removeItem('cwout:activeProgramId');
+	localStorage.removeItem('cwout:activeProgramIds');
+	location.reload();
+}
+
+export async function clearActivityLog(): Promise<void> {
+	await clearStores(['activities']);
+	location.reload();
+}
+
+export async function clearHabitsData(): Promise<void> {
+	await clearStores(['habits', 'habitLogs']);
+	location.reload();
+}
+
+export async function clearHealthData(): Promise<void> {
+	await clearStores(['healthReadings']);
+	location.reload();
+}
+
+export async function clearEverything(): Promise<void> {
 	await clearWorkoutData();
 	localStorage.removeItem('cwout:activeSession');
 	localStorage.removeItem('cwout:activeProgramId');
