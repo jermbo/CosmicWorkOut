@@ -8,6 +8,7 @@ const DEFAULTS: UserPrefs = {
 	roundness: 'default',
 	weightUnit: 'lb',
 	healthMetricsEnabled: false,
+	goalProgressionPlansEnabled: false,
 };
 
 class PrefsStore {
@@ -16,6 +17,7 @@ class PrefsStore {
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
+	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
 
 	load(): void {
 		const stored = localStorage.getItem(PREFS_KEY);
@@ -26,6 +28,7 @@ class PrefsStore {
 			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
 			this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
+			this.goalProgressionPlansEnabled = parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
 		}
 
 		this.applyAccentColor();
@@ -40,12 +43,18 @@ class PrefsStore {
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
 			healthMetricsEnabled: this.healthMetricsEnabled,
+			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
 
 	setHealthMetricsEnabled(enabled: boolean): void {
 		this.healthMetricsEnabled = enabled;
+		this.save();
+	}
+
+	setGoalProgressionPlansEnabled(enabled: boolean): void {
+		this.goalProgressionPlansEnabled = enabled;
 		this.save();
 	}
 

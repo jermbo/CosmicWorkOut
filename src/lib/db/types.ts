@@ -177,6 +177,7 @@ export interface UserPrefs {
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
 	healthMetricsEnabled: boolean;
+	goalProgressionPlansEnabled: boolean;
 }
 
 export interface ActiveSet {

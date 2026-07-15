@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { effectiveSections } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import PageHeader from '$lib/components/PageHeader.svelte';
@@ -9,6 +11,7 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let showAddPractice = $state(false);
+	let goalsEnabled = $derived(prefsStore.goalProgressionPlansEnabled);
 
 	function groupSummary(groupId: string): { summary: string; meta: string } {
 		const plans = programStore.activeProgramsForGroup(groupId);
@@ -59,10 +62,23 @@
 			<p class="practice-empty__body">
 				Nothing is turned on yet. Add a workout or dance plan when you're ready — you can pause or add more anytime.
 			</p>
-			<button class="practice-empty__btn" type="button" onclick={() => (showAddPractice = true)}> Add practice </button>
+			<div class="practice-empty__actions">
+				<button class="practice-empty__btn" type="button" onclick={() => (showAddPractice = true)}>
+					Add practice
+				</button>
+				{#if goalsEnabled}
+					<a class="practice-empty__goal" href={resolve('/goals/new')}>Start a goal plan</a>
+					<p class="practice-empty__goal-hint">
+						Build toward a specific lift (e.g. bench 250×5) with an auto-generated wave.
+					</p>
+				{/if}
+			</div>
 		</section>
 	{:else}
 		<div class="practice-page__toolbar">
+			{#if goalsEnabled}
+				<a class="practice-page__goals" href={resolve('/goals')}>Goal plans</a>
+			{/if}
 			<button class="practice-page__add" type="button" onclick={() => (showAddPractice = true)}> Add practice </button>
 		</div>
 
@@ -104,6 +120,13 @@
 		margin-block-end: var(--space-5);
 	}
 
+	.practice-empty__actions {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
 	.practice-empty__btn {
 		padding-inline: var(--space-5);
 		block-size: 48px;
@@ -114,10 +137,58 @@
 		font-weight: 700;
 	}
 
+	.practice-empty__goal {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding-inline: var(--space-5);
+		block-size: 44px;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-strong);
+		background: var(--color-surface-3);
+		color: var(--color-text-primary);
+		font-size: 0.9375rem;
+		font-weight: 700;
+		text-decoration: none;
+
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
+	}
+
+	.practice-empty__goal-hint {
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		max-inline-size: 34ch;
+		margin: 0;
+	}
+
 	.practice-page__toolbar {
 		display: flex;
 		justify-content: flex-end;
+		align-items: center;
+		gap: var(--space-3);
 		margin-block-end: var(--space-3);
+	}
+
+	.practice-page__goals {
+		display: inline-flex;
+		align-items: center;
+		padding-inline: var(--space-4);
+		block-size: 40px;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-strong);
+		background: var(--color-surface-2);
+		font-size: 0.875rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+		text-decoration: none;
+
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
 	}
 
 	.practice-page__add {

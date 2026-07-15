@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { Program } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { practiceGroupById, practiceGroups } from '$lib/practice';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { practiceGroupById, practiceGroups, WORKOUT_GROUP_ID } from '$lib/practice';
 	import BottomSheet from './BottomSheet.svelte';
 	import CreateProgramSheet from './CreateProgramSheet.svelte';
 
@@ -28,6 +31,9 @@
 
 	let group = $derived(practiceGroupById(groupId));
 	let disciplineId = $derived(group?.disciplineIds[0] ?? '');
+	let showGoalPlans = $derived(
+		prefsStore.goalProgressionPlansEnabled && groupId === WORKOUT_GROUP_ID,
+	);
 
 	let programs = $derived.by(() => {
 		if (!group) return [] as Program[];
@@ -85,7 +91,29 @@
 				<button class="add-practice__back" type="button" onclick={() => (step = 'group')}> ← All areas </button>
 			{/if}
 
-			<p class="add-practice__lead">Turn plans on or off. History is always kept when you pause.</p>
+			{#if showGoalPlans}
+				<button
+					class="add-practice__goal-card"
+					type="button"
+					onclick={() => {
+						onClose();
+						goto(resolve('/goals/new'));
+					}}
+				>
+					<span class="add-practice__goal-card-label">Start a goal plan</span>
+					<span class="add-practice__goal-card-desc">
+						Wave-loading plan toward one lift target — generated from a template.
+					</span>
+				</button>
+			{/if}
+
+			<p class="add-practice__lead">
+				{#if showGoalPlans}
+					Or turn on a course or custom plan. History is kept when you pause.
+				{:else}
+					Turn plans on or off. History is always kept when you pause.
+				{/if}
+			</p>
 
 			<div class="add-practice__filters" role="tablist" aria-label="Plan filter">
 				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
@@ -132,7 +160,7 @@
 
 			<div class="add-practice__footer">
 				<button class="add-practice__create" type="button" onclick={() => (createDisciplineId = disciplineId)}>
-					Create new plan
+					Create custom plan
 				</button>
 			</div>
 		{/if}
@@ -186,6 +214,36 @@
 		font-size: 0.9375rem;
 		color: var(--color-text-secondary);
 		margin-block-end: var(--space-4);
+	}
+
+	.add-practice__goal-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-1);
+		margin-inline: var(--space-5);
+		margin-block-end: var(--space-4);
+		padding: var(--space-4) var(--space-5);
+		border-radius: var(--r-xl);
+		border: 1px solid var(--color-accent);
+		background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-2));
+		text-align: start;
+
+		&:hover {
+			background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface-2));
+		}
+	}
+
+	.add-practice__goal-card-label {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+	}
+
+	.add-practice__goal-card-desc {
+		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
+		line-height: 1.4;
 	}
 
 	.add-practice__groups {
@@ -355,6 +413,9 @@
 	}
 
 	.add-practice__footer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 		padding: var(--space-4) var(--space-5);
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
 	}

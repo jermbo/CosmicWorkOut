@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { Routine, Item } from '$lib/db/types';
 	import { formatMinutes } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
@@ -8,9 +9,13 @@
 		workout: Routine;
 		exerciseMap: Map<string, Item>;
 		onStart: () => Promise<void>;
+		/** Weekly targets from an active goal plan; shown next to each exercise. */
+		prescribed?: Map<string, { weight: number; reps?: number }>;
+		/** Wave position from an active goal plan; shown as a header chip. */
+		goalContext?: { blockNumber: number; totalBlocks: number; blockWeek: number; phase: string } | null;
 	};
 
-	let { workout, exerciseMap, onStart }: Props = $props();
+	let { workout, exerciseMap, onStart, prescribed, goalContext = null }: Props = $props();
 
 	let starting = $state(false);
 
@@ -59,6 +64,11 @@
 		<span class="packet-card__tab packet-card__tab--ghost">
 			{workout.letter ?? programStore.currentRoutineLetter}
 		</span>
+		{#if goalContext}
+			<a class="packet-card__tab packet-card__tab--wave" href={resolve('/goals')} aria-label="View goal plan">
+				B{goalContext.blockNumber} · {goalContext.phase}
+			</a>
+		{/if}
 	</div>
 
 	<h2 class="packet-card__title">{workout.name}</h2>
@@ -92,10 +102,14 @@
 		{#each flattenItems(workout) as we, i (we.itemId)}
 			{@const exercise = exerciseMap.get(we.itemId)}
 			{#if exercise}
+				{@const target = prescribed?.get(we.itemId)}
 				<li class="packet-card__exercise">
 					<span class="packet-card__exercise-ix" aria-hidden="true">{i + 1}</span>
 					<span class="packet-card__exercise-name">{exercise.name}</span>
-					<span class="packet-card__exercise-sets">{we.sets}×{we.reps}</span>
+					{#if target && target.weight > 0}
+						<span class="packet-card__exercise-target">{target.weight} {exercise.unit ?? 'lb'}</span>
+					{/if}
+					<span class="packet-card__exercise-sets">{we.sets}×{target?.reps ?? we.reps}</span>
 				</li>
 			{/if}
 		{/each}
@@ -204,6 +218,17 @@
 		color: var(--color-text-secondary);
 	}
 
+	.packet-card__tab--wave {
+		background: color-mix(in srgb, var(--workout-accent) 14%, var(--color-surface-3));
+		border: 1px solid color-mix(in srgb, var(--workout-accent) 40%, transparent);
+		color: var(--color-text-primary);
+		text-decoration: none;
+
+		&:hover {
+			border-color: var(--workout-accent);
+		}
+	}
+
 	.packet-card__staple {
 		inline-size: 14px;
 		block-size: 14px;
@@ -304,6 +329,14 @@
 		font-family: var(--font-mono);
 		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
+		flex-shrink: 0;
+	}
+
+	.packet-card__exercise-target {
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--workout-accent);
 		flex-shrink: 0;
 	}
 

@@ -1,4 +1,5 @@
 import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
+import type { GoalPlan } from '$lib/goalPlans/types';
 import { db, clearWorkoutData, putAllRecords, initDB } from './database';
 
 const BACKUP_FORMAT = 'cosmic-workout-backup';
@@ -16,6 +17,8 @@ interface BackupDb {
 	habits: Habit[];
 	habitLogs: HabitLog[];
 	healthReadings: HealthReading[];
+	/** Absent in pre-v1.9.0 backups. */
+	goalPlans?: GoalPlan[];
 }
 
 export interface BackupEnvelope {
@@ -48,16 +51,18 @@ function writeLocal(key: string, value: unknown): void {
 
 /** Build a complete, versioned snapshot of all durable on-device data. */
 export async function exportBackup(): Promise<BackupEnvelope> {
-	const [items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings] = await Promise.all([
-		db.items.getAll(),
-		db.programs.getAll(),
-		db.sessions.getAll(),
-		db.itemLastUsed.getAll(),
-		db.activities.getAll(),
-		db.habits.getAll(),
-		db.habitLogs.getAll(),
-		db.healthReadings.getAll(),
-	]);
+	const [items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings, goalPlans] =
+		await Promise.all([
+			db.items.getAll(),
+			db.programs.getAll(),
+			db.sessions.getAll(),
+			db.itemLastUsed.getAll(),
+			db.activities.getAll(),
+			db.habits.getAll(),
+			db.habitLogs.getAll(),
+			db.healthReadings.getAll(),
+			db.goalPlans.getAll(),
+		]);
 
 	const local: Record<string, unknown> = {};
 	for (const key of BACKUP_LOCAL_KEYS) {
@@ -69,7 +74,7 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		format: BACKUP_FORMAT,
 		version: BACKUP_VERSION,
 		exportedAt: new Date().toISOString(),
-		db: { items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings },
+		db: { items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings, goalPlans },
 		localStorage: local,
 	};
 }
@@ -132,6 +137,7 @@ const DB_STORES: (keyof BackupDb)[] = [
 	'habits',
 	'habitLogs',
 	'healthReadings',
+	'goalPlans',
 ];
 
 /**

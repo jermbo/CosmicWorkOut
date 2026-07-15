@@ -4,6 +4,8 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
@@ -52,6 +54,28 @@
 
 	let showSuggestedHint = $derived(selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id);
 
+	// Goal-plan hook: when the viewed program belongs to the active goal plan (and the
+	// feature is on), prescribe this week's wave targets instead of last-used prefill.
+	let goalPlan = $derived.by(() => {
+		if (!prefsStore.goalProgressionPlansEnabled || !programId) return null;
+		const plan = goalPlanStore.activePlan;
+		if (plan && plan.programId === programId) return plan;
+		return null;
+	});
+	let prescribedTargets = $derived(goalPlan ? goalPlanStore.prescribedTargets(goalPlan) : undefined);
+	let goalContext = $derived.by(() => {
+		if (!goalPlan) return null;
+		const block = goalPlanStore.currentBlock(goalPlan);
+		const focus = goalPlanStore.focusTarget(goalPlan);
+		if (!block || !focus) return null;
+		return {
+			blockNumber: block.blockNumber,
+			totalBlocks: goalPlan.blocks.length,
+			blockWeek: goalPlanStore.currentBlockWeek(goalPlan),
+			phase: focus.phase,
+		};
+	});
+
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
 	let showStartConfirm = $state(false);
@@ -61,7 +85,10 @@
 		const workout = selectedWorkout;
 		const program = viewingProgram;
 		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.itemMap, { date: contextDate });
+		await sessionStore.start(workout, program, programStore.itemMap, {
+			date: contextDate,
+			prescribed: prescribedTargets,
+		});
 	}
 
 	async function startSession() {
@@ -93,7 +120,12 @@
 <div class="page page--wide workout-page">
 	<PageHeader title="Workout" showBack>
 		{#snippet trailing()}
-			<a href={resolve('/program')} class="workout-page__programs-link">Programs</a>
+			<span class="workout-page__header-links">
+				{#if prefsStore.goalProgressionPlansEnabled}
+					<a href={resolve('/goals')} class="workout-page__programs-link">Goals</a>
+				{/if}
+				<a href={resolve('/program')} class="workout-page__programs-link">Programs</a>
+			</span>
 		{/snippet}
 	</PageHeader>
 
@@ -112,6 +144,9 @@
 		<div class="workout-page__no-program">
 			<p>No plan selected.</p>
 			<a href={resolve('/practice/workout')} class="workout-page__choose-btn"> Choose a plan </a>
+			{#if prefsStore.goalProgressionPlansEnabled}
+				<a href={resolve('/goals/new')} class="workout-page__goal-link">Or start a goal plan</a>
+			{/if}
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<div class="session-done">
@@ -151,7 +186,13 @@
 				onSelect={(id) => loggingContext.setWorkoutId(id)}
 			/>
 
-			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.itemMap} onStart={startSession} />
+			<TodayWorkout
+				workout={selectedWorkout}
+				exerciseMap={programStore.itemMap}
+				onStart={startSession}
+				prescribed={prescribedTargets}
+				{goalContext}
+			/>
 		</div>
 	{:else}
 		<div class="workout-page__no-program">
@@ -209,6 +250,12 @@
 <style>
 	.workout-page {
 		inline-size: 100%;
+	}
+
+	.workout-page__header-links {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
 	}
 
 	.workout-page__programs-link {
@@ -301,6 +348,9 @@
 	}
 
 	.workout-page__choose-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		padding-inline: var(--space-5);
 		block-size: 48px;
 		background: var(--color-accent);
@@ -308,6 +358,18 @@
 		border-radius: var(--radius-full);
 		font-size: 0.9375rem;
 		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.workout-page__goal-link {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		text-decoration: none;
+
+		&:hover {
+			color: var(--color-accent);
+		}
 	}
 
 	.workout-page__program-link {

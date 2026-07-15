@@ -1,6 +1,8 @@
 import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
+import type { GoalPlan } from '$lib/goalPlans/types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';
+import { generateGoalPlanSampleData } from '$lib/goalPlans/sampleData';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 function reportWriteError(error: unknown): void {
@@ -9,7 +11,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
 let dbInstance: IDBDatabase | null = null;
 
@@ -49,6 +51,9 @@ function openDB(): Promise<IDBDatabase> {
 			const hrStore = db.createObjectStore('healthReadings', { keyPath: 'id' });
 			hrStore.createIndex('by_date', 'date');
 			hrStore.createIndex('by_metric', 'metricId');
+
+			const gpStore = db.createObjectStore('goalPlans', { keyPath: 'id' });
+			gpStore.createIndex('by_status', 'status');
 		};
 
 		request.onsuccess = (event) => {
@@ -188,7 +193,27 @@ export async function loadDebugSeedData(): Promise<void> {
 	await putAllRecords('activities', activities);
 	await putAllRecords('habitLogs', habitLogs);
 	await putAllRecords('healthReadings', healthReadings);
+
+	const goalSample = generateGoalPlanSampleData();
+	await putAllRecords('goalPlans', goalSample.goalPlans);
+	await putAllRecords('programs', goalSample.programs);
+	await putAllRecords('sessions', goalSample.sessions);
+	activateSeededProgram(goalSample.activeProgramId);
+
 	location.reload();
+}
+
+/** Add a seeded program to the active list so it shows up on Practice/Workout. */
+function activateSeededProgram(programId: string): void {
+	try {
+		const raw = localStorage.getItem('cwout:activeProgramIds');
+		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
+		if (Array.isArray(ids) && !ids.includes(programId)) {
+			localStorage.setItem('cwout:activeProgramIds', JSON.stringify([...ids, programId]));
+		}
+	} catch {
+		localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
+	}
 }
 
 export async function clearCustomExercises(): Promise<void> {
@@ -221,6 +246,11 @@ export async function clearHabitsData(): Promise<void> {
 
 export async function clearHealthData(): Promise<void> {
 	await clearStores(['healthReadings']);
+	location.reload();
+}
+
+export async function clearGoalPlansData(): Promise<void> {
+	await clearStores(['goalPlans']);
 	location.reload();
 }
 
@@ -314,5 +344,12 @@ export const db = {
 		getAll: () => getAll<HealthReading>('healthReadings'),
 		put: (reading: HealthReading) => putRecord('healthReadings', reading),
 		remove: (id: string) => removeRecord('healthReadings', id),
+	},
+
+	goalPlans: {
+		getAll: () => getAll<GoalPlan>('goalPlans'),
+		getOne: (id: string) => getOne<GoalPlan>('goalPlans', id),
+		put: (plan: GoalPlan) => putRecord('goalPlans', plan),
+		remove: (id: string) => removeRecord('goalPlans', id),
 	},
 };

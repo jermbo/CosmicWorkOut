@@ -440,6 +440,21 @@ class ProgramStore {
 		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
+	/** Write a fully-built program record (used by generators like goal plans). */
+	async upsertProgram(program: Program): Promise<void> {
+		try {
+			await db.programs.put($state.snapshot(program) as Program);
+		} catch (e) {
+			console.error('Failed to save program:', e);
+			throw e;
+		}
+		if (this.programs.some((p) => p.id === program.id)) {
+			this.programs = this.programs.map((p) => (p.id === program.id ? program : p));
+		} else {
+			this.programs = [...this.programs, program];
+		}
+	}
+
 	private async commitActiveProgram(updated: Program): Promise<void> {
 		try {
 			await db.programs.put($state.snapshot(updated));

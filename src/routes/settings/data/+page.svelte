@@ -6,6 +6,7 @@
 		clearActivityLog,
 		clearHabitsData,
 		clearHealthData,
+		clearGoalPlansData,
 		clearEverything,
 		loadDebugSeedData,
 	} from '$lib/db/database';
@@ -18,13 +19,22 @@
 	} from '$lib/db/backup';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
 
-	type ClearAction = 'exercises' | 'programs' | 'workoutSessions' | 'activityLog' | 'habits' | 'health' | 'everything';
+	type ClearAction =
+		| 'exercises'
+		| 'programs'
+		| 'workoutSessions'
+		| 'activityLog'
+		| 'habits'
+		| 'health'
+		| 'goalPlans'
+		| 'everything';
 
 	const clearFns: Record<ClearAction, () => Promise<void>> = {
 		exercises: clearCustomExercises,
@@ -33,6 +43,7 @@
 		activityLog: clearActivityLog,
 		habits: clearHabitsData,
 		health: clearHealthData,
+		goalPlans: clearGoalPlansData,
 		everything: clearEverything,
 	};
 
@@ -196,6 +207,13 @@
 			description="Weight and blood pressure readings."
 			onclick={() => openClearDialog('health')}
 		/>
+		{#if prefsStore.goalProgressionPlansEnabled}
+			<SettingsActionRow
+				label="Goal plans"
+				description="Goal progression plan records. Their generated programs and sessions stay in place."
+				onclick={() => openClearDialog('goalPlans')}
+			/>
+		{/if}
 	</SettingsGroup>
 
 	<section class="settings-section">
@@ -215,9 +233,10 @@
 		<h2 class="settings-section__title">Advanced</h2>
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
-				Load 45 days of realistic debug data — workout sessions, activities, habit logs, and health readings — for
-				testing graphs and visualizations. Existing data is kept. Remove with "Workout sessions" and "Activity log"
-				above.
+				Load 45 days of realistic debug data — workout sessions, activities, habit logs, health readings, and two
+				sample goal plans (one completed, one mid-plan; visible when goal progression plans are enabled) — for
+				testing graphs and visualizations. Existing data is kept. Remove with "Workout sessions", "Activity log",
+				and "Goal plans" above.
 			</p>
 			<button class="data-action__btn data-action__btn--ghost" onclick={() => (showSeedConfirm = true)}>
 				Load debug data
@@ -324,6 +343,20 @@
 		oncancel={() => (activeDialog = null)}
 	>
 		This removes all habits and habit logs. The default habit set will be restored. This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'goalPlans'}
+	<ConfirmDialog
+		title="Clear goal plans?"
+		confirmLabel="Clear goal plans"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes all goal progression plan records — active, paused, and completed. The programs and sessions they
+		generated stay and can be cleared with "Custom programs" and "Workout sessions". This cannot be undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'health'}
 	<ConfirmDialog

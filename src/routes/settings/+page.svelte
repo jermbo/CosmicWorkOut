@@ -26,6 +26,15 @@
 			checked={prefsStore.healthMetricsEnabled}
 			onchange={(v) => prefsStore.setHealthMetricsEnabled(v)}
 		/>
+		<SettingsToggleRow
+			label="Goal progression plans"
+			description="Wave-loading strength plans that build toward a target lift. Your plan data is kept when off."
+			checked={prefsStore.goalProgressionPlansEnabled}
+			onchange={(v) => prefsStore.setGoalProgressionPlansEnabled(v)}
+		/>
+		{#if prefsStore.goalProgressionPlansEnabled}
+			<SettingsRow href="/goals" label="Goal plans" detail="Manage & create" />
+		{/if}
 	</SettingsGroup>
 
 	<SettingsGroup title="Data">

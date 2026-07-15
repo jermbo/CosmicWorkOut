@@ -18,6 +18,12 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
+/**
+ * Optional per-item weekly targets a plan engine (e.g. goal progression plans)
+ * can pass into start(); they take precedence over the last-used prefill.
+ */
+export type PrescribedTargets = Map<string, { weight: number; reps?: number }>;
+
 function metricForLoggedItem(logged: LoggedItem): Metric {
 	if (logged.checked !== undefined) return 'check';
 	if (logged.value !== undefined || logged.skipped) return 'measure';
@@ -86,13 +92,19 @@ class SessionStore {
 		}
 	}
 
-	private async buildStrengthItem(ri: RoutineItem, item: Item): Promise<ActiveItem> {
+	private async buildStrengthItem(
+		ri: RoutineItem,
+		item: Item,
+		prescribed?: { weight: number; reps?: number },
+	): Promise<ActiveItem> {
 		const lastUsed = await db.itemLastUsed.get(ri.itemId);
-		const defaultWeight: number | string = lastUsed?.weight ?? 0;
+		const defaultWeight: number | string = prescribed?.weight ?? lastUsed?.weight ?? 0;
 
-		const targetReps = ri.reps ?? item.defaultReps ?? '8';
+		const targetReps = prescribed?.reps != null ? String(prescribed.reps) : (ri.reps ?? item.defaultReps ?? '8');
 		let defaultReps = parseInt(targetReps.split('-')[0], 10) || 8;
-		if (lastUsed?.reps) {
+		if (prescribed?.reps != null) {
+			defaultReps = prescribed.reps;
+		} else if (lastUsed?.reps) {
 			defaultReps = lastUsed.reps;
 		}
 
@@ -146,6 +158,7 @@ class SessionStore {
 		routine: Routine,
 		program: Program,
 		itemMap: Map<string, Item>,
+		prescribed?: PrescribedTargets,
 	): Promise<ActiveItem[]> {
 		const activeItems: ActiveItem[] = [];
 		const sections = effectiveSections(program, routine);
@@ -156,7 +169,7 @@ class SessionStore {
 				if (!item) continue;
 
 				if (section.metric === 'setsReps') {
-					activeItems.push(await this.buildStrengthItem(ri, item));
+					activeItems.push(await this.buildStrengthItem(ri, item, prescribed?.get(ri.itemId)));
 				} else if (section.metric === 'check') {
 					activeItems.push(this.buildCheckItem(item, section.key));
 				} else {
@@ -222,11 +235,11 @@ class SessionStore {
 		routine: Routine,
 		program: Program,
 		itemMap: Map<string, Item>,
-		options?: { date?: string },
+		options?: { date?: string; prescribed?: PrescribedTargets },
 	): Promise<void> {
 		const date = options?.date ?? todayIso();
 		const now = new Date().toISOString();
-		const items = await this.buildActiveItems(routine, program, itemMap);
+		const items = await this.buildActiveItems(routine, program, itemMap, options?.prescribed);
 
 		this.active = {
 			id: generateId(),
