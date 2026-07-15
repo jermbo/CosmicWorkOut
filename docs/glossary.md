@@ -28,9 +28,11 @@ Pickleball is already an Activity type — it cost zero architecture. That's the
 ---
 
 ## Structured archetype terms
+
 These generalize the original strength model so belly dance (and anything after it) reuses one engine. The model shipped in v1.4.0; the strength-only names below were renamed at that point.
 
 ### Discipline
+
 A first-class, data-driven definition of a structured movement practice. A Discipline declares everything that makes it _specific_ while the engine stays _generic_:
 
 - its **sections** and the order they run in,
@@ -43,6 +45,7 @@ Strength and Belly Dance are both Disciplines (seeded, read-only config in `src/
 > **Discipline vs. Practice — don't conflate them.** _Discipline_ is the **data-model** term (config in code). _Practice_ (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
 
 ### Practice
+
 The **Practice destination** and page shell for guided sessions (`/practice`). Organized as:
 
 - **Practice groups** — broad buckets like Workout and Dance (UI config, not stored in IndexedDB).
@@ -52,6 +55,7 @@ The **Practice destination** and page shell for guided sessions (`/practice`). O
 Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
 
 ### Section
+
 An ordered division of a routine. A Discipline defines its own sections.
 
 - **Strength:** a single implicit section — the exercise list.
@@ -60,6 +64,7 @@ An ordered division of a routine. A Discipline defines its own sections.
 Each section is tied to a **metric**, which decides how its items are logged.
 
 ### Metric
+
 The rule for how one item is recorded during a session. This is the core flexibility lever — a new Discipline picks from existing metrics or adds one.
 
 | Metric     | Logs                                         | Used by             |
@@ -73,10 +78,31 @@ The rule for how one item is recorded during a session. This is the core flexibi
 The atomic unit of any routine — one movement. Belongs to a Discipline, carries a **section** key, **focus** tag(s), an optional cue, and a logging metric. Ships built-in (seeded, read-only) or custom (user-created). Built-in items are **derived from catalog seeds** — see [Data Model](architecture/data-model.md#catalog--item-derivation).
 
 ### Focus
+
 A descriptive tag on an item for filtering — _hips · core · arms · legs · …_. Independent of section/metric. Multiple per item (see `FOCUS_TAGS`).
 
 ### Program
+
 A multi-week plan within **one** Discipline: name, duration in weeks, days per week, and its routines. Ships built-in (read-only; edit = copy-first) or custom. Every Program belongs to a Discipline.
+
+Two program **flavors** exist for Strength today:
+
+| Flavor                                        | Purpose                                         | Progression                                                                  |
+| --------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Course program**                            | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump                   |
+| **Goal progression plan** _(v1.9.0, planned)_ | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Goal progression plan](#goal-progression-plan) |
+
+### Goal progression plan _(v1.9.0, planned)_
+
+A Strength program type where the user sets a **focus exercise** and a **goal** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Max Bench 01 vs Max Bench 02) is a separate plan record. Only one may be **active** at a time. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+
+### Progression block
+
+One **4-week wave** within a goal progression plan. Focus exercise pattern: build → build → peak → deload (e.g. 150×10 → 160×8 → 170×6 → 150×10), then the next block starts at a higher baseline. The user may **repeat** the current block without rewinding to earlier blocks.
+
+### Focus exercise
+
+The single lift a goal progression plan is built around. It follows the full wave block schedule. All other exercises in the plan are **supporting** — weekly `weightIncrement` bumps, no deload wave.
 
 ### Routine _(renamed from **Workout**)_
 
@@ -87,6 +113,7 @@ A single training day within a program — optionally lettered **A / B / C**, an
 A completed, recorded instance of a routine on a given date. Written on finish. What gets stored per item depends on that item's metric.
 
 ### Bookends
+
 The shared warm-up and cool-down sections. Routine **A** defines the canonical lists; other routines inherit until they set `overridesBookends`. A Discipline-level pattern generalizing template inheritance.
 
 ---
@@ -98,6 +125,7 @@ The shared warm-up and cool-down sections. Routine **A** defines the canonical l
 A lightweight record of a non-structured physical activity: a **type** (Run · Bike · Pickleball · Swim · Hike · Yoga · …), a **duration**, and an **intensity** (Easy · Moderate · Hard). No program, no routine, no session flow. This is where cardio and sports live — and where most "next things" will land.
 
 ### Activity type
+
 One value in the Activity type list. Adding one (e.g. Kayaking) is a config change, not architecture.
 
 ---
@@ -105,9 +133,11 @@ One value in the Activity type list. Adding one (e.g. Kayaking) is a config chan
 ## Habit archetype terms
 
 ### Habit
+
 A daily trackable behavior with a **type** (`times · minutes · count · boolean · mood`), optional daily goal, and unit label.
 
 ### Habit log
+
 One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)).
 
 ---

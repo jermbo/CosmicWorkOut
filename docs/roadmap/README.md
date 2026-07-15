@@ -50,11 +50,16 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Training intelligence
 
-| Item | Notes |
-| ---- | ----- |
-| Load periodization engine | No auto light → heavy → deload; weight uses last-used prefill + manual bump |
-| Additional Disciplines | Engine supports more; only strength + belly dance ship |
-| Day-of-week scheduling | Progression stays count-driven (`completedSessionCount % routineCount`) |
+| Item | Notes | Spec |
+| ---- | ----- | ---- |
+| Goal progression plans | Wave-loading goal plans with generator, templates, block repeat — **in design for v1.9.0** | [v1.9.0](../features/v1.9.0/README.md) |
+| Plan comparison visualizations | Compare isolated plan instances (e.g. Max Bench 01 vs 02) — data captured in v1.9.0, UI later | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) |
+| Plan-switching handoff | UX when starting a new goal plan while another exists | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
+| Pro-authored goal templates | Built-in starters in v1.9.0; professional templates later | [v1.9.0](../features/v1.9.0/README.md) |
+| Additional Disciplines | Engine supports more; only strength + belly dance ship | — |
+| Day-of-week scheduling | Progression stays count-driven (`completedSessionCount % routineCount`) | — |
+
+**Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a goal plan.
 
 ---
 
