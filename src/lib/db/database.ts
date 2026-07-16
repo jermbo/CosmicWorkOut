@@ -33,36 +33,47 @@ function openDB(): Promise<IDBDatabase> {
 		const request = indexedDB.open(DB_NAME, DB_VERSION);
 
 		request.onupgradeneeded = (event) => {
-			const db = (event.target as IDBOpenDBRequest).result;
+			const req = event.target as IDBOpenDBRequest;
+			const db = req.result;
+			const tx = req.transaction!;
 
-			for (const name of Array.from(db.objectStoreNames)) {
-				db.deleteObjectStore(name);
-			}
+			// Idempotent, non-destructive migration: create only stores/indexes that
+			// don't already exist so bumping DB_VERSION never wipes user data.
+			// Future schema changes append new ensureStore/ensureIndex calls (and
+			// data transforms keyed on event.oldVersion when needed).
+			const ensureStore = (name: string, opts: IDBObjectStoreParameters): IDBObjectStore =>
+				db.objectStoreNames.contains(name)
+					? tx.objectStore(name)
+					: db.createObjectStore(name, opts);
 
-			db.createObjectStore('items', { keyPath: 'id' });
+			const ensureIndex = (store: IDBObjectStore, name: string, keyPath: string): void => {
+				if (!store.indexNames.contains(name)) store.createIndex(name, keyPath);
+			};
 
-			db.createObjectStore('programs', { keyPath: 'id' });
+			ensureStore('items', { keyPath: 'id' });
 
-			const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
-			sessionStore.createIndex('by_date', 'date');
+			ensureStore('programs', { keyPath: 'id' });
 
-			db.createObjectStore('itemLastUsed', { keyPath: 'itemId' });
+			const sessionStore = ensureStore('sessions', { keyPath: 'id' });
+			ensureIndex(sessionStore, 'by_date', 'date');
 
-			const actStore = db.createObjectStore('activities', { keyPath: 'id' });
-			actStore.createIndex('by_date', 'date');
+			ensureStore('itemLastUsed', { keyPath: 'itemId' });
 
-			db.createObjectStore('habits', { keyPath: 'id' });
+			const actStore = ensureStore('activities', { keyPath: 'id' });
+			ensureIndex(actStore, 'by_date', 'date');
 
-			const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
-			hlStore.createIndex('by_date', 'date');
-			hlStore.createIndex('by_habit', 'habitId');
+			ensureStore('habits', { keyPath: 'id' });
 
-			const hrStore = db.createObjectStore('healthReadings', { keyPath: 'id' });
-			hrStore.createIndex('by_date', 'date');
-			hrStore.createIndex('by_metric', 'metricId');
+			const hlStore = ensureStore('habitLogs', { keyPath: 'id' });
+			ensureIndex(hlStore, 'by_date', 'date');
+			ensureIndex(hlStore, 'by_habit', 'habitId');
 
-			const gpStore = db.createObjectStore('goalPlans', { keyPath: 'id' });
-			gpStore.createIndex('by_status', 'status');
+			const hrStore = ensureStore('healthReadings', { keyPath: 'id' });
+			ensureIndex(hrStore, 'by_date', 'date');
+			ensureIndex(hrStore, 'by_metric', 'metricId');
+
+			const gpStore = ensureStore('goalPlans', { keyPath: 'id' });
+			ensureIndex(gpStore, 'by_status', 'status');
 		};
 
 		request.onsuccess = (event) => {

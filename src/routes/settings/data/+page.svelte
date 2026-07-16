@@ -104,8 +104,11 @@
 		try {
 			await importBackup(pendingBackup);
 			location.reload();
-		} catch {
-			restoreError = 'Restore failed. Your existing data is unchanged.';
+		} catch (err) {
+			restoreError =
+				err instanceof BackupValidationError
+					? `${err.message} Your existing data is unchanged.`
+					: 'Restore failed partway through. Some data may have been lost — re-import a valid backup.';
 			restoring = false;
 		}
 	}

@@ -20,16 +20,21 @@ class PrefsStore {
 	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
 
 	load(): void {
-		const stored = localStorage.getItem(PREFS_KEY);
-		if (stored) {
-			const parsed = JSON.parse(stored) as UserPrefs;
-			this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
-			this.density = parsed.density ?? DEFAULTS.density;
-			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
-			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
-			this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
-			this.goalProgressionPlansEnabled =
-				parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
+		try {
+			const stored = localStorage.getItem(PREFS_KEY);
+			if (stored) {
+				const parsed = JSON.parse(stored) as Partial<UserPrefs>;
+				this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
+				this.density = parsed.density ?? DEFAULTS.density;
+				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
+				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
+				this.goalProgressionPlansEnabled =
+					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
+			}
+		} catch (e) {
+			// Corrupt prefs must never block app startup — fall back to defaults.
+			console.error('Failed to load preferences, using defaults:', e);
 		}
 
 		this.applyAccentColor();

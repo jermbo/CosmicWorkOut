@@ -20,24 +20,30 @@
 	let { children } = $props();
 
 	let appReady = $state(false);
+	let loadError = $state(false);
 	let hasRecoverableSession = $state(false);
 
 	onMount(async () => {
-		await initDB();
-		prefsStore.load();
-		await Promise.all([
-			programStore.load(),
-			habitStore.load(),
-			activityStore.load(),
-			healthStore.load(),
-			goalPlanStore.load(),
-		]);
+		try {
+			await initDB();
+			prefsStore.load();
+			await Promise.all([
+				programStore.load(),
+				habitStore.load(),
+				activityStore.load(),
+				healthStore.load(),
+				goalPlanStore.load(),
+			]);
 
-		if (sessionStore.checkForRecovery()) {
-			hasRecoverableSession = true;
+			if (sessionStore.checkForRecovery()) {
+				hasRecoverableSession = true;
+			}
+		} catch (e) {
+			console.error('Startup failed:', e);
+			loadError = true;
+		} finally {
+			appReady = true;
 		}
-
-		appReady = true;
 	});
 
 	function handleResumeSession() {
@@ -53,7 +59,25 @@
 
 <div class="app">
 	<Toaster />
-	{#if appReady}
+	{#if appReady && loadError}
+		<div
+			class="app-loading"
+			role="alert"
+		>
+			<div class="app-error">
+				<p class="app-error__title">Couldn't load your data</p>
+				<p class="app-error__body">
+					Something went wrong while starting up. Try reloading — your data on this device is safe.
+				</p>
+				<button
+					class="app-error__btn"
+					onclick={() => location.reload()}
+				>
+					Reload
+				</button>
+			</div>
+		</div>
+	{:else if appReady}
 		<main
 			class="app__main"
 			id="main-content"

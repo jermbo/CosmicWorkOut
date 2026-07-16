@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 
@@ -10,6 +11,9 @@
 	let { set, onTap }: Props = $props();
 
 	let isAnimating = $state(false);
+	let animTimer: ReturnType<typeof setTimeout> | undefined;
+
+	onDestroy(() => clearTimeout(animTimer));
 
 	function formatWeight(w: number | string): string {
 		if (typeof w === 'string') {
@@ -36,7 +40,8 @@
 		}
 		if (!set.completed) {
 			isAnimating = true;
-			setTimeout(() => {
+			clearTimeout(animTimer);
+			animTimer = setTimeout(() => {
 				isAnimating = false;
 			}, 400);
 		}

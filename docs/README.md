@@ -163,6 +163,7 @@ See [Implementation Status](implementation/status.md) for the current built-vs-d
 ## Maintenance
 
 - [June 2026 Audit](maintenance/audit-2026-06.md) — Holistic review before the user-testing pause: doc-drift inventory, clean-code findings (CSS reuse, ternaries, comments, oversized files), and the phased execution plan.
+- [July 2026 Hardening Audit](maintenance/audit-2026-07-hardening.md) — Performance, memory-leak, security, and correctness review. Three data-loss bugs fixed; the rest recorded as deferred concerns with triggers for when to act.
 
 ---
 

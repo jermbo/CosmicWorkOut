@@ -180,6 +180,18 @@ const DB_STORES: (keyof BackupDb)[] = [
  * built-ins. Does not reload — the caller decides when to refresh.
  */
 export async function importBackup(envelope: BackupEnvelope): Promise<void> {
+	// Validate the full payload BEFORE touching existing data. clearWorkoutData()
+	// is destructive, so anything that can be caught up front must be caught here
+	// to avoid wiping the user's data and then failing partway through the write.
+	for (const store of DB_STORES) {
+		const records = envelope.db[store];
+		if (records !== undefined && !Array.isArray(records)) {
+			throw new BackupValidationError(`This backup's "${store}" data is malformed and cannot be restored.`);
+		}
+	}
+	const localEntries =
+		envelope.localStorage && typeof envelope.localStorage === 'object' ? envelope.localStorage : {};
+
 	await clearWorkoutData();
 
 	for (const store of DB_STORES) {
@@ -193,7 +205,7 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 	localStorage.removeItem('cwout:activeProgramId');
 
 	for (const key of BACKUP_LOCAL_KEYS) {
-		if (key in envelope.localStorage) writeLocal(key, envelope.localStorage[key]);
+		if (key in localEntries) writeLocal(key, localEntries[key]);
 	}
 
 	await initDB();
