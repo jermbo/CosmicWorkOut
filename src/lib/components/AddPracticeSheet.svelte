@@ -5,6 +5,7 @@
 	import type { Program } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import { practiceGroupById, practiceGroups, WORKOUT_GROUP_ID } from '$lib/practice';
 	import BottomSheet from './BottomSheet.svelte';
 	import CreateProgramSheet from './CreateProgramSheet.svelte';
@@ -38,6 +39,8 @@
 	let programs = $derived.by(() => {
 		if (!group) return [] as Program[];
 		let list = programStore.programs.filter((p) => group.disciplineIds.includes(p.disciplineId));
+		// Backing programs for goal plans are managed on /goals — hide them here.
+		list = list.filter((p) => !goalPlanStore.planForProgram(p.id));
 		if (filter === 'mine') list = list.filter((p) => !p.isBuiltIn);
 		if (filter === 'builtin') list = list.filter((p) => p.isBuiltIn);
 		return list;
@@ -48,7 +51,10 @@
 		step = 'plans';
 	}
 
-	function activate(program: Program) {
+	async function activate(program: Program) {
+		// Switching to a course/custom plan pauses any running goal plan.
+		const activeGoal = goalPlanStore.activePlan;
+		if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 		programStore.setActiveProgram(program.id);
 		onClose();
 	}

@@ -19,9 +19,11 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/calendar`           | `routes/calendar/+page.svelte`           | History — month grid, stats, day summary                                                                 |
 | `/insights`           | `routes/insights/+page.svelte`           | Insights — Chart.js charts with date-range picker                                                        |
 | `/health`             | `routes/health/+page.svelte`             | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))             |
+| `/goals`              | `routes/goals/+page.svelte`              | Goal progression plans — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)) |
+| `/goals/new`          | `routes/goals/new/+page.svelte`          | Create goal plan wizard                                                                                  |
 | `/settings`           | `routes/settings/+page.svelte`           | Settings **hub** — navigation to sub-pages ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
 | `/settings/habits`    | `routes/settings/habits/+page.svelte`    | Habit CRUD and reorder                                                                                   |
-| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data, debug seed                                                                   |
+| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. goal plans), debug seed                                                |
 
 Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, and Health are reached from their summary cards and the Practice hub.
 
@@ -51,6 +53,7 @@ flowchart TB
     Main --> Calendar["/calendar"]
     Main --> Insights["/insights"]
     Main --> Health["/health"]
+    Main --> Goals["/goals (+ /new)"]
     Main --> Settings["/settings"]
     Settings --> SettingsHab["/settings/habits"]
     Settings --> SettingsData["/settings/data"]
@@ -60,7 +63,7 @@ flowchart TB
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     class Layout,Main,Nav,Toast shell;
     class Overlay,Dance,Complete,Recovery overlay;
-    class Today,Habits,Practice,Workout,Program,Log,Calendar,Insights,Health,Settings,SettingsHab,SettingsData route;
+    class Today,Habits,Practice,Workout,Program,Log,Calendar,Insights,Health,Goals,Settings,SettingsHab,SettingsData route;
 ```
 
 `routes/+layout.ts` sets `ssr = false` — fully client-rendered.
@@ -77,14 +80,16 @@ sequenceDiagram
     participant DB as initDB
     participant P as prefsStore
     participant Prog as programStore
+    participant GP as goalPlanStore
     participant H as habitStore
     participant A as activityStore
     participant He as healthStore
     participant S as sessionStore
 
-    L->>DB: open IndexedDB v8, seed if empty, run migrations
+    L->>DB: open IndexedDB v9, seed if empty, run migrations
     L->>P: load prefs, apply to DOM
     L->>Prog: load programs, exercises, sessions
+    L->>GP: load goal plans
     L->>H: load habits, habit logs
     L->>A: load activities
     L->>He: load health readings
@@ -92,14 +97,15 @@ sequenceDiagram
     L->>L: appReady = true
 ```
 
-1. `initDB()` — open IndexedDB (version 8), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
+1. `initDB()` — open IndexedDB (version 9), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
 2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
 3. `programStore.load()` — load programs, items, sessions; pick active program per Discipline
-4. `habitStore.load()` — load habits and all habit logs
-5. `activityStore.load()` — load all activity logs
-6. `healthStore.load()` — load health readings _(US-029)_
-7. `sessionStore.checkForRecovery()` — flag recoverable session if from today
-8. Set `appReady = true` → render app
+4. `goalPlanStore.load()` — load goal progression plans _(US-033)_
+5. `habitStore.load()` — load habits and all habit logs
+6. `activityStore.load()` — load all activity logs
+7. `healthStore.load()` — load health readings _(US-029)_
+8. `sessionStore.checkForRecovery()` — flag recoverable session if from today
+9. Set `appReady = true` → render app
 
 ---
 
@@ -119,6 +125,9 @@ src/
 │   │   └── [groupId]/+page.svelte
 │   ├── workout/+page.svelte
 │   ├── program/+page.svelte
+│   ├── goals/
+│   │   ├── +page.svelte
+│   │   └── new/+page.svelte
 │   ├── log/+page.svelte
 │   ├── calendar/+page.svelte
 │   ├── insights/+page.svelte
@@ -133,6 +142,12 @@ src/
     │   ├── types.ts
     │   ├── database.ts
     │   └── seed.ts
+    ├── goalPlans/                 (US-033 module)
+    │   ├── types.ts
+    │   ├── generator.ts
+    │   ├── buildProgram.ts
+    │   ├── templates.ts
+    │   └── …
     ├── stores/
     │   ├── program.svelte.ts
     │   ├── session.svelte.ts
@@ -140,10 +155,12 @@ src/
     │   ├── habits.svelte.ts
     │   ├── activities.svelte.ts
     │   ├── health.svelte.ts
+    │   ├── goalPlans.svelte.ts
     │   ├── loggingContext.svelte.ts
     │   └── toast.svelte.ts
     ├── components/
     │   ├── insights/*.svelte
+    │   ├── goals/*.svelte
     │   └── *.svelte
     └── utils.ts
 ```

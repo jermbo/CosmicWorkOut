@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Program } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
 	type Props = {
@@ -11,13 +12,16 @@
 
 	let { onClose, onCreateNew, disciplineId }: Props = $props();
 
-	let programs = $derived(
-		disciplineId
+	let programs = $derived.by(() => {
+		let list = disciplineId
 			? programStore.programs.filter((p) => p.disciplineId === disciplineId)
-			: programStore.programs,
-	);
+			: programStore.programs;
+		return list.filter((p) => !goalPlanStore.planForProgram(p.id));
+	});
 
-	function activate(program: Program) {
+	async function activate(program: Program) {
+		const activeGoal = goalPlanStore.activePlan;
+		if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 		programStore.setActiveProgram(program.id);
 	}
 

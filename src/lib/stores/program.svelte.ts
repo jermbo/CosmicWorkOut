@@ -509,6 +509,23 @@ class ProgramStore {
 		this.persistActiveProgramIds();
 	}
 
+	/**
+	 * Activate `programId` and deactivate every other active program in the same
+	 * discipline — used when a goal plan must be the sole Strength plan.
+	 */
+	setSoleActiveProgram(programId: string): void {
+		const program = this.programById(programId);
+		if (!program) return;
+		const keep = new Set([programId]);
+		const next = this.activeProgramIds.filter((id) => {
+			const other = this.programById(id);
+			return !other || other.disciplineId !== program.disciplineId || keep.has(id);
+		});
+		if (!next.includes(programId)) next.push(programId);
+		this.activeProgramIds = next;
+		this.persistActiveProgramIds();
+	}
+
 	deactivateProgram(programId: string): void {
 		if (!this.isProgramActive(programId)) return;
 		this.activeProgramIds = this.activeProgramIds.filter((id) => id !== programId);

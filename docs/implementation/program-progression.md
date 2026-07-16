@@ -105,13 +105,13 @@ Workout edits via `saveWorkoutExercises()` propagate to **all weeks** by matchin
 The logic above is unchanged — it just runs **per Discipline**. v1.4.0 tracks one active program per Discipline, so strength and belly dance each compute their own `todaysRoutine`, `currentWeek`, and streak from their own session counts. Two deliberate non-goals, locked in [US-015](../features/v1.4.0/US-015-discipline-engine-foundation.md#decisions--non-goals-locked):
 
 - **Count-driven, never calendar-driven.** No day-of-week scheduling — the user logs whichever Discipline they want on a given day, and each recommends its next routine by count (A → B → C).
-- **No load periodization on course programs.** Weeks are not auto-progressed; weight carries forward via the per-item last-used prefill and is adjusted manually. **Goal progression plans** (v1.9.0, planned) are a separate program type with a wave-loading generator — see [v1.9.0](../features/v1.9.0/README.md).
+- **No load periodization on course programs.** Weeks are not auto-progressed; weight carries forward via the per-item last-used prefill and is adjusted manually. **Goal progression plans** (v1.9.0) are a separate program type with a wave-loading generator — see [v1.9.0](../features/v1.9.0/README.md).
 
 ---
 
-## Goal progression plans (v1.9.0, planned)
+## Goal progression plans (v1.9.0)
 
-When a **goal progression plan** is active, routine rotation and week numbering use the **same count-driven formulas** as course programs. What differs is **prescribed load**: the focus exercise follows 4-week wave blocks; supporting exercises bump by `weightIncrement` each week. Block repeat extends the timeline without erasing history. Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
+When a **goal progression plan** is active, routine rotation and week numbering use the **same count-driven formulas** as course programs (via a generated backing `Program`). What differs is **prescribed load**: the focus exercise follows 4-week wave blocks (final peak snaps to the goal weight × reps); supporting exercises bump by `weightIncrement` each week. Block repeat rewinds targets via `countOffset` and extends the backing program without erasing session history. Activating a goal plan makes it the sole active Strength program; activating a course plan pauses the goal plan. Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
 
 ---
 

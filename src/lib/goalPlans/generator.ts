@@ -54,9 +54,28 @@ export function nextBaseline(block: ProgressionBlock): GoalTarget {
 }
 
 /**
- * Chain 4-week blocks from the starting point until a block's peak week reaches the
- * goal weight (the final deload then sits just under the goal). Always at least one
- * block; capped at MAX_BLOCKS.
+ * A prescription meets the goal when it is at least as heavy and at most as many
+ * reps — same or harder than the requested weight × reps pair.
+ */
+export function meetsGoal(target: GoalTarget, goal: GoalTarget): boolean {
+	return target.weight >= goal.weight && target.reps <= goal.reps;
+}
+
+/**
+ * When a block's natural peak first clears the goal weight, snap that peak week to
+ * the user's goal so the plan actually prescribes the target weight × reps.
+ */
+function snapPeakToGoal(block: ProgressionBlock, goal: GoalTarget, increment: number): void {
+	const peak = block.weeks.find((w) => w.phase === 'peak');
+	if (!peak) return;
+	peak.weight = roundToIncrement(goal.weight, increment);
+	peak.reps = goal.reps;
+}
+
+/**
+ * Chain 4-week blocks from the starting point until a peak week meets the goal
+ * (weight × reps). The final peak is snapped to the goal so the schedule
+ * prescribes it. Always at least one block; capped at MAX_BLOCKS.
  */
 export function generateBlocks(
 	start: GoalTarget,
@@ -69,9 +88,14 @@ export function generateBlocks(
 
 	for (let n = 1; n <= MAX_BLOCKS; n++) {
 		const block = buildBlock(n, baseline, inc);
-		blocks.push(block);
 		const peak = block.weeks.find((w) => w.phase === 'peak');
-		if (peak && peak.weight >= goal.weight) break;
+		if (peak && peak.weight >= goal.weight) {
+			snapPeakToGoal(block, goal, inc);
+			blocks.push(block);
+			break;
+		}
+		blocks.push(block);
+		if (peak && meetsGoal(peak, goal)) break;
 		baseline = nextBaseline(block);
 	}
 

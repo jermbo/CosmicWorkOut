@@ -17,6 +17,7 @@ import {
 	effectivePlanWeek,
 	isPlanFinished,
 	countOffsetForRepeat,
+	meetsGoal,
 } from './generator.ts';
 import { autoPlanName } from './naming.ts';
 import type { GoalPlan } from './types.ts';
@@ -77,13 +78,30 @@ test('next block starts at the previous peak weight with week-1 reps (AC 3b)', (
 	);
 });
 
-test('generateBlocks chains until a peak reaches the goal weight', () => {
-	// 150x10 → goal 200x5, inc 5: peaks 170, 190, 210 → 3 blocks
+test('generateBlocks chains until a peak meets the goal weight × reps', () => {
+	// 150x10 → goal 200x5, inc 5: natural peaks 170×6, 190×6, then snap to 200×5
 	const blocks = generateBlocks({ weight: 150, reps: 10 }, { weight: 200, reps: 5 }, 5);
 	assert.equal(blocks.length, 3);
 	const lastPeak = blocks[2].weeks.find((w) => w.phase === 'peak');
-	assert.ok(lastPeak && lastPeak.weight >= 200);
+	assert.deepEqual(lastPeak && { weight: lastPeak.weight, reps: lastPeak.reps }, {
+		weight: 200,
+		reps: 5,
+	});
 	assert.equal(totalPlanWeeks(blocks), 12);
+});
+
+test('generateBlocks final peak prescribes the goal, not just a heavier wave week', () => {
+	const blocks = generateBlocks({ weight: 150, reps: 10 }, { weight: 200, reps: 5 }, 5);
+	const peak = blocks.at(-1)?.weeks.find((w) => w.phase === 'peak');
+	assert.ok(peak);
+	assert.equal(peak.weight, 200);
+	assert.equal(peak.reps, 5);
+	// Earlier peaks still follow the wave (higher weight, lower reps than week 1).
+	const firstPeak = blocks[0].weeks.find((w) => w.phase === 'peak');
+	assert.deepEqual(firstPeak && { weight: firstPeak.weight, reps: firstPeak.reps }, {
+		weight: 170,
+		reps: 6,
+	});
 });
 
 test('a farther starting point needs more blocks (AC 2c)', () => {
@@ -164,6 +182,28 @@ test('repeats extend the timeline; the plan finishes later (AC 6c)', () => {
 	const offset = countOffsetForRepeat(28, 3, daysPerWeek);
 	assert.equal(isPlanFinished(36, offset, daysPerWeek, totalWeeks), false);
 	assert.equal(isPlanFinished(36 + offset, offset, daysPerWeek, totalWeeks), true);
+});
+
+test('a second repeat across blocks keeps finish math consistent', () => {
+	const daysPerWeek = 3;
+	const totalWeeks = 12;
+	// First repeat of block 2 at week 6 (completed 15).
+	const offset1 = countOffsetForRepeat(15, 2, daysPerWeek);
+	assert.equal(effectivePlanWeek(15, offset1, daysPerWeek, totalWeeks), 5);
+	// Later, at block 3 week 2 of the resumed plan (completed 30), repeat block 3.
+	const offset2 = countOffsetForRepeat(30, 3, daysPerWeek);
+	assert.equal(effectivePlanWeek(30, offset2, daysPerWeek, totalWeeks), 9);
+	assert.equal(isPlanFinished(30, offset2, daysPerWeek, totalWeeks), false);
+	// Full redo of block 3 from week 1 takes 12 sessions → finish at 42.
+	assert.equal(isPlanFinished(42, offset2, daysPerWeek, totalWeeks), true);
+});
+
+test('meetsGoal requires weight at-or-above and reps at-or-below', () => {
+	assert.equal(meetsGoal({ weight: 200, reps: 5 }, { weight: 200, reps: 5 }), true);
+	assert.equal(meetsGoal({ weight: 210, reps: 5 }, { weight: 200, reps: 5 }), true);
+	assert.equal(meetsGoal({ weight: 200, reps: 4 }, { weight: 200, reps: 5 }), true);
+	assert.equal(meetsGoal({ weight: 200, reps: 6 }, { weight: 200, reps: 5 }), false);
+	assert.equal(meetsGoal({ weight: 190, reps: 5 }, { weight: 200, reps: 5 }), false);
 });
 
 test('autoPlanName numbers instances per focus exercise', () => {

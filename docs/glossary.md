@@ -90,11 +90,11 @@ Two program **flavors** exist for Strength today:
 | Flavor                                        | Purpose                                         | Progression                                                                  |
 | --------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
 | **Course program**                            | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump                   |
-| **Goal progression plan** _(v1.9.0, planned)_ | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Goal progression plan](#goal-progression-plan) |
+| **Goal progression plan** _(v1.9.0)_          | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Goal progression plan](#goal-progression-plan) |
 
-### Goal progression plan _(v1.9.0, planned)_
+### Goal progression plan _(v1.9.0)_
 
-A Strength program type where the user sets a **focus exercise** and a **goal** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Max Bench 01 vs Max Bench 02) is a separate plan record. Only one may be **active** at a time. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+A Strength program type where the user sets a **focus exercise** and a **goal** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench Goal 01 vs Bench Goal 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
 
 ### Progression block
 

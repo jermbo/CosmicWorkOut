@@ -315,6 +315,68 @@ type HealthReading = {
 - **Blood pressure:** many readings per `date`; Insights charts use daily averages of systolic/diastolic (and pulse when present).
 - **Feature gate:** `UserPrefs.healthMetricsEnabled` (default `false`). When off, UI is hidden; readings remain in IndexedDB.
 
+### GoalPlan
+
+> **Shipped — [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).** Opt-in Strength stint toward one focus lift. Types live in `src/lib/goalPlans/types.ts`.
+
+Each instance owns a generated backing `Program` (for A/B/C rotation) plus wave metadata. Backing programs are hidden from generic plan pickers and managed on `/goals`.
+
+```typescript
+type GoalPlanStatus = 'active' | 'paused' | 'completed';
+type WavePhase = 'build' | 'peak' | 'deload';
+type GoalTarget = { weight: number; reps: number };
+
+type WaveWeek = {
+	planWeek: number; // 1-based across the whole plan
+	blockWeek: number; // 1-4 within the block
+	phase: WavePhase;
+	weight: number;
+	reps: number;
+};
+
+type ProgressionBlock = {
+	blockNumber: number;
+	baseline: GoalTarget; // week-1 / deload target
+	weeks: WaveWeek[]; // always 4
+};
+
+type SupportingBaseline = {
+	itemId: string;
+	startWeight: number; // history at generation, else 0
+	weightIncrement: number; // frozen from the item at generation
+};
+
+type BlockRepeatEvent = {
+	blockNumber: number;
+	atCompletedCount: number;
+	repeatedAt: string;
+};
+
+type GoalPlan = {
+	id: string;
+	disciplineId: string; // always "strength"
+	programId: string; // backing Program
+	templateId: string; // scaffold id (e.g. "gp-priority")
+	name: string; // default: "<Focus> Goal NN"
+	focusItemId: string;
+	goal: GoalTarget;
+	start: GoalTarget;
+	focusIncrement: number;
+	blocks: ProgressionBlock[];
+	supporting: SupportingBaseline[];
+	daysPerWeek: number;
+	status: GoalPlanStatus;
+	countOffset: number; // session-count rewind from block repeats
+	repeatEvents: BlockRepeatEvent[];
+	createdAt: string;
+	completedAt?: string;
+	pausedAt?: string;
+};
+```
+
+- **Feature gate:** `UserPrefs.goalProgressionPlansEnabled` (default `false`). When off, UI is hidden; plans remain in IndexedDB.
+- **Clear data:** "Clear goal plans" deletes `goalPlans` **and** their backing programs. "Clear custom programs" skips goal-backed programs so plans stay consistent.
+
 ### UserPrefs
 
 Stored in localStorage (`cwout:prefs`).
@@ -326,6 +388,7 @@ type UserPrefs = {
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
 	healthMetricsEnabled?: boolean; // default false — US-029
+	goalProgressionPlansEnabled?: boolean; // default false — US-033
 };
 ```
 
@@ -352,15 +415,19 @@ erDiagram
     ActiveSession ||--|| Session : "becomes on finish"
     ItemLastUsed }o--|| Item : "last weight/reps"
     HabitLog }o--|| Habit : "daily value for"
+    GoalPlan }o--|| Program : "backing programId"
+    GoalPlan }o--|| Item : "focusItemId"
 ```
 
 **Health readings** (`HealthReading`) are standalone rows keyed by `metricId` + `date` (+ `recordedAt` for blood pressure). Metric definitions are code-only — see [US-029](../features/v1.7.0/US-029-health-metrics.md).
+
+**Goal plans** (`GoalPlan`) pair with a generated `Program` for session rotation; prescribed loads come from the plan's blocks, not `itemLastUsed`.
 
 ---
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **8** today. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
+DB name `cosmic-workout`, version **9** today. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
 
 **Version history:**
 
@@ -371,6 +438,7 @@ DB name `cosmic-workout`, version **8** today. The upgrade path is **wipe-and-re
 | v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                 |
 | v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                            |
 | v8 (v1.7.0) | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                      |
+| v9 (v1.9.0) | `goalPlans` store — [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).                                                                                                   |
 
 | Store            | Key      | Indexes                | Contents                         |
 | ---------------- | -------- | ---------------------- | -------------------------------- |
@@ -382,6 +450,7 @@ DB name `cosmic-workout`, version **8** today. The upgrade path is **wipe-and-re
 | `habits`         | `id`     | —                      | Habit definitions                |
 | `habitLogs`      | `id`     | `by_date`, `by_habit`  | Daily habit log values           |
 | `healthReadings` | `id`     | `by_date`, `by_metric` | Health metric readings (US-029)  |
+| `goalPlans`      | `id`     | `by_status`            | Goal progression plans (US-033)  |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
@@ -406,3 +475,4 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 - [State Management](../implementation/state.md) — How stores read/write these types
 - [Program Progression](../implementation/program-progression.md) — How sessions advance the schedule
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health readings store
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Goal plan store

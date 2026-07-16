@@ -231,7 +231,27 @@ export async function clearCustomExercises(): Promise<void> {
 }
 
 export async function clearCustomPrograms(): Promise<void> {
-	await clearNonBuiltIn('programs');
+	const [programs, plans] = await Promise.all([
+		getAll<{ id: string; isBuiltIn: boolean }>('programs'),
+		getAll<{ programId: string }>('goalPlans'),
+	]);
+	const goalProgramIds = new Set(plans.map((p) => p.programId));
+	const customIds = programs
+		.filter((r) => !r.isBuiltIn && !goalProgramIds.has(r.id))
+		.map((r) => r.id);
+	if (customIds.length > 0) {
+		const db = await openDB();
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction('programs', 'readwrite');
+			const store = tx.objectStore('programs');
+			for (const id of customIds) store.delete(id);
+			tx.oncomplete = () => resolve();
+			tx.onerror = () => {
+				reportWriteError(tx.error);
+				reject(tx.error);
+			};
+		});
+	}
 	location.reload();
 }
 
@@ -259,7 +279,37 @@ export async function clearHealthData(): Promise<void> {
 }
 
 export async function clearGoalPlansData(): Promise<void> {
-	await clearStores(['goalPlans']);
+	const plans = await getAll<{ programId: string }>('goalPlans');
+	const programIds = plans.map((p) => p.programId);
+	const db = await openDB();
+	await new Promise<void>((resolve, reject) => {
+		const storeNames = programIds.length > 0 ? ['goalPlans', 'programs'] : ['goalPlans'];
+		const tx = db.transaction(storeNames, 'readwrite');
+		tx.objectStore('goalPlans').clear();
+		if (programIds.length > 0) {
+			const programs = tx.objectStore('programs');
+			for (const id of programIds) programs.delete(id);
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
+	});
+	// Drop backing programs from the active list if they were running.
+	try {
+		const raw = localStorage.getItem('cwout:activeProgramIds');
+		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
+		if (Array.isArray(ids) && programIds.length > 0) {
+			const drop = new Set(programIds);
+			localStorage.setItem(
+				'cwout:activeProgramIds',
+				JSON.stringify(ids.filter((id) => !drop.has(id))),
+			);
+		}
+	} catch {
+		/* ignore */
+	}
 	location.reload();
 }
 

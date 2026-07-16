@@ -18,7 +18,7 @@ New stories follow the [User Story Standards](../standards/user-story-standards.
 | [v1.6.0](v1.6.0/README.md) | Belly dance catalog & course programs       | Backfilled (no per-story files) |
 | [v1.7.0](v1.7.0/README.md) | Full strength catalog, PWA, health & backup | US-028 – US-031                 |
 | [v1.8.0](v1.8.0/README.md) | Granular data clearing                      | US-032                          |
-| [v1.9.0](v1.9.0/README.md) | Goal progression plans                      | US-033 (Planned)                |
+| [v1.9.0](v1.9.0/README.md) | Goal progression plans                      | US-033                          |
 
 ---
 

@@ -158,7 +158,8 @@ class GoalPlanStore {
 		plan.status = 'active';
 		plan.pausedAt = undefined;
 		await this.persist(plan);
-		programStore.setActiveProgram(plan.programId);
+		// Goal plan is the sole active Strength program while running.
+		programStore.setSoleActiveProgram(plan.programId);
 		return true;
 	}
 

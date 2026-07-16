@@ -2,7 +2,7 @@
 
 What's built today. **Current phase:** user testing and feedback — new work starts on the [roadmap](../roadmap/README.md).
 
-Verified against the codebase (June 2026).
+Verified against the codebase (July 2026).
 
 ---
 
@@ -120,9 +120,9 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 ## v1.8.0 — Granular Data Clearing
 
-| Feature                | Status  | Notes                                                                                                                                                                                                                           |
-| ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Per-section data clear | Planned | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) — independent Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health clears, plus a "clear everything" action, on `settings/data` |
+| Feature                | Status | Notes                                                                                                                                                                                                                           |
+| ---------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Per-section data clear | Built  | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) — independent Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health clears, plus a "clear everything" action, on `settings/data` |
 
 See [v1.8.0 feature README](../features/v1.8.0/README.md).
 
@@ -130,17 +130,17 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 
 ## v1.9.0 — Goal Progression Plans
 
-| Feature                                         | Status  | Notes                                                                                         |
-| ----------------------------------------------- | ------- | --------------------------------------------------------------------------------------------- |
-| Goal progression plan type                      | Planned | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift |
-| Settings toggle (`goalProgressionPlansEnabled`) | Planned | Default off; hides UI, data persists — same pattern as health metrics                         |
-| Modular implementation                          | Planned | Dedicated module + thin hooks; removable without breaking course programs                     |
-| Plan generator (goal + start → blocks)          | Planned | Wave blocks toward weight × reps target; 3–6 month estimate                                   |
-| Starter templates                               | Planned | Built-in A/B/C scaffolds; pro templates later                                                 |
-| Focus wave (4-week block)                       | Planned | Build → build → peak → deload                                                                 |
-| Supporting weekly increment                     | Planned | Uses existing `weightIncrement` on items                                                      |
-| Block repeat                                    | Planned | Re-run current block from week 1                                                              |
-| Plan lifecycle (complete / pause)               | Planned | One active goal plan at a time                                                                |
+| Feature                                         | Status | Notes                                                                                                      |
+| ----------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
+| Goal progression plan type                      | Built  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9      |
+| Settings toggle (`goalProgressionPlansEnabled`) | Built  | Default off; hides UI, data persists — same pattern as health metrics                                      |
+| Modular implementation                          | Built  | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                  |
+| Plan generator (goal + start → blocks)          | Built  | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                     |
+| Starter scaffolds                               | Built  | Priority week / Focus only / From scratch                                                                  |
+| Focus wave (4-week block)                       | Built  | Build → build → peak → deload                                                                              |
+| Supporting weekly increment                     | Built  | Uses frozen `weightIncrement`; reps stay flat                                                              |
+| Block repeat                                    | Built  | Re-run current block from week 1 via `countOffset`                                                         |
+| Plan lifecycle (complete / pause)               | Built  | One active goal plan; sole active Strength program; backing programs hidden from generic pickers           |
 
 See [v1.9.0 feature README](../features/v1.9.0/README.md).
 

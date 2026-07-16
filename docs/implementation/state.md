@@ -1,6 +1,6 @@
 # State Management
 
-Seven Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
+Eight Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
 
 ---
 
@@ -35,6 +35,7 @@ Owns the long-lived workout data — programs, items, sessions, and derived sche
 - `refreshSessions()` — reload sessions after finish
 - `getWorkoutById(id)` — lookup by ID
 - `getWorkoutForSession(session)` — lookup workout for a completed session
+- `setSoleActiveProgram(id)` — activate one program and deactivate others in its discipline (used by goal plans)
 
 ---
 
@@ -53,7 +54,7 @@ Owns the ephemeral active session lifecycle.
 
 **Key actions:**
 
-- `start(workout, program, exerciseMap, opts)` — build ActiveSession from workout template; `opts.date` sets the session date
+- `start(workout, program, exerciseMap, opts)` — build ActiveSession from workout template; `opts.date` sets the session date; `opts.prescribed` applies goal-plan targets when present
 - `editSession(session, workout, exerciseMap)` — reopen a completed session for editing
 - `completeSet(ex, set)` — instant mode: mark set done at current weight/reps
 - `logSet(ex, set, weight, reps)` — sheet mode: mark set done with explicit values
@@ -71,12 +72,14 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref          | Default       | Applied via                          |
-| ------------- | ------------- | ------------------------------------ |
-| `accentColor` | `#b2f042`     | `--color-accent` CSS var + ink color |
-| `density`     | `comfortable` | `data-density` on `<html>`           |
-| `roundness`   | `default`     | `data-roundness` on `<html>`         |
-| `weightUnit`  | `lb`          | Display in SetTile, LogSetSheet      |
+| Pref                          | Default       | Applied via                          |
+| ----------------------------- | ------------- | ------------------------------------ |
+| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color |
+| `density`                     | `comfortable` | `data-density` on `<html>`           |
+| `roundness`                   | `default`     | `data-roundness` on `<html>`         |
+| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet      |
+| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI       |
+| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI        |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 
@@ -186,6 +189,33 @@ Reads `loggingContext.date` for the active logging date (same as `habitStore` an
 
 ---
 
+## goalPlanStore
+
+**File:** `src/lib/stores/goalPlans.svelte.ts`
+
+Owns goal progression plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.goalProgressionPlansEnabled`.
+
+| State   | Source    | Purpose               |
+| ------- | --------- | --------------------- |
+| `plans` | IndexedDB | All goal plan records |
+
+**Key derived values:**
+
+- `activePlan` — the single active plan, or null
+- `pausedPlans` / `completedPlans` — history lists
+- `prescribedTargets(plan)` — this week's focus + supporting targets for session start
+
+**Key actions:**
+
+- `load()` — boot-time data load
+- `createPlan(input)` — generate blocks, upsert backing Program, store paused plan
+- `activatePlan(id)` — sole active Strength program via `setSoleActiveProgram`
+- `pausePlan(id)` / `completePlan(id)` — lifecycle; deactivate backing program
+- `repeatCurrentBlock(id)` — rewind targets via `countOffset`; extend backing program weeks
+- `renamePlan(id, name)` — rename plan + backing program
+
+---
+
 ## Data Flow Diagram
 
 ```mermaid
@@ -198,6 +228,7 @@ flowchart TB
     HS[habitStore]
     AS[activityStore]
     HeS[healthStore]
+    GP[goalPlanStore]
     LC[loggingContext]
     UI[Svelte UI]
 
@@ -206,6 +237,7 @@ flowchart TB
     IDB <-->|load / put| HS
     IDB <-->|load / put| AS
     IDB <-->|load / put| HeS
+    IDB <-->|load / put| GP
     LS <-->|persist activeSession| SS
     LS <-->|read/write prefs| PR
     LS <-->|lastActivityType| AS
@@ -213,18 +245,21 @@ flowchart TB
     LC -->|date| AS
     LC -->|date| HeS
     LC -->|date + workoutId| PS
+    GP -->|prescribed targets| SS
+    GP -->|setSoleActiveProgram| PS
     PS -->|suggestedWorkout, sessions| UI
     SS -->|isActive / isComplete| UI
     HS -->|activeHabits, logs| UI
     AS -->|activitiesByDate| UI
     HeS -->|readings, charts| UI
-    PR -->|accent, density, roundness, healthMetricsEnabled| UI
+    GP -->|activePlan, timelines| UI
+    PR -->|accent, density, feature toggles| UI
 
     classDef storage fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class IDB,LS storage;
-    class PS,SS,PR,HS,AS,HeS,LC store;
+    class PS,SS,PR,HS,AS,HeS,GP,LC store;
     class UI ui;
 ```
 
@@ -237,3 +272,4 @@ flowchart TB
 - [Program Progression](program-progression.md) — Schedule derivation
 - [Session Logging](../requirements/session-logging.md) — User-facing flow
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health store
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Goal plan store

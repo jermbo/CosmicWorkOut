@@ -27,9 +27,9 @@
 
 ## Planned
 
-| ID                                           | Title                  | Status  | Notes                                                                                                                                                      |
-| -------------------------------------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [US-032](./US-032-granular-data-clearing.md) | Granular Data Clearing | Planned | Splits today's single "Clear workout data" action into Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health / Everything |
+| ID                                           | Title                  | Status | Notes                                                                                                                                                      |
+| -------------------------------------------- | ---------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [US-032](./US-032-granular-data-clearing.md) | Granular Data Clearing | Built  | Splits today's single "Clear workout data" action into Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health / Everything |
 
 ---
 

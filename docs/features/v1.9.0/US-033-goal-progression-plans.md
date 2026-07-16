@@ -1,5 +1,7 @@
 # US-033 — Goal Progression Plans
 
+> **As built:** `goalPlans` store at **DB_VERSION 9**; module in `src/lib/goalPlans/`; `goalPlanStore`; routes `/goals` + `/goals/new`; Settings toggle `goalProgressionPlansEnabled` (default off). Activating a plan makes its backing program the sole active Strength program; backing programs are hidden from Add Practice / Programs pickers.
+
 As a **fitness user**, I want to create a goal-driven strength plan from a template — with one focus lift on a wave-loading progression and supporting exercises that still get stronger each week —
 so that I can work toward a specific target (e.g. bench 250×5) over several months without hand-authoring every week's weights, and repeat a block when my body needs more time.
 
@@ -141,13 +143,14 @@ flowchart TB
 | **Increments**                    | Reuse existing `weightIncrement` on items — not a new field                                                |
 | **Session rotation**              | A → B → C → A count-driven progression — same engine as today                                              |
 | **Repeat scope**                  | Current 4-week block only                                                                                  |
-| **Templates**                     | Built-in starter templates in v1.9.0; pro-authored templates later                                         |
-| **Naming**                        | Auto-name + optional rename; format **TBD**                                                                |
+| **Scaffolds**                     | Priority week / Focus only / From scratch (not a static template catalog)                                  |
+| **Naming**                        | Auto-name `"<Focus> Goal NN"` + optional rename                                                            |
 | **Lifecycle**                     | Complete or Pause on end; inactivity = rest (no special state)                                             |
-| **Concurrency**                   | One active goal plan at a time                                                                             |
-| **Course program coexistence**    | Deferred — v1.9.0 treats the goal plan as the active strength plan                                         |
+| **Concurrency**                   | One active goal plan at a time; its backing program is the sole active Strength program                    |
+| **Course program coexistence**    | Activating a course/custom plan pauses the active goal plan; backing programs stay off generic pickers     |
 | **Optional feature**              | Master Settings toggle; default off; off hides UI, data persists (same contract as `healthMetricsEnabled`) |
 | **Modularity**                    | Dedicated module + thin hooks; course-program path must work with toggle off and with module removed       |
+| **Supporting reps**               | Stay flat — only weight climbs via `weightIncrement`                                                       |
 
 ---
 
@@ -164,13 +167,14 @@ flowchart TB
    c. The system shall propose a starting weight × reps from session history for the focus exercise when history exists.
    d. The user shall confirm or override the starting point; when no history exists, the user shall enter it manually.
    e. The system shall generate an ordered series of **4-week progression blocks** with weekly weight × rep targets for the focus exercise.
-   f. The system shall estimate plan duration (e.g. 3–6 months) from the number of blocks required to approach the goal from the starting point.
+   f. The system shall estimate plan duration from the number of blocks required to approach the goal from the starting point.
    g. The system shall generate weekly targets for all non-focus exercises using the light weekly `weightIncrement` progression.
-   h. The system shall auto-generate a plan name with an option to rename before activation; the auto-name format is **TBD**.
+   h. The system shall auto-generate a plan name as `"<Focus> Goal NN"` with an option to rename before activation.
 3. Wave block behavior (focus)
    a. Each block shall span 4 program weeks with the pattern: build → build → peak → deload (higher weight / fewer reps, then return to week-1 load).
    b. Weight jumps shall respect the focus item's `weightIncrement` (and generator rounding rules).
    c. Each subsequent block shall start at a higher baseline than the previous block's week-1 target.
+   d. The final block's peak week shall prescribe the user's goal weight × reps (snapped when the natural peak first reaches the goal weight).
 4. Supporting exercise behavior
    a. Non-focus exercises shall increase by their item's `weightIncrement` each program week within the plan.
    b. Non-focus exercises shall not follow the 4-week deload wave.
@@ -240,16 +244,14 @@ flowchart TB
 
 ## Deferred / Out of Scope (v1.9.0)
 
-| Item                                | Notes                                                                              |
-| ----------------------------------- | ---------------------------------------------------------------------------------- |
-| Plan-switching handoff UX           | Starting a new plan while another is active — require complete/pause vs auto-pause |
-| Auto-name format                    | Auto + rename agreed; wording deferred                                             |
-| Pro-authored templates              | Built-in starters only in v1.9.0                                                   |
-| Plan comparison / Insights charts   | Capture data now; UI later                                                         |
-| Supporting exercise rep adjustments | Weekly weight bump locked; rep behavior TBD at build time                          |
-| Non-strength disciplines            | Goal plans are Strength-only in v1.9.0                                             |
-| Calendar-based scheduling           | Progression stays count-driven                                                     |
-| Retrofitting course programs        | No wave engine on Strength Foundation etc.                                         |
+| Item                              | Notes                                                                              |
+| --------------------------------- | ---------------------------------------------------------------------------------- |
+| Plan-switching handoff UX         | Starting a new plan while another is active — require complete/pause vs auto-pause |
+| Pro-authored templates            | Scaffold choices only in v1.9.0                                                    |
+| Plan comparison / Insights charts | Capture data now; UI later                                                         |
+| Non-strength disciplines          | Goal plans are Strength-only in v1.9.0                                             |
+| Calendar-based scheduling         | Progression stays count-driven                                                     |
+| Retrofitting course programs      | No wave engine on Strength Foundation etc.                                         |
 
 ---
 

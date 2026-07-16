@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import {
 		flattenItems,
 		effectiveSections,
@@ -28,7 +29,9 @@
 	);
 
 	let disciplinePrograms = $derived(
-		programStore.programs.filter((p) => p.disciplineId === disciplineId),
+		programStore.programs.filter(
+			(p) => p.disciplineId === disciplineId && !goalPlanStore.planForProgram(p.id),
+		),
 	);
 
 	let viewingProgramId = $state<string | undefined>(undefined);
@@ -101,6 +104,7 @@
 
 	async function handleDeleteProgram() {
 		if (!viewingProgram || deletingProgram) return;
+		if (goalPlanStore.planForProgram(viewingProgram.id)) return;
 		deletingProgram = true;
 		try {
 			await programStore.deleteProgram(viewingProgram.id);
@@ -193,7 +197,9 @@
 					{:else}
 						<button
 							class="prog-card__activate-btn"
-							onclick={() => {
+							onclick={async () => {
+								const activeGoal = goalPlanStore.activePlan;
+								if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 								programStore.setActiveProgram(program.id);
 								viewingProgramId = program.id;
 							}}
