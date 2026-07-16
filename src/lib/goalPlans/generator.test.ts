@@ -22,7 +22,7 @@ import { autoPlanName } from './naming.ts';
 import type { GoalPlan } from './types.ts';
 
 test('buildBlock follows build → build → peak → deload from the baseline', () => {
-	// Spec example: 150×10 → 160×8 → 170×6 → deload 150×10 (increment 5, +2 increments/week)
+	// Spec example: 150x10 → 160x8 → 170x6 → deload 150x10 (increment 5, +2 increments/week)
 	const block = buildBlock(1, { weight: 150, reps: 10 }, 5);
 	assert.equal(block.weeks.length, WEEKS_PER_BLOCK);
 	assert.deepEqual(
@@ -78,7 +78,7 @@ test('next block starts at the previous peak weight with week-1 reps (AC 3b)', (
 });
 
 test('generateBlocks chains until a peak reaches the goal weight', () => {
-	// 150×10 → goal 200×5, inc 5: peaks 170, 190, 210 → 3 blocks
+	// 150x10 → goal 200x5, inc 5: peaks 170, 190, 210 → 3 blocks
 	const blocks = generateBlocks({ weight: 150, reps: 10 }, { weight: 200, reps: 5 }, 5);
 	assert.equal(blocks.length, 3);
 	const lastPeak = blocks[2].weeks.find((w) => w.phase === 'peak');
@@ -134,7 +134,7 @@ test('supporting exercises climb every week and never deload (AC 4a/4b)', () => 
 });
 
 test('effectivePlanWeek advances by session count and caps at the plan end', () => {
-	// 3 days/week: sessions 0–2 → week 1, 3–5 → week 2
+	// 3 days/week: sessions 0-2 → week 1, 3-5 → week 2
 	assert.equal(effectivePlanWeek(0, 0, 3, 12), 1);
 	assert.equal(effectivePlanWeek(2, 0, 3, 12), 1);
 	assert.equal(effectivePlanWeek(3, 0, 3, 12), 2);

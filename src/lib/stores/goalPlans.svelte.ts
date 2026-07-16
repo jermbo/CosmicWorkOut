@@ -1,4 +1,4 @@
-import type { Item, Program, Routine, RoutineColor, Week } from '$lib/db/types';
+import type { Item, Routine, Week } from '$lib/db/types';
 import type {
 	GoalPlan,
 	GoalTarget,
@@ -14,16 +14,16 @@ import {
 	isPlanFinished,
 	focusTargetForWeek,
 	blockForWeek,
-	supportingWeightForWeek,
 	countOffsetForRepeat,
 	WEEKS_PER_BLOCK,
 } from '$lib/goalPlans/generator';
+import { buildGoalProgram } from '$lib/goalPlans/buildProgram';
+import { prescribedTargetsForWeek, type PrescribedTarget } from '$lib/goalPlans/prescribed';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
-import { STRENGTH_DISCIPLINE_ID, singleSection } from '$lib/discipline';
+import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 import { programStore } from './program.svelte';
 
-const ROUTINE_COLORS: RoutineColor[] = ['lime', 'lavender', 'red'];
 const DEFAULT_INCREMENT = 5;
 
 export interface CreatePlanInput {
@@ -37,11 +37,7 @@ export interface CreatePlanInput {
 	daysPerWeek: number;
 }
 
-/** A prescribed weekly target passed into the session prefill seam. */
-export interface PrescribedTarget {
-	weight: number;
-	reps?: number;
-}
+export type { PrescribedTarget };
 
 function hasNumericWeight(item: Item | undefined): boolean {
 	return item?.unit === 'lb' || item?.unit === 'kg';
@@ -75,7 +71,7 @@ class GoalPlanStore {
 	// ── Creation ──────────────────────────────────────────────────────
 
 	/**
-	 * Generate the wave blocks, build the backing Program record (same A/B/C ×
+	 * Generate the wave blocks, build the backing Program record (same A/B/C x
 	 * weeks shape the rotation engine already understands), and store the plan.
 	 * The plan starts paused; call activatePlan() to make it the running plan.
 	 */
@@ -84,14 +80,25 @@ class GoalPlanStore {
 		const focusIncrement = focusItem?.weightIncrement ?? DEFAULT_INCREMENT;
 		const blocks = generateBlocks(input.start, input.goal, focusIncrement);
 		const durationWeeks = totalPlanWeeks(blocks);
+		const programId = generateId();
+		const createdAt = new Date().toISOString();
 
-		const program = this.buildProgram(input, durationWeeks);
+		const program = buildGoalProgram({
+			name: input.name,
+			goal: input.goal,
+			routines: input.routines,
+			daysPerWeek: input.daysPerWeek,
+			durationWeeks,
+			programId,
+			createdAt,
+			makeRoutineId: (weekNumber, routineIndex) => `w${weekNumber}-${generateId().slice(0, 8)}${routineIndex}`,
+		});
 		await programStore.upsertProgram(program);
 
 		const plan: GoalPlan = {
 			id: generateId(),
 			disciplineId: STRENGTH_DISCIPLINE_ID,
-			programId: program.id,
+			programId,
 			templateId: input.templateId,
 			name: input.name,
 			focusItemId: input.focusItemId,
@@ -104,42 +111,12 @@ class GoalPlanStore {
 			status: 'paused',
 			countOffset: 0,
 			repeatEvents: [],
-			createdAt: new Date().toISOString(),
+			createdAt,
 		};
 
 		await db.goalPlans.put($state.snapshot(plan) as GoalPlan);
 		this.plans = [...this.plans, plan];
 		return plan;
-	}
-
-	private buildProgram(input: CreatePlanInput, durationWeeks: number): Program {
-		const weeks: Week[] = Array.from({ length: durationWeeks }, (_, wi) => ({
-			weekNumber: wi + 1,
-			routines: input.routines.map(
-				(tmpl, i): Routine => ({
-					id: `w${wi + 1}-${generateId().slice(0, 8)}`,
-					disciplineId: STRENGTH_DISCIPLINE_ID,
-					name: tmpl.name,
-					letter: tmpl.letter,
-					focus: tmpl.focus,
-					color: ROUTINE_COLORS[i % ROUTINE_COLORS.length],
-					estMin: tmpl.estMin,
-					sections: singleSection(tmpl.slots.map((s) => ({ itemId: s.itemId, sets: s.sets, reps: s.reps }))),
-				}),
-			),
-		}));
-
-		return {
-			id: generateId(),
-			disciplineId: STRENGTH_DISCIPLINE_ID,
-			name: input.name,
-			description: `Goal progression plan — ${input.goal.weight} × ${input.goal.reps}`,
-			durationWeeks,
-			daysPerWeek: input.daysPerWeek,
-			weeks,
-			createdAt: new Date().toISOString(),
-			isBuiltIn: false,
-		};
 	}
 
 	/** Weekly-increment baselines for every weighted non-focus exercise. */
@@ -274,14 +251,19 @@ class GoalPlanStore {
 
 	/** The plan week targets are read from (repeat-aware, capped at the last week). */
 	currentWeek(plan: GoalPlan): number {
-		return effectivePlanWeek(this.completedCountFor(plan), plan.countOffset, plan.daysPerWeek, this.totalWeeksFor(plan));
+		return effectivePlanWeek(
+			this.completedCountFor(plan),
+			plan.countOffset,
+			plan.daysPerWeek,
+			this.totalWeeksFor(plan),
+		);
 	}
 
 	currentBlock(plan: GoalPlan): ProgressionBlock | null {
 		return blockForWeek(plan.blocks, this.currentWeek(plan));
 	}
 
-	/** 1–4 within the current block. */
+	/** 1-4 within the current block. */
 	currentBlockWeek(plan: GoalPlan): number {
 		return ((this.currentWeek(plan) - 1) % WEEKS_PER_BLOCK) + 1;
 	}
@@ -301,19 +283,7 @@ class GoalPlanStore {
 	 * weight (bodyweight, bands) are not prescribed.
 	 */
 	prescribedTargets(plan: GoalPlan): Map<string, PrescribedTarget> {
-		const week = this.currentWeek(plan);
-		const targets = new Map<string, PrescribedTarget>();
-
-		const focus = focusTargetForWeek(plan.blocks, week);
-		if (focus) {
-			targets.set(plan.focusItemId, { weight: focus.weight, reps: focus.reps });
-		}
-
-		for (const baseline of plan.supporting) {
-			targets.set(baseline.itemId, { weight: supportingWeightForWeek(baseline, week) });
-		}
-
-		return targets;
+		return prescribedTargetsForWeek(plan, this.currentWeek(plan));
 	}
 }
 

@@ -4,10 +4,12 @@ import { generateBlocks, totalPlanWeeks, focusTargetForWeek, supportingWeightFor
 import { goalPlanTemplateById } from './templates';
 
 /**
- * Debug-seed sample data for goal progression plans: one completed bench stint and
- * one active stint currently mid-plan (block 2, week 2), each with its generated
- * program and wave-following sessions. Ids are deterministic so reloading the seed
- * overwrites instead of duplicating.
+ * Debug-seed only — not used by the create-plan wizard or live UX.
+ *
+ * Seeds one completed bench stint and one active mid-plan stint (block 2, week 2),
+ * each with its generated program and wave-following sessions. Ids are deterministic
+ * so reloading the seed overwrites instead of duplicating. Wired from
+ * `database.ts` sample/debug seeding paths only.
  */
 
 const STRENGTH = 'strength';
@@ -65,7 +67,9 @@ function buildSampleProgram(idPrefix: string, name: string, durationWeeks: numbe
 				focus: tmpl.focus,
 				color: (['lime', 'lavender', 'red'] as const)[i % 3],
 				estMin: tmpl.estMin,
-				sections: [{ key: 'exercises', items: tmpl.slots.map((s) => ({ itemId: s.itemId, sets: s.sets, reps: s.reps })) }],
+				sections: [
+					{ key: 'exercises', items: tmpl.slots.map((s) => ({ itemId: s.itemId, sets: s.sets, reps: s.reps })) },
+				],
 			}),
 		),
 	}));
@@ -84,12 +88,7 @@ function buildSampleProgram(idPrefix: string, name: string, durationWeeks: numbe
 }
 
 /** Log one session following that plan week's prescribed targets. */
-function buildSampleSession(
-	idPrefix: string,
-	plan: GoalPlan,
-	sessionIndex: number,
-	date: Date,
-): Session {
+function buildSampleSession(idPrefix: string, plan: GoalPlan, sessionIndex: number, date: Date): Session {
 	const template = goalPlanTemplateById(TEMPLATE_ID)!;
 	const planWeek = Math.floor(sessionIndex / DAYS_PER_WEEK) + 1;
 	const routineIndex = sessionIndex % DAYS_PER_WEEK;
@@ -153,7 +152,7 @@ export function generateGoalPlanSampleData(): {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	// ── Stint 1 — completed: 135×10 → 185×5 (3 blocks, 12 weeks, all 36 sessions) ──
+	// ── Stint 1 — completed: 135x10 → 185x5 (3 blocks, 12 weeks, all 36 sessions) ──
 	const start1 = { weight: 135, reps: 10 };
 	const goal1 = { weight: 185, reps: 5 };
 	const blocks1 = generateBlocks(start1, goal1, 5);
@@ -187,7 +186,7 @@ export function generateGoalPlanSampleData(): {
 		return buildSampleSession('gp-seed-01', plan1, i, shiftDays(firstDay1, week * 7 + dayInWeek));
 	});
 
-	// ── Stint 2 — active, mid-plan: 155×10 → 205×5, currently block 2 week 2 ──
+	// ── Stint 2 — active, mid-plan: 155x10 → 205x5, currently block 2 week 2 ──
 	const start2 = { weight: 155, reps: 10 };
 	const goal2 = { weight: 205, reps: 5 };
 	const blocks2 = generateBlocks(start2, goal2, 5);

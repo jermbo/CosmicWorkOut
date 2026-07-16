@@ -18,7 +18,7 @@ export function roundToIncrement(weight: number, increment: number): number {
 	return Math.round(weight / increment) * increment;
 }
 
-/** One 4-week wave for the focus exercise, starting from a baseline weight × reps. */
+/** One 4-week wave for the focus exercise, starting from a baseline weight x reps. */
 export function buildBlock(blockNumber: number, baseline: GoalTarget, increment: number): ProgressionBlock {
 	const startWeek = (blockNumber - 1) * WEEKS_PER_BLOCK;
 	const step = increment * INCREMENTS_PER_BUILD_WEEK;

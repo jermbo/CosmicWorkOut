@@ -63,6 +63,21 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ---
 
+### Exercise catalog depth
+
+Discussed July 2026: enriching the catalog with muscle diagrams, video links, and a per-body-type view. [MuscleWiki](https://musclewiki.com/) and [Muscle & Strength](https://www.muscleandstrength.com/workout-routines) are useful references for *coverage* — which exercises and program shapes are worth having. Their diagrams and written content are copyrighted and are not to be reproduced; any diagram here is drawn in-house.
+
+| Item | Notes |
+| ---- | ----- |
+| Structured muscle data | `Item.muscles` is a display string today (`'Chest · Triceps · Anterior delts'`). Splitting to `primaryMuscles[]` / `secondaryMuscles[]` is the prerequisite for diagrams and muscle-based filtering |
+| Muscle diagram | If built: one shared front/back body SVG with muscle regions as targetable IDs, tinted from the structured data. Not per-exercise images — hundreds of assets bloat the precache and weaken the offline story |
+| Body-type diagram toggle | Only ever a preference for which body SVG renders. The exercise list does not vary by sex — do not encode that |
+| More built-in programs | Pure seed data in the existing `strength-programs.ts` shape; no maintenance tail. Cheapest item here if the catalog is ever revisited |
+| Exercise video links | **Not planned** — an outbound link is the first thing in the app that fails with the network pulled (violates [Offline First](../vision/principles.md#2-offline-first-always)), and links rot silently across the long gaps between updates |
+| SQLite (wasm) for the catalog | **Not planned** — the catalog is ~111 rows of static seed data compiled into the bundle, not mutable user data. A `.filter()` beats opening a connection; a ~1MB WASM blob plus an OPFS VFS violates [Small Surface Area](../vision/principles.md#5-small-surface-area) and [Web Tech, Web Idioms](../vision/principles.md#6-web-tech-web-idioms). It would also force hand-written schema migrations and break the JSON round-trip in `backup.ts`. IndexedDB (version 8, upsert-on-boot) covers the mutable data at this volume. Revisit only with tens of thousands of rows, full-text search, or user-authored queries — none of which this app's identity allows |
+
+---
+
 ### Infrastructure (if needed later)
 
 | Item | Notes |

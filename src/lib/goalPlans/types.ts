@@ -5,7 +5,7 @@ export type GoalPlanStatus = 'active' | 'paused' | 'completed';
 
 export type WavePhase = 'build' | 'peak' | 'deload';
 
-/** A weight × reps pair — the unit is the focus item's unit (lb/kg). */
+/** A weight x reps pair — the unit is the focus item's unit (lb/kg). */
 export interface GoalTarget {
 	weight: number;
 	reps: number;
@@ -15,7 +15,7 @@ export interface GoalTarget {
 export interface WaveWeek {
 	/** 1-based week within the whole plan (aligned to program week numbers). */
 	planWeek: number;
-	/** 1–4 within the block. */
+	/** 1-4 within the block. */
 	blockWeek: number;
 	phase: WavePhase;
 	weight: number;

@@ -1,6 +1,6 @@
 # Components
 
-Inventory of the **52** UI components in `src/lib/components/` (plus `components/insights/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Generated against the code on branch `feature/v1.6.0`.
+Inventory of the UI components in `src/lib/components/` (plus `components/insights/` and `components/goals/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.9.0 goal progression plans.
 
 > **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](../maintenance/audit-2026-06.md).
 
@@ -101,6 +101,25 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ---
 
+## Goal progression plans (`/goals`, `/goals/new`) — v1.9.0
+
+Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.ts`.
+
+| Component            | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `WeightRepsInputs`   | Shared weight × reps pair inputs (goal + starting point steps). |
+| `GoalWizardSteps`    | Step indicator for the create-plan wizard.                      |
+| `GoalFocusStep`      | Pick focus lift + goal weight × reps.                           |
+| `GoalSetupStep`      | Choose Priority / Focus-only / Scratch week scaffold.           |
+| `GoalExercisesStep`  | Edit A/B/C exercise slots; keep focus lift in the week.         |
+| `GoalStartStep`      | Confirm starting point (history prefill or manual).             |
+| `GoalPreviewStep`    | Plan name + generated block preview before create.              |
+| `ActiveGoalPlanCard` | Active plan: rename, now/finished state, actions.               |
+| `GoalBlockTimeline`  | Wave-block progress strip inside the active card.               |
+| `GoalPlanRow`        | Paused / completed plan list row.                               |
+
+---
+
 ## Activity log (`/log`)
 
 | Component          | Purpose                                                            |
@@ -197,6 +216,13 @@ flowchart TB
         IFS[ItemFormSheet]
     end
 
+    subgraph goals ["Goal plans"]
+        AGPC[ActiveGoalPlanCard]
+        GBT[GoalBlockTimeline]
+        GFS[GoalFocusStep]
+        WRI[WeightRepsInputs]
+    end
+
     subgraph dayactions ["Calendar day"]
         DAS[DayActionsSheet]
         DAI[DayActionItem]
@@ -208,6 +234,8 @@ flowchart TB
     SO --> LS
     WE --> ELS --> EFS
     DRE --> ILS --> IFS
+    AGPC --> GBT
+    GFS --> WRI
     DAS --> DAI & DAAL & DAWS
     PH --> WeekStrip
     LS & EFS & ILS & IFS & ELS & DAS --> BS
@@ -217,12 +245,14 @@ flowchart TB
     classDef strength fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef editor fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef dance fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef goals fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
     classDef day fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class BN,SO,DSO,SC,TO layout;
     class BS,IC,CD,PH shared;
     class EC,ST,LS,PR strength;
     class WE,ELS,EFS editor;
     class DRE,ILS,IFS dance;
+    class AGPC,GBT,GFS,WRI goals;
     class DAS,DAI,DAAL,DAWS day;
 ```
 
