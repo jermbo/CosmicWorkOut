@@ -1,3 +1,4 @@
+import { SvelteSet } from 'svelte/reactivity';
 import type { Item, Routine, Week } from '$lib/db/types';
 import type {
 	GoalPlan,
@@ -123,7 +124,7 @@ class GoalPlanStore {
 	/** Weekly-increment baselines for every weighted non-focus exercise. */
 	private async buildSupportingBaselines(input: CreatePlanInput): Promise<SupportingBaseline[]> {
 		const baselines: SupportingBaseline[] = [];
-		const seen = new Set<string>([input.focusItemId]);
+		const seen = new SvelteSet<string>([input.focusItemId]);
 
 		for (const routine of input.routines) {
 			for (const slot of routine.slots) {
