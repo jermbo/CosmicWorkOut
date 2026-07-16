@@ -4,11 +4,13 @@
 	import type { Item } from '$lib/db/types';
 	import type { GoalTemplateRoutine } from '$lib/goalPlans/types';
 	import {
-		goalPlanTemplates,
 		SCRATCH_TEMPLATE_ID,
-		blankGoalRoutines,
-		cloneTemplateRoutines,
-		goalPlanTemplateById,
+		PRIORITY_TEMPLATE_ID,
+		FOCUS_ONLY_TEMPLATE_ID,
+		FOCUS_QUICK_PICK_IDS,
+		blankRoutinesWithFocus,
+		buildPriorityRoutines,
+		buildFocusOnlyRoutines,
 	} from '$lib/goalPlans/templates';
 	import { generateBlocks, totalPlanWeeks, estimateMonths } from '$lib/goalPlans/generator';
 	import { autoPlanName } from '$lib/goalPlans/naming';
@@ -20,23 +22,22 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import ExerciseLibrarySheet from '$lib/components/ExerciseLibrarySheet.svelte';
 
-	type Step = 'template' | 'exercises' | 'goal' | 'start' | 'preview';
-	const STEPS: Step[] = ['template', 'exercises', 'goal', 'start', 'preview'];
+	type Step = 'focus' | 'setup' | 'exercises' | 'start' | 'preview';
+	const STEPS: Step[] = ['focus', 'setup', 'exercises', 'start', 'preview'];
 	const STEP_LABELS: Record<Step, string> = {
-		template: 'Template',
+		focus: 'Focus & goal',
+		setup: 'Setup',
 		exercises: 'Exercises',
-		goal: 'Focus & goal',
 		start: 'Starting point',
 		preview: 'Review',
 	};
 
-	let step = $state<Step>('template');
-	/** Built-in template id, or SCRATCH_TEMPLATE_ID when starting empty. */
+	let step = $state<Step>('focus');
 	let templateId = $state<string | null>(null);
-	/** Editable A/B/C lists — cloned from a template or blank. */
 	let routines = $state<GoalTemplateRoutine[]>([]);
 	let daysPerWeek = $state(3);
 	let addingToLetter = $state<'A' | 'B' | 'C' | null>(null);
+	let pickingFocus = $state(false);
 	let focusItemId = $state<string | null>(null);
 	let goalWeight = $state<number | null>(null);
 	let goalReps = $state<number | null>(null);
@@ -51,28 +52,27 @@
 	let stepIndex = $derived(STEPS.indexOf(step));
 	let isScratch = $derived(templateId === SCRATCH_TEMPLATE_ID);
 
-	/** Weighted exercises in the plan — the focus candidates. */
-	let focusChoices = $derived.by((): Item[] => {
-		const seen = new Set<string>();
-		const items: Item[] = [];
-		for (const routine of routines) {
-			for (const slot of routine.slots) {
-				if (seen.has(slot.itemId)) continue;
-				seen.add(slot.itemId);
-				const item = programStore.getItemById(slot.itemId);
-				if (item && (item.unit === 'lb' || item.unit === 'kg')) items.push(item);
-			}
-		}
-		return items;
-	});
-
 	let focusItem = $derived(focusItemId ? programStore.getItemById(focusItemId) : undefined);
 	let unitLabel = $derived(focusItem?.unit === 'kg' ? 'kg' : 'lb');
 	let focusIncrement = $derived(focusItem?.weightIncrement ?? 5);
 
-	let goalValid = $derived(focusItemId !== null && (goalWeight ?? 0) > 0 && (goalReps ?? 0) >= 1);
+	let quickPicks = $derived(
+		FOCUS_QUICK_PICK_IDS.map((id) => programStore.getItemById(id)).filter((i): i is Item => !!i),
+	);
+
+	let goalValid = $derived(
+		focusItemId !== null &&
+			(focusItem?.unit === 'lb' || focusItem?.unit === 'kg') &&
+			(goalWeight ?? 0) > 0 &&
+			(goalReps ?? 0) >= 1,
+	);
 	let startValid = $derived((startWeight ?? 0) > 0 && (startReps ?? 0) >= 1);
-	let exercisesValid = $derived(routines.length > 0 && routines.every((r) => r.slots.length > 0));
+	let focusInPlan = $derived(
+		!!focusItemId && routines.some((r) => r.slots.some((s) => s.itemId === focusItemId)),
+	);
+	let exercisesValid = $derived(
+		routines.length > 0 && routines.every((r) => r.slots.length > 0) && focusInPlan,
+	);
 
 	let previewBlocks = $derived.by(() => {
 		if (!goalValid || !startValid) return [];
@@ -85,27 +85,37 @@
 	let previewWeeks = $derived(totalPlanWeeks(previewBlocks));
 	let previewMonths = $derived(estimateMonths(previewBlocks));
 
-	function clearFocusIfMissing() {
-		if (focusItemId && !focusChoices.some((i) => i.id === focusItemId)) {
-			focusItemId = null;
+	function setFocus(item: Item) {
+		if (item.unit !== 'lb' && item.unit !== 'kg') {
+			toastStore.error('Pick a weighted lift for your focus.');
+			return;
+		}
+		const changed = focusItemId !== item.id;
+		focusItemId = item.id;
+		pickingFocus = false;
+		if (changed) {
+			// Changing focus invalidates a previously chosen week scaffold.
+			templateId = null;
+			routines = [];
+			prefillLoadedFor = null;
+			startWeight = null;
+			startReps = null;
+			startFromHistory = false;
+			if (!nameTouched) planName = '';
 		}
 	}
 
-	function pickTemplate(id: string) {
-		const tmpl = goalPlanTemplateById(id);
-		if (!tmpl) return;
-		templateId = id;
-		daysPerWeek = tmpl.daysPerWeek;
-		routines = cloneTemplateRoutines(tmpl);
-		focusItemId = null;
-		step = 'exercises';
-	}
-
-	function pickScratch() {
-		templateId = SCRATCH_TEMPLATE_ID;
+	function pickSetup(kind: typeof PRIORITY_TEMPLATE_ID | typeof FOCUS_ONLY_TEMPLATE_ID | typeof SCRATCH_TEMPLATE_ID) {
+		if (!focusItem) return;
+		templateId = kind;
 		daysPerWeek = 3;
-		routines = blankGoalRoutines();
-		focusItemId = null;
+		if (kind === PRIORITY_TEMPLATE_ID) {
+			routines = buildPriorityRoutines(focusItem);
+		} else if (kind === FOCUS_ONLY_TEMPLATE_ID) {
+			routines = buildFocusOnlyRoutines(focusItem);
+		} else {
+			routines = blankRoutinesWithFocus(focusItem);
+		}
 		step = 'exercises';
 	}
 
@@ -114,7 +124,6 @@
 			if (r.letter !== letter) return r;
 			return { ...r, slots: r.slots.filter((s) => s.itemId !== itemId) };
 		});
-		clearFocusIfMissing();
 	}
 
 	function addExercise(item: Item) {
@@ -139,9 +148,8 @@
 		});
 	}
 
-	/** Propose the starting point from session history (last-used) when it exists. */
 	async function goToStart() {
-		if (!goalValid || !focusItemId) return;
+		if (!goalValid || !focusItemId || !exercisesValid) return;
 		if (prefillLoadedFor !== focusItemId) {
 			const lastUsed = await db.itemLastUsed.get(focusItemId);
 			if (typeof lastUsed?.weight === 'number' && lastUsed.weight > 0) {
@@ -226,41 +234,125 @@
 			{/each}
 		</ol>
 
-		{#if step === 'template'}
+		{#if step === 'focus'}
 			<p class="goal-new__lead">
-				Start from a starter template or build empty A/B/C days yourself. You can add and remove exercises on the next
-				step.
+				Pick the <strong>one lift</strong> this plan is for — e.g. bench press — then set the weight × reps you're
+				chasing. Everything else in the week supports that lift.
+			</p>
+
+			<div class="form-field">
+				<span class="form-field__label" id="focus-label">Focus lift</span>
+				{#if focusItem}
+					<div class="focus-selected">
+						<div class="focus-selected__info">
+							<span class="focus-selected__name">{focusItem.name}</span>
+							<span class="focus-selected__meta"
+								>{focusItem.cat} · +{focusItem.weightIncrement ?? 5} {focusItem.unit}</span
+							>
+						</div>
+						<button type="button" class="focus-selected__change" onclick={() => (pickingFocus = true)}>
+							Change
+						</button>
+					</div>
+				{:else}
+					<div class="focus-list" role="radiogroup" aria-labelledby="focus-label">
+						{#each quickPicks as item (item.id)}
+							<button
+								type="button"
+								class="focus-option"
+								onclick={() => setFocus(item)}
+							>
+								<span class="focus-option__name">{item.name}</span>
+								<span class="focus-option__meta">{item.cat}</span>
+							</button>
+						{/each}
+					</div>
+					<button type="button" class="focus-browse" onclick={() => (pickingFocus = true)}>
+						Browse full library…
+					</button>
+				{/if}
+			</div>
+
+			{#if focusItem}
+				<div class="form-field">
+					<span class="form-field__label">Goal — weight × reps</span>
+					<div class="pair-inputs">
+						<label class="pair-inputs__field">
+							<input
+								class="form-field__input"
+								type="number"
+								inputmode="decimal"
+								min="1"
+								step={focusIncrement}
+								bind:value={goalWeight}
+								placeholder="250"
+								aria-label="Goal weight"
+							/>
+							<span class="pair-inputs__unit">{unitLabel}</span>
+						</label>
+						<span class="pair-inputs__times" aria-hidden="true">×</span>
+						<label class="pair-inputs__field">
+							<input
+								class="form-field__input"
+								type="number"
+								inputmode="numeric"
+								min="1"
+								max="30"
+								bind:value={goalReps}
+								placeholder="5"
+								aria-label="Goal reps"
+							/>
+							<span class="pair-inputs__unit">reps</span>
+						</label>
+					</div>
+				</div>
+			{/if}
+		{:else if step === 'setup' && focusItem}
+			<p class="goal-new__lead">
+				How do you want the week built around <strong>{focusItem.name}</strong>? This is not a full powerlifting
+				split — other max lifts stay out unless you add them.
 			</p>
 			<div class="template-list">
 				<button
 					class="template-card"
+					class:template-card--selected={templateId === PRIORITY_TEMPLATE_ID}
+					onclick={() => pickSetup(PRIORITY_TEMPLATE_ID)}
+				>
+					<span class="template-card__name">Priority week</span>
+					<span class="template-card__desc">
+						{focusItem.name} on every day, plus support work that helps that lift. Recommended.
+					</span>
+					<span class="template-card__meta">3×/week · Heavy · Volume · Assist</span>
+				</button>
+				<button
+					class="template-card"
+					class:template-card--selected={templateId === FOCUS_ONLY_TEMPLATE_ID}
+					onclick={() => pickSetup(FOCUS_ONLY_TEMPLATE_ID)}
+				>
+					<span class="template-card__name">Focus only</span>
+					<span class="template-card__desc">
+						Just {focusItem.name} on Days A/B/C — add accessories yourself next.
+					</span>
+					<span class="template-card__meta">3×/week · minimal</span>
+				</button>
+				<button
+					class="template-card"
 					class:template-card--selected={templateId === SCRATCH_TEMPLATE_ID}
-					onclick={pickScratch}
+					onclick={() => pickSetup(SCRATCH_TEMPLATE_ID)}
 				>
 					<span class="template-card__name">Start from scratch</span>
-					<span class="template-card__desc">Empty Day A / B / C — pick every exercise from your library.</span>
-					<span class="template-card__meta">3×/week · blank scaffold</span>
+					<span class="template-card__desc">
+						{focusItem.name} on Day A; build the rest of the week from your library.
+					</span>
+					<span class="template-card__meta">3×/week · blank days</span>
 				</button>
-				{#each goalPlanTemplates as tmpl (tmpl.id)}
-					<button
-						class="template-card"
-						class:template-card--selected={templateId === tmpl.id}
-						onclick={() => pickTemplate(tmpl.id)}
-					>
-						<span class="template-card__name">{tmpl.name}</span>
-						<span class="template-card__desc">{tmpl.description}</span>
-						<span class="template-card__meta">
-							{tmpl.daysPerWeek}×/week · {tmpl.routines.map((r) => r.name).join(' · ')}
-						</span>
-					</button>
-				{/each}
 			</div>
-		{:else if step === 'exercises' && templateId}
+		{:else if step === 'exercises' && templateId && focusItem}
 			<p class="goal-new__lead">
 				{#if isScratch}
-					Add exercises to each day. Your focus lift can be any weighted exercise you include.
+					Add supporting exercises. Keep {focusItem.name} in the week — it's your wave lift.
 				{:else}
-					Trim or expand the list. Removed exercises stay out of the plan; adds come from your exercise library.
+					Edit the week. Support work helps {focusItem.name}; remove anything you won't train.
 				{/if}
 			</p>
 			{#each routines as routine (routine.letter)}
@@ -272,9 +364,13 @@
 					<ul class="routine-group__list" role="list">
 						{#each routine.slots as slot (slot.itemId)}
 							{@const item = programStore.getItemById(slot.itemId)}
-							<li class="slot-row">
+							{@const isFocus = slot.itemId === focusItemId}
+							<li class="slot-row" class:slot-row--focus={isFocus}>
 								<div class="slot-row__info">
-									<span class="slot-row__name">{item?.name ?? slot.itemId}</span>
+									<span class="slot-row__name">
+										{item?.name ?? slot.itemId}
+										{#if isFocus}<span class="slot-row__badge">Focus</span>{/if}
+									</span>
 									<span class="slot-row__meta">{slot.sets}×{slot.reps}</span>
 								</div>
 								<button
@@ -289,80 +385,27 @@
 							<li class="slot-row slot-row--empty">No exercises yet</li>
 						{/each}
 					</ul>
-					<button
-						type="button"
-						class="routine-group__add"
-						onclick={() => (addingToLetter = routine.letter)}
-					>
+					<button type="button" class="routine-group__add" onclick={() => (addingToLetter = routine.letter)}>
 						Add exercise
 					</button>
 				</section>
 			{/each}
 			{#if !exercisesValid}
-				<p class="goal-new__error">Each day needs at least one exercise.</p>
+				<p class="goal-new__error">
+					{#if !focusInPlan}
+						Keep {focusItem.name} on at least one day — it's the wave lift.
+					{:else}
+						Each day needs at least one exercise.
+					{/if}
+				</p>
 			{/if}
-		{:else if step === 'goal'}
-			<p class="goal-new__lead">Choose the one lift this plan builds toward, then set the target.</p>
-			<div class="form-field">
-				<span class="form-field__label" id="focus-label">Focus exercise</span>
-				{#if focusChoices.length === 0}
-					<p class="goal-new__error">Add at least one weighted exercise first, then pick it as the focus.</p>
-				{:else}
-					<div class="focus-list" role="radiogroup" aria-labelledby="focus-label">
-						{#each focusChoices as item (item.id)}
-							<button
-								type="button"
-								class="focus-option"
-								class:focus-option--selected={focusItemId === item.id}
-								role="radio"
-								aria-checked={focusItemId === item.id}
-								onclick={() => (focusItemId = item.id)}
-							>
-								<span class="focus-option__name">{item.name}</span>
-								<span class="focus-option__meta">{item.cat} · +{item.weightIncrement ?? 5} {item.unit}</span>
-							</button>
-						{/each}
-					</div>
-				{/if}
-			</div>
-			<div class="form-field">
-				<span class="form-field__label">Goal — weight × reps</span>
-				<div class="pair-inputs">
-					<label class="pair-inputs__field">
-						<input
-							class="form-field__input"
-							type="number"
-							inputmode="decimal"
-							min="1"
-							step={focusIncrement}
-							bind:value={goalWeight}
-							placeholder="250"
-							aria-label="Goal weight"
-						/>
-						<span class="pair-inputs__unit">{unitLabel}</span>
-					</label>
-					<span class="pair-inputs__times" aria-hidden="true">×</span>
-					<label class="pair-inputs__field">
-						<input
-							class="form-field__input"
-							type="number"
-							inputmode="numeric"
-							min="1"
-							max="30"
-							bind:value={goalReps}
-							placeholder="5"
-							aria-label="Goal reps"
-						/>
-						<span class="pair-inputs__unit">reps</span>
-					</label>
-				</div>
-			</div>
 		{:else if step === 'start'}
 			<p class="goal-new__lead">
 				{#if startFromHistory}
 					Proposed from your session history — confirm it or adjust to match where you are today.
 				{:else}
-					No history for {focusItem?.name ?? 'this exercise'} yet. Enter a challenging-but-doable weight × reps to start from.
+					No history for {focusItem?.name ?? 'this exercise'} yet. Enter a challenging-but-doable weight × reps to
+					start from.
 				{/if}
 			</p>
 			<div class="form-field">
@@ -422,11 +465,11 @@
 					{unitLabel === 'kg' ? '(kg)' : '(lb)'}
 				</p>
 				<p class="preview-summary__line">
-					{previewBlocks.length} blocks · {previewWeeks} weeks · roughly {previewMonths}
+					{previewBlocks.length} blocks · ~{previewWeeks} weeks · about {previewMonths}
 					{previewMonths === 1 ? 'month' : 'months'} at {daysPerWeek}×/week
 				</p>
 				<p class="preview-summary__note">
-					Everything that isn't {focusItem.name} climbs by its own small increment each week — no deload wave.
+					Only {focusItem.name} rides the wave. Other exercises bump weekly by their weight increment.
 				</p>
 			</section>
 
@@ -436,7 +479,11 @@
 						<h3 class="preview-block__title">Block {String(block.blockNumber).padStart(2, '0')}</h3>
 						<div class="preview-block__weeks">
 							{#each block.weeks as wk (wk.planWeek)}
-								<div class="preview-week" class:preview-week--peak={wk.phase === 'peak'} class:preview-week--deload={wk.phase === 'deload'}>
+								<div
+									class="preview-week"
+									class:preview-week--peak={wk.phase === 'peak'}
+									class:preview-week--deload={wk.phase === 'deload'}
+								>
 									<span class="preview-week__label">Wk {wk.planWeek}</span>
 									<span class="preview-week__target">{wk.weight}×{wk.reps}</span>
 									<span class="preview-week__phase">{wk.phase}</span>
@@ -452,12 +499,12 @@
 			{#if stepIndex > 0}
 				<button class="goal-new__btn goal-new__btn--ghost" type="button" onclick={back}>Back</button>
 			{/if}
-			{#if step === 'exercises'}
-				<button class="goal-new__btn" type="button" disabled={!exercisesValid} onclick={() => (step = 'goal')}>
+			{#if step === 'focus'}
+				<button class="goal-new__btn" type="button" disabled={!goalValid} onclick={() => (step = 'setup')}>
 					Continue
 				</button>
-			{:else if step === 'goal'}
-				<button class="goal-new__btn" type="button" disabled={!goalValid} onclick={goToStart}>Continue</button>
+			{:else if step === 'exercises'}
+				<button class="goal-new__btn" type="button" disabled={!exercisesValid} onclick={goToStart}>Continue</button>
 			{:else if step === 'start'}
 				<button class="goal-new__btn" type="button" disabled={!startValid} onclick={goToPreview}>
 					Generate plan
@@ -482,6 +529,14 @@
 		exercises={programStore.items}
 		onAdd={addExercise}
 		onClose={() => (addingToLetter = null)}
+	/>
+{/if}
+
+{#if pickingFocus}
+	<ExerciseLibrarySheet
+		exercises={programStore.items}
+		onAdd={setFocus}
+		onClose={() => (pickingFocus = false)}
 	/>
 {/if}
 
@@ -558,6 +613,11 @@
 		color: var(--color-text-secondary);
 		line-height: 1.5;
 		margin-block-end: var(--space-4);
+
+		strong {
+			color: var(--color-text-primary);
+			font-weight: 700;
+		}
 	}
 
 	.goal-new__error {
@@ -570,6 +630,52 @@
 		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
 		margin-block-start: var(--space-3);
+	}
+
+	.focus-selected {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3) var(--space-4);
+		background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-2));
+		border: 1px solid var(--color-accent);
+		border-radius: var(--radius-lg);
+	}
+
+	.focus-selected__info {
+		flex: 1;
+		min-inline-size: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.focus-selected__name {
+		font-size: 1rem;
+		font-weight: 700;
+	}
+
+	.focus-selected__meta {
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
+	}
+
+	.focus-selected__change {
+		flex-shrink: 0;
+		padding-inline: var(--space-3);
+		block-size: 32px;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+	}
+
+	.focus-browse {
+		margin-block-start: var(--space-3);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-accent);
 	}
 
 	.template-list {
@@ -675,6 +781,11 @@
 		border-radius: var(--radius-lg);
 	}
 
+	.slot-row--focus {
+		border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+		background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-2));
+	}
+
 	.slot-row--empty {
 		justify-content: center;
 		color: var(--color-text-muted);
@@ -693,6 +804,22 @@
 	.slot-row__name {
 		font-size: 0.9375rem;
 		font-weight: 600;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+
+	.slot-row__badge {
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		padding-inline: 6px;
+		padding-block: 2px;
+		border-radius: var(--radius-full);
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
 	}
 
 	.slot-row__meta {
@@ -779,11 +906,6 @@
 		&:hover {
 			border-color: var(--color-border-strong);
 		}
-	}
-
-	.focus-option--selected {
-		border-color: var(--color-accent);
-		background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-2));
 	}
 
 	.focus-option__name {

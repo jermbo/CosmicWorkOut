@@ -11,7 +11,7 @@ import { goalPlanTemplateById } from './templates';
  */
 
 const STRENGTH = 'strength';
-const TEMPLATE_ID = 'gp-big-three';
+const TEMPLATE_ID = 'gp-priority';
 const FOCUS_ITEM_ID = 'st-bb-bench-press';
 const DAYS_PER_WEEK = 3;
 
