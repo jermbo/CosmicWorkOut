@@ -58,7 +58,10 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="85dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="85dvh"
+>
 	<div class="add-practice">
 		<div class="add-practice__header">
 			<h2 class="add-practice__title">
@@ -68,10 +71,30 @@
 					{group?.label ?? 'Plans'}
 				{/if}
 			</h2>
-			<button class="add-practice__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+			<button
+				class="add-practice__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					aria-hidden="true"
+				>
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -80,7 +103,10 @@
 			<p class="add-practice__lead">Choose a practice area to browse plans.</p>
 			<div class="add-practice__groups">
 				{#each practiceGroups as g (g.id)}
-					<button class="add-practice__group" onclick={() => pickGroup(g.id)}>
+					<button
+						class="add-practice__group"
+						onclick={() => pickGroup(g.id)}
+					>
 						<span class="add-practice__group-label">{g.label}</span>
 						<span class="add-practice__group-desc">{g.description}</span>
 					</button>
@@ -88,7 +114,13 @@
 			</div>
 		{:else if group}
 			{#if !initialGroupId}
-				<button class="add-practice__back" type="button" onclick={() => (step = 'group')}> ← All areas </button>
+				<button
+					class="add-practice__back"
+					type="button"
+					onclick={() => (step = 'group')}
+				>
+					← All areas
+				</button>
 			{/if}
 
 			{#if showGoalPlans}
@@ -115,7 +147,11 @@
 				{/if}
 			</p>
 
-			<div class="add-practice__filters" role="tablist" aria-label="Plan filter">
+			<div
+				class="add-practice__filters"
+				role="tablist"
+				aria-label="Plan filter"
+			>
 				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
 					<button
 						type="button"
@@ -133,7 +169,10 @@
 			<div class="add-practice__list">
 				{#each programs as program (program.id)}
 					{@const isActive = programStore.isProgramActive(program.id)}
-					<div class="add-practice__row" class:add-practice__row--active={isActive}>
+					<div
+						class="add-practice__row"
+						class:add-practice__row--active={isActive}
+					>
 						<div class="add-practice__row-info">
 							<div class="add-practice__row-name-row">
 								<span class="add-practice__row-name">{program.name}</span>
@@ -148,9 +187,19 @@
 							</span>
 						</div>
 						{#if isActive}
-							<button class="add-practice__pause" type="button" onclick={() => pause(program)}>Pause</button>
+							<button
+								class="add-practice__pause"
+								type="button"
+								onclick={() => pause(program)}>Pause</button
+							>
 						{:else}
-							<button class="add-practice__activate" type="button" onclick={() => activate(program)}> Activate </button>
+							<button
+								class="add-practice__activate"
+								type="button"
+								onclick={() => activate(program)}
+							>
+								Activate
+							</button>
 						{/if}
 					</div>
 				{:else}
@@ -159,7 +208,11 @@
 			</div>
 
 			<div class="add-practice__footer">
-				<button class="add-practice__create" type="button" onclick={() => (createDisciplineId = disciplineId)}>
+				<button
+					class="add-practice__create"
+					type="button"
+					onclick={() => (createDisciplineId = disciplineId)}
+				>
 					Create custom plan
 				</button>
 			</div>
@@ -168,7 +221,10 @@
 </BottomSheet>
 
 {#if createDisciplineId}
-	<CreateProgramSheet disciplineId={createDisciplineId} onClose={() => (createDisciplineId = null)} />
+	<CreateProgramSheet
+		disciplineId={createDisciplineId}
+		onClose={() => (createDisciplineId = null)}
+	/>
 {/if}
 
 <style>

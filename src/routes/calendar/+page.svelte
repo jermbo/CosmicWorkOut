@@ -121,7 +121,8 @@
 	});
 
 	let dayActionsHasActivities = $derived.by(() => {
-		if (dayActionsDate) return (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0;
+		if (dayActionsDate)
+			return (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0;
 		return false;
 	});
 
@@ -173,7 +174,9 @@
 
 	let monthSessions = $derived(programStore.sessions.filter((s) => s.date.startsWith(monthKey)));
 
-	let monthActivities = $derived(activityStore.activities.filter((a) => a.date.startsWith(monthKey)));
+	let monthActivities = $derived(
+		activityStore.activities.filter((a) => a.date.startsWith(monthKey)),
+	);
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));
 
@@ -228,27 +231,62 @@
 
 	<div class="calendar-month">
 		<div class="calendar-month__nav">
-			<button class="calendar-month__nav-btn" onclick={prevMonth} aria-label="Previous month">
-				<Icon name="chevron-left" size={20} />
+			<button
+				class="calendar-month__nav-btn"
+				onclick={prevMonth}
+				aria-label="Previous month"
+			>
+				<Icon
+					name="chevron-left"
+					size={20}
+				/>
 			</button>
 
-			<span class="calendar-month__label" aria-live="polite" aria-atomic="true">
+			<span
+				class="calendar-month__label"
+				aria-live="polite"
+				aria-atomic="true"
+			>
 				{formatMonthYear(viewDate)}
 			</span>
 
-			<button class="calendar-month__nav-btn" onclick={nextMonth} aria-label="Next month" disabled={isAtCurrentMonth}>
-				<Icon name="chevron-right" size={20} />
+			<button
+				class="calendar-month__nav-btn"
+				onclick={nextMonth}
+				aria-label="Next month"
+				disabled={isAtCurrentMonth}
+			>
+				<Icon
+					name="chevron-right"
+					size={20}
+				/>
 			</button>
 		</div>
 
-		<div class="calendar-month__grid" role="grid" aria-label={formatMonthYear(viewDate)}>
-			<div class="calendar-month__weekdays" role="row">
+		<div
+			class="calendar-month__grid"
+			role="grid"
+			aria-label={formatMonthYear(viewDate)}
+		>
+			<div
+				class="calendar-month__weekdays"
+				role="row"
+			>
 				{#each WEEKDAY_HEADERS as day (day)}
-					<div class="calendar-month__weekday" role="columnheader" aria-label={day}>{day}</div>
+					<div
+						class="calendar-month__weekday"
+						role="columnheader"
+						aria-label={day}
+					>
+						{day}
+					</div>
 				{/each}
 			</div>
 
-			<div class="calendar-month__days" role="rowgroup">
+			<div
+				class="calendar-month__days"
+				role="rowgroup"
+			>
 				{#each calendarDays as cell, i (cell.date ?? `pad-${i}`)}
 					{#if cell.date && cell.dayNum}
 						{@const status = getDayStatus(cell.date)}
@@ -271,8 +309,14 @@
 							onclick={() => tappable && handleDayTap(cell.date!)}
 							disabled={!tappable}
 						>
-							<span class="calendar-day__num" aria-hidden="true">{cell.dayNum}</span>
-							<span class="calendar-day__dots" aria-hidden="true">
+							<span
+								class="calendar-day__num"
+								aria-hidden="true">{cell.dayNum}</span
+							>
+							<span
+								class="calendar-day__dots"
+								aria-hidden="true"
+							>
 								{#if hasStrength}
 									<span class="calendar-day__dot calendar-day__dot--session"></span>
 								{/if}
@@ -295,14 +339,21 @@
 							</span>
 						</button>
 					{:else}
-						<div class="calendar-day calendar-day--empty" role="gridcell" aria-hidden="true"></div>
+						<div
+							class="calendar-day calendar-day--empty"
+							role="gridcell"
+							aria-hidden="true"
+						></div>
 					{/if}
 				{/each}
 			</div>
 		</div>
 	</div>
 
-	<div class="calendar-legend" aria-label="Legend">
+	<div
+		class="calendar-legend"
+		aria-label="Legend"
+	>
 		<span class="cal-legend-item cal-legend-item--session">Strength</span>
 		<span class="cal-legend-item cal-legend-item--dance">Dance</span>
 		<span class="cal-legend-item cal-legend-item--activity">Activity</span>
@@ -339,11 +390,17 @@
 {/if}
 
 {#if habitHistoryDate}
-	<HabitHistorySheet date={habitHistoryDate} onClose={() => (habitHistoryDate = null)} />
+	<HabitHistorySheet
+		date={habitHistoryDate}
+		onClose={() => (habitHistoryDate = null)}
+	/>
 {/if}
 
 {#if editingActivity}
-	<ActivityLogSheet editing={editingActivity} onClose={() => (editingActivity = null)} />
+	<ActivityLogSheet
+		editing={editingActivity}
+		onClose={() => (editingActivity = null)}
+	/>
 {/if}
 
 <style>
@@ -535,7 +592,11 @@
 			content: '';
 			position: absolute;
 			inset: 0;
-			background: color-mix(in srgb, var(--color-accent) calc(var(--habit-ratio, 0) * 18%), transparent);
+			background: color-mix(
+				in srgb,
+				var(--color-accent) calc(var(--habit-ratio, 0) * 18%),
+				transparent
+			);
 			pointer-events: none;
 			border-radius: inherit;
 		}

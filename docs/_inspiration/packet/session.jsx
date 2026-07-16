@@ -15,7 +15,15 @@ function vibe(ms) {
 	} catch (e) {}
 }
 
-function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, accent, onClose, onFinish }) {
+function SessionView({
+	workout: w,
+	loggingMode,
+	completionLevel,
+	showEmoji,
+	accent,
+	onClose,
+	onFinish,
+}) {
 	// sets[exIdx] = array of null | { weight, reps } ; weight may be number | band string | null
 	const [sets, setSets] = useState(() => w.exercises.map((ex) => Array(ex.sets).fill(null)));
 	const [lastUsed, setLastUsed] = useState(() => w.exercises.map((ex) => ex.last));
@@ -91,7 +99,11 @@ function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, acce
 			{/* Header */}
 			<div className="ses-top">
 				<div className="ses-bar">
-					<button className="icon-btn" onClick={onClose} aria-label="Back">
+					<button
+						className="icon-btn"
+						onClick={onClose}
+						aria-label="Back"
+					>
 						<Icon name="chevL" />
 					</button>
 					<div className="ses-titles">
@@ -113,7 +125,10 @@ function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, acce
 			</div>
 
 			{/* Exercise list */}
-			<div className="scroll" ref={listRef}>
+			<div
+				className="scroll"
+				ref={listRef}
+			>
 				<div className="ses-list">
 					{w.exercises.map((ex, ei) => {
 						const arr = sets[ei];
@@ -129,14 +144,21 @@ function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, acce
 										<div className="ex-emoji">{ex.icon}</div>
 									) : (
 										<div className={`ex-ring${complete ? ' complete' : ''}`}>
-											<ProgressRing done={nDone} total={ex.sets} complete={complete} />
+											<ProgressRing
+												done={nDone}
+												total={ex.sets}
+												complete={complete}
+											/>
 											<span className="pct">{complete ? '✓' : `${nDone}/${ex.sets}`}</span>
 										</div>
 									)}
 									<div className="ex-info">
 										<div className="ex-name">
 											{ex.name}
-											<Icon name="check" className="chk" />
+											<Icon
+												name="check"
+												className="chk"
+											/>
 										</div>
 										<div className="ex-cue">{ex.cue}</div>
 									</div>
@@ -144,7 +166,9 @@ function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, acce
 										<div className="v">
 											{ex.sets}×{ex.reps}
 										</div>
-										<div className="l">{ex.unit === 'lb' ? 'target' : ex.unit === 'band' ? 'band' : 'hold'}</div>
+										<div className="l">
+											{ex.unit === 'lb' ? 'target' : ex.unit === 'band' ? 'band' : 'hold'}
+										</div>
 									</div>
 								</div>
 
@@ -196,11 +220,22 @@ function SessionView({ workout: w, loggingMode, completionLevel, showEmoji, acce
 			<div className="finish-bar">
 				<button
 					className={`finish-btn${allDone ? '' : ' muted'}`}
-					onClick={() => onFinish({ doneSets, totalSets, elapsed, exDoneCount: exDone.filter(Boolean).length })}
+					onClick={() =>
+						onFinish({
+							doneSets,
+							totalSets,
+							elapsed,
+							exDoneCount: exDone.filter(Boolean).length,
+						})
+					}
 				>
 					{allDone ? (
 						<>
-							<Icon name="flag" style={{ width: 18, height: 18 }} /> Finish session
+							<Icon
+								name="flag"
+								style={{ width: 18, height: 18 }}
+							/>{' '}
+							Finish session
 						</>
 					) : (
 						`Finish early · ${doneSets}/${totalSets} sets`
@@ -270,7 +305,8 @@ function LogSheet({ ex, setIdx, mode, existing, prefillWeight, onClose, onSave }
 		if (padField === 'weight') setWeight(v);
 		else setReps(v);
 	}
-	const padWeight = padField === 'weight' && padStr !== '' ? padStr : isLb ? weight : isBand ? weight : '—';
+	const padWeight =
+		padField === 'weight' && padStr !== '' ? padStr : isLb ? weight : isBand ? weight : '—';
 	const padReps = padField === 'reps' && padStr !== '' ? padStr : reps;
 
 	function save() {
@@ -286,8 +322,14 @@ function LogSheet({ ex, setIdx, mode, existing, prefillWeight, onClose, onSave }
 	}
 
 	return (
-		<div className="sheet-back" onClick={onClose}>
-			<div className="sheet" onClick={(e) => e.stopPropagation()}>
+		<div
+			className="sheet-back"
+			onClick={onClose}
+		>
+			<div
+				className="sheet"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<div className="sheet-grab" />
 				<div className="sheet-head">
 					<span className="nm">{ex.name}</span>
@@ -317,15 +359,27 @@ function LogSheet({ ex, setIdx, mode, existing, prefillWeight, onClose, onSave }
 							<div className="stepper">
 								<div className="cap">{isBand ? 'Band' : 'Weight'}</div>
 								<div className="row">
-									<button className="step-btn" onClick={() => bumpWeight(-1)}>
-										<Icon name="minus" style={{ width: 22, height: 22 }} />
+									<button
+										className="step-btn"
+										onClick={() => bumpWeight(-1)}
+									>
+										<Icon
+											name="minus"
+											style={{ width: 22, height: 22 }}
+										/>
 									</button>
 									<div className="step-val">
 										<div className="n">{isBand ? weight : weight}</div>
 										<div className="u">{isBand ? 'level' : 'lb'}</div>
 									</div>
-									<button className="step-btn" onClick={() => bumpWeight(1)}>
-										<Icon name="plus" style={{ width: 22, height: 22 }} />
+									<button
+										className="step-btn"
+										onClick={() => bumpWeight(1)}
+									>
+										<Icon
+											name="plus"
+											style={{ width: 22, height: 22 }}
+										/>
 									</button>
 								</div>
 							</div>
@@ -333,15 +387,29 @@ function LogSheet({ ex, setIdx, mode, existing, prefillWeight, onClose, onSave }
 						<div className="stepper">
 							<div className="cap">{suffix === 's' ? 'Hold' : 'Reps'}</div>
 							<div className="row">
-								<button className="step-btn" onClick={() => setReps((r) => Math.max(0, r - (suffix === 's' ? 5 : 1)))}>
-									<Icon name="minus" style={{ width: 22, height: 22 }} />
+								<button
+									className="step-btn"
+									onClick={() => setReps((r) => Math.max(0, r - (suffix === 's' ? 5 : 1)))}
+								>
+									<Icon
+										name="minus"
+										style={{ width: 22, height: 22 }}
+									/>
 								</button>
 								<div className="step-val">
 									<div className="n">{reps}</div>
-									<div className="u">{suffix === 's' ? 'sec' : suffix === 'ea' ? 'each' : 'reps'}</div>
+									<div className="u">
+										{suffix === 's' ? 'sec' : suffix === 'ea' ? 'each' : 'reps'}
+									</div>
 								</div>
-								<button className="step-btn" onClick={() => setReps((r) => r + (suffix === 's' ? 5 : 1))}>
-									<Icon name="plus" style={{ width: 22, height: 22 }} />
+								<button
+									className="step-btn"
+									onClick={() => setReps((r) => r + (suffix === 's' ? 5 : 1))}
+								>
+									<Icon
+										name="plus"
+										style={{ width: 22, height: 22 }}
+									/>
 								</button>
 							</div>
 						</div>
@@ -376,24 +444,40 @@ function LogSheet({ ex, setIdx, mode, existing, prefillWeight, onClose, onSave }
 						</div>
 						<div className="pad">
 							{['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((k) => (
-								<button key={k} className="pad-key" onClick={() => padPress(k)}>
+								<button
+									key={k}
+									className="pad-key"
+									onClick={() => padPress(k)}
+								>
 									{k}
 								</button>
 							))}
-							<button className="pad-key fn" onClick={() => padPress('del')}>
+							<button
+								className="pad-key fn"
+								onClick={() => padPress('del')}
+							>
 								Del
 							</button>
-							<button className="pad-key" onClick={() => padPress('0')}>
+							<button
+								className="pad-key"
+								onClick={() => padPress('0')}
+							>
 								0
 							</button>
-							<button className="pad-key fn" onClick={() => padPress('next')}>
+							<button
+								className="pad-key fn"
+								onClick={() => padPress('next')}
+							>
 								Next
 							</button>
 						</div>
 					</>
 				)}
 
-				<button className="sheet-confirm" onClick={save}>
+				<button
+					className="sheet-confirm"
+					onClick={save}
+				>
 					<Icon name="check" /> Log set {setIdx + 1}
 				</button>
 			</div>

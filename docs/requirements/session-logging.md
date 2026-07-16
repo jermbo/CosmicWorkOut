@@ -8,8 +8,8 @@ The core action of the app — recording a completed workout.
 
 ## Implementation Status
 
-| Story                                                   | Status   | Notes                                        |
-| ------------------------------------------------------- | -------- | -------------------------------------------- |
+| Story                                                   | Status    | Notes                                        |
+| ------------------------------------------------------- | --------- | -------------------------------------------- |
 | Start session from Today                                | Built     |                                              |
 | Smart tap: instant if weight known, sheet if first time | Built     |                                              |
 | First-time weight entry (number input)                  | Built     | Autofocuses, rounds to nearest 2.5           |

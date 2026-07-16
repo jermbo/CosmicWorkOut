@@ -51,7 +51,11 @@
 				maintainAspectRatio: false,
 				plugins: {
 					legend: { display: false },
-					tooltip: { callbacks: { label: (ctx) => ` ${Math.round((ctx.raw as number) * 100)}%` } },
+					tooltip: {
+						callbacks: {
+							label: (ctx) => ` ${Math.round((ctx.raw as number) * 100)}%`,
+						},
+					},
 				},
 				scales: {
 					r: {
@@ -59,7 +63,10 @@
 						max: 1,
 						ticks: { display: false },
 						grid: { color: borderColor },
-						pointLabels: { color: textPrimary, font: { family: fontBody, size: 12 } },
+						pointLabels: {
+							color: textPrimary,
+							font: { family: fontBody, size: 12 },
+						},
 						angleLines: { color: borderColor },
 					},
 				},
@@ -70,4 +77,7 @@
 	});
 </script>
 
-<canvas bind:this={canvas} aria-label="Radar chart: average consistency per habit"></canvas>
+<canvas
+	bind:this={canvas}
+	aria-label="Radar chart: average consistency per habit"
+></canvas>

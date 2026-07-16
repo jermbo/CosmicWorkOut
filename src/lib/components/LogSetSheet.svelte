@@ -206,7 +206,11 @@
 						</div>
 					{:else}
 						<div class="stepper__row">
-							<button class="stepper__btn" onclick={() => bumpWeight(-1)} aria-label="Decrease {weightOrBandNoun}">
+							<button
+								class="stepper__btn"
+								onclick={() => bumpWeight(-1)}
+								aria-label="Decrease {weightOrBandNoun}"
+							>
 								<svg
 									viewBox="0 0 24 24"
 									fill="none"
@@ -215,14 +219,23 @@
 									stroke-linecap="round"
 									aria-hidden="true"
 								>
-									<line x1="5" y1="12" x2="19" y2="12" />
+									<line
+										x1="5"
+										y1="12"
+										x2="19"
+										y2="12"
+									/>
 								</svg>
 							</button>
 							<div class="stepper__val">
 								<span class="stepper__n">{stepperValue}</span>
 								<span class="stepper__u">{stepperUnitLabel}</span>
 							</div>
-							<button class="stepper__btn" onclick={() => bumpWeight(1)} aria-label="Increase {weightOrBandNoun}">
+							<button
+								class="stepper__btn"
+								onclick={() => bumpWeight(1)}
+								aria-label="Increase {weightOrBandNoun}"
+							>
 								<svg
 									viewBox="0 0 24 24"
 									fill="none"
@@ -231,8 +244,18 @@
 									stroke-linecap="round"
 									aria-hidden="true"
 								>
-									<line x1="12" y1="5" x2="12" y2="19" />
-									<line x1="5" y1="12" x2="19" y2="12" />
+									<line
+										x1="12"
+										y1="5"
+										x2="12"
+										y2="19"
+									/>
+									<line
+										x1="5"
+										y1="12"
+										x2="19"
+										y2="12"
+									/>
 								</svg>
 							</button>
 						</div>
@@ -242,7 +265,11 @@
 			<div class="stepper">
 				<div class="stepper__cap">{repCapLabel}</div>
 				<div class="stepper__row">
-					<button class="stepper__btn" onclick={() => bumpReps(-1)} aria-label="Decrease reps">
+					<button
+						class="stepper__btn"
+						onclick={() => bumpReps(-1)}
+						aria-label="Decrease reps"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -251,14 +278,23 @@
 							stroke-linecap="round"
 							aria-hidden="true"
 						>
-							<line x1="5" y1="12" x2="19" y2="12" />
+							<line
+								x1="5"
+								y1="12"
+								x2="19"
+								y2="12"
+							/>
 						</svg>
 					</button>
 					<div class="stepper__val">
 						<span class="stepper__n">{stepReps}</span>
 						<span class="stepper__u">{repUnitLabel}</span>
 					</div>
-					<button class="stepper__btn" onclick={() => bumpReps(1)} aria-label="Increase reps">
+					<button
+						class="stepper__btn"
+						onclick={() => bumpReps(1)}
+						aria-label="Increase reps"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -267,15 +303,28 @@
 							stroke-linecap="round"
 							aria-hidden="true"
 						>
-							<line x1="12" y1="5" x2="12" y2="19" />
-							<line x1="5" y1="12" x2="19" y2="12" />
+							<line
+								x1="12"
+								y1="5"
+								x2="12"
+								y2="19"
+							/>
+							<line
+								x1="5"
+								y1="12"
+								x2="19"
+								y2="12"
+							/>
 						</svg>
 					</button>
 				</div>
 			</div>
 		</div>
 
-		<button class="log-sheet__confirm" onclick={handleSave}>
+		<button
+			class="log-sheet__confirm"
+			onclick={handleSave}
+		>
 			<svg
 				viewBox="0 0 24 24"
 				fill="none"

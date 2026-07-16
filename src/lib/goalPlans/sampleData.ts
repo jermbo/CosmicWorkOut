@@ -1,6 +1,11 @@
 import type { LoggedItem, LoggedSet, Program, Routine, Session, Week } from '../db/types';
 import type { GoalPlan, SupportingBaseline } from './types';
-import { generateBlocks, totalPlanWeeks, focusTargetForWeek, supportingWeightForWeek } from './generator';
+import {
+	generateBlocks,
+	totalPlanWeeks,
+	focusTargetForWeek,
+	supportingWeightForWeek,
+} from './generator';
 import { goalPlanTemplateById } from './templates';
 
 /**
@@ -68,7 +73,14 @@ function buildSampleProgram(idPrefix: string, name: string, durationWeeks: numbe
 				color: (['lime', 'lavender', 'red'] as const)[i % 3],
 				estMin: tmpl.estMin,
 				sections: [
-					{ key: 'exercises', items: tmpl.slots.map((s) => ({ itemId: s.itemId, sets: s.sets, reps: s.reps })) },
+					{
+						key: 'exercises',
+						items: tmpl.slots.map((s) => ({
+							itemId: s.itemId,
+							sets: s.sets,
+							reps: s.reps,
+						})),
+					},
 				],
 			}),
 		),
@@ -88,7 +100,12 @@ function buildSampleProgram(idPrefix: string, name: string, durationWeeks: numbe
 }
 
 /** Log one session following that plan week's prescribed targets. */
-function buildSampleSession(idPrefix: string, plan: GoalPlan, sessionIndex: number, date: Date): Session {
+function buildSampleSession(
+	idPrefix: string,
+	plan: GoalPlan,
+	sessionIndex: number,
+	date: Date,
+): Session {
 	const template = goalPlanTemplateById(TEMPLATE_ID)!;
 	const planWeek = Math.floor(sessionIndex / DAYS_PER_WEEK) + 1;
 	const routineIndex = sessionIndex % DAYS_PER_WEEK;
@@ -120,7 +137,12 @@ function buildSampleSession(idPrefix: string, plan: GoalPlan, sessionIndex: numb
 			setTime = new Date(setTime.getTime() + 150 * 1000);
 			if (weight > 0) totalVolume += weight * reps;
 			totalSets++;
-			sets.push({ setNumber: s, weight, reps, completedAt: setTime.toISOString() });
+			sets.push({
+				setNumber: s,
+				weight,
+				reps,
+				completedAt: setTime.toISOString(),
+			});
 		}
 		return { itemId: slot.itemId, sets };
 	});

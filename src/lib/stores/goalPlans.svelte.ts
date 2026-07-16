@@ -91,7 +91,8 @@ class GoalPlanStore {
 			durationWeeks,
 			programId,
 			createdAt,
-			makeRoutineId: (weekNumber, routineIndex) => `w${weekNumber}-${generateId().slice(0, 8)}${routineIndex}`,
+			makeRoutineId: (weekNumber, routineIndex) =>
+				`w${weekNumber}-${generateId().slice(0, 8)}${routineIndex}`,
 		});
 		await programStore.upsertProgram(program);
 
@@ -207,7 +208,11 @@ class GoalPlanStore {
 		plan.countOffset = countOffsetForRepeat(completed, block.blockNumber, plan.daysPerWeek);
 		plan.repeatEvents = [
 			...plan.repeatEvents,
-			{ blockNumber: block.blockNumber, atCompletedCount: completed, repeatedAt: new Date().toISOString() },
+			{
+				blockNumber: block.blockNumber,
+				atCompletedCount: completed,
+				repeatedAt: new Date().toISOString(),
+			},
 		];
 		await this.persist(plan);
 		await this.extendProgram(plan.programId, WEEKS_PER_BLOCK);
@@ -274,7 +279,12 @@ class GoalPlanStore {
 
 	/** Every week of every block trained through — time to mark it Completed. */
 	isFinished(plan: GoalPlan): boolean {
-		return isPlanFinished(this.completedCountFor(plan), plan.countOffset, plan.daysPerWeek, this.totalWeeksFor(plan));
+		return isPlanFinished(
+			this.completedCountFor(plan),
+			plan.countOffset,
+			plan.daysPerWeek,
+			this.totalWeeksFor(plan),
+		);
 	}
 
 	/**

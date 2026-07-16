@@ -56,13 +56,20 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="70dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="70dvh"
+>
 	<div class="bp-sheet">
 		<div class="bp-sheet__header">
 			<h2 class="bp-sheet__title">
 				{#if editing}Edit Reading{:else}Log Blood Pressure{/if}
 			</h2>
-			<button class="bp-sheet__close" onclick={onClose} aria-label="Close">
+			<button
+				class="bp-sheet__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -71,8 +78,18 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -92,7 +109,10 @@
 					/>
 					<span class="bp-field__unit">mmHg</span>
 				</label>
-				<span class="bp-row__sep" aria-hidden="true">/</span>
+				<span
+					class="bp-row__sep"
+					aria-hidden="true">/</span
+				>
 				<label class="bp-field">
 					<span class="bp-field__label">Diastolic</span>
 					<input
@@ -109,7 +129,8 @@
 			</div>
 
 			<label class="bp-field bp-field--full">
-				<span class="bp-field__label">Pulse <span class="bp-field__optional">(optional)</span></span>
+				<span class="bp-field__label">Pulse <span class="bp-field__optional">(optional)</span></span
+				>
 				<input
 					class="bp-field__input"
 					type="number"
@@ -124,11 +145,20 @@
 		</div>
 
 		<div class="bp-sheet__footer">
-			<button class="bp-sheet__save-btn" onclick={handleSave} disabled={saving || !canSave} aria-busy={saving}>
+			<button
+				class="bp-sheet__save-btn"
+				onclick={handleSave}
+				disabled={saving || !canSave}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if editing}Save changes{:else}Log reading{/if}
 			</button>
 			{#if editing}
-				<button class="bp-sheet__delete-btn" class:bp-sheet__delete-btn--confirm={confirming} onclick={handleDelete}>
+				<button
+					class="bp-sheet__delete-btn"
+					class:bp-sheet__delete-btn--confirm={confirming}
+					onclick={handleDelete}
+				>
 					{#if confirming}Tap to confirm delete{:else}Delete{/if}
 				</button>
 			{/if}

@@ -1,4 +1,10 @@
-import type { GoalTarget, ProgressionBlock, SupportingBaseline, WaveWeek, WavePhase } from './types';
+import type {
+	GoalTarget,
+	ProgressionBlock,
+	SupportingBaseline,
+	WaveWeek,
+	WavePhase,
+} from './types';
 
 export const WEEKS_PER_BLOCK = 4;
 
@@ -19,7 +25,11 @@ export function roundToIncrement(weight: number, increment: number): number {
 }
 
 /** One 4-week wave for the focus exercise, starting from a baseline weight x reps. */
-export function buildBlock(blockNumber: number, baseline: GoalTarget, increment: number): ProgressionBlock {
+export function buildBlock(
+	blockNumber: number,
+	baseline: GoalTarget,
+	increment: number,
+): ProgressionBlock {
 	const startWeek = (blockNumber - 1) * WEEKS_PER_BLOCK;
 	const step = increment * INCREMENTS_PER_BUILD_WEEK;
 
@@ -48,7 +58,11 @@ export function nextBaseline(block: ProgressionBlock): GoalTarget {
  * goal weight (the final deload then sits just under the goal). Always at least one
  * block; capped at MAX_BLOCKS.
  */
-export function generateBlocks(start: GoalTarget, goal: GoalTarget, increment: number): ProgressionBlock[] {
+export function generateBlocks(
+	start: GoalTarget,
+	goal: GoalTarget,
+	increment: number,
+): ProgressionBlock[] {
 	const inc = increment > 0 ? increment : 5;
 	const blocks: ProgressionBlock[] = [];
 	let baseline: GoalTarget = { weight: start.weight, reps: start.reps };
@@ -83,7 +97,10 @@ export function focusTargetForWeek(blocks: ProgressionBlock[], planWeek: number)
 	return block?.weeks[(planWeek - 1) % WEEKS_PER_BLOCK] ?? null;
 }
 
-export function blockForWeek(blocks: ProgressionBlock[], planWeek: number): ProgressionBlock | null {
+export function blockForWeek(
+	blocks: ProgressionBlock[],
+	planWeek: number,
+): ProgressionBlock | null {
 	return blocks[Math.floor((planWeek - 1) / WEEKS_PER_BLOCK)] ?? null;
 }
 
@@ -120,7 +137,11 @@ export function isPlanFinished(
  * Offset that rewinds the effective week to week 1 of the given block. Session
  * history and the raw completed count are untouched; the timeline just extends.
  */
-export function countOffsetForRepeat(completedCount: number, blockNumber: number, daysPerWeek: number): number {
+export function countOffsetForRepeat(
+	completedCount: number,
+	blockNumber: number,
+	daysPerWeek: number,
+): number {
 	const blockStartWeek = (blockNumber - 1) * WEEKS_PER_BLOCK + 1;
 	return completedCount - (blockStartWeek - 1) * daysPerWeek;
 }

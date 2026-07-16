@@ -126,7 +126,11 @@
 	<div class="workout-editor__inner">
 		<div class="workout-editor__top">
 			<div class="workout-editor__bar">
-				<button class="icon-btn" onclick={onBack} aria-label="Back">
+				<button
+					class="icon-btn"
+					onclick={onBack}
+					aria-label="Back"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -180,7 +184,12 @@
 						Workout {letter} · {formatCountWithWord(exercises.length, 'exercise')}
 					</p>
 				</div>
-				<button class="workout-editor__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
+				<button
+					class="workout-editor__save-btn"
+					onclick={handleSave}
+					disabled={saving}
+					aria-busy={saving}
+				>
 					{#if saving}Saving…{:else}Save{/if}
 				</button>
 			</div>
@@ -262,7 +271,11 @@
 								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 							</svg>
 						</button>
-						<button class="editor-row__del-btn" onclick={() => removeExercise(i)} aria-label="Remove {exercise?.name}">
+						<button
+							class="editor-row__del-btn"
+							onclick={() => removeExercise(i)}
+							aria-label="Remove {exercise?.name}"
+						>
 							<svg
 								viewBox="0 0 24 24"
 								fill="none"
@@ -271,8 +284,18 @@
 								stroke-linecap="round"
 								aria-hidden="true"
 							>
-								<line x1="18" y1="6" x2="6" y2="18" />
-								<line x1="6" y1="6" x2="18" y2="18" />
+								<line
+									x1="18"
+									y1="6"
+									x2="6"
+									y2="18"
+								/>
+								<line
+									x1="6"
+									y1="6"
+									x2="18"
+									y2="18"
+								/>
 							</svg>
 						</button>
 					</div>
@@ -282,21 +305,33 @@
 							<p class="inline-editor__name">{exercise?.name}</p>
 							<div class="inline-editor__fields">
 								<div class="inline-editor__field">
-									<label class="inline-editor__label" for={`sets-${i}`}>Sets</label>
+									<label
+										class="inline-editor__label"
+										for={`sets-${i}`}>Sets</label
+									>
 									<div class="inline-editor__stepper">
 										<button
 											onclick={() => {
 												if ((ex.sets ?? 0) > 1) {
-													exercises[i] = { ...exercises[i], sets: (ex.sets ?? 0) - 1 };
+													exercises[i] = {
+														...exercises[i],
+														sets: (ex.sets ?? 0) - 1,
+													};
 												}
 											}}
 											aria-label="Decrease sets">−</button
 										>
-										<span id={`sets-${i}`} aria-live="polite">{ex.sets}</span>
+										<span
+											id={`sets-${i}`}
+											aria-live="polite">{ex.sets}</span
+										>
 										<button
 											onclick={() => {
 												if ((ex.sets ?? 0) < 8) {
-													exercises[i] = { ...exercises[i], sets: (ex.sets ?? 0) + 1 };
+													exercises[i] = {
+														...exercises[i],
+														sets: (ex.sets ?? 0) + 1,
+													};
 												}
 											}}
 											aria-label="Increase sets">+</button
@@ -304,7 +339,10 @@
 									</div>
 								</div>
 								<div class="inline-editor__field">
-									<label class="inline-editor__label" for={`reps-${i}`}>Reps / hold</label>
+									<label
+										class="inline-editor__label"
+										for={`reps-${i}`}>Reps / hold</label
+									>
 									<input
 										id={`reps-${i}`}
 										class="inline-editor__reps-input"
@@ -312,7 +350,10 @@
 										value={ex.reps}
 										placeholder="e.g. 10 ea"
 										oninput={(e) => {
-											exercises[i] = { ...exercises[i], reps: (e.target as HTMLInputElement).value };
+											exercises[i] = {
+												...exercises[i],
+												reps: (e.target as HTMLInputElement).value,
+											};
 										}}
 									/>
 								</div>
@@ -329,9 +370,15 @@
 					{/if}
 				{/each}
 
-				<div class="workout-editor__divider" aria-hidden="true"></div>
+				<div
+					class="workout-editor__divider"
+					aria-hidden="true"
+				></div>
 
-				<button class="workout-editor__add-btn" onclick={() => (showLibrary = true)}>
+				<button
+					class="workout-editor__add-btn"
+					onclick={() => (showLibrary = true)}
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -340,8 +387,18 @@
 						stroke-linecap="round"
 						aria-hidden="true"
 					>
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
+						<line
+							x1="12"
+							y1="5"
+							x2="12"
+							y2="19"
+						/>
+						<line
+							x1="5"
+							y1="12"
+							x2="19"
+							y2="12"
+						/>
 					</svg>
 					Browse exercise library
 				</button>
@@ -351,7 +408,11 @@
 </dialog>
 
 {#if showLibrary}
-	<ExerciseLibrarySheet exercises={programStore.items} onAdd={addFromLibrary} onClose={() => (showLibrary = false)} />
+	<ExerciseLibrarySheet
+		exercises={programStore.items}
+		onAdd={addFromLibrary}
+		onClose={() => (showLibrary = false)}
+	/>
 {/if}
 
 <style>

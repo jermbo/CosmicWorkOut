@@ -34,7 +34,10 @@
 </script>
 
 <div class="form-field">
-	<label class="form-field__label" for="plan-name">Plan name</label>
+	<label
+		class="form-field__label"
+		for="plan-name">Plan name</label
+	>
 	<input
 		id="plan-name"
 		class="form-field__input"
@@ -47,7 +50,8 @@
 
 <section class="preview-summary">
 	<p class="preview-summary__line">
-		<strong>{focusItem.name}</strong> — {startWeight} × {startReps} → goal {goalWeight} × {goalReps}
+		<strong>{focusItem.name}</strong> — {startWeight} × {startReps} → goal {goalWeight}
+		× {goalReps}
 		{unit === 'kg' ? '(kg)' : '(lb)'}
 	</p>
 	<p class="preview-summary__line">
@@ -62,7 +66,9 @@
 <div class="preview-blocks">
 	{#each previewBlocks as block (block.blockNumber)}
 		<section class="preview-block">
-			<h3 class="preview-block__title">Block {String(block.blockNumber).padStart(2, '0')}</h3>
+			<h3 class="preview-block__title">
+				Block {String(block.blockNumber).padStart(2, '0')}
+			</h3>
 			<div class="preview-block__weeks">
 				{#each block.weeks as wk (wk.planWeek)}
 					<div

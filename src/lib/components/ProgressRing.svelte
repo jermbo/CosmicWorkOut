@@ -31,9 +31,23 @@
 	let center = $derived(size / 2);
 </script>
 
-<span class="progress-ring" style:inline-size="{size}px" style:block-size="{size}px">
-	<svg class="progress-ring__svg" viewBox="0 0 {size} {size}" aria-hidden="true">
-		<circle class="progress-ring__track" cx={center} cy={center} r={radius} stroke-width={strokeWidth} />
+<span
+	class="progress-ring"
+	style:inline-size="{size}px"
+	style:block-size="{size}px"
+>
+	<svg
+		class="progress-ring__svg"
+		viewBox="0 0 {size} {size}"
+		aria-hidden="true"
+	>
+		<circle
+			class="progress-ring__track"
+			cx={center}
+			cy={center}
+			r={radius}
+			stroke-width={strokeWidth}
+		/>
 		{#if ratio > 0}
 			<circle
 				class="progress-ring__fill"

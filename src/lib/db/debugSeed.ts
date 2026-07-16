@@ -142,7 +142,12 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 			const actualReps = actualRepsFor(unit, reps);
 			if (unit === 'lb') totalVolume += (weight as number) * actualReps;
 			totalSets++;
-			loggedSets.push({ setNumber: s, weight, reps: actualReps, completedAt: setTime.toISOString() });
+			loggedSets.push({
+				setNumber: s,
+				weight,
+				reps: actualReps,
+				completedAt: setTime.toISOString(),
+			});
 		}
 
 		setTime = new Date(setTime.getTime() + rInt(60, 120) * 1000);
@@ -277,7 +282,9 @@ function habitValue(habitId: string, workoutDay: boolean): number {
 }
 
 const WORKOUT_OFFSETS = [1, 3, 5, 8, 10, 12, 15, 17, 19, 20, 25, 29, 31, 33, 36, 38, 41, 43, 44];
-const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map((_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3]);
+const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map(
+	(_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3],
+);
 
 const DUAL_ACTIVITY_OFFSETS = new Set([3, 12, 19, 31, 41]);
 

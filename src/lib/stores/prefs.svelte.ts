@@ -28,7 +28,8 @@ class PrefsStore {
 			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
 			this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
-			this.goalProgressionPlansEnabled = parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
+			this.goalProgressionPlansEnabled =
+				parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
 		}
 
 		this.applyAccentColor();

@@ -75,7 +75,8 @@ export class GoalWizard {
 	);
 	startValid = $derived((this.startWeight ?? 0) > 0 && (this.startReps ?? 0) >= 1);
 	focusInPlan = $derived(
-		!!this.focusItemId && this.routines.some((r) => r.slots.some((s) => s.itemId === this.focusItemId)),
+		!!this.focusItemId &&
+			this.routines.some((r) => r.slots.some((s) => s.itemId === this.focusItemId)),
 	);
 	exercisesValid = $derived(
 		this.routines.length > 0 && this.routines.every((r) => r.slots.length > 0) && this.focusInPlan,

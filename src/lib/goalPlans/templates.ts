@@ -45,41 +45,107 @@ function accessoryPacks(focus: Item): Accel[][] {
 
 	if (cat === 'Chest' || focus.id.includes('bench')) {
 		return [
-			[slot('st-incline-db-bench', 3, '10'), slot('st-pec-deck', 3, '12'), slot('st-tricep-rope-pushdown', 3, '12')],
-			[slot('st-db-ohp', 3, '10'), slot('st-lateral-raise', 3, '12'), slot('st-face-pull', 3, '15')],
-			[slot('st-bb-bent-over-row', 3, '10'), slot('st-tricep-rope-pushdown', 3, '12'), slot('st-plank', 3, '45 s')],
+			[
+				slot('st-incline-db-bench', 3, '10'),
+				slot('st-pec-deck', 3, '12'),
+				slot('st-tricep-rope-pushdown', 3, '12'),
+			],
+			[
+				slot('st-db-ohp', 3, '10'),
+				slot('st-lateral-raise', 3, '12'),
+				slot('st-face-pull', 3, '15'),
+			],
+			[
+				slot('st-bb-bent-over-row', 3, '10'),
+				slot('st-tricep-rope-pushdown', 3, '12'),
+				slot('st-plank', 3, '45 s'),
+			],
 		];
 	}
 
-	if (cat === 'Legs' || focus.id.includes('squat') || focus.id === 'st-leg-press' || focus.id === 'st-rdl') {
+	if (
+		cat === 'Legs' ||
+		focus.id.includes('squat') ||
+		focus.id === 'st-leg-press' ||
+		focus.id === 'st-rdl'
+	) {
 		return [
-			[slot('st-leg-press', 3, '10'), slot('st-leg-curl', 3, '12'), slot('st-standing-calf-raise', 3, '12')],
-			[slot('st-rdl', 3, '10'), slot('st-leg-extension', 3, '12'), slot('st-side-plank', 3, '30 s ea')],
-			[slot('st-leg-curl', 3, '12'), slot('st-standing-calf-raise', 3, '12'), slot('st-plank', 3, '45 s')],
+			[
+				slot('st-leg-press', 3, '10'),
+				slot('st-leg-curl', 3, '12'),
+				slot('st-standing-calf-raise', 3, '12'),
+			],
+			[
+				slot('st-rdl', 3, '10'),
+				slot('st-leg-extension', 3, '12'),
+				slot('st-side-plank', 3, '30 s ea'),
+			],
+			[
+				slot('st-leg-curl', 3, '12'),
+				slot('st-standing-calf-raise', 3, '12'),
+				slot('st-plank', 3, '45 s'),
+			],
 		];
 	}
 
-	if (cat === 'Back' || focus.id.includes('deadlift') || focus.id.includes('row') || focus.id.includes('pulldown')) {
+	if (
+		cat === 'Back' ||
+		focus.id.includes('deadlift') ||
+		focus.id.includes('row') ||
+		focus.id.includes('pulldown')
+	) {
 		return [
-			[slot('st-lat-pulldown-wide', 3, '10'), slot('st-face-pull', 3, '15'), slot('st-db-curl', 3, '12')],
-			[slot('st-seated-cable-row', 3, '10'), slot('st-bb-bent-over-row', 3, '10'), slot('st-plank', 3, '45 s')],
-			[slot('st-lat-pulldown-wide', 3, '10'), slot('st-face-pull', 3, '15'), slot('st-cable-crunch', 3, '15')],
+			[
+				slot('st-lat-pulldown-wide', 3, '10'),
+				slot('st-face-pull', 3, '15'),
+				slot('st-db-curl', 3, '12'),
+			],
+			[
+				slot('st-seated-cable-row', 3, '10'),
+				slot('st-bb-bent-over-row', 3, '10'),
+				slot('st-plank', 3, '45 s'),
+			],
+			[
+				slot('st-lat-pulldown-wide', 3, '10'),
+				slot('st-face-pull', 3, '15'),
+				slot('st-cable-crunch', 3, '15'),
+			],
 		];
 	}
 
 	if (cat === 'Shoulders' || focus.id.includes('ohp')) {
 		return [
-			[slot('st-lateral-raise', 3, '12'), slot('st-face-pull', 3, '15'), slot('st-tricep-rope-pushdown', 3, '12')],
-			[slot('st-db-ohp', 3, '10'), slot('st-bb-bent-over-row', 3, '10'), slot('st-plank', 3, '45 s')],
-			[slot('st-lateral-raise', 3, '12'), slot('st-face-pull', 3, '15'), slot('st-db-curl', 3, '12')],
+			[
+				slot('st-lateral-raise', 3, '12'),
+				slot('st-face-pull', 3, '15'),
+				slot('st-tricep-rope-pushdown', 3, '12'),
+			],
+			[
+				slot('st-db-ohp', 3, '10'),
+				slot('st-bb-bent-over-row', 3, '10'),
+				slot('st-plank', 3, '45 s'),
+			],
+			[
+				slot('st-lateral-raise', 3, '12'),
+				slot('st-face-pull', 3, '15'),
+				slot('st-db-curl', 3, '12'),
+			],
 		];
 	}
 
 	// Generic: light full-body support that won't steal the spotlight from the focus.
 	return [
 		[slot('st-face-pull', 3, '15'), slot('st-plank', 3, '45 s'), slot('st-lateral-raise', 3, '12')],
-		[slot('st-bb-bent-over-row', 3, '10'), slot('st-tricep-rope-pushdown', 3, '12'), slot('st-plank', 3, '45 s')],
-		[slot('st-face-pull', 3, '15'), slot('st-db-curl', 3, '12'), slot('st-standing-calf-raise', 3, '12')],
+		[
+			slot('st-bb-bent-over-row', 3, '10'),
+			slot('st-tricep-rope-pushdown', 3, '12'),
+			slot('st-plank', 3, '45 s'),
+		],
+		[
+			slot('st-face-pull', 3, '15'),
+			slot('st-db-curl', 3, '12'),
+			slot('st-standing-calf-raise', 3, '12'),
+		],
 	];
 }
 
@@ -123,9 +189,27 @@ export function buildFocusOnlyRoutines(focus: Item): GoalTemplateRoutine[] {
 	const main = focusSlot(focus);
 	const short = focus.name.replace(/Barbell |Dumbbell /g, '');
 	return [
-		{ letter: 'A', name: `${short} A`, focus: short, estMin: 35, slots: [{ ...main }] },
-		{ letter: 'B', name: `${short} B`, focus: short, estMin: 35, slots: [{ ...main, sets: 3 }] },
-		{ letter: 'C', name: `${short} C`, focus: short, estMin: 35, slots: [{ ...main, sets: 3, reps: '10' }] },
+		{
+			letter: 'A',
+			name: `${short} A`,
+			focus: short,
+			estMin: 35,
+			slots: [{ ...main }],
+		},
+		{
+			letter: 'B',
+			name: `${short} B`,
+			focus: short,
+			estMin: 35,
+			slots: [{ ...main, sets: 3 }],
+		},
+		{
+			letter: 'C',
+			name: `${short} C`,
+			focus: short,
+			estMin: 35,
+			slots: [{ ...main, sets: 3, reps: '10' }],
+		},
 	];
 }
 
@@ -142,7 +226,13 @@ export function blankGoalRoutines(): GoalTemplateRoutine[] {
 export function blankRoutinesWithFocus(focus: Item): GoalTemplateRoutine[] {
 	const main = focusSlot(focus);
 	return [
-		{ letter: 'A', name: 'Day A', focus: focus.name, estMin: 45, slots: [{ ...main }] },
+		{
+			letter: 'A',
+			name: 'Day A',
+			focus: focus.name,
+			estMin: 45,
+			slots: [{ ...main }],
+		},
 		{ letter: 'B', name: 'Day B', focus: focus.name, estMin: 45, slots: [] },
 		{ letter: 'C', name: 'Day C', focus: focus.name, estMin: 45, slots: [] },
 	];

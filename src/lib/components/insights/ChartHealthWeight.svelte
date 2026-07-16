@@ -66,4 +66,7 @@
 	});
 </script>
 
-<canvas bind:this={canvas} aria-label="Line chart: body weight trend over the selected period"></canvas>
+<canvas
+	bind:this={canvas}
+	aria-label="Line chart: body weight trend over the selected period"
+></canvas>

@@ -51,13 +51,20 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="60dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="60dvh"
+>
 	<div class="wt-sheet">
 		<div class="wt-sheet__header">
 			<h2 class="wt-sheet__title">
 				{#if editing}Edit Weight{:else}Log Weight{/if}
 			</h2>
-			<button class="wt-sheet__close" onclick={onClose} aria-label="Close">
+			<button
+				class="wt-sheet__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -66,15 +73,31 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
 
 		<div class="wt-sheet__body">
-			<div class="wt-stepper" aria-label="Weight in {unit}">
-				<button onclick={() => adjust(-0.5)} aria-label="Decrease half {unit}">−</button>
+			<div
+				class="wt-stepper"
+				aria-label="Weight in {unit}"
+			>
+				<button
+					onclick={() => adjust(-0.5)}
+					aria-label="Decrease half {unit}">−</button
+				>
 				<div class="wt-stepper__val">
 					<input
 						class="wt-stepper__input"
@@ -88,16 +111,28 @@
 					/>
 					<span class="wt-stepper__unit">{unit}</span>
 				</div>
-				<button onclick={() => adjust(0.5)} aria-label="Increase half {unit}">+</button>
+				<button
+					onclick={() => adjust(0.5)}
+					aria-label="Increase half {unit}">+</button
+				>
 			</div>
 		</div>
 
 		<div class="wt-sheet__footer">
-			<button class="wt-sheet__save-btn" onclick={handleSave} disabled={saving || !canSave} aria-busy={saving}>
+			<button
+				class="wt-sheet__save-btn"
+				onclick={handleSave}
+				disabled={saving || !canSave}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if editing}Save changes{:else}Log weight{/if}
 			</button>
 			{#if editing}
-				<button class="wt-sheet__delete-btn" class:wt-sheet__delete-btn--confirm={confirming} onclick={handleDelete}>
+				<button
+					class="wt-sheet__delete-btn"
+					class:wt-sheet__delete-btn--confirm={confirming}
+					onclick={handleDelete}
+				>
 					{#if confirming}Tap to confirm delete{:else}Delete{/if}
 				</button>
 			{/if}

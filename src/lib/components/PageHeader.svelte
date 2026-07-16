@@ -34,7 +34,9 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let displayDate = $derived(formatWeekdayShortDate(contextDate, ' · '));
-	let activeSessions = $derived(programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id));
+	let activeSessions = $derived(
+		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
+	);
 
 	function openDatePicker() {
 		dateInputEl?.showPicker?.();
@@ -55,7 +57,11 @@
 		<div class="page-header__text">
 			<div class="page-header__eyebrow-row">
 				{#if showBack}
-					<button class="page-header__back" onclick={() => goto(resolveHref(backHref))} aria-label="Back">
+					<button
+						class="page-header__back"
+						onclick={() => goto(resolveHref(backHref))}
+						aria-label="Back"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -68,9 +74,19 @@
 						</svg>
 					</button>
 				{/if}
-				<button class="page-header__date-btn" onclick={openDatePicker} aria-label="Change logging date">
+				<button
+					class="page-header__date-btn"
+					onclick={openDatePicker}
+					aria-label="Change logging date"
+				>
 					{displayDate}
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						aria-hidden="true"
+					>
 						<polyline points="6 9 12 15 18 9" />
 					</svg>
 				</button>
@@ -96,7 +112,12 @@
 </header>
 
 {#if programStore.loaded}
-	<WeekStrip sessions={activeSessions} stayOnPage={showBack} {showMoodDots} {dayIndicators} />
+	<WeekStrip
+		sessions={activeSessions}
+		stayOnPage={showBack}
+		{showMoodDots}
+		{dayIndicators}
+	/>
 {/if}
 
 <style>

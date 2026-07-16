@@ -1,16 +1,36 @@
-const fmtShortMonthDay = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
-const fmtLongDate = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+const fmtShortMonthDay = new Intl.DateTimeFormat(undefined, {
+	month: 'short',
+	day: 'numeric',
+});
+const fmtLongDate = new Intl.DateTimeFormat(undefined, {
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+});
 const fmtMonthLong = new Intl.DateTimeFormat(undefined, { month: 'long' });
-const fmtMonthDayLong = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric' });
-const fmtMonthYear = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
-const fmtWeekdayShort = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
+const fmtMonthDayLong = new Intl.DateTimeFormat(undefined, {
+	month: 'long',
+	day: 'numeric',
+});
+const fmtMonthYear = new Intl.DateTimeFormat(undefined, {
+	month: 'long',
+	year: 'numeric',
+});
+const fmtWeekdayShort = new Intl.DateTimeFormat(undefined, {
+	weekday: 'short',
+});
 const fmtWeekdayShortMonthDay = new Intl.DateTimeFormat(undefined, {
 	weekday: 'short',
 	month: 'short',
 	day: 'numeric',
 });
-const fmtWeekRange = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
-const fmtWeekdayNarrow = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
+const fmtWeekRange = new Intl.DateTimeFormat(undefined, {
+	month: 'short',
+	day: 'numeric',
+});
+const fmtWeekdayNarrow = new Intl.DateTimeFormat(undefined, {
+	weekday: 'narrow',
+});
 
 const MONDAY_REFERENCE = new Date(2024, 0, 1);
 
@@ -20,7 +40,11 @@ function mondayPlusDays(days: number): Date {
 	return date;
 }
 
-function partValue(fmt: Intl.DateTimeFormat, date: Date, type: Intl.DateTimeFormatPartTypes): string {
+function partValue(
+	fmt: Intl.DateTimeFormat,
+	date: Date,
+	type: Intl.DateTimeFormatPartTypes,
+): string {
 	return fmt.formatToParts(date).find((p) => p.type === type)?.value ?? '';
 }
 

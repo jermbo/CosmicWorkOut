@@ -1,4 +1,13 @@
-import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
+import type {
+	Item,
+	Program,
+	Session,
+	ItemLastUsed,
+	ActivityLog,
+	Habit,
+	HabitLog,
+	HealthReading,
+} from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';

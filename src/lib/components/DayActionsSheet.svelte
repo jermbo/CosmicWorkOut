@@ -194,7 +194,11 @@
 		</div>
 
 		{#if activities.length > 0}
-			<DayActionsActivityList {activities} {onClose} onEdit={onEditActivity} />
+			<DayActionsActivityList
+				{activities}
+				{onClose}
+				onEdit={onEditActivity}
+			/>
 		{/if}
 	</div>
 </BottomSheet>

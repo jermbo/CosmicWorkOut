@@ -66,12 +66,12 @@ Each card is a jumping-off point to its dedicated screen.
 
 The app does **not** know your weekly schedule. For each active plan it gives you the **next routine in sequence**, based on how many sessions you've already finished for that plan:
 
-| You've completed | You see next                    |
-| ---------------- | ------------------------------- |
-| 0 sessions       | Routine A (week 1)              |
-| 1 session        | Routine B                       |
-| 2 sessions       | Routine C                       |
-| 3 sessions       | Routine A (week 2)              |
+| You've completed | You see next       |
+| ---------------- | ------------------ |
+| 0 sessions       | Routine A (week 1) |
+| 1 session        | Routine B          |
+| 2 sessions       | Routine C          |
+| 3 sessions       | Routine A (week 2) |
 
 The index is `completedSessions % routineCount`, computed **per Discipline**. If you already logged a session for a plan **today**, that plan shows a "complete for today" state — one session per plan per calendar day. See [Program Progression](program-progression.md) for the full logic.
 
@@ -109,10 +109,10 @@ Haptic feedback fires when you **complete an item** (all its sets done), not on 
 
 ### Finishing vs abandoning
 
-| Action      | How                                            | What gets saved                                            |
-| ----------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| Action      | How                                            | What gets saved                                               |
+| ----------- | ---------------------------------------------- | ------------------------------------------------------------- |
 | **Finish**  | Footer button (says "Finish early" if partial) | Only completed work is saved as a Session. No confirm dialog. |
-| **Abandon** | Back arrow → "End session" confirm             | Nothing saved. All progress lost.                          |
+| **Abandon** | Back arrow → "End session" confirm             | Nothing saved. All progress lost.                             |
 
 Both clear the in-progress session from local storage. Finishing shows a completion overlay with duration, volume, and counts (confetti plays).
 

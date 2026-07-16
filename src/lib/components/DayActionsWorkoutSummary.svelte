@@ -8,7 +8,10 @@
 	let { workoutName, durationLabel = null, variant = 'strength' }: Props = $props();
 </script>
 
-<div class="day-actions-summary" class:day-actions-summary--dance={variant === 'dance'}>
+<div
+	class="day-actions-summary"
+	class:day-actions-summary--dance={variant === 'dance'}
+>
 	<span class="day-actions-summary__label">
 		{#if variant === 'dance'}Dance logged{:else}Workout logged{/if}
 	</span>

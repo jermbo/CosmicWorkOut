@@ -19,7 +19,11 @@
 	</header>
 
 	<SettingsGroup title="Tracking">
-		<SettingsRow href="/settings/habits" label="Habits" detail="{activeHabitCount} active" />
+		<SettingsRow
+			href="/settings/habits"
+			label="Habits"
+			detail="{activeHabitCount} active"
+		/>
 		<SettingsToggleRow
 			label="Health metrics"
 			description="Track weight and blood pressure trends."
@@ -33,12 +37,19 @@
 			onchange={(v) => prefsStore.setGoalProgressionPlansEnabled(v)}
 		/>
 		{#if prefsStore.goalProgressionPlansEnabled}
-			<SettingsRow href="/goals" label="Goal plans" detail="Manage & create" />
+			<SettingsRow
+				href="/goals"
+				label="Goal plans"
+				detail="Manage & create"
+			/>
 		{/if}
 	</SettingsGroup>
 
 	<SettingsGroup title="Data">
-		<SettingsRow href="/settings/data" label="Data & backup" />
+		<SettingsRow
+			href="/settings/data"
+			label="Data & backup"
+		/>
 	</SettingsGroup>
 </div>
 

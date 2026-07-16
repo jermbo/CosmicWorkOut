@@ -24,7 +24,9 @@ export function prescribedTargetsForWeek(
 	}
 
 	for (const baseline of plan.supporting) {
-		targets.set(baseline.itemId, { weight: supportingWeightForWeek(baseline, planWeek) });
+		targets.set(baseline.itemId, {
+			weight: supportingWeightForWeek(baseline, planWeek),
+		});
 	}
 
 	return targets;

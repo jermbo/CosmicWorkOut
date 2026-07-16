@@ -46,7 +46,10 @@
 	}: Props = $props();
 </script>
 
-<section class="plan-card" aria-label="Active goal plan">
+<section
+	class="plan-card"
+	aria-label="Active goal plan"
+>
 	<header class="plan-card__header">
 		{#if renaming}
 			<form
@@ -64,32 +67,48 @@
 					autofocus
 					aria-label="Plan name"
 				/>
-				<button type="submit" class="plan-card__rename-save" disabled={!renameValue.trim()}>Save</button>
-				<button type="button" class="plan-card__rename-cancel" onclick={onCancelRename}>Cancel</button>
+				<button
+					type="submit"
+					class="plan-card__rename-save"
+					disabled={!renameValue.trim()}>Save</button
+				>
+				<button
+					type="button"
+					class="plan-card__rename-cancel"
+					onclick={onCancelRename}>Cancel</button
+				>
 			</form>
 		{:else}
 			<div class="plan-card__title-row">
 				<h2 class="plan-card__name">{plan.name}</h2>
-				<button class="plan-card__rename-btn" type="button" onclick={onStartRename}>Rename</button>
+				<button
+					class="plan-card__rename-btn"
+					type="button"
+					onclick={onStartRename}>Rename</button
+				>
 			</div>
 		{/if}
 		<p class="plan-card__goal">
-			{focusName} · {targetLabel(plan.start, unit)} → <strong>{targetLabel(plan.goal, unit)}</strong>
+			{focusName} · {targetLabel(plan.start, unit)} →
+			<strong>{targetLabel(plan.goal, unit)}</strong>
 		</p>
 	</header>
 
 	{#if finished}
 		<div class="plan-card__finished">
 			<p>
-				Every block is trained through — you're at the end of the wave. Mark the plan complete, or repeat the
-				final block for another push.
+				Every block is trained through — you're at the end of the wave. Mark the plan complete, or
+				repeat the final block for another push.
 			</p>
 		</div>
 	{:else if focus && block}
 		<div class="plan-card__now">
 			<div class="plan-card__now-cell">
 				<span class="plan-card__now-value"
-					>{String(block.blockNumber).padStart(2, '0')}/{String(plan.blocks.length).padStart(2, '0')}</span
+					>{String(block.blockNumber).padStart(2, '0')}/{String(plan.blocks.length).padStart(
+						2,
+						'0',
+					)}</span
 				>
 				<span class="plan-card__now-label">block</span>
 			</div>
@@ -119,10 +138,25 @@
 	</p>
 
 	<div class="plan-card__actions">
-		<a class="plan-card__cta" href={resolve('/workout') + `?program=${plan.programId}`}>Go to workout</a>
-		<button class="plan-card__action" type="button" onclick={onRepeat}>Repeat block</button>
-		<button class="plan-card__action" type="button" onclick={onPause}>Pause</button>
-		<button class="plan-card__action plan-card__action--complete" type="button" onclick={onComplete}>
+		<a
+			class="plan-card__cta"
+			href={resolve('/workout') + `?program=${plan.programId}`}>Go to workout</a
+		>
+		<button
+			class="plan-card__action"
+			type="button"
+			onclick={onRepeat}>Repeat block</button
+		>
+		<button
+			class="plan-card__action"
+			type="button"
+			onclick={onPause}>Pause</button
+		>
+		<button
+			class="plan-card__action plan-card__action--complete"
+			type="button"
+			onclick={onComplete}
+		>
 			Complete
 		</button>
 	</div>

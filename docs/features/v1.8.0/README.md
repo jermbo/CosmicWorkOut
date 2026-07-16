@@ -8,12 +8,12 @@
 
 ## What's Shipping
 
-| Area | Detail | Source |
-| --- | --- | --- |
-| Per-section clear | Independent "Clear custom exercises," "Clear custom programs," "Clear workout sessions," "Clear activity log," "Clear habits," and "Clear health data" actions on `/settings/data` | `src/routes/settings/data/+page.svelte`, `src/lib/db/database.ts` |
-| Exercise-in-use warning | Bulk-clearing custom exercises warns (but doesn't block) when exercises are used in a program | `src/lib/stores/program.svelte.ts` |
-| Clear everything | Single action that clears all sections at once, replacing today's implicit all-or-nothing button | `src/lib/db/database.ts` |
-| Compact clear list | Per-section actions render as scannable rows (`SettingsActionRow`), not six identical full-width danger buttons; "Clear everything" stays visually distinct in its own "Danger zone" | `src/lib/components/SettingsActionRow.svelte`, `src/routes/settings/data/+page.svelte` |
+| Area                    | Detail                                                                                                                                                                               | Source                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Per-section clear       | Independent "Clear custom exercises," "Clear custom programs," "Clear workout sessions," "Clear activity log," "Clear habits," and "Clear health data" actions on `/settings/data`   | `src/routes/settings/data/+page.svelte`, `src/lib/db/database.ts`                      |
+| Exercise-in-use warning | Bulk-clearing custom exercises warns (but doesn't block) when exercises are used in a program                                                                                        | `src/lib/stores/program.svelte.ts`                                                     |
+| Clear everything        | Single action that clears all sections at once, replacing today's implicit all-or-nothing button                                                                                     | `src/lib/db/database.ts`                                                               |
+| Compact clear list      | Per-section actions render as scannable rows (`SettingsActionRow`), not six identical full-width danger buttons; "Clear everything" stays visually distinct in its own "Danger zone" | `src/lib/components/SettingsActionRow.svelte`, `src/routes/settings/data/+page.svelte` |
 
 ---
 
@@ -27,8 +27,8 @@
 
 ## Planned
 
-| ID | Title | Status | Notes |
-| --- | --- | --- | --- |
+| ID                                           | Title                  | Status  | Notes                                                                                                                                                      |
+| -------------------------------------------- | ---------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [US-032](./US-032-granular-data-clearing.md) | Granular Data Clearing | Planned | Splits today's single "Clear workout data" action into Custom exercises / Custom programs / Workout sessions / Activity log / Habits / Health / Everything |
 
 ---

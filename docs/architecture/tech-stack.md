@@ -108,15 +108,15 @@ Built-in items and programs are upserted on every boot (so new fields land on ol
 
 Class-based stores using Svelte 5 runes. The core ones:
 
-| Store             | File                  | Responsibility                                  |
-| ----------------- | --------------------- | ----------------------------------------------- |
-| `programStore`    | `program.svelte.ts`   | Programs, items, sessions, today's routine      |
-| `sessionStore`    | `session.svelte.ts`   | Active session, set logging, finish/abandon     |
-| `prefsStore`      | `prefs.svelte.ts`     | User preferences, accent color, density         |
-| `habitStore`      | `habits.svelte.ts`    | Habit definitions, daily logs, mood             |
-| `activityStore`   | `activities.svelte.ts`   | Quick-log activity entries                   |
-| `healthStore`     | `health.svelte.ts`       | Weight + blood pressure readings (US-029)    |
-| `loggingContext`  | `loggingContext.svelte.ts` | Global selected/logging date               |
+| Store            | File                       | Responsibility                              |
+| ---------------- | -------------------------- | ------------------------------------------- |
+| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine  |
+| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon |
+| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density     |
+| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood         |
+| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                  |
+| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)   |
+| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                |
 
 See [State Management](../implementation/state.md) for the complete list and data flow.
 

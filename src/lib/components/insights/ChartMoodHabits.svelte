@@ -110,7 +110,11 @@
 						max: 5,
 						grid: gridOpts,
 						ticks: { ...tickOpts, stepSize: 5 },
-						title: { display: true, text: 'Mood', color: chartTheme().textSecondary },
+						title: {
+							display: true,
+							text: 'Mood',
+							color: chartTheme().textSecondary,
+						},
 					},
 					yHabits: {
 						type: 'linear',
@@ -118,7 +122,11 @@
 						min: 0,
 						grid: { display: false },
 						ticks: tickOpts,
-						title: { display: true, text: 'Count', color: chartTheme().textSecondary },
+						title: {
+							display: true,
+							text: 'Count',
+							color: chartTheme().textSecondary,
+						},
 					},
 				},
 			},
@@ -128,4 +136,7 @@
 	});
 </script>
 
-<canvas bind:this={canvas} aria-label="Line chart: mood, coffee, and water over the selected period"></canvas>
+<canvas
+	bind:this={canvas}
+	aria-label="Line chart: mood, coffee, and water over the selected period"
+></canvas>

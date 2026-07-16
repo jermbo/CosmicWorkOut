@@ -2,16 +2,32 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
 		<title>Packet</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
-		<link rel="stylesheet" href="tokens.css" />
-		<link rel="stylesheet" href="app.css" />
+		<link
+			rel="stylesheet"
+			href="tokens.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="app.css"
+		/>
 		<script
 			src="https://unpkg.com/react@18.3.1/umd/react.development.js"
 			integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
@@ -31,13 +47,34 @@
 	<body>
 		<div id="root"></div>
 
-		<script type="text/babel" src="tweaks-panel.jsx"></script>
-		<script type="text/babel" src="components.jsx"></script>
-		<script type="text/babel" src="data.jsx"></script>
-		<script type="text/babel" src="today.jsx"></script>
-		<script type="text/babel" src="session.jsx"></script>
-		<script type="text/babel" src="calendar.jsx"></script>
-		<script type="text/babel" src="program.jsx"></script>
+		<script
+			type="text/babel"
+			src="tweaks-panel.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="components.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="data.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="today.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="session.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="calendar.jsx"
+		></script>
+		<script
+			type="text/babel"
+			src="program.jsx"
+		></script>
 
 		<script type="text/babel">
 			const { useState, useEffect, useRef } = React;
@@ -67,9 +104,24 @@
 				comfy: { '--tile-h': '78px', '--card-gap': '16px' },
 			};
 			const ROUNDNESS = {
-				sharp: { '--radius-tile': '6px', '--radius-xl': '10px', '--radius-2xl': '12px', '--radius-lg': '8px' },
-				default: { '--radius-tile': '14px', '--radius-xl': '16px', '--radius-2xl': '20px', '--radius-lg': '12px' },
-				soft: { '--radius-tile': '20px', '--radius-xl': '24px', '--radius-2xl': '28px', '--radius-lg': '18px' },
+				sharp: {
+					'--radius-tile': '6px',
+					'--radius-xl': '10px',
+					'--radius-2xl': '12px',
+					'--radius-lg': '8px',
+				},
+				default: {
+					'--radius-tile': '14px',
+					'--radius-xl': '16px',
+					'--radius-2xl': '20px',
+					'--radius-lg': '12px',
+				},
+				soft: {
+					'--radius-tile': '20px',
+					'--radius-xl': '24px',
+					'--radius-2xl': '28px',
+					'--radius-lg': '18px',
+				},
 			};
 
 			function DoneOverlay({ stats, accent, completion, onHome, onCalendar }) {
@@ -80,7 +132,10 @@
 				}, []);
 				const mins = Math.max(1, Math.round(stats.elapsed / 60));
 				return (
-					<div className="done-overlay" ref={ref}>
+					<div
+						className="done-overlay"
+						ref={ref}
+					>
 						<div className="done-check">
 							<Icon name="check" />
 						</div>
@@ -111,10 +166,16 @@
 							</div>
 						</div>
 						<div className="done-actions">
-							<button className="finish-btn" onClick={onHome}>
+							<button
+								className="finish-btn"
+								onClick={onHome}
+							>
 								Back to today
 							</button>
-							<button className="finish-btn muted" onClick={onCalendar}>
+							<button
+								className="finish-btn muted"
+								onClick={onCalendar}
+							>
 								See it in calendar
 							</button>
 						</div>
@@ -197,7 +258,10 @@
 
 							{/* Workout editor overlay */}
 							{editWorkout && (
-								<WorkoutEditor workout={editWorkout._new ? null : editWorkout} onBack={() => setEditWorkout(null)} />
+								<WorkoutEditor
+									workout={editWorkout._new ? null : editWorkout}
+									onBack={() => setEditWorkout(null)}
+								/>
 							)}
 
 							{/* Active session overlay */}
@@ -242,7 +306,11 @@
 								options={['#B2F042', '#B286FD', '#60C6FF', '#E55733']}
 								onChange={(v) => setTweak('accent', v)}
 							/>
-							<TweakToggle label="Emoji exercise icons" value={t.emoji} onChange={(v) => setTweak('emoji', v)} />
+							<TweakToggle
+								label="Emoji exercise icons"
+								value={t.emoji}
+								onChange={(v) => setTweak('emoji', v)}
+							/>
 
 							<TweakSection label="Logging" />
 							<TweakRadio

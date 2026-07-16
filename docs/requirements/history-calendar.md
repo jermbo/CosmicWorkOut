@@ -10,16 +10,16 @@ Viewing past sessions and tracking progress over time.
 
 > **See [Implementation Status](../implementation/status.md)** for the full checklist.
 
-| Area                              | Status   |
-| --------------------------------- | -------- |
-| Monthly calendar + navigation     | Built |                                 |
-| Completed day highlighting        | Built |                                 |
-| Day summary sheet                 | Built |                                 |
-| Edit/delete sessions & activities | Built |                                 |
-| Habit heatmap on calendar         | Built |                                 |
-| Week strip on home                | Built |                                 |
-| Weekly consistency streak         | Built | Per active program / discipline |
-| Backfill past days                | Built | Date picker + calendar tap      |
+| Area                              | Status |
+| --------------------------------- | ------ | ------------------------------- |
+| Monthly calendar + navigation     | Built  |                                 |
+| Completed day highlighting        | Built  |                                 |
+| Day summary sheet                 | Built  |                                 |
+| Edit/delete sessions & activities | Built  |                                 |
+| Habit heatmap on calendar         | Built  |                                 |
+| Week strip on home                | Built  |                                 |
+| Weekly consistency streak         | Built  | Per active program / discipline |
+| Backfill past days                | Built  | Date picker + calendar tap      |
 
 Insights charts (volume trends, etc.) shipped in v1.5.0 — see [/insights](../implementation/app-structure.md).
 
@@ -59,10 +59,10 @@ Scheduled, rest, and skipped **calendar cell styles** beyond completed/today/pas
 
 ## Streak Behavior (Built Today)
 
-| Location         | What it shows | How it works                                                              |
-| ---------------- | ------------- | ------------------------------------------------------------------------- |
-| **Home header**  | Week streak   | `computeWeekStreak` — consecutive weeks with sessions ≥ `daysPerWeek`     |
-| **Practice hub** | Combined streak | Cross-discipline streak when multiple plans are active                  |
+| Location         | What it shows   | How it works                                                          |
+| ---------------- | --------------- | --------------------------------------------------------------------- |
+| **Home header**  | Week streak     | `computeWeekStreak` — consecutive weeks with sessions ≥ `daysPerWeek` |
+| **Practice hub** | Combined streak | Cross-discipline streak when multiple plans are active                |
 
 See `programStore.weekStreakFor` and `combinedWeekStreak` in [State Management](../implementation/state.md).
 

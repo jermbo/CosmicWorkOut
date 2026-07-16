@@ -35,7 +35,8 @@
 			const matchSection = activeSection === 'all' || it.section === activeSection;
 			const matchFocus = !activeFocus || (it.focus ?? []).includes(activeFocus);
 			const q = query.trim().toLowerCase();
-			const matchQuery = !q || it.name.toLowerCase().includes(q) || (it.focus ?? []).some((f) => f.includes(q));
+			const matchQuery =
+				!q || it.name.toLowerCase().includes(q) || (it.focus ?? []).some((f) => f.includes(q));
 			return matchSection && matchFocus && matchQuery;
 		}),
 	);
@@ -81,12 +82,19 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="85dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="85dvh"
+>
 	<div class="lib-sheet">
 		<div class="lib-sheet__header">
 			<h2 class="lib-sheet__title">Item Library</h2>
 			<div class="lib-sheet__header-actions">
-				<button class="lib-sheet__add-btn" onclick={() => (formItem = null)} aria-label="Add custom item">
+				<button
+					class="lib-sheet__add-btn"
+					onclick={() => (formItem = null)}
+					aria-label="Add custom item"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -95,12 +103,26 @@
 						stroke-linecap="round"
 						aria-hidden="true"
 					>
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
+						<line
+							x1="12"
+							y1="5"
+							x2="12"
+							y2="19"
+						/>
+						<line
+							x1="5"
+							y1="12"
+							x2="19"
+							y2="12"
+						/>
 					</svg>
 					New
 				</button>
-				<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
+				<button
+					class="lib-sheet__close"
+					onclick={onClose}
+					aria-label="Close library"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -109,8 +131,18 @@
 						stroke-linecap="round"
 						aria-hidden="true"
 					>
-						<line x1="18" y1="6" x2="6" y2="18" />
-						<line x1="6" y1="6" x2="18" y2="18" />
+						<line
+							x1="18"
+							y1="6"
+							x2="6"
+							y2="18"
+						/>
+						<line
+							x1="6"
+							y1="6"
+							x2="18"
+							y2="18"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -127,8 +159,17 @@
 				stroke-linejoin="round"
 				aria-hidden="true"
 			>
-				<circle cx="11" cy="11" r="8" />
-				<line x1="21" y1="21" x2="16.65" y2="16.65" />
+				<circle
+					cx="11"
+					cy="11"
+					r="8"
+				/>
+				<line
+					x1="21"
+					y1="21"
+					x2="16.65"
+					y2="16.65"
+				/>
 			</svg>
 			<input
 				class="lib-sheet__search-input"
@@ -139,7 +180,11 @@
 			/>
 		</div>
 
-		<div class="lib-sheet__cats" role="group" aria-label="Filter by section">
+		<div
+			class="lib-sheet__cats"
+			role="group"
+			aria-label="Filter by section"
+		>
 			<button
 				class="lib-chip"
 				class:lib-chip--active={activeSection === 'all'}
@@ -156,7 +201,11 @@
 			{/each}
 		</div>
 
-		<div class="lib-sheet__cats" role="group" aria-label="Filter by focus">
+		<div
+			class="lib-sheet__cats"
+			role="group"
+			aria-label="Filter by focus"
+		>
 			<button
 				class="lib-chip lib-chip--focus"
 				class:lib-chip--active={activeFocus === null}
@@ -179,8 +228,15 @@
 			{/if}
 			{#each filtered as it (it.id)}
 				{@const isOpen = expandedId === it.id}
-				<div class="lib-row" class:lib-row--open={isOpen}>
-					<button class="lib-row__main" onclick={() => toggleExpand(it.id)} aria-expanded={isOpen}>
+				<div
+					class="lib-row"
+					class:lib-row--open={isOpen}
+				>
+					<button
+						class="lib-row__main"
+						onclick={() => toggleExpand(it.id)}
+						aria-expanded={isOpen}
+					>
 						<div class="lib-row__info">
 							<span class="lib-row__name">
 								{it.name}
@@ -229,13 +285,27 @@
 										stroke-linecap="round"
 										aria-hidden="true"
 									>
-										<line x1="12" y1="5" x2="12" y2="19" />
-										<line x1="5" y1="12" x2="19" y2="12" />
+										<line
+											x1="12"
+											y1="5"
+											x2="12"
+											y2="19"
+										/>
+										<line
+											x1="5"
+											y1="12"
+											x2="19"
+											y2="12"
+										/>
 									</svg>
 									Add to routine
 								</button>
 								{#if !it.isBuiltIn}
-									<button class="lib-row__edit" onclick={() => (formItem = it)} aria-label="Edit {it.name}">
+									<button
+										class="lib-row__edit"
+										onclick={() => (formItem = it)}
+										aria-label="Edit {it.name}"
+									>
 										<svg
 											viewBox="0 0 24 24"
 											fill="none"
@@ -254,7 +324,11 @@
 											onclick={() => deleteItem(it)}
 											aria-label="Confirm delete {it.name}">Sure?</button
 										>
-										<button class="lib-row__delete" onclick={() => (confirmDeleteId = null)} aria-label="Cancel delete">
+										<button
+											class="lib-row__delete"
+											onclick={() => (confirmDeleteId = null)}
+											aria-label="Cancel delete"
+										>
 											<svg
 												viewBox="0 0 24 24"
 												fill="none"
@@ -263,12 +337,26 @@
 												stroke-linecap="round"
 												aria-hidden="true"
 											>
-												<line x1="18" y1="6" x2="6" y2="18" />
-												<line x1="6" y1="6" x2="18" y2="18" />
+												<line
+													x1="18"
+													y1="6"
+													x2="6"
+													y2="18"
+												/>
+												<line
+													x1="6"
+													y1="6"
+													x2="18"
+													y2="18"
+												/>
 											</svg>
 										</button>
 									{:else}
-										<button class="lib-row__delete" onclick={() => deleteItem(it)} aria-label="Delete {it.name}">
+										<button
+											class="lib-row__delete"
+											onclick={() => deleteItem(it)}
+											aria-label="Delete {it.name}"
+										>
 											<svg
 												viewBox="0 0 24 24"
 												fill="none"

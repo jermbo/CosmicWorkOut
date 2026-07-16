@@ -2,7 +2,16 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export const STRENGTH_CATS = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Legs', 'Core', 'Full Body'] as const;
+export const STRENGTH_CATS = [
+	'Chest',
+	'Back',
+	'Shoulders',
+	'Biceps',
+	'Triceps',
+	'Legs',
+	'Core',
+	'Full Body',
+] as const;
 export type ItemCat = (typeof STRENGTH_CATS)[number];
 export type ExerciseType = 'compound' | 'isolation' | 'dynamic' | 'isometric';
 export type CatalogDifficulty = 'beginner' | 'intermediate' | 'advanced';

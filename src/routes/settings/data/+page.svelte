@@ -144,8 +144,8 @@
 		<h2 class="settings-section__title">Backup</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Download all your workout data — sessions, programs, exercises, habits, activities, and health readings — as a
-				single JSON file. Works fully offline.
+				Download all your workout data — sessions, programs, exercises, habits, activities, and
+				health readings — as a single JSON file. Works fully offline.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--primary"
@@ -159,9 +159,13 @@
 
 		<div class="data-action">
 			<p class="data-action__desc">
-				Restore from a backup file. This <strong>replaces</strong> all workout data currently on this device.
+				Restore from a backup file. This <strong>replaces</strong> all workout data currently on this
+				device.
 			</p>
-			<button class="data-action__btn data-action__btn--secondary" onclick={openFilePicker}>
+			<button
+				class="data-action__btn data-action__btn--secondary"
+				onclick={openFilePicker}
+			>
 				Restore from backup
 			</button>
 			<input
@@ -220,10 +224,13 @@
 		<h2 class="settings-section__title">Danger zone</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Remove everything above at once — exercises, programs, workout sessions, activities, habits, and health
-				data. Built-in content is restored.
+				Remove everything above at once — exercises, programs, workout sessions, activities, habits,
+				and health data. Built-in content is restored.
 			</p>
-			<button class="data-action__btn data-action__btn--danger" onclick={() => openClearDialog('everything')}>
+			<button
+				class="data-action__btn data-action__btn--danger"
+				onclick={() => openClearDialog('everything')}
+			>
 				Clear everything
 			</button>
 		</div>
@@ -233,12 +240,15 @@
 		<h2 class="settings-section__title">Advanced</h2>
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
-				Load 45 days of realistic debug data — workout sessions, activities, habit logs, health readings, and two
-				sample goal plans (one completed, one mid-plan; visible when goal progression plans are enabled) — for
-				testing graphs and visualizations. Existing data is kept. Remove with "Workout sessions", "Activity log",
-				and "Goal plans" above.
+				Load 45 days of realistic debug data — workout sessions, activities, habit logs, health
+				readings, and two sample goal plans (one completed, one mid-plan; visible when goal
+				progression plans are enabled) — for testing graphs and visualizations. Existing data is
+				kept. Remove with "Workout sessions", "Activity log", and "Goal plans" above.
 			</p>
-			<button class="data-action__btn data-action__btn--ghost" onclick={() => (showSeedConfirm = true)}>
+			<button
+				class="data-action__btn data-action__btn--ghost"
+				onclick={() => (showSeedConfirm = true)}
+			>
 				Load debug data
 			</button>
 		</div>
@@ -259,8 +269,10 @@
 			restoreError = null;
 		}}
 	>
-		This replaces <strong>all</strong> workout data on this device with the contents of the backup from
-		{new Date(pendingBackup.exportedAt).toLocaleDateString()}. This cannot be undone. The app will reload when done.
+		This replaces <strong>all</strong> workout data on this device with the contents of the backup
+		from
+		{new Date(pendingBackup.exportedAt).toLocaleDateString()}. This cannot be undone. The app will
+		reload when done.
 	</ConfirmDialog>
 {/if}
 
@@ -280,7 +292,9 @@
 			<br /><br /><strong>Some of these exercises are used in a program:</strong>
 			<ul class="confirm-list">
 				{#each itemsInUse as entry (entry.item.id)}
-					<li>{entry.item.name} — used in {entry.programs.map((p) => p.name).join(', ')}</li>
+					<li>
+						{entry.item.name} — used in {entry.programs.map((p) => p.name).join(', ')}
+					</li>
 				{/each}
 			</ul>
 			Those programs will show the exercise as missing afterward.
@@ -297,8 +311,8 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes your custom programs. Built-in programs are kept, and your exercises and workout log are unaffected.
-		This cannot be undone.
+		This removes your custom programs. Built-in programs are kept, and your exercises and workout
+		log are unaffected. This cannot be undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'workoutSessions'}
 	<ConfirmDialog
@@ -311,8 +325,8 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes session history and weight memory. Activities, programs, and exercises are unaffected. This cannot
-		be undone.
+		This removes session history and weight memory. Activities, programs, and exercises are
+		unaffected. This cannot be undone.
 		{#if sessionStore.isActive}
 			<br /><br />You have a session in progress — it will be discarded.
 		{/if}
@@ -328,8 +342,8 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes all logged activities (runs, walks, and other movement you've logged). Workout sessions are
-		unaffected. This cannot be undone.
+		This removes all logged activities (runs, walks, and other movement you've logged). Workout
+		sessions are unaffected. This cannot be undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'habits'}
 	<ConfirmDialog
@@ -342,7 +356,8 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes all habits and habit logs. The default habit set will be restored. This cannot be undone.
+		This removes all habits and habit logs. The default habit set will be restored. This cannot be
+		undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'goalPlans'}
 	<ConfirmDialog
@@ -355,8 +370,9 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes all goal progression plan records — active, paused, and completed. The programs and sessions they
-		generated stay and can be cleared with "Custom programs" and "Workout sessions". This cannot be undone.
+		This removes all goal progression plan records — active, paused, and completed. The programs and
+		sessions they generated stay and can be cleared with "Custom programs" and "Workout sessions".
+		This cannot be undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'health'}
 	<ConfirmDialog
@@ -382,8 +398,8 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes session history, activities, custom programs and exercises, habits, health readings, and any
-		in-progress session. Built-in content will be restored. This cannot be undone.
+		This removes session history, activities, custom programs and exercises, habits, health
+		readings, and any in-progress session. Built-in content will be restored. This cannot be undone.
 		{#if sessionStore.isActive}
 			<br /><br />You have a session in progress — it will be discarded.
 		{/if}
@@ -399,8 +415,8 @@
 		onconfirm={handleLoadSeedData}
 		oncancel={() => (showSeedConfirm = false)}
 	>
-		Adds 45 days of randomized workout sessions, activities, habit logs, and health readings. Your existing data is not
-		removed. The page will reload when done.
+		Adds 45 days of randomized workout sessions, activities, habit logs, and health readings. Your
+		existing data is not removed. The page will reload when done.
 	</ConfirmDialog>
 {/if}
 

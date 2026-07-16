@@ -55,7 +55,12 @@
 					dailyGoal,
 				});
 			} else {
-				await habitStore.addHabit({ name: name.trim(), unit: unit.trim(), type, dailyGoal });
+				await habitStore.addHabit({
+					name: name.trim(),
+					unit: unit.trim(),
+					type,
+					dailyGoal,
+				});
 			}
 			onclose();
 		} finally {
@@ -64,9 +69,21 @@
 	}
 </script>
 
-<div class="modal-backdrop" role="presentation" onclick={() => !saving && onclose()}></div>
-<div class="modal" role="dialog" aria-labelledby={titleId} aria-modal="true">
-	<p class="modal__title" id={titleId}>
+<div
+	class="modal-backdrop"
+	role="presentation"
+	onclick={() => !saving && onclose()}
+></div>
+<div
+	class="modal"
+	role="dialog"
+	aria-labelledby={titleId}
+	aria-modal="true"
+>
+	<p
+		class="modal__title"
+		id={titleId}
+	>
 		{#if editing}Edit Habit{:else}New Habit{/if}
 	</p>
 
@@ -75,15 +92,33 @@
 			<p class="hf-presets__label">Start from a preset</p>
 			<div class="hf-presets__grid">
 				{#each HABIT_PRESETS as preset (preset.name)}
-					<button class="hf-preset-btn" onclick={() => applyPreset(preset)}>{preset.name}</button>
+					<button
+						class="hf-preset-btn"
+						onclick={() => applyPreset(preset)}>{preset.name}</button
+					>
 				{/each}
 			</div>
-			<button class="hf-presets__skip" onclick={() => (showPresets = false)}> Start from scratch </button>
+			<button
+				class="hf-presets__skip"
+				onclick={() => (showPresets = false)}
+			>
+				Start from scratch
+			</button>
 		</div>
 	{:else}
 		<div class="hf-field">
-			<label class="hf-label" for="habit-name">Name <span class="hf-hint">max 40 chars</span></label>
-			<input id="habit-name" class="hf-input" type="text" bind:value={name} placeholder="e.g. Water" maxlength={40} />
+			<label
+				class="hf-label"
+				for="habit-name">Name <span class="hf-hint">max 40 chars</span></label
+			>
+			<input
+				id="habit-name"
+				class="hf-input"
+				type="text"
+				bind:value={name}
+				placeholder="e.g. Water"
+				maxlength={40}
+			/>
 		</div>
 
 		{#if editing}
@@ -112,7 +147,10 @@
 
 		{#if type === 'count'}
 			<div class="hf-field">
-				<label class="hf-label" for="habit-unit">Unit label <span class="hf-hint">required · max 20 chars</span></label>
+				<label
+					class="hf-label"
+					for="habit-unit">Unit label <span class="hf-hint">required · max 20 chars</span></label
+				>
 				<input
 					id="habit-unit"
 					class="hf-input"
@@ -126,13 +164,27 @@
 
 		{#if typeHasGoal}
 			<div class="hf-field">
-				<label class="hf-label" for="habit-goal">Daily goal <span class="hf-hint">optional</span></label>
-				<input id="habit-goal" class="hf-input" type="number" bind:value={goal} placeholder="e.g. 8" min="1" />
+				<label
+					class="hf-label"
+					for="habit-goal">Daily goal <span class="hf-hint">optional</span></label
+				>
+				<input
+					id="habit-goal"
+					class="hf-input"
+					type="number"
+					bind:value={goal}
+					placeholder="e.g. 8"
+					min="1"
+				/>
 			</div>
 		{/if}
 
 		<div class="modal__actions">
-			<button class="modal__btn modal__btn--ghost" onclick={onclose} disabled={saving}>Cancel</button>
+			<button
+				class="modal__btn modal__btn--ghost"
+				onclick={onclose}
+				disabled={saving}>Cancel</button
+			>
 			<button
 				class="modal__btn modal__btn--primary"
 				onclick={save}

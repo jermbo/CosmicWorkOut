@@ -12,7 +12,12 @@
 		/** Weekly targets from an active goal plan; shown next to each exercise. */
 		prescribed?: Map<string, { weight: number; reps?: number }>;
 		/** Wave position from an active goal plan; shown as a header chip. */
-		goalContext?: { blockNumber: number; totalBlocks: number; blockWeek: number; phase: string } | null;
+		goalContext?: {
+			blockNumber: number;
+			totalBlocks: number;
+			blockWeek: number;
+			phase: string;
+		} | null;
 	};
 
 	let { workout, exerciseMap, onStart, prescribed, goalContext = null }: Props = $props();
@@ -42,8 +47,14 @@
 	});
 </script>
 
-<article class="packet-card" style:--workout-accent={accentColor}>
-	<div class="packet-card__ruled" aria-hidden="true"></div>
+<article
+	class="packet-card"
+	style:--workout-accent={accentColor}
+>
+	<div
+		class="packet-card__ruled"
+		aria-hidden="true"
+	></div>
 
 	<div class="packet-card__tabs">
 		<span class="packet-card__tab packet-card__tab--active">
@@ -60,12 +71,17 @@
 			</svg>
 			<span class="packet-card__tab-text">{programStore.activeProgram?.name ?? 'Program'}</span>
 		</span>
-		<span class="packet-card__tab packet-card__tab--ghost">Wk {programStore.currentWeekNumber}</span>
+		<span class="packet-card__tab packet-card__tab--ghost">Wk {programStore.currentWeekNumber}</span
+		>
 		<span class="packet-card__tab packet-card__tab--ghost">
 			{workout.letter ?? programStore.currentRoutineLetter}
 		</span>
 		{#if goalContext}
-			<a class="packet-card__tab packet-card__tab--wave" href={resolve('/goals')} aria-label="View goal plan">
+			<a
+				class="packet-card__tab packet-card__tab--wave"
+				href={resolve('/goals')}
+				aria-label="View goal plan"
+			>
 				B{goalContext.blockNumber} · {goalContext.phase}
 			</a>
 		{/if}
@@ -76,7 +92,10 @@
 	<div class="packet-card__meta">
 		{#each focusChips as chip (chip)}
 			<span class="packet-card__chip">
-				<span class="packet-card__chip-dot" aria-hidden="true"></span>
+				<span
+					class="packet-card__chip-dot"
+					aria-hidden="true"
+				></span>
 				{chip}
 			</span>
 		{/each}
@@ -90,7 +109,11 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<circle cx="12" cy="12" r="10" />
+					<circle
+						cx="12"
+						cy="12"
+						r="10"
+					/>
 					<polyline points="12 6 12 12 16 14" />
 				</svg>
 				~{formatMinutes(workout.estMin)}
@@ -98,16 +121,24 @@
 		{/if}
 	</div>
 
-	<ul class="packet-card__exercises" role="list" aria-label="Exercises in this workout">
+	<ul
+		class="packet-card__exercises"
+		role="list"
+		aria-label="Exercises in this workout"
+	>
 		{#each flattenItems(workout) as we, i (we.itemId)}
 			{@const exercise = exerciseMap.get(we.itemId)}
 			{#if exercise}
 				{@const target = prescribed?.get(we.itemId)}
 				<li class="packet-card__exercise">
-					<span class="packet-card__exercise-ix" aria-hidden="true">{i + 1}</span>
+					<span
+						class="packet-card__exercise-ix"
+						aria-hidden="true">{i + 1}</span
+					>
 					<span class="packet-card__exercise-name">{exercise.name}</span>
 					{#if target && target.weight > 0}
-						<span class="packet-card__exercise-target">{target.weight} {exercise.unit ?? 'lb'}</span>
+						<span class="packet-card__exercise-target">{target.weight} {exercise.unit ?? 'lb'}</span
+						>
 					{/if}
 					<span class="packet-card__exercise-sets">{we.sets}×{target?.reps ?? we.reps}</span>
 				</li>
@@ -115,7 +146,12 @@
 		{/each}
 	</ul>
 
-	<button class="packet-card__start" onclick={handleStart} disabled={starting} aria-busy={starting}>
+	<button
+		class="packet-card__start"
+		onclick={handleStart}
+		disabled={starting}
+		aria-busy={starting}
+	>
 		{#if starting}
 			<svg
 				class="packet-card__start-spinner"
@@ -125,7 +161,11 @@
 				stroke-width="2.5"
 				aria-hidden="true"
 			>
-				<circle cx="12" cy="12" r="10" />
+				<circle
+					cx="12"
+					cy="12"
+					r="10"
+				/>
 			</svg>
 			Starting…
 		{:else}

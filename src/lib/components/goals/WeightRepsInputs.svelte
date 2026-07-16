@@ -42,7 +42,10 @@
 			/>
 			<span class="pair-inputs__unit">{unit}</span>
 		</label>
-		<span class="pair-inputs__times" aria-hidden="true">×</span>
+		<span
+			class="pair-inputs__times"
+			aria-hidden="true">×</span
+		>
 		<label class="pair-inputs__field">
 			<input
 				class="form-field__input"

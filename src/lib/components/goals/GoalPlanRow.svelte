@@ -12,7 +12,10 @@
 	let { plan, metaLines, done = false, onResume, onComplete }: Props = $props();
 </script>
 
-<div class="plan-row" class:plan-row--done={done}>
+<div
+	class="plan-row"
+	class:plan-row--done={done}
+>
 	<div class="plan-row__info">
 		<span class="plan-row__name">{plan.name}</span>
 		{#each metaLines as line, i (`${i}:${line}`)}
@@ -22,10 +25,18 @@
 	{#if onResume || onComplete}
 		<div class="plan-row__actions">
 			{#if onResume}
-				<button class="plan-row__btn plan-row__btn--primary" type="button" onclick={onResume}>Resume</button>
+				<button
+					class="plan-row__btn plan-row__btn--primary"
+					type="button"
+					onclick={onResume}>Resume</button
+				>
 			{/if}
 			{#if onComplete}
-				<button class="plan-row__btn" type="button" onclick={onComplete}>Complete</button>
+				<button
+					class="plan-row__btn"
+					type="button"
+					onclick={onComplete}>Complete</button
+				>
 			{/if}
 		</div>
 	{/if}

@@ -1,4 +1,13 @@
-import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
+import type {
+	Item,
+	Program,
+	Session,
+	ItemLastUsed,
+	ActivityLog,
+	Habit,
+	HabitLog,
+	HealthReading,
+} from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
 import { db, clearWorkoutData, putAllRecords, initDB } from './database';
 
@@ -6,7 +15,11 @@ const BACKUP_FORMAT = 'cosmic-workout-backup';
 const BACKUP_VERSION = 1;
 
 /** localStorage keys included in a backup. Transient keys (activeSession, habitDay) are excluded. */
-const BACKUP_LOCAL_KEYS = ['cwout:prefs', 'cwout:activeProgramIds', 'cwout:lastActivityType'] as const;
+const BACKUP_LOCAL_KEYS = [
+	'cwout:prefs',
+	'cwout:activeProgramIds',
+	'cwout:lastActivityType',
+] as const;
 
 interface BackupDb {
 	items: Item[];
@@ -51,18 +64,27 @@ function writeLocal(key: string, value: unknown): void {
 
 /** Build a complete, versioned snapshot of all durable on-device data. */
 export async function exportBackup(): Promise<BackupEnvelope> {
-	const [items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings, goalPlans] =
-		await Promise.all([
-			db.items.getAll(),
-			db.programs.getAll(),
-			db.sessions.getAll(),
-			db.itemLastUsed.getAll(),
-			db.activities.getAll(),
-			db.habits.getAll(),
-			db.habitLogs.getAll(),
-			db.healthReadings.getAll(),
-			db.goalPlans.getAll(),
-		]);
+	const [
+		items,
+		programs,
+		sessions,
+		itemLastUsed,
+		activities,
+		habits,
+		habitLogs,
+		healthReadings,
+		goalPlans,
+	] = await Promise.all([
+		db.items.getAll(),
+		db.programs.getAll(),
+		db.sessions.getAll(),
+		db.itemLastUsed.getAll(),
+		db.activities.getAll(),
+		db.habits.getAll(),
+		db.habitLogs.getAll(),
+		db.healthReadings.getAll(),
+		db.goalPlans.getAll(),
+	]);
 
 	const local: Record<string, unknown> = {};
 	for (const key of BACKUP_LOCAL_KEYS) {
@@ -74,7 +96,17 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		format: BACKUP_FORMAT,
 		version: BACKUP_VERSION,
 		exportedAt: new Date().toISOString(),
-		db: { items, programs, sessions, itemLastUsed, activities, habits, habitLogs, healthReadings, goalPlans },
+		db: {
+			items,
+			programs,
+			sessions,
+			itemLastUsed,
+			activities,
+			habits,
+			habitLogs,
+			healthReadings,
+			goalPlans,
+		},
 		localStorage: local,
 	};
 }
@@ -119,7 +151,9 @@ export function parseBackup(text: string): BackupEnvelope {
 		throw new BackupValidationError('This backup is missing a version and cannot be restored.');
 	}
 	if (env.version > BACKUP_VERSION) {
-		throw new BackupValidationError('This backup was made by a newer version of the app. Please update first.');
+		throw new BackupValidationError(
+			'This backup was made by a newer version of the app. Please update first.',
+		);
 	}
 	if (typeof env.db !== 'object' || env.db === null) {
 		throw new BackupValidationError('This backup is missing its data and cannot be restored.');

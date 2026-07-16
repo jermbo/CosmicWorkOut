@@ -17,7 +17,12 @@
 	);
 </script>
 
-<HomeCard href="/log" title="Activity" {ariaLabel} variant="log">
+<HomeCard
+	href="/log"
+	title="Activity"
+	{ariaLabel}
+	variant="log"
+>
 	{#if activities.length === 0}
 		<p class="home-activity-card__empty">No activities yet.</p>
 	{:else}

@@ -12,7 +12,9 @@
 	let { onClose, onCreateNew, disciplineId }: Props = $props();
 
 	let programs = $derived(
-		disciplineId ? programStore.programs.filter((p) => p.disciplineId === disciplineId) : programStore.programs,
+		disciplineId
+			? programStore.programs.filter((p) => p.disciplineId === disciplineId)
+			: programStore.programs,
 	);
 
 	function activate(program: Program) {
@@ -24,11 +26,18 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="80dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="80dvh"
+>
 	<div class="prog-sheet">
 		<div class="prog-sheet__header">
 			<h2 class="prog-sheet__title">Plans</h2>
-			<button class="prog-sheet__close" onclick={onClose} aria-label="Close">
+			<button
+				class="prog-sheet__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -37,8 +46,18 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -46,7 +65,10 @@
 		<div class="prog-sheet__list">
 			{#each programs as program (program.id)}
 				{@const isActive = programStore.isProgramActive(program.id)}
-				<div class="prog-row" class:prog-row--active={isActive}>
+				<div
+					class="prog-row"
+					class:prog-row--active={isActive}
+				>
 					<div class="prog-row__info">
 						<div class="prog-row__name-row">
 							<span class="prog-row__name">{program.name}</span>
@@ -59,16 +81,25 @@
 						</span>
 					</div>
 					{#if isActive}
-						<button class="prog-row__deactivate-btn" onclick={() => pause(program)}>Pause</button>
+						<button
+							class="prog-row__deactivate-btn"
+							onclick={() => pause(program)}>Pause</button
+						>
 					{:else}
-						<button class="prog-row__action-btn" onclick={() => activate(program)}>Activate</button>
+						<button
+							class="prog-row__action-btn"
+							onclick={() => activate(program)}>Activate</button
+						>
 					{/if}
 				</div>
 			{/each}
 		</div>
 
 		<div class="prog-sheet__footer">
-			<button class="prog-sheet__new-btn" onclick={onCreateNew}>
+			<button
+				class="prog-sheet__new-btn"
+				onclick={onCreateNew}
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -77,8 +108,18 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="12" y1="5" x2="12" y2="19" />
-					<line x1="5" y1="12" x2="19" y2="12" />
+					<line
+						x1="12"
+						y1="5"
+						x2="12"
+						y2="19"
+					/>
+					<line
+						x1="5"
+						y1="12"
+						x2="19"
+						y2="12"
+					/>
 				</svg>
 				Create new plan
 			</button>

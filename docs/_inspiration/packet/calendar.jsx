@@ -12,22 +12,36 @@ function CalendarView({ training, dayLog, monthLabel, monthStartDow, daysInMonth
 	for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
 	const doneDays = Object.entries(training).filter(([, v]) => v.status === 'done');
-	const scheduledCount = Object.values(training).filter((v) => v.status === 'scheduled' || v.status === 'today').length;
+	const scheduledCount = Object.values(training).filter(
+		(v) => v.status === 'scheduled' || v.status === 'today',
+	).length;
 	const totalVolume = doneDays.reduce((a, [, v]) => a + (v.volume || 0), 0);
 
 	return (
 		<div className="scroll fade-in">
-			<div className="scr-pad top-pad" style={{ paddingTop: 'max(22px, env(safe-area-inset-top))' }}>
-				<div className="eyebrow" style={{ marginBottom: 6 }}>
+			<div
+				className="scr-pad top-pad"
+				style={{ paddingTop: 'max(22px, env(safe-area-inset-top))' }}
+			>
+				<div
+					className="eyebrow"
+					style={{ marginBottom: 6 }}
+				>
 					History
 				</div>
 				<div className="cal-head">
 					<div className="cal-month">{monthLabel}</div>
 					<div className="cal-nav">
-						<button className="icon-btn" aria-label="Previous month">
+						<button
+							className="icon-btn"
+							aria-label="Previous month"
+						>
 							<Icon name="chevL" />
 						</button>
-						<button className="icon-btn" aria-label="Next month">
+						<button
+							className="icon-btn"
+							aria-label="Next month"
+						>
 							<Icon name="chevR" />
 						</button>
 					</div>
@@ -65,7 +79,13 @@ function CalendarView({ training, dayLog, monthLabel, monthStartDow, daysInMonth
 				</div>
 				<div className="cal-grid">
 					{cells.map((d, i) => {
-						if (d == null) return <div key={i} className="cal-cell empty" />;
+						if (d == null)
+							return (
+								<div
+									key={i}
+									className="cal-cell empty"
+								/>
+							);
 						const t = training[d];
 						const status = d === todayDate ? 'today' : t ? t.status : 'rest';
 						const tappable = status === 'done';
@@ -106,7 +126,12 @@ function CalendarView({ training, dayLog, monthLabel, monthStartDow, daysInMonth
 			<div style={{ height: 24 }} />
 
 			{openDay != null && (
-				<DaySummary date={openDay} info={training[openDay]} log={dayLog[openDay]} onClose={() => setOpenDay(null)} />
+				<DaySummary
+					date={openDay}
+					info={training[openDay]}
+					log={dayLog[openDay]}
+					onClose={() => setOpenDay(null)}
+				/>
 			)}
 		</div>
 	);
@@ -115,8 +140,14 @@ function CalendarView({ training, dayLog, monthLabel, monthStartDow, daysInMonth
 function DaySummary({ date, info, log, onClose }) {
 	const sets = log ? log.length : 0;
 	return (
-		<div className="sheet-back" onClick={onClose}>
-			<div className="sheet" onClick={(e) => e.stopPropagation()}>
+		<div
+			className="sheet-back"
+			onClick={onClose}
+		>
+			<div
+				className="sheet"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<div className="sheet-grab" />
 				<div className="day-sum-head">
 					<div className="day-sum-badge">
@@ -149,7 +180,10 @@ function DaySummary({ date, info, log, onClose }) {
 				{log ? (
 					<div className="day-log">
 						{log.map((row, i) => (
-							<div className="day-log-row" key={i}>
+							<div
+								className="day-log-row"
+								key={i}
+							>
 								<span className="nm">{row.name}</span>
 								<span className="se">{row.sets}</span>
 								<span className="tp">{row.top}</span>

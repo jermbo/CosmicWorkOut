@@ -92,13 +92,20 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="92dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="92dvh"
+>
 	<div class="ex-form">
 		<div class="ex-form__header">
 			<h2 class="ex-form__title">
 				{#if exercise}Edit Exercise{:else}New Exercise{/if}
 			</h2>
-			<button class="ex-form__close" onclick={onClose} aria-label="Close">
+			<button
+				class="ex-form__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -107,8 +114,18 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -120,8 +137,14 @@
 				handleSave();
 			}}
 		>
-			<div class="form-field" class:form-field--error={errors.name}>
-				<label class="form-field__label" for="ex-name">Name</label>
+			<div
+				class="form-field"
+				class:form-field--error={errors.name}
+			>
+				<label
+					class="form-field__label"
+					for="ex-name">Name</label
+				>
 				<input
 					id="ex-name"
 					class="form-field__input"
@@ -134,8 +157,9 @@
 			</div>
 
 			<div class="form-field">
-				<label class="form-field__label" for="ex-cue"
-					>Coaching cue <span class="form-field__optional">optional</span></label
+				<label
+					class="form-field__label"
+					for="ex-cue">Coaching cue <span class="form-field__optional">optional</span></label
 				>
 				<input
 					id="ex-cue"
@@ -147,8 +171,14 @@
 				/>
 			</div>
 
-			<div class="form-field" class:form-field--error={errors.muscles}>
-				<label class="form-field__label" for="ex-muscles">Muscles worked</label>
+			<div
+				class="form-field"
+				class:form-field--error={errors.muscles}
+			>
+				<label
+					class="form-field__label"
+					for="ex-muscles">Muscles worked</label
+				>
 				<input
 					id="ex-muscles"
 					class="form-field__input"
@@ -161,8 +191,15 @@
 			</div>
 
 			<div class="form-field">
-				<span class="form-field__label" id="ex-cat-label">Category</span>
-				<div class="cat-chips" role="radiogroup" aria-labelledby="ex-cat-label">
+				<span
+					class="form-field__label"
+					id="ex-cat-label">Category</span
+				>
+				<div
+					class="cat-chips"
+					role="radiogroup"
+					aria-labelledby="ex-cat-label"
+				>
 					{#each CATS as c (c)}
 						<button
 							type="button"
@@ -178,8 +215,15 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<span class="form-field__label" id="ex-unit-label">Weight type</span>
-					<div class="seg-control" role="radiogroup" aria-labelledby="ex-unit-label">
+					<span
+						class="form-field__label"
+						id="ex-unit-label">Weight type</span
+					>
+					<div
+						class="seg-control"
+						role="radiogroup"
+						aria-labelledby="ex-unit-label"
+					>
 						{#each UNITS as u (u)}
 							<button
 								type="button"
@@ -196,7 +240,10 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<label class="form-field__label" for="ex-sets">Default sets</label>
+					<label
+						class="form-field__label"
+						for="ex-sets">Default sets</label
+					>
 					<div class="stepper">
 						<button
 							type="button"
@@ -216,15 +263,31 @@
 					</div>
 				</div>
 				<div class="form-field">
-					<label class="form-field__label" for="ex-reps">Default reps</label>
-					<input id="ex-reps" class="form-field__input" type="text" bind:value={defaultReps} placeholder="e.g. 8-10" />
+					<label
+						class="form-field__label"
+						for="ex-reps">Default reps</label
+					>
+					<input
+						id="ex-reps"
+						class="form-field__input"
+						type="text"
+						bind:value={defaultReps}
+						placeholder="e.g. 8-10"
+					/>
 				</div>
 			</div>
 
 			{#if unit === 'lb' || unit === 'kg'}
 				<div class="form-field">
-					<span class="form-field__label" id="ex-increment-label">Weight increment ({unit})</span>
-					<div class="seg-control" role="radiogroup" aria-labelledby="ex-increment-label">
+					<span
+						class="form-field__label"
+						id="ex-increment-label">Weight increment ({unit})</span
+					>
+					<div
+						class="seg-control"
+						role="radiogroup"
+						aria-labelledby="ex-increment-label"
+					>
 						{#each WEIGHT_INCREMENTS as inc (inc)}
 							<button
 								type="button"
@@ -239,7 +302,12 @@
 				</div>
 			{/if}
 
-			<button type="submit" class="ex-form__submit" disabled={saving} aria-busy={saving}>
+			<button
+				type="submit"
+				class="ex-form__submit"
+				disabled={saving}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if exercise}Save changes{:else}Add exercise{/if}
 			</button>
 		</form>

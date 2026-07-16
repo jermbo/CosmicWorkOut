@@ -28,7 +28,11 @@
 </script>
 
 <div class="range-bar">
-	<div class="range-chips" role="group" aria-label="Date range">
+	<div
+		class="range-chips"
+		role="group"
+		aria-label="Date range"
+	>
 		{#each RANGE_OPTIONS as opt (opt.key)}
 			<button
 				class="range-chip"
@@ -45,12 +49,26 @@
 		<div class="range-custom">
 			<label class="range-custom__label">
 				From
-				<input class="range-custom__input" type="date" bind:value={customStart} max={customEnd || todayStr} />
+				<input
+					class="range-custom__input"
+					type="date"
+					bind:value={customStart}
+					max={customEnd || todayStr}
+				/>
 			</label>
-			<span class="range-custom__sep" aria-hidden="true">→</span>
+			<span
+				class="range-custom__sep"
+				aria-hidden="true">→</span
+			>
 			<label class="range-custom__label">
 				To
-				<input class="range-custom__input" type="date" bind:value={customEnd} min={customStart} max={todayStr} />
+				<input
+					class="range-custom__input"
+					type="date"
+					bind:value={customEnd}
+					min={customStart}
+					max={todayStr}
+				/>
 			</label>
 		</div>
 	{/if}

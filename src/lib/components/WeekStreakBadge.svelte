@@ -9,8 +9,14 @@
 </script>
 
 {#if streak > 0}
-	<div class="week-streak" aria-label="{streak} week streak">
-		<Icon name="flame" size={14} />
+	<div
+		class="week-streak"
+		aria-label="{streak} week streak"
+	>
+		<Icon
+			name="flame"
+			size={14}
+		/>
 		<span><strong>{streak}</strong> wk streak</span>
 	</div>
 {/if}

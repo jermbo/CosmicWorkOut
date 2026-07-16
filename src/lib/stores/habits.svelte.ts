@@ -11,7 +11,9 @@ class HabitStore {
 	logs = $state<HabitLog[]>([]);
 	loaded = $state(false);
 
-	activeHabits = $derived([...this.habits].filter((h) => h.active).sort((a, b) => a.sortOrder - b.sortOrder));
+	activeHabits = $derived(
+		[...this.habits].filter((h) => h.active).sort((a, b) => a.sortOrder - b.sortOrder),
+	);
 
 	/** Active habits shown in grids and completion counts — mood is tracked separately. */
 	trackableHabits = $derived(this.activeHabits.filter((h) => h.type !== 'mood'));
@@ -74,7 +76,12 @@ class HabitStore {
 		localStorage.setItem(TODAY_KEY, this.todayStr());
 	}
 
-	async addHabit(data: { name: string; unit: string; type: HabitType; dailyGoal?: number }): Promise<Habit> {
+	async addHabit(data: {
+		name: string;
+		unit: string;
+		type: HabitType;
+		dailyGoal?: number;
+	}): Promise<Habit> {
 		const maxOrder = this.habits.reduce((m, h) => Math.max(m, h.sortOrder), -1);
 		const habit: Habit = {
 			id: generateId(),

@@ -125,7 +125,11 @@ test('focusTargetForWeek and blockForWeek map plan weeks into blocks', () => {
 });
 
 test('supporting exercises climb every week and never deload (AC 4a/4b)', () => {
-	const baseline = { itemId: 'st-front-raise', startWeight: 15, weightIncrement: 2.5 };
+	const baseline = {
+		itemId: 'st-front-raise',
+		startWeight: 15,
+		weightIncrement: 2.5,
+	};
 	const weights = [1, 2, 3, 4, 5].map((wk) => supportingWeightForWeek(baseline, wk));
 	assert.deepEqual(weights, [15, 17.5, 20, 22.5, 25]);
 	for (let i = 1; i < weights.length; i++) {
@@ -164,7 +168,10 @@ test('repeats extend the timeline; the plan finishes later (AC 6c)', () => {
 
 test('autoPlanName numbers instances per focus exercise', () => {
 	const planFor = (focusItemId: string) => ({ focusItemId }) as GoalPlan;
-	assert.equal(autoPlanName('Barbell Bench Press', 'st-bb-bench-press', []), 'Barbell Bench Press Goal 01');
+	assert.equal(
+		autoPlanName('Barbell Bench Press', 'st-bb-bench-press', []),
+		'Barbell Bench Press Goal 01',
+	);
 	assert.equal(
 		autoPlanName('Barbell Bench Press', 'st-bb-bench-press', [planFor('st-bb-bench-press')]),
 		'Barbell Bench Press Goal 02',

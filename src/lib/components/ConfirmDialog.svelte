@@ -35,9 +35,23 @@
 	});
 </script>
 
-<div class="confirm-backdrop" role="presentation" onclick={() => !busy && oncancel()}></div>
-<div class="confirm" role="alertdialog" aria-labelledby={titleId} aria-modal="true">
-	<p class="confirm__title" id={titleId}>{title}</p>
+<div
+	class="confirm-backdrop"
+	role="presentation"
+	onclick={() => !busy && oncancel()}
+></div>
+<div
+	class="confirm"
+	role="alertdialog"
+	aria-labelledby={titleId}
+	aria-modal="true"
+>
+	<p
+		class="confirm__title"
+		id={titleId}
+	>
+		{title}
+	</p>
 	{#if children}
 		<div class="confirm__body">{@render children()}</div>
 	{/if}
@@ -45,7 +59,11 @@
 		<p class="confirm__error">{error}</p>
 	{/if}
 	<div class="confirm__actions">
-		<button class="confirm__btn confirm__btn--ghost" onclick={oncancel} disabled={busy}>
+		<button
+			class="confirm__btn confirm__btn--ghost"
+			onclick={oncancel}
+			disabled={busy}
+		>
 			{cancelLabel}
 		</button>
 		<button

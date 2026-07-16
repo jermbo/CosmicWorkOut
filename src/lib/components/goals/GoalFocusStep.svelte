@@ -26,32 +26,52 @@
 </script>
 
 <p class="lead">
-	Pick the <strong>one lift</strong> this plan is for — e.g. bench press — then set the weight × reps you're chasing.
-	Everything else in the week supports that lift.
+	Pick the <strong>one lift</strong> this plan is for — e.g. bench press — then set the weight × reps
+	you're chasing. Everything else in the week supports that lift.
 </p>
 
 <div class="form-field">
-	<span class="form-field__label" id="focus-label">Focus lift</span>
+	<span
+		class="form-field__label"
+		id="focus-label">Focus lift</span
+	>
 	{#if focusItem}
 		<div class="focus-selected">
 			<div class="focus-selected__info">
 				<span class="focus-selected__name">{focusItem.name}</span>
 				<span class="focus-selected__meta"
-					>{focusItem.cat} · +{focusItem.weightIncrement ?? 5} {focusItem.unit}</span
+					>{focusItem.cat} · +{focusItem.weightIncrement ?? 5}
+					{focusItem.unit}</span
 				>
 			</div>
-			<button type="button" class="focus-selected__change" onclick={onBrowse}>Change</button>
+			<button
+				type="button"
+				class="focus-selected__change"
+				onclick={onBrowse}>Change</button
+			>
 		</div>
 	{:else}
-		<div class="focus-list" role="radiogroup" aria-labelledby="focus-label">
+		<div
+			class="focus-list"
+			role="radiogroup"
+			aria-labelledby="focus-label"
+		>
 			{#each quickPicks as item (item.id)}
-				<button type="button" class="focus-option" onclick={() => onSetFocus(item)}>
+				<button
+					type="button"
+					class="focus-option"
+					onclick={() => onSetFocus(item)}
+				>
 					<span class="focus-option__name">{item.name}</span>
 					<span class="focus-option__meta">{item.cat}</span>
 				</button>
 			{/each}
 		</div>
-		<button type="button" class="focus-browse" onclick={onBrowse}>Browse full library…</button>
+		<button
+			type="button"
+			class="focus-browse"
+			onclick={onBrowse}>Browse full library…</button
+		>
 	{/if}
 </div>
 

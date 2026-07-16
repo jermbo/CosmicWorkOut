@@ -91,11 +91,27 @@
 <div class="page page--wide">
 	<SettingsSubHeader title="Habits" />
 
-	<section class="settings-section" aria-labelledby="section-habits">
+	<section
+		class="settings-section"
+		aria-labelledby="section-habits"
+	>
 		<div class="settings-section__title-row">
-			<h2 class="settings-section__title" id="section-habits">Habits</h2>
-			<button class="habits-add-btn" onclick={openNewHabit} aria-label="Add habit">
-				<Icon name="plus" size={13} stroke={2.5} />
+			<h2
+				class="settings-section__title"
+				id="section-habits"
+			>
+				Habits
+			</h2>
+			<button
+				class="habits-add-btn"
+				onclick={openNewHabit}
+				aria-label="Add habit"
+			>
+				<Icon
+					name="plus"
+					size={13}
+					stroke={2.5}
+				/>
 				Add
 			</button>
 		</div>
@@ -128,7 +144,10 @@
 </div>
 
 {#if showHabitForm}
-	<HabitForm editing={editingHabit} onclose={() => (showHabitForm = false)} />
+	<HabitForm
+		editing={editingHabit}
+		onclose={() => (showHabitForm = false)}
+	/>
 {/if}
 
 <style>

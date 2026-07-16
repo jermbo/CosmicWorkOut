@@ -11,8 +11,16 @@
 	const titleId = $props.id();
 </script>
 
-<section class="settings-group" aria-labelledby={titleId}>
-	<h2 class="settings-group__title" id={titleId}>{title}</h2>
+<section
+	class="settings-group"
+	aria-labelledby={titleId}
+>
+	<h2
+		class="settings-group__title"
+		id={titleId}
+	>
+		{title}
+	</h2>
 	<div class="settings-group__rows">
 		{@render children()}
 	</div>

@@ -68,9 +68,15 @@
 	{ondragend}
 	role="listitem"
 >
-	<div class="habit-row__drag-handle" aria-hidden="true">
+	<div
+		class="habit-row__drag-handle"
+		aria-hidden="true"
+	>
 		{#if !locked}
-			<Icon name="drag" size={16} />
+			<Icon
+				name="drag"
+				size={16}
+			/>
 		{/if}
 	</div>
 	<div class="habit-row__info">
@@ -89,17 +95,41 @@
 			>
 				<span class="habit-row__toggle-thumb"></span>
 			</button>
-			<button class="habit-row__btn" onclick={onedit} aria-label="Edit {habit.name}">
-				<Icon name="edit" size={14} />
+			<button
+				class="habit-row__btn"
+				onclick={onedit}
+				aria-label="Edit {habit.name}"
+			>
+				<Icon
+					name="edit"
+					size={14}
+				/>
 			</button>
 			{#if confirmingDelete}
-				<button class="habit-row__btn habit-row__btn--confirm" onclick={ondelete}>Sure?</button>
-				<button class="habit-row__btn" onclick={oncanceldelete} aria-label="Cancel">
-					<Icon name="close" size={14} />
+				<button
+					class="habit-row__btn habit-row__btn--confirm"
+					onclick={ondelete}>Sure?</button
+				>
+				<button
+					class="habit-row__btn"
+					onclick={oncanceldelete}
+					aria-label="Cancel"
+				>
+					<Icon
+						name="close"
+						size={14}
+					/>
 				</button>
 			{:else}
-				<button class="habit-row__btn habit-row__btn--delete" onclick={ondelete} aria-label="Delete {habit.name}">
-					<Icon name="trash" size={14} />
+				<button
+					class="habit-row__btn habit-row__btn--delete"
+					onclick={ondelete}
+					aria-label="Delete {habit.name}"
+				>
+					<Icon
+						name="trash"
+						size={14}
+					/>
 				</button>
 			{/if}
 		{/if}

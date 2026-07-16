@@ -10,14 +10,14 @@ Defining, selecting, and editing fitness programs.
 
 > **See [Implementation Status](../implementation/status.md)** for the full checklist. Summary below.
 
-| Area                         | Status   |
-| ---------------------------- | -------- |
-| Program picker / switching   | Built |                                                                                |
-| Create program from scratch  | Built |                                                                                |
-| Copy built-in before editing | Built |                                                                                |
-| Custom item CRUD             | Built |                                                                                |
-| Browse all program weeks     | Built |                                                                                |
-| Multi-plan activation        | Built | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
+| Area                         | Status |
+| ---------------------------- | ------ | ------------------------------------------------------------------------------ |
+| Program picker / switching   | Built  |                                                                                |
+| Create program from scratch  | Built  |                                                                                |
+| Copy built-in before editing | Built  |                                                                                |
+| Custom item CRUD             | Built  |                                                                                |
+| Browse all program weeks     | Built  |                                                                                |
+| Multi-plan activation        | Built  | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
 
 **Roadmap:** week-by-week schedule preview in program picker — [roadmap](../roadmap/README.md#ux-polish).
 

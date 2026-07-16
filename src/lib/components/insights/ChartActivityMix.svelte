@@ -15,7 +15,9 @@
 			if (!dateSet.has(a.date)) continue;
 			counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
 		}
-		return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([type, count]) => ({ type, count }));
+		return [...counts.entries()]
+			.sort((a, b) => b[1] - a[1])
+			.map(([type, count]) => ({ type, count }));
 	});
 
 	let activityTotal = $derived(activityBreakdown.reduce((s, a) => s + a.count, 0));
@@ -36,7 +38,9 @@
 				datasets: [
 					{
 						data: counts,
-						backgroundColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc'),
+						backgroundColor: types.map(
+							(_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc',
+						),
 						borderColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length]),
 						borderWidth: 1,
 					},
@@ -74,7 +78,11 @@
 							},
 						},
 					},
-					tooltip: { callbacks: { label: (ctx) => ` ${ctx.label}: ${ctx.formattedValue}` } },
+					tooltip: {
+						callbacks: {
+							label: (ctx) => ` ${ctx.label}: ${ctx.formattedValue}`,
+						},
+					},
 				},
 			},
 		});

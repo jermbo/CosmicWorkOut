@@ -37,7 +37,11 @@
 </svelte:head>
 
 <div class="page page--wide goal-new">
-	<PageHeader title="New goal plan" showBack backHref="/goals" />
+	<PageHeader
+		title="New goal plan"
+		showBack
+		backHref="/goals"
+	/>
 
 	{#if !prefsStore.goalProgressionPlansEnabled}
 		<section class="goal-new__disabled">
@@ -45,7 +49,10 @@
 			<a href={resolve('/settings')}>Enable them in Settings</a>
 		</section>
 	{:else}
-		<GoalWizardSteps step={wizard.step} stepIndex={wizard.stepIndex} />
+		<GoalWizardSteps
+			step={wizard.step}
+			stepIndex={wizard.stepIndex}
+		/>
 
 		{#if wizard.step === 'focus'}
 			<GoalFocusStep
@@ -106,7 +113,11 @@
 
 		<div class="goal-new__actions">
 			{#if wizard.stepIndex > 0}
-				<button class="goal-new__btn goal-new__btn--ghost" type="button" onclick={() => wizard.back()}>
+				<button
+					class="goal-new__btn goal-new__btn--ghost"
+					type="button"
+					onclick={() => wizard.back()}
+				>
 					Back
 				</button>
 			{/if}

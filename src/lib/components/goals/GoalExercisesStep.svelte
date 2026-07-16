@@ -39,11 +39,17 @@
 			<span class="routine-group__letter">{routine.letter}</span>
 			{routine.name}
 		</h2>
-		<ul class="routine-group__list" role="list">
+		<ul
+			class="routine-group__list"
+			role="list"
+		>
 			{#each routine.slots as slot (slot.itemId)}
 				{@const item = programStore.getItemById(slot.itemId)}
 				{@const isFocus = slot.itemId === focusItemId}
-				<li class="slot-row" class:slot-row--focus={isFocus}>
+				<li
+					class="slot-row"
+					class:slot-row--focus={isFocus}
+				>
 					<div class="slot-row__info">
 						<span class="slot-row__name">
 							{item?.name ?? slot.itemId}
@@ -63,7 +69,11 @@
 				<li class="slot-row slot-row--empty">No exercises yet</li>
 			{/each}
 		</ul>
-		<button type="button" class="routine-group__add" onclick={() => onAddToLetter(routine.letter)}>
+		<button
+			type="button"
+			class="routine-group__add"
+			onclick={() => onAddToLetter(routine.letter)}
+		>
 			Add exercise
 		</button>
 	</section>

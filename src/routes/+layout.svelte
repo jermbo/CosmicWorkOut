@@ -54,7 +54,10 @@
 <div class="app">
 	<Toaster />
 	{#if appReady}
-		<main class="app__main" id="main-content">
+		<main
+			class="app__main"
+			id="main-content"
+		>
 			{@render children()}
 		</main>
 
@@ -73,22 +76,45 @@
 		{/if}
 
 		{#if hasRecoverableSession}
-			<div class="recovery-banner" role="alertdialog" aria-labelledby="recovery-title" aria-modal="true">
-				<p class="recovery-banner__title" id="recovery-title">Resume session?</p>
+			<div
+				class="recovery-banner"
+				role="alertdialog"
+				aria-labelledby="recovery-title"
+				aria-modal="true"
+			>
+				<p
+					class="recovery-banner__title"
+					id="recovery-title"
+				>
+					Resume session?
+				</p>
 				<p class="recovery-banner__body">You have an unfinished session to resume.</p>
 				<div class="recovery-banner__actions">
-					<button class="recovery-banner__btn recovery-banner__btn--resume" onclick={handleResumeSession}>
+					<button
+						class="recovery-banner__btn recovery-banner__btn--resume"
+						onclick={handleResumeSession}
+					>
 						Resume
 					</button>
-					<button class="recovery-banner__btn recovery-banner__btn--discard" onclick={handleDiscardSession}>
+					<button
+						class="recovery-banner__btn recovery-banner__btn--discard"
+						onclick={handleDiscardSession}
+					>
 						Discard
 					</button>
 				</div>
 			</div>
 		{/if}
 	{:else}
-		<div class="app-loading" aria-busy="true" aria-label="Loading CosmicWorkOut">
-			<div class="app-loading__spinner" role="status">
+		<div
+			class="app-loading"
+			aria-busy="true"
+			aria-label="Loading CosmicWorkOut"
+		>
+			<div
+				class="app-loading__spinner"
+				role="status"
+			>
 				<span class="sr-only">Loading…</span>
 			</div>
 		</div>

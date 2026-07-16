@@ -53,21 +53,32 @@
 	<PageHeader title="Practice" />
 
 	{#if !programStore.loaded}
-		<div class="practice-page__loading" aria-busy="true">
+		<div
+			class="practice-page__loading"
+			aria-busy="true"
+		>
 			<div class="practice-page__spinner"></div>
 		</div>
 	{:else if programStore.activeGroups.length === 0}
 		<section class="practice-empty">
 			<h2 class="practice-empty__title">Choose what you practice</h2>
 			<p class="practice-empty__body">
-				Nothing is turned on yet. Add a workout or dance plan when you're ready — you can pause or add more anytime.
+				Nothing is turned on yet. Add a workout or dance plan when you're ready — you can pause or
+				add more anytime.
 			</p>
 			<div class="practice-empty__actions">
-				<button class="practice-empty__btn" type="button" onclick={() => (showAddPractice = true)}>
+				<button
+					class="practice-empty__btn"
+					type="button"
+					onclick={() => (showAddPractice = true)}
+				>
 					Add practice
 				</button>
 				{#if goalsEnabled}
-					<a class="practice-empty__goal" href={resolve('/goals/new')}>Start a goal plan</a>
+					<a
+						class="practice-empty__goal"
+						href={resolve('/goals/new')}>Start a goal plan</a
+					>
 					<p class="practice-empty__goal-hint">
 						Build toward a specific lift (e.g. bench 250×5) with an auto-generated wave.
 					</p>
@@ -77,16 +88,30 @@
 	{:else}
 		<div class="practice-page__toolbar">
 			{#if goalsEnabled}
-				<a class="practice-page__goals" href={resolve('/goals')}>Goal plans</a>
+				<a
+					class="practice-page__goals"
+					href={resolve('/goals')}>Goal plans</a
+				>
 			{/if}
-			<button class="practice-page__add" type="button" onclick={() => (showAddPractice = true)}> Add practice </button>
+			<button
+				class="practice-page__add"
+				type="button"
+				onclick={() => (showAddPractice = true)}
+			>
+				Add practice
+			</button>
 		</div>
 
 		<div class="practice-page__cards">
 			{#each programStore.activeGroups as group (group.id)}
 				{@const plans = programStore.activeProgramsForGroup(group.id)}
 				{@const info = groupSummary(group.id)}
-				<PracticeGroupCard {group} planCount={plans.length} summary={info.summary} meta={info.meta} />
+				<PracticeGroupCard
+					{group}
+					planCount={plans.length}
+					summary={info.summary}
+					meta={info.meta}
+				/>
 			{/each}
 		</div>
 	{/if}

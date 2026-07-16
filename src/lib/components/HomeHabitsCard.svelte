@@ -14,7 +14,12 @@
 	});
 </script>
 
-<HomeCard href="/habits" title="Habits" {ariaLabel} variant="habits">
+<HomeCard
+	href="/habits"
+	title="Habits"
+	{ariaLabel}
+	variant="habits"
+>
 	{#if total === 0}
 		<p class="home-habits-card__empty">Add habits in Settings to get started.</p>
 	{:else}

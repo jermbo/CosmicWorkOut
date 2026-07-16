@@ -87,13 +87,20 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="92dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="92dvh"
+>
 	<div class="item-form">
 		<div class="item-form__header">
 			<h2 class="item-form__title">
 				{#if item}Edit Item{:else}New Item{/if}
 			</h2>
-			<button class="item-form__close" onclick={onClose} aria-label="Close">
+			<button
+				class="item-form__close"
+				onclick={onClose}
+				aria-label="Close"
+			>
 				<svg
 					viewBox="0 0 24 24"
 					fill="none"
@@ -102,8 +109,18 @@
 					stroke-linecap="round"
 					aria-hidden="true"
 				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
+					<line
+						x1="18"
+						y1="6"
+						x2="6"
+						y2="18"
+					/>
+					<line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"
+					/>
 				</svg>
 			</button>
 		</div>
@@ -115,8 +132,14 @@
 				handleSave();
 			}}
 		>
-			<div class="form-field" class:form-field--error={errors.name}>
-				<label class="form-field__label" for="item-name">Name</label>
+			<div
+				class="form-field"
+				class:form-field--error={errors.name}
+			>
+				<label
+					class="form-field__label"
+					for="item-name">Name</label
+				>
 				<input
 					id="item-name"
 					class="form-field__input"
@@ -129,7 +152,10 @@
 			</div>
 
 			<div class="form-field">
-				<label class="form-field__label" for="item-cue">Cue <span class="form-field__optional">optional</span></label>
+				<label
+					class="form-field__label"
+					for="item-cue">Cue <span class="form-field__optional">optional</span></label
+				>
 				<input
 					id="item-cue"
 					class="form-field__input"
@@ -141,8 +167,15 @@
 			</div>
 
 			<div class="form-field">
-				<span class="form-field__label" id="item-section-label">Section</span>
-				<div class="chips" role="radiogroup" aria-labelledby="item-section-label">
+				<span
+					class="form-field__label"
+					id="item-section-label">Section</span
+				>
+				<div
+					class="chips"
+					role="radiogroup"
+					aria-labelledby="item-section-label"
+				>
 					{#each sections as s (s.key)}
 						<button
 							type="button"
@@ -159,9 +192,19 @@
 				<span class="form-field__hint">Logged as: {metricHint()}</span>
 			</div>
 
-			<div class="form-field" class:form-field--error={errors.focus}>
-				<span class="form-field__label" id="item-focus-label">Focus</span>
-				<div class="chips" role="group" aria-labelledby="item-focus-label">
+			<div
+				class="form-field"
+				class:form-field--error={errors.focus}
+			>
+				<span
+					class="form-field__label"
+					id="item-focus-label">Focus</span
+				>
+				<div
+					class="chips"
+					role="group"
+					aria-labelledby="item-focus-label"
+				>
 					{#each FOCUS_TAGS as tag (tag)}
 						<button
 							type="button"
@@ -177,7 +220,12 @@
 				{#if errors.focus}<span class="form-field__error">{errors.focus}</span>{/if}
 			</div>
 
-			<button type="submit" class="item-form__submit" disabled={saving} aria-busy={saving}>
+			<button
+				type="submit"
+				class="item-form__submit"
+				disabled={saving}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if item}Save changes{:else}Add item{/if}
 			</button>
 		</form>

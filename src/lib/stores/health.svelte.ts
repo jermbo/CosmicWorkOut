@@ -26,7 +26,10 @@ class HealthStore {
 	/** All BP readings for a date, ordered by time recorded. */
 	bloodPressureForDate(date: string): (HealthReading & { values: BloodPressureValues })[] {
 		return this.readings
-			.filter((r): r is HealthReading & { values: BloodPressureValues } => r.date === date && isBloodPressureReading(r))
+			.filter(
+				(r): r is HealthReading & { values: BloodPressureValues } =>
+					r.date === date && isBloodPressureReading(r),
+			)
 			.sort((a, b) => a.recordedAt.localeCompare(b.recordedAt));
 	}
 

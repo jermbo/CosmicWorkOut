@@ -50,12 +50,16 @@
 			liveDisciplineId: liveDiscipline,
 			liveRoutineName: sessionStore.active?.routineName ?? null,
 			sessionsForProgram: (programId, date) => programStore.sessionForProgramDate(programId, date),
-			suggestedRoutineForProgram: (programId) => programStore.suggestedRoutineInCurrentWeekForProgram(programId),
+			suggestedRoutineForProgram: (programId) =>
+				programStore.suggestedRoutineInCurrentWeekForProgram(programId),
 		}),
 	);
 
 	let weekIndicators = $derived.by(() => {
-		const indicators: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>> = {};
+		const indicators: Record<
+			string,
+			Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>
+		> = {};
 
 		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'health') {
 			if (!indicators[date]) indicators[date] = [];
@@ -103,7 +107,10 @@
 	</PageHeader>
 
 	<div class="home-cards">
-		<HomeHabitsCard logged={habitsLogged} total={habitsTotal} />
+		<HomeHabitsCard
+			logged={habitsLogged}
+			total={habitsTotal}
+		/>
 		<HomePracticeHubCard
 			completedCount={practiceNextUp.completedCount}
 			live={practiceNextUp.live}
@@ -112,7 +119,10 @@
 		/>
 		<HomeActivityCard activities={dateActivities} />
 		{#if healthEnabled}
-			<HomeHealthCard weight={dateWeight} latestBp={dateLatestBp} />
+			<HomeHealthCard
+				weight={dateWeight}
+				latestBp={dateLatestBp}
+			/>
 		{/if}
 	</div>
 </div>

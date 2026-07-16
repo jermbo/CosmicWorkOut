@@ -64,7 +64,11 @@
 </svelte:head>
 
 <div class="page page--wide goals-page">
-	<PageHeader title="Goal plans" showBack backHref="/practice/workout" />
+	<PageHeader
+		title="Goal plans"
+		showBack
+		backHref="/practice/workout"
+	/>
 
 	{#if !prefsStore.goalProgressionPlansEnabled}
 		<section class="goals-disabled">
@@ -73,7 +77,10 @@
 		</section>
 	{:else}
 		<div class="goals-page__toolbar">
-			<a class="goals-page__new" href={resolve('/goals/new')}>New goal plan</a>
+			<a
+				class="goals-page__new"
+				href={resolve('/goals/new')}>New goal plan</a
+			>
 		</div>
 
 		{#if activePlan}
@@ -101,9 +108,13 @@
 			<section class="goals-empty">
 				<p class="goals-empty__title">No active goal plan</p>
 				<p class="goals-empty__body">
-					Set a goal — like bench 250×5 — and get a generated multi-month wave plan that builds toward it.
+					Set a goal — like bench 250×5 — and get a generated multi-month wave plan that builds
+					toward it.
 				</p>
-				<a class="goals-empty__cta" href={resolve('/goals/new')}>Create your first goal plan</a>
+				<a
+					class="goals-empty__cta"
+					href={resolve('/goals/new')}>Create your first goal plan</a
+				>
 			</section>
 		{/if}
 
@@ -150,8 +161,8 @@
 		onconfirm={handleConfirm}
 		oncancel={() => (confirmAction = null)}
 	>
-		The current 4-week block restarts from week 1 with its original targets. Nothing you've logged is changed — the plan
-		just takes longer.
+		The current 4-week block restarts from week 1 with its original targets. Nothing you've logged
+		is changed — the plan just takes longer.
 	</ConfirmDialog>
 {:else if confirmAction === 'pause'}
 	<ConfirmDialog
@@ -160,8 +171,8 @@
 		onconfirm={handleConfirm}
 		oncancel={() => (confirmAction = null)}
 	>
-		The plan holds its block and week until you resume. Resting between sessions doesn't need a pause — the plan never
-		moves on its own.
+		The plan holds its block and week until you resume. Resting between sessions doesn't need a
+		pause — the plan never moves on its own.
 	</ConfirmDialog>
 {:else if confirmAction === 'complete'}
 	<ConfirmDialog
@@ -170,7 +181,8 @@
 		onconfirm={handleConfirm}
 		oncancel={() => (confirmAction = null)}
 	>
-		The stint ends and becomes read-only history. Starting the same goal again later creates a fresh plan instance.
+		The stint ends and becomes read-only history. Starting the same goal again later creates a fresh
+		plan instance.
 	</ConfirmDialog>
 {/if}
 

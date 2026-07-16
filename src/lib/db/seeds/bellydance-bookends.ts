@@ -112,5 +112,10 @@ export const bellyDanceBookendSeeds: BellyDanceBookendSeed[] = [
 ];
 
 /** Shared warm-up and cool-down lists used by every course program. */
-export const SHARED_WARM_UP = ['bd-wu-neck-shoulders', 'bd-wu-hip-circles', 'bd-wu-rib-slides', 'bd-wu-wrist-circles'];
+export const SHARED_WARM_UP = [
+	'bd-wu-neck-shoulders',
+	'bd-wu-hip-circles',
+	'bd-wu-rib-slides',
+	'bd-wu-wrist-circles',
+];
 export const SHARED_COOL_DOWN = ['bd-cd-side-stretch', 'bd-cd-deep-breathing', 'bd-cd-hip-openers'];

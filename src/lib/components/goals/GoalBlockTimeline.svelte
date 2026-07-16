@@ -36,7 +36,10 @@
 			<span class="timeline-block__label">
 				B{b.blockNumber}
 				{#if plan.repeatEvents.some((r) => r.blockNumber === b.blockNumber)}
-					<span class="timeline-block__repeat" title="Block repeated">↻</span>
+					<span
+						class="timeline-block__repeat"
+						title="Block repeated">↻</span
+					>
 				{/if}
 			</span>
 		</div>

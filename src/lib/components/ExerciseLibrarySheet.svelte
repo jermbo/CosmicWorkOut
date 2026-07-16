@@ -75,12 +75,19 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="85dvh">
+<BottomSheet
+	onclose={onClose}
+	maxHeight="85dvh"
+>
 	<div class="lib-sheet">
 		<div class="lib-sheet__header">
 			<h2 class="lib-sheet__title">Exercise Library</h2>
 			<div class="lib-sheet__header-actions">
-				<button class="lib-sheet__add-btn" onclick={() => (formExercise = null)} aria-label="Add custom exercise">
+				<button
+					class="lib-sheet__add-btn"
+					onclick={() => (formExercise = null)}
+					aria-label="Add custom exercise"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -89,12 +96,26 @@
 						stroke-linecap="round"
 						aria-hidden="true"
 					>
-						<line x1="12" y1="5" x2="12" y2="19" />
-						<line x1="5" y1="12" x2="19" y2="12" />
+						<line
+							x1="12"
+							y1="5"
+							x2="12"
+							y2="19"
+						/>
+						<line
+							x1="5"
+							y1="12"
+							x2="19"
+							y2="12"
+						/>
 					</svg>
 					New
 				</button>
-				<button class="lib-sheet__close" onclick={onClose} aria-label="Close library">
+				<button
+					class="lib-sheet__close"
+					onclick={onClose}
+					aria-label="Close library"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -103,8 +124,18 @@
 						stroke-linecap="round"
 						aria-hidden="true"
 					>
-						<line x1="18" y1="6" x2="6" y2="18" />
-						<line x1="6" y1="6" x2="18" y2="18" />
+						<line
+							x1="18"
+							y1="6"
+							x2="6"
+							y2="18"
+						/>
+						<line
+							x1="6"
+							y1="6"
+							x2="18"
+							y2="18"
+						/>
 					</svg>
 				</button>
 			</div>
@@ -121,8 +152,17 @@
 				stroke-linejoin="round"
 				aria-hidden="true"
 			>
-				<circle cx="11" cy="11" r="8" />
-				<line x1="21" y1="21" x2="16.65" y2="16.65" />
+				<circle
+					cx="11"
+					cy="11"
+					r="8"
+				/>
+				<line
+					x1="21"
+					y1="21"
+					x2="16.65"
+					y2="16.65"
+				/>
 			</svg>
 			<input
 				class="lib-sheet__search-input"
@@ -133,7 +173,11 @@
 			/>
 		</div>
 
-		<div class="lib-sheet__cats" role="group" aria-label="Filter by category">
+		<div
+			class="lib-sheet__cats"
+			role="group"
+			aria-label="Filter by category"
+		>
 			{#each CATS as cat (cat)}
 				<button
 					class="lib-cat-chip"
@@ -153,9 +197,20 @@
 			{#each filtered as ex (ex.id)}
 				{@const dot = CAT_COLORS[ex.cat ?? ''] ?? 'var(--color-accent)'}
 				{@const isOpen = expandedId === ex.id}
-				<div class="lib-row" class:lib-row--open={isOpen}>
-					<button class="lib-row__main" onclick={() => toggleExpand(ex.id)} aria-expanded={isOpen}>
-						<span class="lib-row__dot" style:background={dot} aria-hidden="true"></span>
+				<div
+					class="lib-row"
+					class:lib-row--open={isOpen}
+				>
+					<button
+						class="lib-row__main"
+						onclick={() => toggleExpand(ex.id)}
+						aria-expanded={isOpen}
+					>
+						<span
+							class="lib-row__dot"
+							style:background={dot}
+							aria-hidden="true"
+						></span>
 						<div class="lib-row__info">
 							<span class="lib-row__name">
 								{ex.name}
@@ -165,7 +220,10 @@
 							</span>
 							<span class="lib-row__muscles">{ex.muscles}</span>
 						</div>
-						<span class="lib-row__cat" style:--dot-color={dot}>{ex.cat}</span>
+						<span
+							class="lib-row__cat"
+							style:--dot-color={dot}>{ex.cat}</span
+						>
 						<span class="lib-row__sets">{ex.defaultSets}×{ex.defaultReps}</span>
 						<svg
 							class="lib-row__chevron"
@@ -205,13 +263,27 @@
 										stroke-linecap="round"
 										aria-hidden="true"
 									>
-										<line x1="12" y1="5" x2="12" y2="19" />
-										<line x1="5" y1="12" x2="19" y2="12" />
+										<line
+											x1="12"
+											y1="5"
+											x2="12"
+											y2="19"
+										/>
+										<line
+											x1="5"
+											y1="12"
+											x2="19"
+											y2="12"
+										/>
 									</svg>
 									Add to workout
 								</button>
 								{#if !ex.isBuiltIn}
-									<button class="lib-row__edit" onclick={() => (formExercise = ex)} aria-label="Edit {ex.name}">
+									<button
+										class="lib-row__edit"
+										onclick={() => (formExercise = ex)}
+										aria-label="Edit {ex.name}"
+									>
 										<svg
 											viewBox="0 0 24 24"
 											fill="none"
@@ -232,7 +304,11 @@
 										>
 											Sure?
 										</button>
-										<button class="lib-row__delete" onclick={() => (confirmDeleteId = null)} aria-label="Cancel delete">
+										<button
+											class="lib-row__delete"
+											onclick={() => (confirmDeleteId = null)}
+											aria-label="Cancel delete"
+										>
 											<svg
 												viewBox="0 0 24 24"
 												fill="none"
@@ -241,12 +317,26 @@
 												stroke-linecap="round"
 												aria-hidden="true"
 											>
-												<line x1="18" y1="6" x2="6" y2="18" />
-												<line x1="6" y1="6" x2="18" y2="18" />
+												<line
+													x1="18"
+													y1="6"
+													x2="6"
+													y2="18"
+												/>
+												<line
+													x1="6"
+													y1="6"
+													x2="18"
+													y2="18"
+												/>
 											</svg>
 										</button>
 									{:else}
-										<button class="lib-row__delete" onclick={() => deleteExercise(ex)} aria-label="Delete {ex.name}">
+										<button
+											class="lib-row__delete"
+											onclick={() => deleteExercise(ex)}
+											aria-label="Delete {ex.name}"
+										>
 											<svg
 												viewBox="0 0 24 24"
 												fill="none"
@@ -273,7 +363,10 @@
 </BottomSheet>
 
 {#if formExercise !== undefined}
-	<ExerciseFormSheet exercise={formExercise} onClose={() => (formExercise = undefined)} />
+	<ExerciseFormSheet
+		exercise={formExercise}
+		onClose={() => (formExercise = undefined)}
+	/>
 {/if}
 
 <style>

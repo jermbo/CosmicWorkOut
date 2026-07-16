@@ -97,7 +97,11 @@ export function xLabelsFor(dates: string[]): string[] {
 	});
 }
 
-export function computeRange(key: RangeKey, cs: string, ce: string): { start: string; end: string } {
+export function computeRange(
+	key: RangeKey,
+	cs: string,
+	ce: string,
+): { start: string; end: string } {
 	const today = new Date();
 	const todayStr = toLocalIso(today);
 	switch (key) {
@@ -109,9 +113,15 @@ export function computeRange(key: RangeKey, cs: string, ce: string): { start: st
 			return { start: toLocalIso(d), end: todayStr };
 		}
 		case 'mtd':
-			return { start: toLocalIso(new Date(today.getFullYear(), today.getMonth(), 1)), end: todayStr };
+			return {
+				start: toLocalIso(new Date(today.getFullYear(), today.getMonth(), 1)),
+				end: todayStr,
+			};
 		case 'ytd':
-			return { start: toLocalIso(new Date(today.getFullYear(), 0, 1)), end: todayStr };
+			return {
+				start: toLocalIso(new Date(today.getFullYear(), 0, 1)),
+				end: todayStr,
+			};
 		case 'custom':
 			return { start: cs, end: ce };
 	}
@@ -135,7 +145,19 @@ export function chartTheme() {
 		autoSkip: true,
 		maxRotation: 0,
 	};
-	const legendOpts = { color: textPrimary, font: { family: fontBody, size: 12 } };
+	const legendOpts = {
+		color: textPrimary,
+		font: { family: fontBody, size: 12 },
+	};
 
-	return { accent, textPrimary, textSecondary, borderColor, fontBody, gridOpts, tickOpts, legendOpts };
+	return {
+		accent,
+		textPrimary,
+		textSecondary,
+		borderColor,
+		fontBody,
+		gridOpts,
+		tickOpts,
+		legendOpts,
+	};
 }

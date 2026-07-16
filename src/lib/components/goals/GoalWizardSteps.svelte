@@ -10,7 +10,10 @@
 	let { step, stepIndex }: Props = $props();
 </script>
 
-<ol class="goal-steps" aria-label="Plan creation steps">
+<ol
+	class="goal-steps"
+	aria-label="Plan creation steps"
+>
 	{#each WIZARD_STEPS as s, i (s)}
 		<li
 			class="goal-steps__item"

@@ -1,4 +1,9 @@
-import type { HealthMetricId, HealthReading, WeightValues, BloodPressureValues } from '$lib/db/types';
+import type {
+	HealthMetricId,
+	HealthReading,
+	WeightValues,
+	BloodPressureValues,
+} from '$lib/db/types';
 import { addDays } from '$lib/date';
 
 export type MetricCardinality = 'single' | 'multiple';
@@ -23,7 +28,9 @@ export function getMetricDef(id: HealthMetricId): HealthMetricDef | undefined {
 	return HEALTH_METRICS.find((m) => m.id === id);
 }
 
-export function isWeightReading(reading: HealthReading): reading is HealthReading & { values: WeightValues } {
+export function isWeightReading(
+	reading: HealthReading,
+): reading is HealthReading & { values: WeightValues } {
 	return reading.metricId === 'weight';
 }
 
@@ -79,7 +86,9 @@ export function rollingBpAverage(
 ): { systolic: number; diastolic: number } | null {
 	const cutoffStr = addDays(today, -(days - 1));
 
-	const dailies = bloodPressureDailyAverages(readings).filter((d) => d.date >= cutoffStr && d.date <= today);
+	const dailies = bloodPressureDailyAverages(readings).filter(
+		(d) => d.date >= cutoffStr && d.date <= today,
+	);
 	if (dailies.length === 0) return null;
 
 	const sys = dailies.reduce((s, d) => s + d.systolic, 0) / dailies.length;

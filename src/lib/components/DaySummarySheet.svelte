@@ -28,7 +28,10 @@
 			.map((log) => {
 				const habit = habitStore.habits.find((h) => h.id === log.habitId);
 				if (!habit) return null;
-				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
+				return {
+					name: habit.name,
+					valueStr: formatHabitLogValue(habit, log.value),
+				};
 			})
 			.filter((e): e is { name: string; valueStr: string } => e !== null);
 	});
@@ -76,7 +79,10 @@
 				<span class="day-summary__stat-value">{formatDuration(session.durationSeconds ?? 0)}</span>
 				<span class="day-summary__stat-label">Duration</span>
 			</div>
-			<div class="day-summary__stat-sep" aria-hidden="true"></div>
+			<div
+				class="day-summary__stat-sep"
+				aria-hidden="true"
+			></div>
 			<div class="day-summary__stat">
 				<span class="day-summary__stat-value">{session.items.length}</span>
 				<span class="day-summary__stat-label"
@@ -84,7 +90,10 @@
 				>
 			</div>
 			{#if !isDance}
-				<div class="day-summary__stat-sep" aria-hidden="true"></div>
+				<div
+					class="day-summary__stat-sep"
+					aria-hidden="true"
+				></div>
 				<div class="day-summary__stat">
 					<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
 					<span class="day-summary__stat-label">lb lifted</span>
@@ -111,14 +120,18 @@
 									{/if}
 								</span>
 							{:else}
-								<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
+								<span class="day-summary__exercise-sets"
+									>{formatCountWithWord(loggedEx.sets.length, 'set')}</span
+								>
 							{/if}
 						</div>
 						{#if !isDance && loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
 								{#if typeof loggedEx.sets[0].weight === 'number' && loggedEx.sets[0].weight > 0}
 									Top: {Math.max(
-										...loggedEx.sets.filter((s) => typeof s.weight === 'number').map((s) => s.weight as number),
+										...loggedEx.sets
+											.filter((s) => typeof s.weight === 'number')
+											.map((s) => s.weight as number),
 									)} lb
 								{:else if typeof loggedEx.sets[0].weight === 'string'}
 									{loggedEx.sets[0].weight}
@@ -145,8 +158,16 @@
 		{/if}
 
 		<div class="day-summary__actions">
-			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
-			<button class="day-summary__delete-btn" onclick={() => (showDeleteConfirm = true)}> Delete </button>
+			<button
+				class="day-summary__edit-btn"
+				onclick={handleEdit}>Edit session</button
+			>
+			<button
+				class="day-summary__delete-btn"
+				onclick={() => (showDeleteConfirm = true)}
+			>
+				Delete
+			</button>
 		</div>
 	</div>
 

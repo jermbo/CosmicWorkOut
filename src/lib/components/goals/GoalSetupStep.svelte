@@ -17,8 +17,8 @@
 </script>
 
 <p class="lead">
-	How do you want the week built around <strong>{focusItem.name}</strong>? This is not a full powerlifting split —
-	other max lifts stay out unless you add them.
+	How do you want the week built around <strong>{focusItem.name}</strong>? This is not a full
+	powerlifting split — other max lifts stay out unless you add them.
 </p>
 <div class="template-list">
 	<button

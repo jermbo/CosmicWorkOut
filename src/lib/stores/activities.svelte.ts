@@ -9,7 +9,9 @@ const LAST_TYPE_KEY = 'cwout:lastActivityType';
 class ActivityStore {
 	activities = $state<ActivityLog[]>([]);
 	loaded = $state(false);
-	lastUsedType = $state<ActivityType>((localStorage.getItem(LAST_TYPE_KEY) as ActivityType | null) ?? 'Run');
+	lastUsedType = $state<ActivityType>(
+		(localStorage.getItem(LAST_TYPE_KEY) as ActivityType | null) ?? 'Run',
+	);
 
 	todayStr(): string {
 		return todayIso();

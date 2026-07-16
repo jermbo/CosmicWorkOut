@@ -17,7 +17,16 @@
 		children: Snippet;
 	};
 
-	let { href, title, ariaLabel, variant, done = false, active = false, badge = null, children }: Props = $props();
+	let {
+		href,
+		title,
+		ariaLabel,
+		variant,
+		done = false,
+		active = false,
+		badge = null,
+		children,
+	}: Props = $props();
 </script>
 
 <a
@@ -38,10 +47,16 @@
 				<span class="home-card__badge home-card__badge--{badge}">
 					{#if badge === 'live'}Live{:else}Done{/if}
 				</span>
-				<Icon name="chevron-right" size={18} />
+				<Icon
+					name="chevron-right"
+					size={18}
+				/>
 			</div>
 		{:else}
-			<Icon name="chevron-right" size={18} />
+			<Icon
+				name="chevron-right"
+				size={18}
+			/>
 		{/if}
 	</div>
 	{@render children()}
