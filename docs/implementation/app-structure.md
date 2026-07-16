@@ -105,7 +105,7 @@ sequenceDiagram
 6. `activityStore.load()` — load all activity logs
 7. `healthStore.load()` — load health readings _(US-029)_
 8. `sessionStore.checkForRecovery()` — flag recoverable session if from today
-9. Set `appReady = true` → render app
+9. Set `appReady = true` → render app (or a reload prompt if boot threw — corrupt prefs fall back to defaults and do not block startup)
 
 ---
 
@@ -181,6 +181,8 @@ These render above any route — the user never navigates away during a session:
 ## Related
 
 - [How It Works](behavior.md) — What happens on each screen
+- [System Overview](../architecture/overview.md) — Architecture at a glance
 - [Components](components.md) — What each component does
 - [State Management](state.md) — Store boot and data flow
+- [Implementation Status](status.md) — Built vs deferred
 - [Dev Guide](dev-guide.md) — Running the app locally

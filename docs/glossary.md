@@ -93,6 +93,7 @@ Two program **flavors** exist for Strength today:
 | **Goal progression plan** _(v1.9.0)_          | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Goal progression plan](#goal-progression-plan) |
 
 ### Goal progression plan _(v1.9.0)_
+<a id="goal-progression-plan"></a>
 
 A Strength program type where the user sets a **focus exercise** and a **goal** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench Goal 01 vs Bench Goal 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
 
@@ -170,7 +171,7 @@ One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight:
 
 ## Naming map (original → current)
 
-The v1.4.0 generalization renamed the strength-only entities. These old names no longer appear in the code.
+The v1.4.0 generalization renamed the strength-only **data entities**. The old names no longer exist as stored types or interfaces, though "Exercise" and "Workout" still appear as UI copy and component/route identifiers (e.g. `ExerciseCard`, `WorkoutPicker`, `/workout`).
 
 | Original             | Current                            | Why                                              |
 | -------------------- | ---------------------------------- | ------------------------------------------------ |
@@ -185,6 +186,8 @@ The v1.4.0 generalization renamed the strength-only entities. These old names no
 ## Related
 
 - [North Star](vision/north-star.md) — product identity
+- [How It Works](implementation/behavior.md) — these terms in everyday app behavior
 - [Data Model](architecture/data-model.md) — the entities behind these terms
+- [US-033 — Goal Progression Plans](features/v1.9.0/US-033-goal-progression-plans.md) — wave-loading Strength stints
 - [US-029 — Health Metrics](features/v1.7.0/US-029-health-metrics.md) — optional body measurements
 - [v1.4.0 — Belly Dance](features/v1.4.0/README.md) — first Discipline beyond strength

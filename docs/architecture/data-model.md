@@ -43,7 +43,7 @@ Belly Dance's `warm-up` and `cool-down` are **bookends** — routines other than
 
 ### Active program is per-Discipline
 
-There is **one active program per Discipline** — a Strength program and a Belly Dance program can be active at the same time. The user runs them concurrently (strength on some days, dance on others); the app does **not** bind a Discipline to days of the week. All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive per Discipline, and "one session per program per day" is enforced per Discipline. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
+The model is **one active program per Discipline** — a Strength program and a Belly Dance program can be active at the same time. The user runs them concurrently (strength on some days, dance on others); the app does **not** bind a Discipline to days of the week. Note this is a soft convention, not a hard invariant: `activeProgramIds` is a flat array, `setActiveProgram()` appends without deactivating another program of the same Discipline, and `activeProgramFor()` returns the first match — so a second same-Discipline activation is possible and only the first takes effect. (Tracked as a correctness item in the [hardening audit](../maintenance/audit-2026-07-hardening.md#correctness-deferred).) All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive per Discipline, and "one session per program per day" is enforced per Discipline. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
 
 ---
 
@@ -246,14 +246,14 @@ type Habit = {
 };
 
 type HabitLog = {
-	id: string; // composite: "habitId_dateStr"
+	id: string; // composite: "habitId:date" (colon-separated, ISO date)
 	habitId: string;
 	date: string; // ISO date
 	value: number; // 0/1 for boolean; -5..+5 for mood; count for others
 };
 ```
 
-Six built-in trackable habits plus **Mood** (always on) ship in `seed.ts`. Seeded when the `habits` store is empty on first run — no habit field migration; use a `DB_VERSION` wipe when built-ins change. See [US-031](../features/v1.7.0/US-031-default-habits-tweak.md).
+Five built-in trackable habits (Water, Coffee, Meditation, Writing, Reading) plus **Mood** (always on) ship in `seed.ts` — six total. Seeded only when the `habits` store is empty on first run; a legacy `duration`→`minutes` type migration runs inline on load. There is no automatic re-seed when built-ins change (the store already has rows). See [US-031](../features/v1.7.0/US-031-default-habits-tweak.md).
 
 ### ActivityLog
 
@@ -387,8 +387,8 @@ type UserPrefs = {
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
-	healthMetricsEnabled?: boolean; // default false — US-029
-	goalProgressionPlansEnabled?: boolean; // default false — US-033
+	healthMetricsEnabled: boolean; // default false — US-029
+	goalProgressionPlansEnabled: boolean; // default false — US-033
 };
 ```
 
@@ -427,9 +427,9 @@ erDiagram
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **9** today. The upgrade path is **wipe-and-reseed** (pre-beta, no users): every store is dropped and recreated on a version bump, then `initDB()` re-seeds built-in content.
+DB name `cosmic-workout`, version **9** today. The upgrade path is **non-destructive**: `onupgradeneeded` creates only the stores and indexes that don't already exist (via idempotent `ensureStore` / `ensureIndex` helpers) and never drops user data. Future schema changes append new store/index creation plus, where needed, data transforms keyed on `event.oldVersion`. See the [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16) for why this replaced the earlier wipe-on-bump behavior.
 
-**Version history:**
+**Version history** (bumps up to v9 predate the non-destructive upgrade and ran under the old wipe-and-reseed path; from now on bumps preserve data):
 
 | Version     | Change                                                                                                                                                                               |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -465,7 +465,7 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 | `cwout:activeProgramIds` | Active program id per Discipline                                   |
 | `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset) |
 | `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)              |
-| `cwout:habitDay`         | Selected day on the habit log                                      |
+| `cwout:habitDay`         | Written to today's date on habit-store load; not currently read (vestigial) |
 
 ---
 

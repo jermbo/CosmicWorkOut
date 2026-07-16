@@ -134,6 +134,6 @@ so that I can track hydration throughout the day without breaking my flow.
 
 ### Related Docs
 
-- [Data Model](../../docs/architecture/data-model.md)
+- [Data Model](../../architecture/data-model.md)
 - [US-004 — Habit Tracking](./US-004-habit-tracking.md)
 ```

@@ -10,7 +10,7 @@ Verified against the codebase (July 2026).
 
 | Feature                                                   | Status | Notes                                                                     |
 | --------------------------------------------------------- | ------ | ------------------------------------------------------------------------- |
-| Today view + start session                                | Built  | Home card navigates to `/workout`; workout page handles start/edit        |
+| Today view + start session                                | Built  | Home practice card navigates to `/practice`; workout page handles start/edit |
 | Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry          |
 | Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                  |
 | Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                |
@@ -24,7 +24,7 @@ Verified against the codebase (July 2026).
 | Calendar + day summary                                    | Built  | Month grid, tap completed days                                            |
 | IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                |
 | Preferences store                                         | Built  | Accent, density, roundness, weight unit                                   |
-| Settings UI                                               | Built  | `/settings` hub + `appearance`/`habits`/`data` sub-routes (US-030)        |
+| Settings UI                                               | Built  | `/settings` hub + `habits`/`data` sub-routes (US-030)                     |
 | Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating              |
 | Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks |
 | Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program          |
@@ -113,7 +113,7 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 | Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                    |
 | Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) Phase 1 — JSON export/import on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
 | Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                                    |
-| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/appearance`, `/habits`, `/data`                                                |
+| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults) |
 | Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                   |
 
 ---
@@ -151,8 +151,8 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md).
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
 - **121 items:** 72 strength exercises + 39 belly dance moves + 10 bookend (warm-up/cool-down) items, all derived from catalog seeds (`db/seeds/`).
 - **8 strength categories** (body-part): Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body.
-- **6 built-in trackable habits** + mood (always on): Water, Coffee, Meditation, Writing, Reading, Mood.
-- Items and programs are **upserted on every boot**; habits seed on first run only. Content updates ride the `DB_VERSION` bump (wipe + re-seed). See [Data Model](../architecture/data-model.md).
+- **5 built-in trackable habits** + Mood (always on): Water, Coffee, Meditation, Writing, Reading, plus Mood.
+- Items and programs are **upserted on every boot**; habits seed on first run only. Schema upgrades are **non-destructive** (no wipe) — new stores/indexes are added idempotently and user data is preserved. See [Data Model](../architecture/data-model.md#indexeddb-stores).
 
 ---
 
@@ -160,8 +160,11 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md).
 
 - [Roadmap](../roadmap/README.md) — Deferred and future ideas
 - [How It Works](behavior.md) — Full behavioral mental model
+- [Glossary](../glossary.md) — Shared vocabulary
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
+- [v1.9.0 Features](../features/v1.9.0/README.md) — Goal progression plans (shipped)
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)
 - [v1.4.0 Features](../features/v1.4.0/README.md) — Discipline model (shipped)
+- [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md) — Known deferred concerns

@@ -70,9 +70,16 @@ flowchart TB
     class HW,ST,AS,SM,PP,CO,DG impl;
 ```
 
-**New here?** Start with [North Star](vision/north-star.md) → [How It Works](implementation/behavior.md) → [System Overview](architecture/overview.md).
+**New here?** Follow one short trail, then click **Related** links at the bottom of each page:
 
-**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit — and the rule for where new movement types belong.
+1. [North Star](vision/north-star.md) — why this product exists
+2. [How It Works](implementation/behavior.md) — what the app does (no code)
+3. [System Overview](architecture/overview.md) — how the pieces fit
+4. [Implementation Status](implementation/status.md) — what's built today
+
+**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit, Goal plan — and the rule for where new movement types belong. Most concept pages link back to it.
+
+**Keeping the wiki honest:** relative links are checked by `npm run docs:links` (`scripts/check-doc-links.mjs`). When behavior or schema changes, update the docs in the same change — see [Documenting decisions](#documenting-decisions).
 
 ---
 
