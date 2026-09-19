@@ -6,6 +6,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
@@ -21,7 +22,9 @@
 
 	let { session, exerciseMap, onClose, onEdit, onDelete }: Props = $props();
 
-	let habitLogsForDay = $derived(habitStore.logsForDate(session.date));
+	let habitLogsForDay = $derived(
+		prefsStore.habitsEnabled ? habitStore.logsForDate(session.date) : [],
+	);
 
 	let habitEntries = $derived.by(() => {
 		return habitLogsForDay

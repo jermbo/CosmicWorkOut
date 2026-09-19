@@ -134,6 +134,8 @@ The shared warm-up and cool-down sections. Routine **A** defines the canonical l
 
 A lightweight record of a non-structured physical activity: a **type** (Run · Bike · Pickleball · Swim · Hike · Yoga · …), a **duration**, and an **intensity** (Easy · Moderate · Hard). No program, no routine, no session flow. This is where cardio and sports live — and where most "next things" will land.
 
+**Opt-in:** the activity log is gated by `activityLogEnabled` in Settings (default off); logged activities are kept when off.
+
 ### Activity type
 
 One value in the Activity type list. Adding one (e.g. Kayaking) is a config change, not architecture.
@@ -146,9 +148,11 @@ One value in the Activity type list. Adding one (e.g. Kayaking) is a config chan
 
 A daily trackable behavior with a **type** (`times · minutes · count · boolean · mood`), optional daily goal, and unit label.
 
+**Opt-in:** gated by `habitsEnabled` in Settings (default off); habits and their logs are kept when off. **Mood has no separate flag** — see [Habit log](#habit-log).
+
 ### Habit log
 
-One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)).
+One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)) — "always active" means it can't be deactivated _within_ Habits, not that it survives the `habitsEnabled` flag. Turning Habits off hides the mood strip, week-strip mood pips, History mood dot, and the Mood vs Habits chart too.
 
 ---
 

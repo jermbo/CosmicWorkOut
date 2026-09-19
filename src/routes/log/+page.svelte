@@ -4,6 +4,10 @@
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { formatActivitySummary } from '$lib/activities';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.activityLogEnabled);
 
 	let contextDate = $derived(loggingContext.date);
 

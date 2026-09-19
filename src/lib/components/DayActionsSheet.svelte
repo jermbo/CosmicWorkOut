@@ -90,6 +90,8 @@
 	});
 
 	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dayWeight = $derived(healthStore.weightForDate(date));
 	let dayBp = $derived(healthStore.bloodPressureForDate(date));
@@ -126,21 +128,23 @@
 		{/if}
 
 		<div class="day-actions__list">
-			<DayActionItem
-				icon="check"
-				label={habitsActionLabel}
-				description="Mood, water, meditation, and more"
-				onclick={() => navigate('/habits')}
-			/>
-
-			{#if hasHabits && onViewHabits}
+			{#if habitsEnabled}
 				<DayActionItem
 					icon="check"
-					label="View logged habits"
-					description="See what was logged on this day"
-					secondary
-					onclick={onViewHabits}
+					label={habitsActionLabel}
+					description="Mood, water, meditation, and more"
+					onclick={() => navigate('/habits')}
 				/>
+
+				{#if hasHabits && onViewHabits}
+					<DayActionItem
+						icon="check"
+						label="View logged habits"
+						description="See what was logged on this day"
+						secondary
+						onclick={onViewHabits}
+					/>
+				{/if}
 			{/if}
 
 			{#if practiceEnabled}
@@ -159,12 +163,14 @@
 				/>
 			{/if}
 
-			<DayActionItem
-				icon="plus"
-				label={activityActionLabel}
-				description="Runs, walks, yoga, and more"
-				onclick={() => navigate('/log')}
-			/>
+			{#if activityLogEnabled}
+				<DayActionItem
+					icon="plus"
+					label={activityActionLabel}
+					description="Runs, walks, yoga, and more"
+					onclick={() => navigate('/log')}
+				/>
+			{/if}
 
 			{#if healthEnabled}
 				<DayActionItem

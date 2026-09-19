@@ -36,6 +36,8 @@
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
 	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dateWeight = $derived(healthStore.weightForDate(contextDate));
@@ -81,13 +83,17 @@
 			}
 		}
 
-		for (const activity of activityStore.activities) {
-			add(activity.date, 'activity');
+		if (activityLogEnabled) {
+			for (const activity of activityStore.activities) {
+				add(activity.date, 'activity');
+			}
 		}
 
-		const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
-		for (const log of habitStore.logs) {
-			if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+		if (habitsEnabled) {
+			const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
+			for (const log of habitStore.logs) {
+				if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+			}
 		}
 
 		if (healthEnabled) {
@@ -117,11 +123,27 @@
 		{/snippet}
 	</PageHeader>
 
+	{#if !prefsStore.anyTrackingEnabled}
+		<div class="home-empty">
+			<p class="home-empty__msg">Nothing is being tracked yet.</p>
+			<p class="home-empty__hint">
+				Habits, Activity log, Practice, Health metrics, and Baselines are each opt-in — turn on what
+				you want to track.
+			</p>
+			<a
+				class="home-empty__link"
+				href={resolve('/settings')}>Choose what to track</a
+			>
+		</div>
+	{/if}
+
 	<div class="home-cards">
-		<HomeHabitsCard
-			logged={habitsLogged}
-			total={habitsTotal}
-		/>
+		{#if habitsEnabled}
+			<HomeHabitsCard
+				logged={habitsLogged}
+				total={habitsTotal}
+			/>
+		{/if}
 		{#if practiceEnabled}
 			<HomePracticeHubCard
 				completedCount={practiceNextUp.completedCount}
@@ -130,7 +152,9 @@
 				detail={practiceNextUp.detail}
 			/>
 		{/if}
-		<HomeActivityCard activities={dateActivities} />
+		{#if activityLogEnabled}
+			<HomeActivityCard activities={dateActivities} />
+		{/if}
 		{#if baselinesEnabled}
 			<HomeBaselinesCard
 				cleared={baselinesCleared}
@@ -155,6 +179,40 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
+	}
+
+	.home-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-8) var(--space-4);
+		text-align: center;
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		border-radius: var(--r-xl);
+	}
+
+	.home-empty__msg {
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 700;
+	}
+
+	.home-empty__hint {
+		max-inline-size: 42ch;
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+	}
+
+	.home-empty__link {
+		margin-block-start: var(--space-2);
+		padding: var(--space-3) var(--space-5);
+		border-radius: var(--radius-full);
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
+		font-size: 0.9375rem;
+		font-weight: 700;
 	}
 
 	@container page (inline-size >= 520px) {

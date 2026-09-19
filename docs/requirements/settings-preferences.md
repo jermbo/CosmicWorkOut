@@ -33,7 +33,7 @@ Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a sho
 
 | Route                 | Contents                                                                                             |
 | --------------------- | ---------------------------------------------------------------------------------------------------- |
-| `/settings`           | **Hub** — navigation rows + practice / lift-plan / health / baselines toggles                        |
+| `/settings`           | **Hub** — one toggle per tracking feature + navigation rows for their sub-pages                      |
 | `/settings/habits`    | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))           |
 | `/settings/baselines` | Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                               |
 | `/settings/data`      | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed |
@@ -41,9 +41,11 @@ Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a sho
 ```mermaid
 flowchart LR
     Hub["/settings"]
-    Hub --> Hab["/settings/habits"]
     Hub --> Base["/settings/baselines"]
     Hub --> Data["/settings/data"]
+    Hub -->|toggle| Habits[habitsEnabled]
+    Habits -->|nested| Hab["/settings/habits"]
+    Hub -->|toggle| Activity[activityLogEnabled]
     Hub -->|toggle| Practice[practiceEnabled]
     Practice -->|toggle, nested| Lift[goalProgressionPlansEnabled]
     Hub -->|toggle| Health[healthMetricsEnabled]
@@ -54,7 +56,7 @@ flowchart LR
     classDef toggle fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class Hub hub;
     class Hab,Base,Data route;
-    class Practice,Lift,Health,Baselines toggle;
+    class Habits,Activity,Practice,Lift,Health,Baselines toggle;
 ```
 
 The hub stays short; destructive and infrequent actions live on **Data & backup**. There is no appearance page — see the Appearance UI note above.
@@ -65,12 +67,18 @@ Every feature toggle defaults **off** and hides UI only — data always persists
 
 | Toggle                        | Covers                                                                  |
 | ----------------------------- | ----------------------------------------------------------------------- |
+| `habitsEnabled`               | Habits **and mood** — daily check-in, CRUD, dots, charts                |
+| `activityLogEnabled`          | The activity log — runs, walks, yoga, and other one-off activities      |
 | `practiceEnabled`             | The whole Practice / session engine, plus its History & Insights marks  |
 | `goalProgressionPlansEnabled` | Lift plans — **nested under Practice**; only shown while Practice is on |
 | `healthMetricsEnabled`        | Weight and blood pressure                                               |
 | `baselinesEnabled`            | Daily floors and ceilings                                               |
 
+**Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page, and History day cells are not tappable until at least one feature is on.
+
 Lift plans are nested because a plan can only be trained through `/workout`, which Practice owns. Code reads the derived `prefsStore.liftPlansEnabled` rather than and-ing the two flags.
+
+Mood has no toggle of its own — it is a protected habit, locked _inside_ Habits but hidden along with it.
 
 ---
 

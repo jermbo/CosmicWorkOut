@@ -5,6 +5,10 @@
 	import HabitRow from '$lib/components/HabitRow.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.habitsEnabled);
 
 	let showHabitForm = $state(false);
 	let editingHabit = $state<Habit | null>(null);

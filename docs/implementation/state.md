@@ -72,24 +72,33 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref                          | Default       | Applied via                          |
-| ----------------------------- | ------------- | ------------------------------------ |
-| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color |
-| `density`                     | `comfortable` | `data-density` on `<html>`           |
-| `roundness`                   | `default`     | `data-roundness` on `<html>`         |
-| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet      |
-| `practiceEnabled`             | `false`       | Gates the Practice engine (below)    |
-| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI       |
-| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI        |
-| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI    |
+| Pref                          | Default       | Applied via                           |
+| ----------------------------- | ------------- | ------------------------------------- |
+| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color  |
+| `density`                     | `comfortable` | `data-density` on `<html>`            |
+| `roundness`                   | `default`     | `data-roundness` on `<html>`          |
+| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet       |
+| `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI |
+| `activityLogEnabled`          | `false`       | Gates `/log` and related UI           |
+| `practiceEnabled`             | `false`       | Gates the Practice engine (below)     |
+| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI        |
+| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI         |
+| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI     |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 
 ### Feature flags hide UI; data always persists
 
-Every flag defaults **off** and only controls visibility — IndexedDB rows and localStorage keys are untouched, so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/goals` and `/baselines` additionally show a short "turned off" panel.
+**Every tracking feature is opt-in and defaults off** — Habits, Activity log, Practice, Health metrics, and Baselines. A flag only controls visibility: IndexedDB rows and localStorage keys are untouched (boot still runs every store's `load()` and `seedHabitsIfEmpty()`), so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/goals` and `/baselines` additionally show a short "turned off" panel.
 
-**`practiceEnabled` is the broad one.** Practice is the session engine, not a single screen, so the flag covers: the Practice bottom-nav tab; the routes `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, `/program`; the Overview practice card, week-streak badge, and strength/dance week-strip indicators; the session overlays, completion screen, and crash-recovery banner in `+layout.svelte`; History session dots, legend entries, month "Workouts" / "lb lifted" stats, and day-sheet session actions; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data.
+Because nothing is on for a fresh install, `prefsStore.anyTrackingEnabled` drives an Overview empty state pointing at Settings, and History day cells stop being tappable (the day sheet would otherwise open with no actions in it).
+
+Each flag covers its own Overview card, week-strip indicator, History dots / legend entry / month stat tile / day-sheet actions, Insights charts, and Settings → Data clear row. Two wrinkles are worth knowing:
+
+- **Mood belongs to Habits.** Mood is a protected `Habit` row (`type: 'mood'`) that can't be deactivated _within_ Habits, but it is not exempt from the flag — the mood strip, the week-strip mood pips, the History mood dot and legend entry, and the Mood vs Habits chart all hide with `habitsEnabled`.
+- **Practice is the broad one** (see below), and Lift plans nest inside it.
+
+**`practiceEnabled` reaches furthest.** Practice is the session engine, not a single screen, so the flag covers: the Practice bottom-nav tab; the routes `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, `/program`; the Overview practice card, week-streak badge, and strength/dance week-strip indicators; the session overlays, completion screen, and crash-recovery banner in `+layout.svelte`; History session dots, legend entries, month "Workouts" / "lb lifted" stats, and day-sheet session actions; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data.
 
 **Lift plans nest inside Practice.** A plan generates a backing program and can only be _trained_ through `/workout`, so `goalProgressionPlansEnabled` alone is not enough. `prefsStore.liftPlansEnabled` is a derived `practiceEnabled && goalProgressionPlansEnabled` — every consumer reads that instead of and-ing the two flags itself, and the Lift plans toggle is only shown while Practice is on.
 

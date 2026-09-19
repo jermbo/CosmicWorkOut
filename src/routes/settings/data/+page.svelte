@@ -213,16 +213,20 @@
 				onclick={() => openClearDialog('workoutSessions')}
 			/>
 		{/if}
-		<SettingsActionRow
-			label="Activity log"
-			description="Logged runs, walks, and other activities. Workout sessions stay in place."
-			onclick={() => openClearDialog('activityLog')}
-		/>
-		<SettingsActionRow
-			label="Habits"
-			description="Habits and habit logs. Built-in habits are restored afterward."
-			onclick={() => openClearDialog('habits')}
-		/>
+		{#if prefsStore.activityLogEnabled}
+			<SettingsActionRow
+				label="Activity log"
+				description="Logged runs, walks, and other activities. Workout sessions stay in place."
+				onclick={() => openClearDialog('activityLog')}
+			/>
+		{/if}
+		{#if prefsStore.habitsEnabled}
+			<SettingsActionRow
+				label="Habits"
+				description="Habits and habit logs. Built-in habits are restored afterward."
+				onclick={() => openClearDialog('habits')}
+			/>
+		{/if}
 		<SettingsActionRow
 			label="Health data"
 			description="Weight and blood pressure readings."

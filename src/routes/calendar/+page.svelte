@@ -37,6 +37,8 @@
 	const todayStr = todayIso();
 
 	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
 
 	/**
 	 * Empty while Practice is off, which is what drops session dots, the day sheets,
@@ -86,10 +88,13 @@
 	}
 
 	function habitRatio(dateStr: string): number {
+		if (!habitsEnabled) return 0;
 		return habitStore.completionRatioForDate(dateStr);
 	}
 
+	/** Mood is a protected habit, so it hides with the Habits flag. */
 	function moodForDate(dateStr: string): { label: string; value: number } | null {
+		if (!habitsEnabled) return null;
 		const moodHabit = habitStore.habits.find((h) => h.type === 'mood');
 		if (!moodHabit) return null;
 		const log = habitStore.getLog(moodHabit.id, dateStr);
@@ -123,12 +128,12 @@
 	);
 
 	let dayActionsHasHabits = $derived.by(() => {
-		if (dayActionsDate) return habitStore.logsForDate(dayActionsDate).length > 0;
+		if (habitsEnabled && dayActionsDate) return habitStore.logsForDate(dayActionsDate).length > 0;
 		return false;
 	});
 
 	let dayActionsHasActivities = $derived.by(() => {
-		if (dayActionsDate)
+		if (activityLogEnabled && dayActionsDate)
 			return (activityStore.activitiesByDate.get(dayActionsDate)?.length ?? 0) > 0;
 		return false;
 	});
@@ -159,6 +164,8 @@
 	});
 
 	function handleDayTap(dateStr: string) {
+		// With every tracking feature off the sheet would have no actions in it.
+		if (!prefsStore.anyTrackingEnabled) return;
 		loggingContext.setDate(dateStr);
 		dayActionsDate = dateStr;
 	}
@@ -184,7 +191,7 @@
 	);
 
 	let monthActivities = $derived(
-		activityStore.activities.filter((a) => a.date.startsWith(monthKey)),
+		activityLogEnabled ? activityStore.activities.filter((a) => a.date.startsWith(monthKey)) : [],
 	);
 
 	let monthVolume = $derived(monthSessions.reduce((sum, s) => sum + (s.totalVolume ?? 0), 0));
@@ -202,11 +209,19 @@
 
 	let isAtCurrentMonth = $derived(monthIsoKey(viewDate) === todayStr.slice(0, 7));
 
-	function ariaLabel(dateStr: string, status: DayStatus, dayNum: number): string {
+	function ariaLabel(
+		dateStr: string,
+		status: DayStatus,
+		dayNum: number,
+		tappable: boolean,
+	): string {
 		const base = formatMonthDayLong(viewDate, dayNum);
+		if (!tappable) {
+			if (status === 'today') return `${base}, today`;
+			return base;
+		}
 		if (status === 'today') return `${base}, today — tap to edit`;
-		if (status === 'past') return `${base} — tap to edit`;
-		return base;
+		return `${base} — tap to edit`;
 	}
 </script>
 
@@ -230,14 +245,18 @@
 				<span class="cal-stat__label">lb lifted</span>
 			</div>
 		{/if}
-		<div class="cal-stat">
-			<span class="cal-stat__value">{monthActivities.length}</span>
-			<span class="cal-stat__label">Activities</span>
-		</div>
-		<div class="cal-stat">
-			<span class="cal-stat__value">{monthHabitDays}</span>
-			<span class="cal-stat__label">Habit days</span>
-		</div>
+		{#if activityLogEnabled}
+			<div class="cal-stat">
+				<span class="cal-stat__value">{monthActivities.length}</span>
+				<span class="cal-stat__label">Activities</span>
+			</div>
+		{/if}
+		{#if habitsEnabled}
+			<div class="cal-stat">
+				<span class="cal-stat__value">{monthHabitDays}</span>
+				<span class="cal-stat__label">Habit days</span>
+			</div>
+		{/if}
 	</div>
 
 	<div class="calendar-month">
@@ -304,9 +323,11 @@
 						{@const hasStrength = hasStrengthSession(cell.date)}
 						{@const hasDance = hasDanceSession(cell.date)}
 						{@const hasSession = hasStrength || hasDance}
-						{@const hasActivity = (activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
+						{@const hasActivity =
+							activityLogEnabled &&
+							(activityStore.activitiesByDate.get(cell.date)?.length ?? 0) > 0}
 						{@const hasHealthDot = hasHealth(cell.date)}
-						{@const tappable = status !== 'future'}
+						{@const tappable = status !== 'future' && prefsStore.anyTrackingEnabled}
 						{@const ratio = ratioFor(status, cell.date)}
 						{@const mood = moodFor(status, cell.date)}
 						<button
@@ -316,7 +337,7 @@
 							class:calendar-day--future={status === 'future'}
 							style:--habit-ratio={ratio}
 							role="gridcell"
-							aria-label={ariaLabel(cell.date, status, cell.dayNum)}
+							aria-label={ariaLabel(cell.date, status, cell.dayNum, tappable)}
 							onclick={() => tappable && handleDayTap(cell.date!)}
 							disabled={!tappable}
 						>
@@ -369,12 +390,16 @@
 			<span class="cal-legend-item cal-legend-item--session">Strength</span>
 			<span class="cal-legend-item cal-legend-item--dance">Dance</span>
 		{/if}
-		<span class="cal-legend-item cal-legend-item--activity">Activity</span>
+		{#if activityLogEnabled}
+			<span class="cal-legend-item cal-legend-item--activity">Activity</span>
+		{/if}
 		{#if healthEnabled}
 			<span class="cal-legend-item cal-legend-item--health">Health</span>
 		{/if}
-		<span class="cal-legend-item cal-legend-item--mood">Mood</span>
-		<span class="cal-legend-item cal-legend-item--habits">Habits logged</span>
+		{#if habitsEnabled}
+			<span class="cal-legend-item cal-legend-item--mood">Mood</span>
+			<span class="cal-legend-item cal-legend-item--habits">Habits logged</span>
+		{/if}
 	</div>
 </div>
 
@@ -393,7 +418,9 @@
 		danceSession={dayActionsDanceSession}
 		hasHabits={dayActionsHasHabits}
 		hasActivities={dayActionsHasActivities}
-		activities={activityStore.activitiesByDate.get(dayActionsDate) ?? []}
+		activities={activityLogEnabled
+			? (activityStore.activitiesByDate.get(dayActionsDate) ?? [])
+			: []}
 		onClose={() => (dayActionsDate = null)}
 		onViewStrengthSession={viewStrengthHandler}
 		onViewDanceSession={viewDanceHandler}

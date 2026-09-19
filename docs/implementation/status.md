@@ -145,6 +145,7 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 | Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context                                                                                                        |
 | Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`                                                                                                    |
 | Practice feature flag (`practiceEnabled`)        | Built  | Default off. Hides nav tab, `/practice*`, `/workout`, `/program`, session overlays, and session marks on History/Insights; data persists. Lift plans nest inside it via derived `liftPlansEnabled`. |
+| Habits + Activity log feature flags              | Built  | `habitsEnabled` (incl. mood) and `activityLogEnabled`, both default off. Every tracking feature is now opt-in, so Overview shows a "choose what to track" empty state on a fresh install.           |
 
 See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Baselines](../roadmap/baselines.md).
 

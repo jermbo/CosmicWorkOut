@@ -7,6 +7,8 @@ const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
+	habitsEnabled: false,
+	activityLogEnabled: false,
 	practiceEnabled: false,
 	healthMetricsEnabled: false,
 	goalProgressionPlansEnabled: false,
@@ -18,6 +20,8 @@ class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	habitsEnabled = $state(DEFAULTS.habitsEnabled);
+	activityLogEnabled = $state(DEFAULTS.activityLogEnabled);
 	practiceEnabled = $state(DEFAULTS.practiceEnabled);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
@@ -30,6 +34,18 @@ class PrefsStore {
 	 */
 	liftPlansEnabled = $derived(this.practiceEnabled && this.goalProgressionPlansEnabled);
 
+	/**
+	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
+	 * Overview uses this to offer a way into Settings instead of rendering blank.
+	 */
+	anyTrackingEnabled = $derived(
+		this.habitsEnabled ||
+			this.activityLogEnabled ||
+			this.practiceEnabled ||
+			this.healthMetricsEnabled ||
+			this.baselinesEnabled,
+	);
+
 	load(): void {
 		try {
 			const stored = localStorage.getItem(PREFS_KEY);
@@ -39,6 +55,8 @@ class PrefsStore {
 				this.density = parsed.density ?? DEFAULTS.density;
 				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.habitsEnabled = parsed.habitsEnabled ?? DEFAULTS.habitsEnabled;
+				this.activityLogEnabled = parsed.activityLogEnabled ?? DEFAULTS.activityLogEnabled;
 				this.practiceEnabled = parsed.practiceEnabled ?? DEFAULTS.practiceEnabled;
 				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
 				this.goalProgressionPlansEnabled =
@@ -61,12 +79,24 @@ class PrefsStore {
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
+			habitsEnabled: this.habitsEnabled,
+			activityLogEnabled: this.activityLogEnabled,
 			practiceEnabled: this.practiceEnabled,
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
 			baselinesEnabled: this.baselinesEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+	}
+
+	setHabitsEnabled(enabled: boolean): void {
+		this.habitsEnabled = enabled;
+		this.save();
+	}
+
+	setActivityLogEnabled(enabled: boolean): void {
+		this.activityLogEnabled = enabled;
+		this.save();
 	}
 
 	setPracticeEnabled(enabled: boolean): void {

@@ -9,6 +9,10 @@
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.habitsEnabled);
 
 	const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
 

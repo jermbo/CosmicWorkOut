@@ -21,10 +21,24 @@
 	</header>
 
 	<SettingsGroup title="Tracking">
-		<SettingsRow
-			href="/settings/habits"
+		<SettingsToggleRow
 			label="Habits"
-			detail="{activeHabitCount} active"
+			description="Daily check-in for mood, water, meditation, and more. Your habits and logs are kept when off."
+			checked={prefsStore.habitsEnabled}
+			onchange={(v) => prefsStore.setHabitsEnabled(v)}
+		/>
+		{#if prefsStore.habitsEnabled}
+			<SettingsRow
+				href="/settings/habits"
+				label="Manage habits"
+				detail="{activeHabitCount} active"
+			/>
+		{/if}
+		<SettingsToggleRow
+			label="Activity log"
+			description="Runs, walks, yoga, and other one-off activities. Your logged activities are kept when off."
+			checked={prefsStore.activityLogEnabled}
+			onchange={(v) => prefsStore.setActivityLogEnabled(v)}
 		/>
 		<SettingsToggleRow
 			label="Practice"

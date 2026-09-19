@@ -29,7 +29,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 
 Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, Health, and Baselines are reached from their summary cards and the Practice hub.
 
-**Feature-gated routes.** `practiceEnabled` (default off) hides the Practice tab and guards `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, and `/program`; `/goals*` additionally needs Lift plans on. `/health` needs `healthMetricsEnabled`, `/baselines` and `/settings/baselines` need `baselinesEnabled`. Guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts` — see [state.md](state.md#feature-flags-hide-ui-data-always-persists).
+**Every tracking feature is opt-in and defaults off**, so most of these routes are gated. `habitsEnabled` guards `/habits` and `/settings/habits`; `activityLogEnabled` guards `/log`; `practiceEnabled` hides the Practice tab and guards `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, and `/program`; `/goals*` additionally needs Lift plans on; `/health` needs `healthMetricsEnabled`; `/baselines` and `/settings/baselines` need `baselinesEnabled`. Guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts` — see [state.md](state.md#feature-flags-hide-ui-data-always-persists).
 
 ---
 

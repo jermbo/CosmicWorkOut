@@ -428,6 +428,8 @@ type UserPrefs = {
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
+	habitsEnabled: boolean; // default false — gates Habits, including mood
+	activityLogEnabled: boolean; // default false — gates the Activity log
 	practiceEnabled: boolean; // default false — gates the whole Practice / session engine
 	healthMetricsEnabled: boolean; // default false — US-029
 	goalProgressionPlansEnabled: boolean; // default false — US-033 (Lift plans); only live when practiceEnabled
