@@ -9,6 +9,7 @@ const DEFAULTS: UserPrefs = {
 	weightUnit: 'lb',
 	healthMetricsEnabled: false,
 	goalProgressionPlansEnabled: false,
+	baselinesEnabled: false,
 };
 
 class PrefsStore {
@@ -18,6 +19,7 @@ class PrefsStore {
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
+	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 
 	load(): void {
 		try {
@@ -31,6 +33,7 @@ class PrefsStore {
 				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
 				this.goalProgressionPlansEnabled =
 					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
+				this.baselinesEnabled = parsed.baselinesEnabled ?? DEFAULTS.baselinesEnabled;
 			}
 		} catch (e) {
 			// Corrupt prefs must never block app startup — fall back to defaults.
@@ -50,6 +53,7 @@ class PrefsStore {
 			weightUnit: this.weightUnit,
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
+			baselinesEnabled: this.baselinesEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
@@ -61,6 +65,11 @@ class PrefsStore {
 
 	setGoalProgressionPlansEnabled(enabled: boolean): void {
 		this.goalProgressionPlansEnabled = enabled;
+		this.save();
+	}
+
+	setBaselinesEnabled(enabled: boolean): void {
+		this.baselinesEnabled = enabled;
 		this.save();
 	}
 

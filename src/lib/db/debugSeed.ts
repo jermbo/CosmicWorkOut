@@ -7,6 +7,8 @@ import type {
 	ActivityType,
 	ActivityIntensity,
 	HealthReading,
+	Baseline,
+	BaselineLog,
 } from './types';
 
 function rInt(min: number, max: number): number {
@@ -366,11 +368,68 @@ function buildBpReadings(date: Date): HealthReading[] {
 	return readings;
 }
 
+/**
+ * Baselines have no built-in seed, so the debug data ships its own definitions:
+ * one two-metric floor and one single-metric ceiling.
+ */
+const seedBaselines: Baseline[] = [
+	{
+		id: 'seed-baseline-walking',
+		name: 'Walking',
+		direction: 'up',
+		metrics: [
+			{ id: 'seed-baseline-walking-min', label: 'minutes', target: 30 },
+			{ id: 'seed-baseline-walking-mi', label: 'miles', target: 1.25 },
+		],
+		sortOrder: 0,
+		active: true,
+		createdAt: new Date().toISOString(),
+	},
+	{
+		id: 'seed-baseline-phone',
+		name: 'Phone time',
+		direction: 'under',
+		metrics: [{ id: 'seed-baseline-phone-min', label: 'minutes', target: 30 }],
+		sortOrder: 1,
+		active: true,
+		createdAt: new Date().toISOString(),
+	},
+];
+
+/** A day's entries for one baseline — usually one, sometimes split across the day. */
+function buildBaselineLogs(baseline: Baseline, date: Date, dayIndex: number): BaselineLog[] {
+	if (!chance(0.75)) return [];
+	const entryCount = chance(0.4) ? 2 : 1;
+	const logs: BaselineLog[] = [];
+	for (let i = 0; i < entryCount; i++) {
+		const recordedAt = new Date(date);
+		recordedAt.setHours(pick([8, 12, 17, 21]), rInt(0, 55), 0, 0);
+		const values: Record<string, number> = {};
+		for (const metric of baseline.metrics) {
+			// Drift upward over the seeded window so charts show growth, then split
+			// the day's amount across however many entries this day has.
+			const growth = 1 + (dayIndex / SEED_DAYS) * 0.5;
+			const dayAmount = metric.target * growth * (rInt(70, 130) / 100);
+			values[metric.id] = Math.round((dayAmount / entryCount) * 100) / 100;
+		}
+		logs.push({
+			id: `seed-baseline-log-${baseline.id}-${toDateStr(date)}-${i}`,
+			baselineId: baseline.id,
+			date: toDateStr(date),
+			recordedAt: recordedAt.toISOString(),
+			values,
+		});
+	}
+	return logs;
+}
+
 export function generateDebugSeedData(): {
 	sessions: Session[];
 	activities: ActivityLog[];
 	habitLogs: HabitLog[];
 	healthReadings: HealthReading[];
+	baselines: Baseline[];
+	baselineLogs: BaselineLog[];
 } {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -425,5 +484,20 @@ export function generateDebugSeedData(): {
 		healthReadings.push(...buildBpReadings(date));
 	}
 
-	return { sessions, activities, habitLogs, healthReadings };
+	const baselineLogs: BaselineLog[] = [];
+	for (let i = 0; i < SEED_DAYS; i++) {
+		const date = shiftDays(start, i);
+		for (const baseline of seedBaselines) {
+			baselineLogs.push(...buildBaselineLogs(baseline, date, i));
+		}
+	}
+
+	return {
+		sessions,
+		activities,
+		habitLogs,
+		healthReadings,
+		baselines: seedBaselines,
+		baselineLogs,
+	};
 }

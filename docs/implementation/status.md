@@ -8,30 +8,30 @@ Verified against the codebase (July 2026).
 
 ## v1.1.0 — Core Workout Flows
 
-| Feature                                                   | Status | Notes                                                                     |
-| --------------------------------------------------------- | ------ | ------------------------------------------------------------------------- |
+| Feature                                                   | Status | Notes                                                                        |
+| --------------------------------------------------------- | ------ | ---------------------------------------------------------------------------- |
 | Today view + start session                                | Built  | Home practice card navigates to `/practice`; workout page handles start/edit |
-| Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry          |
-| Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                  |
-| Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                |
-| Per-item weight increment (2.5 / 5 / 10)                  | Built  | Configured on item form; weights round to nearest increment               |
-| Finish / abandon session                                  | Built  | Finish saves completed sets only; abandon has confirm dialog              |
-| Crash recovery                                            | Built  | Resume/discard banner on boot                                             |
-| Session complete overlay                                  | Built  | Stats + confetti                                                          |
-| Program view + week progress                              | Built  | Routine cards from the current week's templates                           |
-| Workout/routine editor                                    | Built  | Edit items, add new routines                                              |
-| Item library browser                                      | Built  | Category-filtered sheet in editor                                         |
-| Calendar + day summary                                    | Built  | Month grid, tap completed days                                            |
-| IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                |
-| Preferences store                                         | Built  | Accent, density, roundness, weight unit                                   |
-| Settings UI                                               | Built  | `/settings` hub + `habits`/`data` sub-routes (US-030)                     |
-| Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating              |
-| Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks |
-| Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program          |
-| Custom item CRUD                                          | Built  | Create/edit/delete in the item library; built-in items are read-only      |
-| Browse all program weeks                                  | Built  | Week picker chevrons on program page                                      |
-| Weekly consistency streak                                 | Built  | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar  |
-| Scheduled/skipped day status                              | Built  | Calendar infers training days-of-week from session history                |
+| Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry             |
+| Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                     |
+| Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                   |
+| Per-item weight increment (2.5 / 5 / 10)                  | Built  | Configured on item form; weights round to nearest increment                  |
+| Finish / abandon session                                  | Built  | Finish saves completed sets only; abandon has confirm dialog                 |
+| Crash recovery                                            | Built  | Resume/discard banner on boot                                                |
+| Session complete overlay                                  | Built  | Stats + confetti                                                             |
+| Program view + week progress                              | Built  | Routine cards from the current week's templates                              |
+| Workout/routine editor                                    | Built  | Edit items, add new routines                                                 |
+| Item library browser                                      | Built  | Category-filtered sheet in editor                                            |
+| Calendar + day summary                                    | Built  | Month grid, tap completed days                                               |
+| IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                   |
+| Preferences store                                         | Built  | Accent, density, roundness, weight unit                                      |
+| Settings UI                                               | Built  | `/settings` hub + `habits`/`data` sub-routes (US-030)                        |
+| Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating                 |
+| Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks    |
+| Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program             |
+| Custom item CRUD                                          | Built  | Create/edit/delete in the item library; built-in items are read-only         |
+| Browse all program weeks                                  | Built  | Week picker chevrons on program page                                         |
+| Weekly consistency streak                                 | Built  | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar     |
+| Scheduled/skipped day status                              | Built  | Calendar infers training days-of-week from session history                   |
 
 ---
 
@@ -106,15 +106,15 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 ## v1.7.0 — Full Strength Catalog & PWA
 
-| Feature                        | Status | Notes                                                                                                                                                         |
-| ------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Full gym exercise catalog      | Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                                           |
-| Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                        |
-| Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                    |
+| Feature                        | Status | Notes                                                                                                                                                                                     |
+| ------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full gym exercise catalog      | Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                                                                       |
+| Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                                                    |
+| Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                                                |
 | Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON export (share sheet or download) + staged restore on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
-| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                                    |
-| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults) |
-| Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                   |
+| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                                                                |
+| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults)                     |
+| Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                                               |
 
 ---
 
@@ -130,20 +130,20 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 
 ## v1.9.0 — Lift Plans & Baselines
 
-| Feature                                         | Status  | Notes                                                                                                      |
-| ----------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
-| Goal progression plan type (Lift plans)         | Built   | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9      |
-| Settings toggle (`goalProgressionPlansEnabled`) | Built   | Default off; hides UI, data persists — same pattern as health metrics                                      |
-| Modular implementation                          | Built   | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                  |
-| Plan generator (goal + start → blocks)          | Built   | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                     |
-| Starter scaffolds                               | Built   | Priority week / Focus only / From scratch                                                                  |
-| Focus wave (4-week block)                       | Built   | Build → build → peak → deload                                                                              |
-| Supporting weekly increment                     | Built   | Uses frozen `weightIncrement`; reps stay flat                                                              |
-| Block repeat                                    | Built   | Re-run current block from week 1 via `countOffset`                                                         |
-| Plan lifecycle (complete / pause)               | Built   | One active goal plan; sole active Strength program; backing programs hidden from generic pickers           |
-| Baselines feature flag + Settings CRUD          | Planned | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — same DB v9 as Lift plans                     |
-| Baselines daily logging (multi-entry, edit past)| Planned | [US-035](../features/v1.9.0/US-035-baselines-logging.md)                                                  |
-| Baselines progress charts                       | Planned | [US-036](../features/v1.9.0/US-036-baselines-charts.md)                                                   |
+| Feature                                          | Status | Notes                                                                                                |
+| ------------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------- |
+| Goal progression plan type (Lift plans)          | Built  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9 |
+| Settings toggle (`goalProgressionPlansEnabled`)  | Built  | Default off; hides UI, data persists — same pattern as health metrics                                |
+| Modular implementation                           | Built  | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                            |
+| Plan generator (goal + start → blocks)           | Built  | Wave blocks; final peak snaps to goal weight × reps; duration estimate                               |
+| Starter scaffolds                                | Built  | Priority week / Focus only / From scratch                                                            |
+| Focus wave (4-week block)                        | Built  | Build → build → peak → deload                                                                        |
+| Supporting weekly increment                      | Built  | Uses frozen `weightIncrement`; reps stay flat                                                        |
+| Block repeat                                     | Built  | Re-run current block from week 1 via `countOffset`                                                   |
+| Plan lifecycle (complete / pause)                | Built  | One active goal plan; sole active Strength program; backing programs hidden from generic pickers     |
+| Baselines feature flag + Settings CRUD           | Built  | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — `baselines` / `baselineLogs` in DB v9       |
+| Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context         |
+| Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`     |
 
 See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Baselines](../roadmap/baselines.md).
 

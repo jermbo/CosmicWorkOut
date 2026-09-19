@@ -187,6 +187,7 @@ export interface UserPrefs {
 	weightUnit: 'lb' | 'kg';
 	healthMetricsEnabled: boolean;
 	goalProgressionPlansEnabled: boolean;
+	baselinesEnabled: boolean;
 }
 
 export interface ActiveSet {
@@ -270,4 +271,32 @@ export interface HealthReading {
 	date: string; // ISO date YYYY-MM-DD — global logging date
 	recordedAt: string; // ISO datetime — orders multiple readings per day
 	values: WeightValues | BloodPressureValues;
+}
+
+/** 'up' = daily floor to meet or beat; 'under' = daily ceiling to stay at or below. */
+export type BaselineDirection = 'up' | 'under';
+
+export interface BaselineMetric {
+	id: string;
+	label: string;
+	target: number;
+}
+
+export interface Baseline {
+	id: string;
+	name: string;
+	direction: BaselineDirection;
+	/** One or two metrics; count is fixed after creation so log history stays readable. */
+	metrics: BaselineMetric[];
+	sortOrder: number;
+	active: boolean;
+	createdAt: string;
+}
+
+export interface BaselineLog {
+	id: string;
+	baselineId: string;
+	date: string; // ISO date YYYY-MM-DD — global logging date
+	recordedAt: string; // ISO datetime — orders multiple entries per day
+	values: Record<string, number>; // metricId → amount for this entry
 }

@@ -25,9 +25,9 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Habits, baselines & tracking
 
-| Item      | Notes                                                                                          | Spec                                                                              |
-| --------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Baselines | Specced as **v1.9.0** (US-034–036). Separate from Habits and Lift plans                       | [baselines.md](baselines.md) · [v1.9.0](../features/v1.9.0/README.md)           |
+| Item      | Notes                                                                   | Spec                                                                  |
+| --------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Baselines | Specced as **v1.9.0** (US-034–036). Separate from Habits and Lift plans | [baselines.md](baselines.md) · [v1.9.0](../features/v1.9.0/README.md) |
 
 ---
 

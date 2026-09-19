@@ -18,6 +18,8 @@
 	import HomePracticeHubCard from '$lib/components/HomePracticeHubCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
 	import HomeHealthCard from '$lib/components/HomeHealthCard.svelte';
+	import HomeBaselinesCard from '$lib/components/HomeBaselinesCard.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
 
 	const todayStr = todayIso();
 
@@ -37,6 +39,10 @@
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dateWeight = $derived(healthStore.weightForDate(contextDate));
 	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
+
+	let baselinesEnabled = $derived(prefsStore.baselinesEnabled);
+	let baselinesTotal = $derived(baselineStore.activeBaselines.length);
+	let baselinesCleared = $derived(baselineStore.clearedCountForDate(contextDate));
 
 	let liveDiscipline = $derived.by(() => {
 		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
@@ -118,6 +124,12 @@
 			detail={practiceNextUp.detail}
 		/>
 		<HomeActivityCard activities={dateActivities} />
+		{#if baselinesEnabled}
+			<HomeBaselinesCard
+				cleared={baselinesCleared}
+				total={baselinesTotal}
+			/>
+		{/if}
 		{#if healthEnabled}
 			<HomeHealthCard
 				weight={dateWeight}

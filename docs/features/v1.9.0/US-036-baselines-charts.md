@@ -1,6 +1,6 @@
 # US-036 — Baselines Progress Charts
 
-> **Status: Planned — v1.9.0**
+> **As built:** `BaselineChart` (Chart.js line) renders inline inside each baseline's expandable section on `/baselines`, under a page-local `RangeBar` defaulting to `last-7`. One solid line per metric plus a dashed flat line at that metric's target. Days with no logs plot as `0` — for baselines a missing day genuinely means nothing was done, unlike the sparse health charts that use gaps.
 >
 > Depends on [US-034](./US-034-baselines-setup.md) and [US-035](./US-035-baselines-logging.md).
 
@@ -17,15 +17,15 @@ so that I can see growth over time (and for two-metric baselines, how the metric
 
 ## Key Decisions
 
-| Topic           | Decision                                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Placement**   | Chart lives with the baseline (on `/baselines` detail or inline — implementer chooses; one chart per baseline) |
-| **Type**        | Line chart (Chart.js, same stack as Insights)                                                                 |
-| **Series**      | One metric → one line; two metrics → two lines                                                                |
-| **Points**      | Each point = **that day’s summed total** for the metric                                                       |
-| **Target**      | Flat horizontal line at the configured target for each metric (or equivalent readable target marker)          |
-| **Date range**  | Same chip options as Insights — reuse `RangeBar` / `RANGE_OPTIONS` (`this-week`, `last-7`, `mtd`, `ytd`, `custom`) |
-| **Default**     | Match Insights default (`last-7`) unless product copy prefers otherwise at implement time                     |
+| Topic          | Decision                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **Placement**  | Chart lives with the baseline (on `/baselines` detail or inline — implementer chooses; one chart per baseline)     |
+| **Type**       | Line chart (Chart.js, same stack as Insights)                                                                      |
+| **Series**     | One metric → one line; two metrics → two lines                                                                     |
+| **Points**     | Each point = **that day’s summed total** for the metric                                                            |
+| **Target**     | Flat horizontal line at the configured target for each metric (or equivalent readable target marker)               |
+| **Date range** | Same chip options as Insights — reuse `RangeBar` / `RANGE_OPTIONS` (`this-week`, `last-7`, `mtd`, `ytd`, `custom`) |
+| **Default**    | Match Insights default (`last-7`) unless product copy prefers otherwise at implement time                          |
 
 ---
 

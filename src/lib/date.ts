@@ -77,6 +77,11 @@ export function formatLongDate(iso: string): string {
 	return fmtLongDate.format(fromIso(iso));
 }
 
+/** Clock time from an ISO datetime — orders multiple same-day entries for the reader. */
+export function formatTime(iso: string): string {
+	return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
 export function formatMonthLong(date: Date): string {
 	return fmtMonthLong.format(date);
 }

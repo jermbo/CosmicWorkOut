@@ -5,6 +5,7 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { formatTime } from '$lib/date';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import HealthWeightSheet from '$lib/components/HealthWeightSheet.svelte';
 	import HealthBloodPressureSheet from '$lib/components/HealthBloodPressureSheet.svelte';
@@ -30,13 +31,6 @@
 	function openBpEdit(reading: HealthReading & { values: BloodPressureValues }) {
 		editingBp = reading;
 		showBpSheet = true;
-	}
-
-	function formatTime(iso: string): string {
-		return new Date(iso).toLocaleTimeString(undefined, {
-			hour: 'numeric',
-			minute: '2-digit',
-		});
 	}
 </script>
 

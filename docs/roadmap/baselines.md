@@ -66,11 +66,11 @@ Lift plans today occupy `/goals` (+ `/goals/new`) in code. Baselines need their 
 
 Required fields:
 
-1. **Name** — e.g. Walking, Writing, Pushups, Phone time  
-2. **Direction** — **go up** (hit or exceed) or **stay under** (ceiling)  
-3. **Metric count** — one metric (majority) or two (e.g. walk time + distance)  
-4. **Unit label(s)** — **user-typed** in Settings (e.g. `minutes`, `miles`, `words`, `pages`). No fixed unit enum for v1.  
-5. **Daily target** — the embarrassing-low floor or ceiling  
+1. **Name** — e.g. Walking, Writing, Pushups, Phone time
+2. **Direction** — **go up** (hit or exceed) or **stay under** (ceiling)
+3. **Metric count** — one metric (majority) or two (e.g. walk time + distance)
+4. **Unit label(s)** — **user-typed** in Settings (e.g. `minutes`, `miles`, `words`, `pages`). No fixed unit enum for v1.
+5. **Daily target** — the embarrassing-low floor or ceiling
 
 **Not configurable:** multiple logs per day. Always allowed; entries **always sum** into the day’s total(s).
 
@@ -80,15 +80,15 @@ The user raises the target **manually when ready**. Auto-raising is out of v1. O
 
 ## Daily use (Baselines screen)
 
-- Each baseline shows **today’s total(s)** next to **the target** (e.g. did 12, target 10; or phone 18 / limit 30).  
-- Primary action: **pick a baseline → add what you just did** (one log entry).  
-- Many entries per day are normal (short walks, pushup breaks, two writing sessions); the day total is the sum.  
-- Prefill / carry-forward of last values for easy adjust-and-save is desirable; exact UX TBD at build time.  
+- Each baseline shows **today’s total(s)** next to **the target** (e.g. did 12, target 10; or phone 18 / limit 30).
+- Primary action: **pick a baseline → add what you just did** (one log entry).
+- Many entries per day are normal (short walks, pushup breaks, two writing sessions); the day total is the sum.
+- Prefill / carry-forward of last values for easy adjust-and-save is desirable; exact UX TBD at build time.
 - **Edit / delete logs:** any entry is editable or removable, including **past dates** (same expectation as other logged history in the app).
 
 Examples the design must support:
 
-| Baseline     | Direction  | Metric(s)      | Notes                                      |
+| Baseline     | Direction  | Metric(s)       | Notes                                      |
 | ------------ | ---------- | --------------- | ------------------------------------------ |
 | Walking      | Go up      | Time + distance | Same time farther, or same distance faster |
 | Writing      | Go up      | Words           | e.g. 250 words                             |
@@ -103,12 +103,12 @@ Topics are **independent**. Movement, creative work, and screen-time baselines a
 
 ## Charts (v1)
 
-- Each baseline has **its own** chart.  
-- Default: **line chart**.  
-- One metric → one series; two metrics → **two lines**.  
-- Each point = **that day’s total** for the metric.  
-- Also draw a **flat target line** (floor or ceiling) so “what I’m measuring against” is always visible.  
-- **Date range:** same chip options as Insights — reuse `RangeBar` / `RANGE_OPTIONS` (`this-week`, `last-7`, `mtd`, `ytd`, `custom`; Insights default is `last-7`). Do not invent a separate Baselines-only range set. (Insights keeps the selected range in page state today; if an app-wide shared range preference is added later, Baselines should use it too.)  
+- Each baseline has **its own** chart.
+- Default: **line chart**.
+- One metric → one series; two metrics → **two lines**.
+- Each point = **that day’s total** for the metric.
+- Also draw a **flat target line** (floor or ceiling) so “what I’m measuring against” is always visible.
+- **Date range:** same chip options as Insights — reuse `RangeBar` / `RANGE_OPTIONS` (`this-week`, `last-7`, `mtd`, `ytd`, `custom`; Insights default is `last-7`). Do not invent a separate Baselines-only range set. (Insights keeps the selected range in page state today; if an app-wide shared range preference is added later, Baselines should use it too.)
 - Richer Insights-style chart work beyond this line + target is a **future enhancement**.
 
 ---
@@ -133,40 +133,40 @@ Topics are **independent**. Movement, creative work, and screen-time baselines a
 
 ## Deferred (explicit)
 
-- Auto-raising the daily target  
-- Motivational “time to raise the baseline?” prompts  
-- Advanced / Insights-hub chart experiments (drill-down, series filtering)  
-- Merging Baselines into Habits  
-- Renaming Lift plan code paths / prefs away from `goalPlan*`  
+- Auto-raising the daily target
+- Motivational “time to raise the baseline?” prompts
+- Advanced / Insights-hub chart experiments (drill-down, series filtering)
+- Merging Baselines into Habits
+- Renaming Lift plan code paths / prefs away from `goalPlan*`
 - Persisting one app-wide chart range shared by Insights + Baselines (nice-to-have; v1 can mirror Insights’ page-local range UX)
 
 ---
 
 ## Review checklist
 
-- [x] Product name: **Baselines** (not “Goals”)  
-- [x] Strength wave plans: **Lift plans** (not “Goals” in UI)  
-- [x] Chart range: same options as Insights (`RangeBar` / `RANGE_OPTIONS`)  
-- [x] Unit label(s): user-chosen in Settings (free text)  
-- [x] Logs editable/deletable, including past dates  
-- [ ] Baselines ≠ Habits (separate sibling destination)  
-- [ ] Flag off by default  
-- [ ] Settings for setup; main Baselines screen for logging + chart  
-- [ ] Direction: go up **or** stay under  
-- [ ] One or two metrics per baseline  
-- [ ] Always multi-log per day; totals add up  
-- [ ] User raises target when ready (no auto bump in v1)  
-- [ ] Per-baseline line chart + flat target line  
+- [x] Product name: **Baselines** (not “Goals”)
+- [x] Strength wave plans: **Lift plans** (not “Goals” in UI)
+- [x] Chart range: same options as Insights (`RangeBar` / `RANGE_OPTIONS`)
+- [x] Unit label(s): user-chosen in Settings (free text)
+- [x] Logs editable/deletable, including past dates
+- [ ] Baselines ≠ Habits (separate sibling destination)
+- [ ] Flag off by default
+- [ ] Settings for setup; main Baselines screen for logging + chart
+- [ ] Direction: go up **or** stay under
+- [ ] One or two metrics per baseline
+- [ ] Always multi-log per day; totals add up
+- [ ] User raises target when ready (no auto bump in v1)
+- [ ] Per-baseline line chart + flat target line
 
 ---
 
 ## Related
 
 - [v1.9.0 — Baselines](../features/v1.9.0/README.md) — feature stories (authoritative for build)
-- [Roadmap index](README.md)  
-- [Glossary — Baseline](../glossary.md#baseline)  
-- [Glossary — Lift plan](../glossary.md#lift-plan)  
-- [Habits — creation](../features/v1.3.0/US-009-habit-creation.md)  
-- [Activity logging](../features/v1.1.0/US-003-activity-logging.md)  
-- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plans (spec filename may lag)  
-- [v1.5.0 Insights](../features/v1.5.0/README.md) — date-range chips / `RangeBar`  
+- [Roadmap index](README.md)
+- [Glossary — Baseline](../glossary.md#baseline)
+- [Glossary — Lift plan](../glossary.md#lift-plan)
+- [Habits — creation](../features/v1.3.0/US-009-habit-creation.md)
+- [Activity logging](../features/v1.1.0/US-003-activity-logging.md)
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plans (spec filename may lag)
+- [v1.5.0 Insights](../features/v1.5.0/README.md) — date-range chips / `RangeBar`

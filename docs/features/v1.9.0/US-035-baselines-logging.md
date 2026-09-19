@@ -1,6 +1,6 @@
 # US-035 — Baselines Daily Logging
 
-> **Status: Planned — v1.9.0**
+> **As built:** `/baselines` lists active baselines as cards showing the selected date's total and target per metric, with a progress bar and a "Cleared" badge. "Log" opens `BaselineEntryDialog`, prefilled from the most recent entry. An expandable section per card lists that date's entries with time, values, edit, and two-tap delete. The date comes from the global `loggingContext`, so the page header's date picker handles backdating and corrections. An entry only stores the metrics the user filled in; a missing metric counts as `0`. Day totals are rounded to 4 decimals so `0.6 + 0.7` renders as `1.3`.
 >
 > Depends on [US-034](./US-034-baselines-setup.md). Charts: [US-036](./US-036-baselines-charts.md).
 
@@ -17,14 +17,14 @@ so that today’s total stays honest and the embarrassing-low target stays visib
 
 ## Key Decisions
 
-| Topic             | Decision                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------ |
-| **Main screen**   | `/baselines` — list active baselines with **today’s total(s)** vs **target(s)**                  |
-| **Primary action**| Pick a baseline → add a log entry (values for each metric on that baseline)                      |
-| **Aggregation**   | Many entries per `(baseline, date)`; day total per metric = **sum** of entry values              |
-| **Date**          | Uses **global date context** (same as habits / health); backdating logs against the selected date |
-| **Corrections**   | Edit or delete any single entry, including on past dates                                         |
-| **Prefill**       | Prefill last-used values when adding is desirable; exact UX at implement time                    |
+| Topic              | Decision                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------- |
+| **Main screen**    | `/baselines` — list active baselines with **today’s total(s)** vs **target(s)**                   |
+| **Primary action** | Pick a baseline → add a log entry (values for each metric on that baseline)                       |
+| **Aggregation**    | Many entries per `(baseline, date)`; day total per metric = **sum** of entry values               |
+| **Date**           | Uses **global date context** (same as habits / health); backdating logs against the selected date |
+| **Corrections**    | Edit or delete any single entry, including on past dates                                          |
+| **Prefill**        | Prefill last-used values when adding is desirable; exact UX at implement time                     |
 
 ---
 

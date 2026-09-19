@@ -74,7 +74,9 @@ console.log('=== BROKEN LINKS ===');
 console.log(broken.length ? broken.map((b) => `${b.from}  ->  ${b.target}`).join('\n') : '(none)');
 
 console.log('\n=== BROKEN ANCHORS (#heading not found) ===');
-console.log(badAnchors.length ? badAnchors.map((b) => `${b.from}  ->  ${b.target}`).join('\n') : '(none)');
+console.log(
+	badAnchors.length ? badAnchors.map((b) => `${b.from}  ->  ${b.target}`).join('\n') : '(none)',
+);
 
 console.log('\n=== ORPHAN DOCS (never linked from another doc; dir links count) ===');
 const dirLinked = new Set([...linkedTargets]);

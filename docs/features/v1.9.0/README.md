@@ -2,8 +2,8 @@
 
 Two opt-in tracks in this release:
 
-1. **Lift plans** (shipped as “Goal progression plans”) — Strength wave-loading toward a lift target  
-2. **Baselines** (planned / in progress) — daily floor/ceiling growth tracking  
+1. **Lift plans** (shipped as “Goal progression plans”) — Strength wave-loading toward a lift target
+2. **Baselines** — daily floor/ceiling growth tracking
 
 Vocabulary: [Glossary — Lift plan](../../glossary.md#lift-plan) · [Glossary — Baseline](../../glossary.md#baseline)
 
@@ -39,24 +39,24 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ### Key Decisions (as built)
 
-| Topic                   | Decision                                                                                                                      |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **Program type**        | New goal-driven plan — not retrofitted onto every exercise in course programs                                                 |
-| **Focus vs supporting** | One focus exercise per plan gets the full wave; all other exercises progress weekly via `weightIncrement`                     |
-| **Goal format**         | Specific weight × reps per plan (user-defined: 250×5 bench, 500×1 deadlift, etc.)                                             |
-| **Starting point**      | Prefill from session history when available; user confirms or overrides; manual entry when no history                         |
-| **Timeline**            | App estimates months from block count; farther start→goal = more blocks (capped at 12)                                        |
-| **Schedule**            | Same A → B → C → A rotation and count-driven week advance as today                                                            |
-| **Increments**          | Reuse existing per-item `weightIncrement` (frozen on the plan at generation)                                                  |
-| **Repeat**              | First-class action: re-run the **current block** only (not a single week, not an earlier block)                               |
-| **Plan instances**      | Each stint is its own plan record — back-to-back bench stints are separate instances                                          |
-| **Naming**              | Auto-name `"<Focus> Goal NN"` + optional rename                                                                               |
-| **Lifecycle end**       | User chooses **Complete** or **Pause**; resting = simply not training (plan holds position)                                   |
-| **Concurrency**         | **One active goal plan at a time**; activating it makes its backing program the **sole active Strength program**              |
+| Topic                   | Decision                                                                                                                          |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Program type**        | New goal-driven plan — not retrofitted onto every exercise in course programs                                                     |
+| **Focus vs supporting** | One focus exercise per plan gets the full wave; all other exercises progress weekly via `weightIncrement`                         |
+| **Goal format**         | Specific weight × reps per plan (user-defined: 250×5 bench, 500×1 deadlift, etc.)                                                 |
+| **Starting point**      | Prefill from session history when available; user confirms or overrides; manual entry when no history                             |
+| **Timeline**            | App estimates months from block count; farther start→goal = more blocks (capped at 12)                                            |
+| **Schedule**            | Same A → B → C → A rotation and count-driven week advance as today                                                                |
+| **Increments**          | Reuse existing per-item `weightIncrement` (frozen on the plan at generation)                                                      |
+| **Repeat**              | First-class action: re-run the **current block** only (not a single week, not an earlier block)                                   |
+| **Plan instances**      | Each stint is its own plan record — back-to-back bench stints are separate instances                                              |
+| **Naming**              | Auto-name `"<Focus> Goal NN"` + optional rename                                                                                   |
+| **Lifecycle end**       | User chooses **Complete** or **Pause**; resting = simply not training (plan holds position)                                       |
+| **Concurrency**         | **One active goal plan at a time**; activating it makes its backing program the **sole active Strength program**                  |
 | **Backing programs**    | Generated `Program` rows power rotation/sessions but are hidden from Add Practice / Programs / plan pickers — managed on `/goals` |
-| **Optional feature**    | Settings master toggle (like [health metrics](../v1.7.0/US-029-health-metrics.md)); default **off**; off = no UI, data kept   |
-| **Modularity**          | Self-contained module — `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at session/program UI                              |
-| **Data for later**      | Capture full plan metadata per instance for future charts/comparisons; visualizations **not** in this story                   |
+| **Optional feature**    | Settings master toggle (like [health metrics](../v1.7.0/US-029-health-metrics.md)); default **off**; off = no UI, data kept       |
+| **Modularity**          | Self-contained module — `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at session/program UI                                  |
+| **Data for later**      | Capture full plan metadata per instance for future charts/comparisons; visualizations **not** in this story                       |
 
 ### Deferred / Future (Lift plans)
 
@@ -69,7 +69,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ---
 
-## Part B — Baselines (planned)
+## Part B — Baselines (built)
 
 ### Design North Star
 
@@ -81,48 +81,48 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ### What's Shipping (Baselines)
 
-| Area                         | Detail                                                                 | Story                                      |
-| ---------------------------- | ---------------------------------------------------------------------- | ------------------------------------------ |
-| Feature flag + Settings CRUD | Master toggle; create/edit/deactivate with direction, 1–2 metrics, user-typed labels, targets | [US-034](./US-034-baselines-setup.md)      |
-| Daily logging                | `/baselines`; many logs per day (summed); edit/delete including past   | [US-035](./US-035-baselines-logging.md)    |
-| Progress charts              | Per-baseline line chart(s) + target line; Insights `RangeBar` options  | [US-036](./US-036-baselines-charts.md)     |
+| Area                         | Detail                                                                                        | Story                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Feature flag + Settings CRUD | Master toggle; create/edit/deactivate with direction, 1–2 metrics, user-typed labels, targets | [US-034](./US-034-baselines-setup.md)   |
+| Daily logging                | `/baselines`; many logs per day (summed); edit/delete including past                          | [US-035](./US-035-baselines-logging.md) |
+| Progress charts              | Per-baseline line chart(s) + target line; Insights `RangeBar` options                         | [US-036](./US-036-baselines-charts.md)  |
 
 ### Key Decisions (Baselines)
 
-| Topic                | Decision                                                                                                                                 |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Not Habits**       | Separate domain — multi-entry days, 1–2 metrics, up/under direction, growth charts                                                       |
-| **Not Lift plans**   | Lift plans stay on `/goals`; Baselines use `/baselines`                                                                                |
-| **Placement**        | Sibling of Habits                                                                                                                        |
-| **Settings**         | Setup under **Settings → Baselines**; main route for logging + chart                                                                     |
-| **Feature gate**     | `baselinesEnabled` — default **off**; off = hide UI, data persists                                                                     |
-| **Direction**        | **go up** or **stay under**                                                                                                              |
-| **Metrics**          | One or two; unit label(s) user-typed                                                                                                     |
-| **Daily aggregation**| Always many logs per day; totals = **sum**                                                                                               |
-| **Target changes**   | Manual only — no auto-raise                                                                                                              |
-| **Date / corrections** | Global date context; edit/delete any entry including past                                                                              |
-| **Charts**           | Line + flat target; same Insights range chips                                                                                            |
-| **DB**               | Same IndexedDB **v9** as Lift plans — add `baselines` + `baselineLogs` to that upgrade |
+| Topic                  | Decision                                                                               |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| **Not Habits**         | Separate domain — multi-entry days, 1–2 metrics, up/under direction, growth charts     |
+| **Not Lift plans**     | Lift plans stay on `/goals`; Baselines use `/baselines`                                |
+| **Placement**          | Sibling of Habits                                                                      |
+| **Settings**           | Setup under **Settings → Baselines**; main route for logging + chart                   |
+| **Feature gate**       | `baselinesEnabled` — default **off**; off = hide UI, data persists                     |
+| **Direction**          | **go up** or **stay under**                                                            |
+| **Metrics**            | One or two; unit label(s) user-typed                                                   |
+| **Daily aggregation**  | Always many logs per day; totals = **sum**                                             |
+| **Target changes**     | Manual only — no auto-raise                                                            |
+| **Date / corrections** | Global date context; edit/delete any entry including past                              |
+| **Charts**             | Line + flat target; same Insights range chips                                          |
+| **DB**                 | Same IndexedDB **v9** as Lift plans — add `baselines` + `baselineLogs` to that upgrade |
 
 ### Deferred / Future (Baselines)
 
-| Item                                      | Notes                                     |
-| ----------------------------------------- | ----------------------------------------- |
-| Auto-raising the daily target             | User-driven only                          |
-| “Time to raise the baseline?” nudges      | Later                                     |
-| Chart drill-down / Insights hub embedding | Line + target on Baselines is enough      |
-| Shared persisted range across Insights    | Page-local range OK for v1                |
+| Item                                      | Notes                                |
+| ----------------------------------------- | ------------------------------------ |
+| Auto-raising the daily target             | User-driven only                     |
+| “Time to raise the baseline?” nudges      | Later                                |
+| Chart drill-down / Insights hub embedding | Line + target on Baselines is enough |
+| Shared persisted range across Insights    | Page-local range OK for v1           |
 
 ---
 
 ## Stories
 
-| ID                                           | Title                     | Status  |
-| -------------------------------------------- | ------------------------- | ------- |
-| [US-033](./US-033-goal-progression-plans.md) | Goal Progression Plans    | Built   |
-| [US-034](./US-034-baselines-setup.md)        | Baselines Setup           | Planned |
-| [US-035](./US-035-baselines-logging.md)      | Baselines Daily Logging   | Planned |
-| [US-036](./US-036-baselines-charts.md)       | Baselines Progress Charts | Planned |
+| ID                                           | Title                     | Status |
+| -------------------------------------------- | ------------------------- | ------ |
+| [US-033](./US-033-goal-progression-plans.md) | Goal Progression Plans    | Built  |
+| [US-034](./US-034-baselines-setup.md)        | Baselines Setup           | Built  |
+| [US-035](./US-035-baselines-logging.md)      | Baselines Daily Logging   | Built  |
+| [US-036](./US-036-baselines-charts.md)       | Baselines Progress Charts | Built  |
 
 ---
 

@@ -7,6 +7,8 @@ import type {
 	Habit,
 	HabitLog,
 	HealthReading,
+	Baseline,
+	BaselineLog,
 } from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
 import { db, clearWorkoutData, putAllRecords, countRecords, initDB } from './database';
@@ -36,6 +38,10 @@ interface BackupDb {
 	healthReadings: HealthReading[];
 	/** Absent in pre-v1.9.0 backups. */
 	goalPlans?: GoalPlan[];
+	/** Absent in pre-v1.9.0 backups. */
+	baselines?: Baseline[];
+	/** Absent in pre-v1.9.0 backups. */
+	baselineLogs?: BaselineLog[];
 }
 
 export interface BackupEnvelope {
@@ -56,6 +62,8 @@ const DB_STORES: (keyof BackupDb)[] = [
 	'habitLogs',
 	'healthReadings',
 	'goalPlans',
+	'baselines',
+	'baselineLogs',
 ];
 
 const STORE_KEY_PATH: Record<keyof BackupDb, string> = {
@@ -68,6 +76,8 @@ const STORE_KEY_PATH: Record<keyof BackupDb, string> = {
 	habitLogs: 'id',
 	healthReadings: 'id',
 	goalPlans: 'id',
+	baselines: 'id',
+	baselineLogs: 'id',
 };
 
 type StoreCounts = Record<keyof BackupDb, number>;
@@ -122,6 +132,8 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		habitLogs,
 		healthReadings,
 		goalPlans,
+		baselines,
+		baselineLogs,
 	] = await Promise.all([
 		db.items.getAll(),
 		db.programs.getAll(),
@@ -132,6 +144,8 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		db.habitLogs.getAll(),
 		db.healthReadings.getAll(),
 		db.goalPlans.getAll(),
+		db.baselines.getAll(),
+		db.baselineLogs.getAll(),
 	]);
 
 	const local: Record<string, unknown> = {};
@@ -154,6 +168,8 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 			habitLogs,
 			healthReadings,
 			goalPlans,
+			baselines,
+			baselineLogs,
 		},
 		localStorage: local,
 	};

@@ -7,15 +7,11 @@
 		clearHabitsData,
 		clearHealthData,
 		clearGoalPlansData,
+		clearBaselinesData,
 		clearEverything,
 		loadDebugSeedData,
 	} from '$lib/db/database';
-	import {
-		downloadBackup,
-		parseBackup,
-		importBackup,
-		BackupValidationError,
-	} from '$lib/db/backup';
+	import { downloadBackup, parseBackup, importBackup, BackupValidationError } from '$lib/db/backup';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -33,6 +29,7 @@
 		| 'habits'
 		| 'health'
 		| 'goalPlans'
+		| 'baselines'
 		| 'everything';
 
 	const clearFns: Record<ClearAction, () => Promise<void>> = {
@@ -43,6 +40,7 @@
 		habits: clearHabitsData,
 		health: clearHealthData,
 		goalPlans: clearGoalPlansData,
+		baselines: clearBaselinesData,
 		everything: clearEverything,
 	};
 
@@ -157,11 +155,11 @@
 		<h2 class="settings-section__title">Backup</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Export all your workout data — sessions, programs, exercises, habits, activities, and
-				health readings — as a JSON file. On a phone, Export opens the share sheet so you can
-				<strong>Save to Files</strong>, Mail, or AirDrop. On desktop it downloads the file. Keep
-				the file until you've confirmed the restore on the other device. A few months of history
-				is typically around 1&nbsp;MB — fine as an email attachment.
+				Export all your workout data — sessions, programs, exercises, habits, activities, and health
+				readings — as a JSON file. On a phone, Export opens the share sheet so you can
+				<strong>Save to Files</strong>, Mail, or AirDrop. On desktop it downloads the file. Keep the
+				file until you've confirmed the restore on the other device. A few months of history is
+				typically around 1&nbsp;MB — fine as an email attachment.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--primary"
@@ -175,9 +173,9 @@
 
 		<div class="data-action">
 			<p class="data-action__desc">
-				Restore from a backup file. This <strong>replaces</strong> all workout data on this device.
-				The file is fully written and verified in a staging area first — if that fails, your
-				existing data is left unchanged.
+				Restore from a backup file. This <strong>replaces</strong> all workout data on this device. The
+				file is fully written and verified in a staging area first — if that fails, your existing data
+				is left unchanged.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--secondary"
@@ -233,6 +231,13 @@
 				label="Goal plans"
 				description="Goal progression plan records. Their generated programs and sessions stay in place."
 				onclick={() => openClearDialog('goalPlans')}
+			/>
+		{/if}
+		{#if prefsStore.baselinesEnabled}
+			<SettingsActionRow
+				label="Baselines"
+				description="Baseline definitions and every logged entry."
+				onclick={() => openClearDialog('baselines')}
 			/>
 		{/if}
 	</SettingsGroup>
@@ -392,6 +397,20 @@
 		This removes all goal progression plan records — active, paused, and completed. The programs and
 		sessions they generated stay and can be cleared with "Custom programs" and "Workout sessions".
 		This cannot be undone.
+	</ConfirmDialog>
+{:else if activeDialog === 'baselines'}
+	<ConfirmDialog
+		title="Clear baselines?"
+		confirmLabel="Clear baselines"
+		confirmBusyLabel="Clearing…"
+		danger
+		busy={clearingData}
+		error={clearError}
+		onconfirm={handleClearConfirm}
+		oncancel={() => (activeDialog = null)}
+	>
+		This removes every baseline and all of its logged entries, including past days. This cannot be
+		undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'health'}
 	<ConfirmDialog

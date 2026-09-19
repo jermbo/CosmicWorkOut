@@ -10,6 +10,7 @@
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
 	import DanceSessionOverlay from '$lib/components/DanceSessionOverlay.svelte';
@@ -33,6 +34,7 @@
 				activityStore.load(),
 				healthStore.load(),
 				goalPlanStore.load(),
+				baselineStore.load(),
 			]);
 
 			if (sessionStore.checkForRecovery()) {

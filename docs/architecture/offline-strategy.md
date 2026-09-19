@@ -36,18 +36,18 @@ flowchart LR
     class PREFS,ACTIVE,PROGID sync;
 ```
 
-| Store                    | Technology   | Written When                                |
-| ------------------------ | ------------ | ------------------------------------------- |
-| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor |
-| `programs`               | IndexedDB    | On routine save in editor                   |
-| `sessions`               | IndexedDB    | On session finish                           |
-| `itemLastUsed`           | IndexedDB    | On each set confirm                         |
-| `healthReadings`         | IndexedDB    | On each health log / edit / delete (US-029) |
-| `baselines`              | IndexedDB    | On baseline create / edit (US-034, planned) |
+| Store                    | Technology   | Written When                                           |
+| ------------------------ | ------------ | ------------------------------------------------------ |
+| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor            |
+| `programs`               | IndexedDB    | On routine save in editor                              |
+| `sessions`               | IndexedDB    | On session finish                                      |
+| `itemLastUsed`           | IndexedDB    | On each set confirm                                    |
+| `healthReadings`         | IndexedDB    | On each health log / edit / delete (US-029)            |
+| `baselines`              | IndexedDB    | On baseline create / edit (US-034, planned)            |
 | `baselineLogs`           | IndexedDB    | On each baseline log / edit / delete (US-035, planned) |
-| `cwout:prefs`            | localStorage | On every preference change                  |
-| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
-| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
+| `cwout:prefs`            | localStorage | On every preference change                             |
+| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)                  |
+| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)                       |
 
 ---
 

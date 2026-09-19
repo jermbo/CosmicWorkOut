@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsRow from '$lib/components/SettingsRow.svelte';
 	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
 
 	let activeHabitCount = $derived(habitStore.activeHabits.filter((h) => h.type !== 'mood').length);
+	let activeBaselineCount = $derived(baselineStore.activeBaselines.length);
 </script>
 
 <svelte:head>
@@ -41,6 +43,19 @@
 				href="/goals"
 				label="Goal plans"
 				detail="Manage & create"
+			/>
+		{/if}
+		<SettingsToggleRow
+			label="Baselines"
+			description="Embarrassingly low daily floors and ceilings. Your baseline data is kept when off."
+			checked={prefsStore.baselinesEnabled}
+			onchange={(v) => prefsStore.setBaselinesEnabled(v)}
+		/>
+		{#if prefsStore.baselinesEnabled}
+			<SettingsRow
+				href="/settings/baselines"
+				label="Manage baselines"
+				detail="{activeBaselineCount} active"
 			/>
 		{/if}
 	</SettingsGroup>

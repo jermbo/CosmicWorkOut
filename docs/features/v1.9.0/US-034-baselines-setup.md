@@ -1,6 +1,8 @@
 # US-034 — Baselines Setup
 
-> **Status: Planned — v1.9.0**
+> **As built:** `baselines` + `baselineLogs` stores at **DB_VERSION 9** (same bump as Lift plans); pure logic in `src/lib/baselines/logic.ts` with tests; `baselineStore` in `src/lib/stores/baselines.svelte.ts`; routes `/baselines` + `/settings/baselines`; Settings toggle `baselinesEnabled` (default off). Overview gets a gated `HomeBaselinesCard` beside Habits. Deleting a baseline retains its logs. Clearing is wired into Settings → Data, and both stores are in the backup envelope.
+>
+> **Local upgrade note:** because the stores were folded into the existing v9 upgrade rather than a new version, a browser DB already opened at v9 will not have them — clear IndexedDB once so the v9 upgrade re-runs.
 >
 > Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Roadmap — Baselines](../../roadmap/baselines.md).
 
@@ -17,14 +19,14 @@ so that I can set an embarrassingly low bar once in Settings and use it day to d
 
 ## Key Decisions
 
-| Topic            | Decision                                                                                                      |
-| ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Separate**     | Not a Habit type; not a Lift plan                                                                             |
-| **Gate**         | Master Settings toggle; default off; data persists when off                                                   |
-| **CRUD home**    | **Settings → Baselines** (create / edit / deactivate / reorder); main `/baselines` is for daily use           |
-| **Fields**       | Name, direction (up / under), 1 or 2 metrics, user-typed unit label(s), daily target per metric               |
-| **Multi-log**    | Not a setting — always on (see US-035)                                                                        |
-| **Routes**       | `/baselines`, `/settings/baselines` — do **not** reuse `/goals` (Lift plans)                                  |
+| Topic         | Decision                                                                                            |
+| ------------- | --------------------------------------------------------------------------------------------------- |
+| **Separate**  | Not a Habit type; not a Lift plan                                                                   |
+| **Gate**      | Master Settings toggle; default off; data persists when off                                         |
+| **CRUD home** | **Settings → Baselines** (create / edit / deactivate / reorder); main `/baselines` is for daily use |
+| **Fields**    | Name, direction (up / under), 1 or 2 metrics, user-typed unit label(s), daily target per metric     |
+| **Multi-log** | Not a setting — always on (see US-035)                                                              |
+| **Routes**    | `/baselines`, `/settings/baselines` — do **not** reuse `/goals` (Lift plans)                        |
 
 ---
 
@@ -77,7 +79,7 @@ type BaselineLog = {
    b. The user shall be able to edit name, direction, unit labels, and targets. Metric count changes that would corrupt history shall be disallowed or clearly handled (prefer: metric count fixed after creation, same spirit as habit type immutability).
    c. The user shall be able to deactivate a baseline so it no longer appears on the main Baselines screen; historical logs remain.
    d. The user shall be able to reorder active baselines; order is reflected on the main Baselines screen.
-   e. The user shall be able to delete a baseline; historical logs for that baseline remain queryable for charts/history or are retained per implementer choice documented in the as-built note (prefer retain like habits).
+   e. The user shall be able to delete a baseline; historical logs for that baseline remain queryable for charts/history or are retained per implementer choice documented in the as-built note (prefer retain like habits). **As built:** logs are retained.
 3. Navigation
    a. When enabled, Baselines shall appear as a sibling destination to Habits (home card and/or equivalent entry), not nested under Habits.
    b. Main logging route shall be `/baselines`. Lift plans remain on `/goals`.

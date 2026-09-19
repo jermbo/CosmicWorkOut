@@ -15,15 +15,15 @@ The dev script includes `--host`, so the server is also accessible on your local
 
 Other scripts:
 
-| Command              | Purpose                                      |
-| -------------------- | -------------------------------------------- |
-| `npm run build`      | Production build                             |
-| `npm run preview`    | Preview production build                     |
-| `npm run check`      | TypeScript + Svelte type checking            |
-| `npm run test`       | Goal-plan unit tests                         |
-| `npm run docs:links` | Check wiki relative links + heading anchors  |
-| `npm run lint`       | Prettier + ESLint                            |
-| `npm run format`     | Auto-format with Prettier                    |
+| Command              | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| `npm run build`      | Production build                            |
+| `npm run preview`    | Preview production build                    |
+| `npm run check`      | TypeScript + Svelte type checking           |
+| `npm run test`       | Goal-plan unit tests                        |
+| `npm run docs:links` | Check wiki relative links + heading anchors |
+| `npm run lint`       | Prettier + ESLint                           |
+| `npm run format`     | Auto-format with Prettier                   |
 
 ---
 

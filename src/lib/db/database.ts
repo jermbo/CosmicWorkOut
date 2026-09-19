@@ -7,6 +7,8 @@ import type {
 	Habit,
 	HabitLog,
 	HealthReading,
+	Baseline,
+	BaselineLog,
 } from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
@@ -33,6 +35,8 @@ export const ALL_STORE_NAMES = [
 	'habitLogs',
 	'healthReadings',
 	'goalPlans',
+	'baselines',
+	'baselineLogs',
 ] as const;
 
 let dbInstance: IDBDatabase | null = null;
@@ -88,6 +92,12 @@ function openDB(): Promise<IDBDatabase> {
 
 			const gpStore = ensureStore('goalPlans', { keyPath: 'id' });
 			ensureIndex(gpStore, 'by_status', 'status');
+
+			ensureStore('baselines', { keyPath: 'id' });
+
+			const blStore = ensureStore('baselineLogs', { keyPath: 'id' });
+			ensureIndex(blStore, 'by_date', 'date');
+			ensureIndex(blStore, 'by_baseline', 'baselineId');
 		};
 
 		request.onsuccess = (event) => {
@@ -270,11 +280,14 @@ async function clearNonBuiltIn(storeName: string): Promise<void> {
 }
 
 export async function loadDebugSeedData(): Promise<void> {
-	const { sessions, activities, habitLogs, healthReadings } = generateDebugSeedData();
+	const { sessions, activities, habitLogs, healthReadings, baselines, baselineLogs } =
+		generateDebugSeedData();
 	await putAllRecords('sessions', sessions);
 	await putAllRecords('activities', activities);
 	await putAllRecords('habitLogs', habitLogs);
 	await putAllRecords('healthReadings', healthReadings);
+	await putAllRecords('baselines', baselines);
+	await putAllRecords('baselineLogs', baselineLogs);
 
 	const goalSample = generateGoalPlanSampleData();
 	await putAllRecords('goalPlans', goalSample.goalPlans);
@@ -348,6 +361,11 @@ export async function clearHabitsData(): Promise<void> {
 
 export async function clearHealthData(): Promise<void> {
 	await clearStores(['healthReadings']);
+	location.reload();
+}
+
+export async function clearBaselinesData(): Promise<void> {
+	await clearStores(['baselines', 'baselineLogs']);
 	location.reload();
 }
 
@@ -483,5 +501,17 @@ export const db = {
 		getOne: (id: string) => getOne<GoalPlan>('goalPlans', id),
 		put: (plan: GoalPlan) => putRecord('goalPlans', plan),
 		remove: (id: string) => removeRecord('goalPlans', id),
+	},
+
+	baselines: {
+		getAll: () => getAll<Baseline>('baselines'),
+		put: (baseline: Baseline) => putRecord('baselines', baseline),
+		remove: (id: string) => removeRecord('baselines', id),
+	},
+
+	baselineLogs: {
+		getAll: () => getAll<BaselineLog>('baselineLogs'),
+		put: (log: BaselineLog) => putRecord('baselineLogs', log),
+		remove: (id: string) => removeRecord('baselineLogs', id),
 	},
 };

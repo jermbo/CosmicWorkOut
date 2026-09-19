@@ -110,18 +110,18 @@ Built-in items and programs are upserted on every boot (so new fields land on ol
 
 Class-based stores using Svelte 5 runes. The core ones:
 
-| Store            | File                       | Responsibility                              |
-| ---------------- | -------------------------- | ------------------------------------------- |
-| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine  |
-| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon |
-| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density     |
-| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood         |
-| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                  |
-| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)   |
+| Store            | File                       | Responsibility                               |
+| ---------------- | -------------------------- | -------------------------------------------- |
+| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine   |
+| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon  |
+| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density      |
+| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood          |
+| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                   |
+| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)    |
 | `goalPlanStore`  | `goalPlans.svelte.ts`      | Lift plans / goal progression plans (US-033) |
 | `baselineStore`  | _(planned)_                | Baselines + logs (US-034 / US-035)           |
-| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                |
-| `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications          |
+| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                 |
+| `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications           |
 
 See [State Management](../implementation/state.md) for the complete list and data flow.
 
@@ -145,14 +145,14 @@ Insights charts render with **Chart.js** (`chart.js`), the app's only runtime UI
 
 Pinned in `package.json` (kept here as a snapshot; `package.json` is authoritative):
 
-| Package                      | Version |
-| ---------------------------- | ------- |
-| `svelte`                     | 5.56.1  |
-| `@sveltejs/kit`              | 2.63.0  |
-| `@sveltejs/adapter-static`   | 3.0.10  |
-| `vite`                       | 8.0.16  |
-| `typescript`                 | 6.0.3   |
-| `chart.js`                   | 4.5.1   |
+| Package                    | Version |
+| -------------------------- | ------- |
+| `svelte`                   | 5.56.1  |
+| `@sveltejs/kit`            | 2.63.0  |
+| `@sveltejs/adapter-static` | 3.0.10  |
+| `vite`                     | 8.0.16  |
+| `typescript`               | 6.0.3   |
+| `chart.js`                 | 4.5.1   |
 
 ---
 
