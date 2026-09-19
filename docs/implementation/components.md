@@ -10,17 +10,26 @@ Inventory of the UI components in `src/lib/components/` (plus `components/insigh
 
 Reusable building blocks with no feature knowledge.
 
-| Component          | Purpose                                                                                                                             |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `Icon`             | Single SVG icon component, keyed by name. Imported by 11 files — but **61 inline `<svg>` blocks still bypass it** (cleanup target). |
-| `BottomSheet`      | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 13 sheets.**                              |
-| `SheetHeader`      | Sheet title row: title, optional action buttons, close button. Used by 7 sheets.                                                    |
-| `ConfirmDialog`    | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 7 callers.                                              |
-| `ValueDialog`      | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`).                                                        |
-| `SegmentedControl` | Generic `role="radiogroup"` segmented toggle (`options`, typed value).                                                              |
-| `ProgressRing`     | Circular SVG progress indicator (exercise cards, habit cards).                                                                      |
-| `PageHeader`       | Standard page title bar; embeds `WeekStrip`. Used by 7 routes.                                                                      |
-| `Toaster`          | Global toast notification host (mounted in layout).                                                                                 |
+| Component       | Purpose                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`        | Dialog/modal action button. `variant` primary \| ghost \| danger, plus `grow`, `bold`. Used by 4 callers.                           |
+| `Chip`          | Pill-shaped filter/choice button. `active`, `caps`, `small`, and `select` (toggle \| radio \| tab) for the right ARIA. 4 callers.   |
+| `FieldLabel`    | Form field label with optional muted `hint`. Renders `<label for>` or a `<span>` caption. Used by 11 callers.                       |
+| `DialogTitle`   | Heading at the top of a modal surface (`as` p \| h2). Used by 6 callers.                                                            |
+| `SheetBody`     | Flex-column wrapper inside `BottomSheet`. Used by 8 sheets.                                                                         |
+| `SheetHeader`   | Sheet title row: title, optional action buttons, close button. Used by 8 sheets.                                                    |
+| `BottomSheet`   | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 15 sheets.**                              |
+| `ConfirmDialog` | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 8 callers.                                              |
+| `ValueDialog`   | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`). Used by 3 callers.                                     |
+| `Icon`          | Single SVG icon component, keyed by name. Imported by 15 files — but **48 inline `<svg>` blocks still bypass it** (cleanup target). |
+| `ProgressRing`  | Circular SVG progress indicator (exercise cards, habit cards).                                                                      |
+| `PageHeader`    | Standard page title bar; embeds `WeekStrip`. Used by 11 routes.                                                                     |
+| `Toaster`       | Global toast notification host (mounted in layout).                                                                                 |
+
+The first six are the **UI primitive layer** the [June 2026 audit](../maintenance/audit-2026-06.md#3-css)
+called for — wrapper components rather than global utility classes, per Decision 4. A pattern
+that recurs across components belongs here; `app.css` stays tokens, reset and app shell only.
+See [Styling](dev-guide.md#styling-tokens-and-primitive-components).
 
 ---
 

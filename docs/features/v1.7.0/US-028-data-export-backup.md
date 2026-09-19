@@ -4,7 +4,7 @@
 >
 > Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
 >
-> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
+> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. The envelope shape, `parseBackup()`, count verification and the pre-wipe preflight live in `src/lib/db/backupPayload.ts` — kept free of IndexedDB so they can be unit-tested (`backupPayload.test.ts`, 21 tests); `backup.ts` keeps the transaction plumbing. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -144,6 +144,7 @@ Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time fi
 ### Implementation Notes
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
+- Pure payload logic split into `src/lib/db/backupPayload.ts` (2026-09-19) so the restore path is testable without a browser.
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.
 - UI: export / restore on `/settings/data` ([US-030](./US-030-settings-restructure.md)); not on the hub.
 

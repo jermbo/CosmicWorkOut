@@ -91,21 +91,31 @@ Add a new test directory to the `test` script's globs in `package.json`.
 
 ---
 
-## Styling: tokens, globals, scoped CSS
+## Styling: tokens and primitive components
 
 Three layers, in order of preference:
 
 1. **Design tokens** (`:root` in `app.css`) — colours, spacing, radii, easing. Never
    hard-code a value a token already covers.
-2. **Shared primitives** (`app.css`) — single-class globals for patterns that recur
-   across components: `.field-label`, `.field-hint`, `.chip` (`--active`, `--caps`),
-   `.btn` (`--primary`, `--ghost`, `--danger`, `--grow`, `--bold`), `.sheet-body`,
-   `.sheet-header` (`--tight`), `.modal-title`.
+2. **Primitive components** (`lib/components/`) — `Button`, `Chip`, `FieldLabel`,
+   `DialogTitle`, `SheetBody`, `SheetHeader`. A recurring visual pattern becomes a
+   component that owns its own scoped CSS. See [Components](components.md#shared-primitives).
 3. **Scoped component CSS** — everything genuinely local to one component.
 
-> Scoped selectors carry a `.svelte-*` hash, so they **outrank** the globals. A component
-> opting into a shared primitive must delete its local copy rather than layering on top
-> of it — a leftover local rule silently wins and the global looks broken.
+**`app.css` is global-only:** tokens, reset, `.sr-only`, focus ring, app shell, `.page`,
+keyframes. Per [Decision 4](../maintenance/audit-2026-06.md#decisions-locked-2026-06-22),
+shared UI patterns are **wrapper components, not global utility classes** — a global
+`.btn`/`.chip` layer was tried and reverted in September 2026.
+
+Two consequences worth knowing:
+
+> **A parent cannot restyle a child component's markup.** Scoped selectors carry a
+> `.svelte-*` hash, and an element rendered by a child component does not carry the
+> parent's hash. So a primitive needs a real prop for anything a caller must vary —
+> never a `class` pass-through, which silently does nothing.
+
+> **Tag selectors stop at the component boundary too.** `.field > label { … }` will not
+> reach a `<label>` rendered by `FieldLabel`. Style the primitive from the inside.
 
 ---
 

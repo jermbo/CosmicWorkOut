@@ -83,6 +83,8 @@ All application code in TypeScript. Types live in `src/lib/db/types.ts` and mirr
 
 Design tokens in `src/app.css` as CSS custom properties (colors, spacing, radius, timing, fonts). Component styles are scoped `<style>` blocks in each `.svelte` file.
 
+Between the two sits a small set of **primitive components** (`Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader`) that own recurring patterns. `app.css` holds no UI utility classes — shared patterns are components, not global classes. See [Styling](../implementation/dev-guide.md#styling-tokens-and-primitive-components).
+
 Runtime theming via `data-density` and `data-roundness` attributes on `<html>`, plus `--color-accent` set by the prefs store.
 
 Reference tokens also exist in the [inspiration package](../_inspiration/packet/tokens.css).
