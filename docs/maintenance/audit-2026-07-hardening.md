@@ -43,7 +43,7 @@ written here so the reasoning survives the session.
 
 ---
 
-## <a id="fixed-2026-07-16"></a>Fixed (2026-07-16)
+## <span id="fixed-2026-07-16"></span>Fixed (2026-07-16)
 
 These were genuine data-loss paths, cheap to fix, and fixed immediately. `svelte-check` clean,
 all 21 tests pass.
@@ -62,7 +62,7 @@ Two low-risk memory-leak fixes rode along:
 
 ---
 
-## <a id="security-deferred"></a>Security — deferred
+## <span id="security-deferred"></span>Security — deferred
 
 **Verdict: healthy.** No XSS sinks (`{@html}`, `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
 `document.write`, `eval`, `new Function` — none present). User text renders through Svelte's
@@ -81,7 +81,7 @@ Remaining, all low severity given the app is client-only with no backend:
 
 ---
 
-## <a id="performance-deferred"></a>Performance — deferred
+## <span id="performance-deferred"></span>Performance — deferred
 
 **Verdict: fine now, scales linearly with logged history.** All findings are "works at 100s of
 records, degrades at 10,000s." Safe to defer until a user (or seed test) has a year-plus of data
@@ -112,7 +112,7 @@ dependencies (charts, week indicators), not loops.
 
 ---
 
-## <a id="correctness-deferred"></a>Correctness — deferred
+## <span id="correctness-deferred"></span>Correctness — deferred
 
 Sharp edges that are low-probability today but fragile:
 

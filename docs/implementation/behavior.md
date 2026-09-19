@@ -169,7 +169,7 @@ Off by default — same contract as health metrics. Enable **Goal progression pl
 
 A goal plan is an isolated Strength stint toward one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Only one goal plan may be **active** at a time; while active it is the sole active Strength program. You can pause, complete, or repeat a block. Turning the toggle off hides the UI; plan data stays in IndexedDB.
 
-Vocabulary: [Glossary — Goal progression plan](../glossary.md#goal-progression-plan). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
+Vocabulary: [Glossary — Lift plan](../glossary.md#lift-plan) (older name: Goal progression plan). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
 
 ---
 

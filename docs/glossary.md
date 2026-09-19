@@ -87,23 +87,30 @@ A multi-week plan within **one** Discipline: name, duration in weeks, days per w
 
 Two program **flavors** exist for Strength today:
 
-| Flavor                                        | Purpose                                         | Progression                                                                  |
-| --------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Course program**                            | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump                   |
-| **Goal progression plan** _(v1.9.0)_          | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Goal progression plan](#goal-progression-plan) |
+| Flavor                   | Purpose                                         | Progression                                                |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------- |
+| **Course program**       | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump |
+| **Lift plan** _(v1.9.0)_ | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Lift plan](#lift-plan)       |
 
-### Goal progression plan _(v1.9.0)_
-<a id="goal-progression-plan"></a>
+### Lift plan _(v1.9.0)_
 
-A Strength program type where the user sets a **focus exercise** and a **goal** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench Goal 01 vs Bench Goal 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+<span id="lift-plan"></span>
+<span id="goal-progression-plan"></span>
+
+**UI / product name:** Lift plan.
+**Older docs / code name:** Goal progression plan (`goalPlans` store, `goalProgressionPlansEnabled` pref, `/goals` routes) — rename in UI first; code identifiers may lag.
+
+A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+
+Do **not** confuse with [Baseline](#baseline) — that is daily floor/ceiling tracking across any topic, not a Strength wave plan.
 
 ### Progression block
 
-One **4-week wave** within a goal progression plan. Focus exercise pattern: build → build → peak → deload (e.g. 150×10 → 160×8 → 170×6 → 150×10), then the next block starts at a higher baseline. The user may **repeat** the current block without rewinding to earlier blocks.
+One **4-week wave** within a lift plan. Focus exercise pattern: build → build → peak → deload (e.g. 150×10 → 160×8 → 170×6 → 150×10), then the next block starts at a higher starting weight. The user may **repeat** the current block without rewinding to earlier blocks.
 
 ### Focus exercise
 
-The single lift a goal progression plan is built around. It follows the full wave block schedule. All other exercises in the plan are **supporting** — weekly `weightIncrement` bumps, no deload wave.
+The single lift a lift plan is built around. It follows the full wave block schedule. All other exercises in the plan are **supporting** — weekly `weightIncrement` bumps, no deload wave.
 
 ### Routine _(renamed from **Workout**)_
 
@@ -143,6 +150,22 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 ---
 
+## Baselines _(roadmap — not built)_
+
+> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Spec: [Baselines](roadmap/baselines.md).
+
+### Baseline
+
+<span id="baseline"></span>
+
+A user-defined daily **floor** (go up / hit-or-exceed) or **ceiling** (stay under), with one or two metrics, logged as many times per day as needed (entries sum). Unit labels are user-typed in Settings. Entries (including past dates) are editable/deletable. Examples: walk 30 min + 1.25 miles, write 250 words, 10 pushups, phone time under 30 min. The target stays embarrassingly low until the user raises it. Distinct from [Habits](#habit) (simple daily check-ins) and from [Lift plans](#lift-plan) (Strength wave-loading).
+
+### Baseline log
+
+One entry toward a Baseline on a given day. Many per day; the day’s total(s) are the sum. (Data model TBD when the feature is built.)
+
+---
+
 ## Health metrics
 
 > **Not a fourth movement archetype.** Body measurements (weight, blood pressure) are optional wellness tracking — separate from Structured, Quick-log, and Habit. Shipped in [US-029](features/v1.7.0/US-029-health-metrics.md).
@@ -173,13 +196,14 @@ One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight:
 
 The v1.4.0 generalization renamed the strength-only **data entities**. The old names no longer exist as stored types or interfaces, though "Exercise" and "Workout" still appear as UI copy and component/route identifiers (e.g. `ExerciseCard`, `WorkoutPicker`, `/workout`).
 
-| Original             | Current                            | Why                                              |
-| -------------------- | ---------------------------------- | ------------------------------------------------ |
-| Exercise             | Item                               | Items exist in any Discipline, not just strength |
-| Workout              | Routine                            | "Workout" reads as strength-only                 |
-| SessionLog           | Session                            | One concept across all Disciplines               |
-| Program _(strength)_ | Program _(Discipline-scoped)_      | Now belongs to a Discipline                      |
-| —                    | Discipline, Section, Metric, Focus | New in the generalized model                     |
+| Original                          | Current                             | Why                                                                        |
+| --------------------------------- | ----------------------------------- | -------------------------------------------------------------------------- |
+| Exercise                          | Item                                | Items exist in any Discipline, not just strength                           |
+| Workout                           | Routine                             | "Workout" reads as strength-only                                           |
+| SessionLog                        | Session                             | One concept across all Disciplines                                         |
+| Program _(strength)_              | Program _(Discipline-scoped)_       | Now belongs to a Discipline                                                |
+| —                                 | Discipline, Section, Metric, Focus  | New in the generalized model                                               |
+| Goal progression plan _(docs/UI)_ | **Lift plan** _(preferred UI name)_ | Avoid clash with [Baseline](#baseline); code ids may still say `goalPlan*` |
 
 ---
 
@@ -188,6 +212,7 @@ The v1.4.0 generalization renamed the strength-only **data entities**. The old n
 - [North Star](vision/north-star.md) — product identity
 - [How It Works](implementation/behavior.md) — these terms in everyday app behavior
 - [Data Model](architecture/data-model.md) — the entities behind these terms
-- [US-033 — Goal Progression Plans](features/v1.9.0/US-033-goal-progression-plans.md) — wave-loading Strength stints
+- [US-033 — Goal Progression Plans](features/v1.9.0/US-033-goal-progression-plans.md) — Lift plans (wave-loading Strength stints)
+- [Roadmap — Baselines](roadmap/baselines.md) — daily floor/ceiling growth tracking (not built)
 - [US-029 — Health Metrics](features/v1.7.0/US-029-health-metrics.md) — optional body measurements
 - [v1.4.0 — Belly Dance](features/v1.4.0/README.md) — first Discipline beyond strength

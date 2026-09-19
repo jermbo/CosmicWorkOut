@@ -77,7 +77,7 @@ flowchart TB
 3. [System Overview](architecture/overview.md) — how the pieces fit
 4. [Implementation Status](implementation/status.md) — what's built today
 
-**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit, Goal plan — and the rule for where new movement types belong. Most concept pages link back to it.
+**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit, Lift plan, Baseline — and the rule for where new movement types belong. Most concept pages link back to it.
 
 **Keeping the wiki honest:** relative links are checked by `npm run docs:links` (`scripts/check-doc-links.mjs`). When behavior or schema changes, update the docs in the same change — see [Documenting decisions](#documenting-decisions).
 
