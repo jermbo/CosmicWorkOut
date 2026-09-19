@@ -12,6 +12,7 @@
 	import DayActionItem from './DayActionItem.svelte';
 	import DayActionsActivityList from './DayActionsActivityList.svelte';
 	import DayActionsWorkoutSummary from './DayActionsWorkoutSummary.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		date: string;
@@ -110,7 +111,7 @@
 
 <BottomSheet onclose={onClose}>
 	<div class="day-actions">
-		<p class="modal-title">{formatLongDate(date)}</p>
+		<DialogTitle>{formatLongDate(date)}</DialogTitle>
 
 		{#if strengthSession}
 			<DayActionsWorkoutSummary

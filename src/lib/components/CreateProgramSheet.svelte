@@ -3,6 +3,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 
 	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+	import FieldLabel from './FieldLabel.svelte';
 
 	type Props = { onClose: () => void; disciplineId?: string };
 
@@ -169,10 +170,7 @@
 						class="form-field"
 						class:form-field--error={errors.name}
 					>
-						<label
-							class="field-label"
-							for="prog-name">Program name</label
-						>
+						<FieldLabel for="prog-name">Program name</FieldLabel>
 						<input
 							id="prog-name"
 							class="form-field__input"
@@ -185,9 +183,9 @@
 					</div>
 
 					<div class="form-field">
-						<label
-							class="field-label"
-							for="prog-desc">Description <span class="field-hint">optional</span></label
+						<FieldLabel
+							for="prog-desc"
+							hint="optional">Description</FieldLabel
 						>
 						<textarea
 							id="prog-desc"
@@ -202,10 +200,7 @@
 						class="form-field"
 						class:form-field--error={errors.weeks}
 					>
-						<label
-							class="field-label"
-							for="prog-weeks">Duration (weeks)</label
-						>
+						<FieldLabel for="prog-weeks">Duration (weeks)</FieldLabel>
 						<div class="stepper">
 							<button
 								type="button"
@@ -230,10 +225,7 @@
 						class="form-field"
 						class:form-field--error={errors.days}
 					>
-						<span
-							class="field-label"
-							id="days-label">Days per week</span
-						>
+						<FieldLabel id="days-label">Days per week</FieldLabel>
 						<div
 							class="days-chips"
 							role="radiogroup"

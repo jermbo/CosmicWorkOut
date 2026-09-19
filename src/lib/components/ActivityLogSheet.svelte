@@ -6,6 +6,7 @@
 	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
 		'Run',
@@ -107,7 +108,7 @@
 	onclose={onClose}
 	maxHeight="80dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={editing ? 'Edit Activity' : 'Log Activity'}
 			{onClose}
@@ -203,7 +204,7 @@
 				</button>
 			{/if}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

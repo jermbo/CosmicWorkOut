@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FieldLabel from '../FieldLabel.svelte';
 	type Props = {
 		label: string;
 		weight: number | null;
@@ -27,7 +28,7 @@
 </script>
 
 <div class="form-field">
-	<span class="field-label">{label}</span>
+	<FieldLabel>{label}</FieldLabel>
 	<div class="pair-inputs">
 		<label class="pair-inputs__field">
 			<input

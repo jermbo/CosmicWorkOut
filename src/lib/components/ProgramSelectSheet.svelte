@@ -4,6 +4,7 @@
 	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		onClose: () => void;
@@ -35,7 +36,7 @@
 	onclose={onClose}
 	maxHeight="80dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title="Plans"
 			{onClose}
@@ -103,7 +104,7 @@
 				Create new plan
 			</button>
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

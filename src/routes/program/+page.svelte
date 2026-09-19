@@ -16,6 +16,7 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import FieldLabel from '$lib/components/FieldLabel.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
@@ -264,7 +265,7 @@
 				{#if viewingIsActive}
 					<div class="schedule__progress">
 						<div class="schedule__progress-labels">
-							<span class="field-label">Progress</span>
+							<FieldLabel>Progress</FieldLabel>
 							<span class="schedule__progress-wk">
 								Week {programStore.currentWeekFor(disciplineId)} of {viewingProgram.durationWeeks}
 							</span>

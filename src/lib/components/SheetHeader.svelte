@@ -52,6 +52,18 @@
 </div>
 
 <style>
+	.sheet-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-inline: var(--space-5);
+		padding-block-end: var(--space-4);
+	}
+
+	.sheet-header--tight {
+		padding-block-end: var(--space-3);
+	}
+
 	.sheet-header__title {
 		font-family: var(--font-display);
 		font-size: 1.25rem;

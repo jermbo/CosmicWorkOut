@@ -3,6 +3,9 @@
 	import type { Baseline, BaselineDirection } from '$lib/db/types';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import { BASELINE_DIRECTIONS, BASELINE_PRESETS } from '$lib/baselines/logic';
+	import Button from './Button.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		editing?: Baseline | null;
@@ -81,16 +84,13 @@
 	aria-labelledby={titleId}
 	aria-modal="true"
 >
-	<p
-		class="modal-title"
-		id={titleId}
-	>
+	<DialogTitle id={titleId}>
 		{#if editing}Edit Baseline{:else}New Baseline{/if}
-	</p>
+	</DialogTitle>
 
 	{#if showPresets && !editing}
 		<div class="bf-presets">
-			<p class="field-label">Start from a preset</p>
+			<FieldLabel>Start from a preset</FieldLabel>
 			<div class="bf-presets__grid">
 				{#each BASELINE_PRESETS as preset (preset.name)}
 					<button
@@ -108,9 +108,9 @@
 		</div>
 	{:else}
 		<div class="bf-field">
-			<label
-				class="field-label"
-				for="baseline-name">Name <span class="field-hint">max 40 chars</span></label
+			<FieldLabel
+				for="baseline-name"
+				hint="max 40 chars">Name</FieldLabel
 			>
 			<input
 				id="baseline-name"
@@ -123,7 +123,7 @@
 		</div>
 
 		<div class="bf-field">
-			<span class="field-label">Direction</span>
+			<FieldLabel>Direction</FieldLabel>
 			<div class="bf-directions">
 				{#each BASELINE_DIRECTIONS as option (option.value)}
 					<button
@@ -140,14 +140,10 @@
 		</div>
 
 		<div class="bf-field">
-			<span class="field-label">
-				Daily target
-				{#if metricCountLocked}
-					<span class="field-hint">metric count locked after creation</span>
-				{:else}
-					<span class="field-hint">one or two metrics</span>
-				{/if}
-			</span>
+			<FieldLabel
+				hint={metricCountLocked ? 'metric count locked after creation' : 'one or two metrics'}
+				>Daily target</FieldLabel
+			>
 
 			{#each metrics as metric, i (i)}
 				<div class="bf-metric">
@@ -189,18 +185,19 @@
 		</div>
 
 		<div class="modal__actions">
-			<button
-				class="btn btn--grow btn--ghost"
+			<Button
+				variant="ghost"
+				grow
 				onclick={onclose}
-				disabled={saving}>Cancel</button
+				disabled={saving}>Cancel</Button
 			>
-			<button
-				class="btn btn--grow btn--primary"
+			<Button
+				grow
 				onclick={save}
 				disabled={!valid || saving}
 			>
 				{#if saving}Saving…{:else}Save{/if}
-			</button>
+			</Button>
 		</div>
 	{/if}
 </div>

@@ -6,6 +6,7 @@
 	import LibrarySheet from './LibrarySheet.svelte';
 	import { danceLibrary } from '$lib/itemLibrary';
 	import Icon from './Icon.svelte';
+	import FieldLabel from './FieldLabel.svelte';
 
 	type Props = {
 		program: Program;
@@ -178,10 +179,7 @@
 
 		<div class="dance-editor__body">
 			<div class="dance-field">
-				<label
-					class="field-label"
-					for="dance-name">Name</label
-				>
+				<FieldLabel for="dance-name">Name</FieldLabel>
 				<input
 					id="dance-name"
 					class="dance-field__input"
@@ -191,9 +189,9 @@
 				/>
 			</div>
 			<div class="dance-field">
-				<label
-					class="field-label"
-					for="dance-focus">Focus <span class="field-hint">optional</span></label
+				<FieldLabel
+					for="dance-focus"
+					hint="optional">Focus</FieldLabel
 				>
 				<input
 					id="dance-focus"

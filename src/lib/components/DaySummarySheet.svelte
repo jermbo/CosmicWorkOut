@@ -11,6 +11,7 @@
 	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		session: Session;
@@ -75,7 +76,7 @@
 			{formatWeekdayShortDate(session.date, ' · ')}
 		</div>
 
-		<h2 class="modal-title">{workoutName}</h2>
+		<DialogTitle as="h2">{workoutName}</DialogTitle>
 
 		<div class="day-summary__stats">
 			<div class="day-summary__stat">

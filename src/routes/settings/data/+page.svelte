@@ -162,7 +162,7 @@
 				typically around 1&nbsp;MB — fine as an email attachment.
 			</p>
 			<button
-				class="data-action__btn btn--primary"
+				class="data-action__btn data-action__btn--primary"
 				onclick={handleExport}
 				disabled={exporting}
 				aria-busy={exporting}
@@ -256,7 +256,7 @@
 				and health data. Built-in content is restored.
 			</p>
 			<button
-				class="data-action__btn btn--danger"
+				class="data-action__btn data-action__btn--danger"
 				onclick={() => openClearDialog('everything')}
 			>
 				Clear everything
@@ -519,6 +519,16 @@
 			opacity: 0.6;
 			cursor: default;
 		}
+	}
+
+	.data-action__btn--primary {
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
+	}
+
+	.data-action__btn--danger {
+		background: var(--color-red);
+		color: #ffffff;
 	}
 
 	.data-action__btn--secondary {

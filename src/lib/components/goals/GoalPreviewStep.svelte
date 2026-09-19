@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Item } from '$lib/db/types';
 	import type { ProgressionBlock } from '$lib/goalPlans/types';
+	import FieldLabel from '../FieldLabel.svelte';
 
 	type Props = {
 		focusItem: Item;
@@ -34,10 +35,7 @@
 </script>
 
 <div class="form-field">
-	<label
-		class="field-label"
-		for="plan-name">Plan name</label
-	>
+	<FieldLabel for="plan-name">Plan name</FieldLabel>
 	<input
 		id="plan-name"
 		class="form-field__input"

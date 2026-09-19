@@ -4,6 +4,7 @@
 	import { healthStore } from '$lib/stores/health.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		date: string;
@@ -61,7 +62,7 @@
 	onclose={onClose}
 	maxHeight="70dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={editing ? 'Edit Reading' : 'Log Blood Pressure'}
 			{onClose}
@@ -136,7 +137,7 @@
 				</button>
 			{/if}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

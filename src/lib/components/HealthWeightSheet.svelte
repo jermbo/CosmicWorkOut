@@ -5,6 +5,7 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		date: string;
@@ -56,7 +57,7 @@
 	onclose={onClose}
 	maxHeight="60dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={editing ? 'Edit Weight' : 'Log Weight'}
 			{onClose}
@@ -110,7 +111,7 @@
 				</button>
 			{/if}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

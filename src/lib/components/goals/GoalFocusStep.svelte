@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Item } from '$lib/db/types';
 	import WeightRepsInputs from './WeightRepsInputs.svelte';
+	import FieldLabel from '../FieldLabel.svelte';
 
 	type Props = {
 		focusItem: Item | undefined;
@@ -31,10 +32,7 @@
 </p>
 
 <div class="form-field">
-	<span
-		class="field-label"
-		id="focus-label">Focus lift</span
-	>
+	<FieldLabel id="focus-label">Focus lift</FieldLabel>
 	{#if focusItem}
 		<div class="focus-selected">
 			<div class="focus-selected__info">

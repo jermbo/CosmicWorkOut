@@ -6,6 +6,9 @@
 	import { disciplineById, sectionMetric } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import Chip from './Chip.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		disciplineId: string;
@@ -92,7 +95,7 @@
 	onclose={onClose}
 	maxHeight="92dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={item ? 'Edit Item' : 'New Item'}
 			{onClose}
@@ -109,10 +112,7 @@
 				class="form-field"
 				class:form-field--error={errors.name}
 			>
-				<label
-					class="field-label"
-					for="item-name">Name</label
-				>
+				<FieldLabel for="item-name">Name</FieldLabel>
 				<input
 					id="item-name"
 					class="form-field__input"
@@ -125,9 +125,9 @@
 			</div>
 
 			<div class="form-field">
-				<label
-					class="field-label"
-					for="item-cue">Cue <span class="field-hint">optional</span></label
+				<FieldLabel
+					for="item-cue"
+					hint="optional">Cue</FieldLabel
 				>
 				<input
 					id="item-cue"
@@ -140,26 +140,21 @@
 			</div>
 
 			<div class="form-field">
-				<span
-					class="field-label"
-					id="item-section-label">Section</span
-				>
+				<FieldLabel id="item-section-label">Section</FieldLabel>
 				<div
 					class="chips"
 					role="radiogroup"
 					aria-labelledby="item-section-label"
 				>
 					{#each sections as s (s.key)}
-						<button
-							type="button"
-							class="chip chip--caps"
-							class:chip--active={section === s.key}
-							role="radio"
-							aria-checked={section === s.key}
+						<Chip
+							caps
+							select="radio"
+							active={section === s.key}
 							onclick={() => (section = s.key)}
 						>
 							{s.label}
-						</button>
+						</Chip>
 					{/each}
 				</div>
 				<span class="form-field__hint">Logged as: {metricHint()}</span>
@@ -169,25 +164,20 @@
 				class="form-field"
 				class:form-field--error={errors.focus}
 			>
-				<span
-					class="field-label"
-					id="item-focus-label">Focus</span
-				>
+				<FieldLabel id="item-focus-label">Focus</FieldLabel>
 				<div
 					class="chips"
 					role="group"
 					aria-labelledby="item-focus-label"
 				>
 					{#each FOCUS_TAGS as tag (tag)}
-						<button
-							type="button"
-							class="chip chip--caps"
-							class:chip--active={focus.includes(tag)}
-							aria-pressed={focus.includes(tag)}
+						<Chip
+							caps
+							active={focus.includes(tag)}
 							onclick={() => toggleFocus(tag)}
 						>
 							{tag}
-						</button>
+						</Chip>
 					{/each}
 				</div>
 				{#if errors.focus}<span class="form-field__error">{errors.focus}</span>{/if}
@@ -202,7 +192,7 @@
 				{#if saving}Saving…{:else if item}Save changes{:else}Add item{/if}
 			</button>
 		</form>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

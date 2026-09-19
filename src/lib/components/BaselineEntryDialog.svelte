@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Baseline } from '$lib/db/types';
+	import Button from './Button.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		baseline: Baseline;
@@ -55,22 +58,16 @@
 	aria-labelledby={titleId}
 	aria-modal="true"
 >
-	<p
-		class="modal-title"
-		id={titleId}
-	>
+	<DialogTitle id={titleId}>
 		{#if mode === 'edit'}Edit entry{:else}{baseline.name}{/if}
-	</p>
+	</DialogTitle>
 
 	{#each baseline.metrics as metric (metric.id)}
 		<div class="bed-field">
-			<label
-				class="field-label"
+			<FieldLabel
 				for="bed-{metric.id}"
+				hint="target {metric.target}">{metric.label}</FieldLabel
 			>
-				{metric.label}
-				<span class="field-hint">target {metric.target}</span>
-			</label>
 			<input
 				id="bed-{metric.id}"
 				class="bed-input"
@@ -85,18 +82,19 @@
 	{/each}
 
 	<div class="modal__actions">
-		<button
-			class="btn btn--grow btn--ghost"
+		<Button
+			variant="ghost"
+			grow
 			onclick={onclose}
-			disabled={saving}>Cancel</button
+			disabled={saving}>Cancel</Button
 		>
-		<button
-			class="btn btn--grow btn--primary"
+		<Button
+			grow
 			onclick={save}
 			disabled={!valid || saving}
 		>
 			{#if saving}Saving…{:else}Save{/if}
-		</button>
+		</Button>
 	</div>
 </div>
 

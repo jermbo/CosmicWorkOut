@@ -5,6 +5,9 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
+	import Chip from './Chip.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	const CATS: ItemCat[] = [...STRENGTH_CATS];
 	const UNITS: WeightUnit[] = ['lb', 'kg', 'bodyweight', 'band'];
@@ -97,7 +100,7 @@
 	onclose={onClose}
 	maxHeight="92dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={exercise ? 'Edit Exercise' : 'New Exercise'}
 			{onClose}
@@ -114,10 +117,7 @@
 				class="form-field"
 				class:form-field--error={errors.name}
 			>
-				<label
-					class="field-label"
-					for="ex-name">Name</label
-				>
+				<FieldLabel for="ex-name">Name</FieldLabel>
 				<input
 					id="ex-name"
 					class="form-field__input"
@@ -130,9 +130,9 @@
 			</div>
 
 			<div class="form-field">
-				<label
-					class="field-label"
-					for="ex-cue">Coaching cue <span class="field-hint">optional</span></label
+				<FieldLabel
+					for="ex-cue"
+					hint="optional">Coaching cue</FieldLabel
 				>
 				<input
 					id="ex-cue"
@@ -148,10 +148,7 @@
 				class="form-field"
 				class:form-field--error={errors.muscles}
 			>
-				<label
-					class="field-label"
-					for="ex-muscles">Muscles worked</label
-				>
+				<FieldLabel for="ex-muscles">Muscles worked</FieldLabel>
 				<input
 					id="ex-muscles"
 					class="form-field__input"
@@ -164,23 +161,17 @@
 			</div>
 
 			<div class="form-field">
-				<span
-					class="field-label"
-					id="ex-cat-label">Category</span
-				>
+				<FieldLabel id="ex-cat-label">Category</FieldLabel>
 				<div
 					class="cat-chips"
 					role="radiogroup"
 					aria-labelledby="ex-cat-label"
 				>
 					{#each CATS as c (c)}
-						<button
-							type="button"
-							class="chip"
-							class:chip--active={cat === c}
-							role="radio"
-							aria-checked={cat === c}
-							onclick={() => (cat = c)}>{c}</button
+						<Chip
+							select="radio"
+							active={cat === c}
+							onclick={() => (cat = c)}>{c}</Chip
 						>
 					{/each}
 				</div>
@@ -188,10 +179,7 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<span
-						class="field-label"
-						id="ex-unit-label">Weight type</span
-					>
+					<FieldLabel id="ex-unit-label">Weight type</FieldLabel>
 					<div
 						class="seg-control"
 						role="radiogroup"
@@ -213,10 +201,7 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<label
-						class="field-label"
-						for="ex-sets">Default sets</label
-					>
+					<FieldLabel for="ex-sets">Default sets</FieldLabel>
 					<div class="stepper">
 						<button
 							type="button"
@@ -236,10 +221,7 @@
 					</div>
 				</div>
 				<div class="form-field">
-					<label
-						class="field-label"
-						for="ex-reps">Default reps</label
-					>
+					<FieldLabel for="ex-reps">Default reps</FieldLabel>
 					<input
 						id="ex-reps"
 						class="form-field__input"
@@ -252,10 +234,7 @@
 
 			{#if unit === 'lb' || unit === 'kg'}
 				<div class="form-field">
-					<span
-						class="field-label"
-						id="ex-increment-label">Weight increment ({unit})</span
-					>
+					<FieldLabel id="ex-increment-label">Weight increment ({unit})</FieldLabel>
 					<div
 						class="seg-control"
 						role="radiogroup"
@@ -284,7 +263,7 @@
 				{#if saving}Saving…{:else if exercise}Save changes{:else}Add exercise{/if}
 			</button>
 		</form>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>

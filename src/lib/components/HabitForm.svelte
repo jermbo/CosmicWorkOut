@@ -3,6 +3,9 @@
 	import type { Habit, HabitType } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '$lib/habits';
+	import Button from './Button.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		editing?: Habit | null;
@@ -80,12 +83,9 @@
 	aria-labelledby={titleId}
 	aria-modal="true"
 >
-	<p
-		class="modal-title"
-		id={titleId}
-	>
+	<DialogTitle id={titleId}>
 		{#if editing}Edit Habit{:else}New Habit{/if}
-	</p>
+	</DialogTitle>
 
 	{#if showPresets && !editing}
 		<div class="hf-presets">
@@ -107,9 +107,9 @@
 		</div>
 	{:else}
 		<div class="hf-field">
-			<label
-				class="field-label"
-				for="habit-name">Name <span class="field-hint">max 40 chars</span></label
+			<FieldLabel
+				for="habit-name"
+				hint="max 40 chars">Name</FieldLabel
 			>
 			<input
 				id="habit-name"
@@ -123,12 +123,12 @@
 
 		{#if editing}
 			<div class="hf-field">
-				<span class="field-label">Type <span class="field-hint">locked after creation</span></span>
+				<FieldLabel hint="locked after creation">Type</FieldLabel>
 				<div class="hf-type-locked">{habitTypeLabel(type)}</div>
 			</div>
 		{:else}
 			<div class="hf-field">
-				<span class="field-label">Type</span>
+				<FieldLabel>Type</FieldLabel>
 				<div class="hf-types">
 					{#each CREATABLE_HABIT_TYPES as ht (ht)}
 						<button
@@ -147,9 +147,9 @@
 
 		{#if type === 'count'}
 			<div class="hf-field">
-				<label
-					class="field-label"
-					for="habit-unit">Unit label <span class="field-hint">required · max 20 chars</span></label
+				<FieldLabel
+					for="habit-unit"
+					hint="required · max 20 chars">Unit label</FieldLabel
 				>
 				<input
 					id="habit-unit"
@@ -164,9 +164,9 @@
 
 		{#if typeHasGoal}
 			<div class="hf-field">
-				<label
-					class="field-label"
-					for="habit-goal">Daily goal <span class="field-hint">optional</span></label
+				<FieldLabel
+					for="habit-goal"
+					hint="optional">Daily goal</FieldLabel
 				>
 				<input
 					id="habit-goal"
@@ -180,18 +180,19 @@
 		{/if}
 
 		<div class="modal__actions">
-			<button
-				class="btn btn--grow btn--ghost"
+			<Button
+				variant="ghost"
+				grow
 				onclick={onclose}
-				disabled={saving}>Cancel</button
+				disabled={saving}>Cancel</Button
 			>
-			<button
-				class="btn btn--grow btn--primary"
+			<Button
+				grow
 				onclick={save}
 				disabled={!name.trim() || saving || (typeRequiresUnit && !unit.trim())}
 			>
 				{#if saving}Saving…{:else}Save{/if}
-			</button>
+			</Button>
 		</div>
 	{/if}
 </div>

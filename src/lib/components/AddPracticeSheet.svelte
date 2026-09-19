@@ -10,6 +10,8 @@
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import CreateProgramSheet from './CreateProgramSheet.svelte';
+	import Chip from './Chip.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		onClose: () => void;
@@ -67,132 +69,131 @@
 	onclose={onClose}
 	maxHeight="85dvh"
 >
-	<div class="sheet-body add-practice">
-		<SheetHeader
-			title={step === 'group' ? 'Add practice' : (group?.label ?? 'Plans')}
-			{onClose}
-			tight
-		/>
+	<SheetBody>
+		<div class="add-practice">
+			<SheetHeader
+				title={step === 'group' ? 'Add practice' : (group?.label ?? 'Plans')}
+				{onClose}
+				tight
+			/>
 
-		{#if step === 'group'}
-			<p class="add-practice__lead">Choose a practice area to browse plans.</p>
-			<div class="add-practice__groups">
-				{#each practiceGroups as g (g.id)}
+			{#if step === 'group'}
+				<p class="add-practice__lead">Choose a practice area to browse plans.</p>
+				<div class="add-practice__groups">
+					{#each practiceGroups as g (g.id)}
+						<button
+							class="add-practice__group"
+							onclick={() => pickGroup(g.id)}
+						>
+							<span class="add-practice__group-label">{g.label}</span>
+							<span class="add-practice__group-desc">{g.description}</span>
+						</button>
+					{/each}
+				</div>
+			{:else if group}
+				{#if !initialGroupId}
 					<button
-						class="add-practice__group"
-						onclick={() => pickGroup(g.id)}
-					>
-						<span class="add-practice__group-label">{g.label}</span>
-						<span class="add-practice__group-desc">{g.description}</span>
-					</button>
-				{/each}
-			</div>
-		{:else if group}
-			{#if !initialGroupId}
-				<button
-					class="add-practice__back"
-					type="button"
-					onclick={() => (step = 'group')}
-				>
-					← All areas
-				</button>
-			{/if}
-
-			{#if showGoalPlans}
-				<button
-					class="add-practice__goal-card"
-					type="button"
-					onclick={() => {
-						onClose();
-						goto(resolve('/goals/new'));
-					}}
-				>
-					<span class="add-practice__goal-card-label">Start a goal plan</span>
-					<span class="add-practice__goal-card-desc">
-						Wave-loading plan toward one lift target — generated from a template.
-					</span>
-				</button>
-			{/if}
-
-			<p class="add-practice__lead">
-				{#if showGoalPlans}
-					Or turn on a course or custom plan. History is kept when you pause.
-				{:else}
-					Turn plans on or off. History is always kept when you pause.
-				{/if}
-			</p>
-
-			<div
-				class="add-practice__filters"
-				role="tablist"
-				aria-label="Plan filter"
-			>
-				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
-					<button
+						class="add-practice__back"
 						type="button"
-						class="chip"
-						class:chip--active={filter === value}
-						role="tab"
-						aria-selected={filter === value}
-						onclick={() => (filter = value as Filter)}
+						onclick={() => (step = 'group')}
 					>
-						{label}
+						← All areas
 					</button>
-				{/each}
-			</div>
+				{/if}
 
-			<div class="add-practice__list">
-				{#each programs as program (program.id)}
-					{@const isActive = programStore.isProgramActive(program.id)}
-					<div
-						class="add-practice__row"
-						class:add-practice__row--active={isActive}
+				{#if showGoalPlans}
+					<button
+						class="add-practice__goal-card"
+						type="button"
+						onclick={() => {
+							onClose();
+							goto(resolve('/goals/new'));
+						}}
 					>
-						<div class="add-practice__row-info">
-							<div class="add-practice__row-name-row">
-								<span class="add-practice__row-name">{program.name}</span>
-								{#if program.isBuiltIn}
-									<span class="add-practice__tag">Built-in</span>
-								{:else}
-									<span class="add-practice__tag add-practice__tag--mine">Mine</span>
-								{/if}
-							</div>
-							<span class="add-practice__row-meta">
-								{program.durationWeeks} wk · {program.daysPerWeek}×/wk
-							</span>
-						</div>
-						{#if isActive}
-							<button
-								class="add-practice__pause"
-								type="button"
-								onclick={() => pause(program)}>Pause</button
-							>
-						{:else}
-							<button
-								class="add-practice__activate"
-								type="button"
-								onclick={() => activate(program)}
-							>
-								Activate
-							</button>
-						{/if}
-					</div>
-				{:else}
-					<p class="add-practice__empty">No plans match this filter.</p>
-				{/each}
-			</div>
+						<span class="add-practice__goal-card-label">Start a goal plan</span>
+						<span class="add-practice__goal-card-desc">
+							Wave-loading plan toward one lift target — generated from a template.
+						</span>
+					</button>
+				{/if}
 
-			<div class="add-practice__footer">
-				<button
-					class="add-practice__create"
-					type="button"
-					onclick={() => (createDisciplineId = disciplineId)}
+				<p class="add-practice__lead">
+					{#if showGoalPlans}
+						Or turn on a course or custom plan. History is kept when you pause.
+					{:else}
+						Turn plans on or off. History is always kept when you pause.
+					{/if}
+				</p>
+
+				<div
+					class="add-practice__filters"
+					role="tablist"
+					aria-label="Plan filter"
 				>
-					Create custom plan
-				</button>
-			</div>
-		{/if}
-	</div>
+					{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
+						<Chip
+							select="tab"
+							active={filter === value}
+							onclick={() => (filter = value as Filter)}
+						>
+							{label}
+						</Chip>
+					{/each}
+				</div>
+
+				<div class="add-practice__list">
+					{#each programs as program (program.id)}
+						{@const isActive = programStore.isProgramActive(program.id)}
+						<div
+							class="add-practice__row"
+							class:add-practice__row--active={isActive}
+						>
+							<div class="add-practice__row-info">
+								<div class="add-practice__row-name-row">
+									<span class="add-practice__row-name">{program.name}</span>
+									{#if program.isBuiltIn}
+										<span class="add-practice__tag">Built-in</span>
+									{:else}
+										<span class="add-practice__tag add-practice__tag--mine">Mine</span>
+									{/if}
+								</div>
+								<span class="add-practice__row-meta">
+									{program.durationWeeks} wk · {program.daysPerWeek}×/wk
+								</span>
+							</div>
+							{#if isActive}
+								<button
+									class="add-practice__pause"
+									type="button"
+									onclick={() => pause(program)}>Pause</button
+								>
+							{:else}
+								<button
+									class="add-practice__activate"
+									type="button"
+									onclick={() => activate(program)}
+								>
+									Activate
+								</button>
+							{/if}
+						</div>
+					{:else}
+						<p class="add-practice__empty">No plans match this filter.</p>
+					{/each}
+				</div>
+
+				<div class="add-practice__footer">
+					<button
+						class="add-practice__create"
+						type="button"
+						onclick={() => (createDisciplineId = disciplineId)}
+					>
+						Create custom plan
+					</button>
+				</div>
+			{/if}
+		</div>
+	</SheetBody>
 </BottomSheet>
 
 {#if createDisciplineId}
@@ -204,6 +205,8 @@
 
 <style>
 	.add-practice {
+		display: flex;
+		flex-direction: column;
 		min-block-size: 200px;
 	}
 

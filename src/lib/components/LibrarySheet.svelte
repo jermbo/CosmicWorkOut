@@ -7,6 +7,8 @@
 	import SheetHeader from './SheetHeader.svelte';
 	import ItemFormSheet from './ItemFormSheet.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
+	import Chip from './Chip.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		config: LibraryConfig;
@@ -74,7 +76,7 @@
 	onclose={onClose}
 	maxHeight="85dvh"
 >
-	<div class="sheet-body">
+	<SheetBody>
 		<SheetHeader
 			title={config.title}
 			{onClose}
@@ -151,22 +153,18 @@
 				role="group"
 				aria-label={group.ariaLabel}
 			>
-				<button
-					class="chip"
-					class:chip--caps={config.capitalize}
-					class:lib-chip--small={group.small}
-					class:chip--active={selected[i] === group.anyValue}
-					onclick={() => (selected[i] = group.anyValue)}
-					aria-pressed={selected[i] === group.anyValue}>{group.anyLabel}</button
+				<Chip
+					caps={config.capitalize}
+					small={group.small}
+					active={selected[i] === group.anyValue}
+					onclick={() => (selected[i] = group.anyValue)}>{group.anyLabel}</Chip
 				>
 				{#each group.options as option (option.value)}
-					<button
-						class="chip"
-						class:chip--caps={config.capitalize}
-						class:lib-chip--small={group.small}
-						class:chip--active={selected[i] === option.value}
-						onclick={() => pickFilter(i, option.value)}
-						aria-pressed={selected[i] === option.value}>{option.label}</button
+					<Chip
+						caps={config.capitalize}
+						small={group.small}
+						active={selected[i] === option.value}
+						onclick={() => pickFilter(i, option.value)}>{option.label}</Chip
 					>
 				{/each}
 			</div>
@@ -343,7 +341,7 @@
 				</div>
 			{/each}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 {#if formItem !== undefined}
@@ -427,11 +425,6 @@
 		&::-webkit-scrollbar {
 			display: none;
 		}
-	}
-
-	.lib-chip--small {
-		block-size: 28px;
-		font-size: 0.75rem;
 	}
 
 	.lib-sheet__list {

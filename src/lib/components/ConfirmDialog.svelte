@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Button from './Button.svelte';
 
 	interface Props {
 		title: string;
@@ -59,22 +60,24 @@
 		<p class="confirm__error">{error}</p>
 	{/if}
 	<div class="confirm__actions">
-		<button
-			class="btn btn--grow btn--bold btn--ghost"
+		<Button
+			variant="ghost"
+			grow
+			bold
 			onclick={oncancel}
 			disabled={busy}
 		>
 			{cancelLabel}
-		</button>
-		<button
-			class="btn btn--grow btn--bold"
-			class:btn--danger={danger}
-			class:btn--primary={!danger}
+		</Button>
+		<Button
+			variant={danger ? 'danger' : 'primary'}
+			grow
+			bold
 			onclick={onconfirm}
 			disabled={busy}
 		>
 			{confirmText}
-		</button>
+		</Button>
 	</div>
 </div>
 
