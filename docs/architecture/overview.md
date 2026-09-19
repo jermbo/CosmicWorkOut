@@ -10,8 +10,8 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 flowchart TB
     subgraph browser ["Browser"]
         UI["SvelteKit UI\nroutes + overlays"]
-        Stores["Svelte Stores\nprogram · session · prefs · habits · activities\nhealth · goalPlans · loggingContext · toast"]
-        IDB[("IndexedDB v9\nitems · programs · sessions · itemLastUsed\nhabits · habitLogs · activities\nhealthReadings · goalPlans")]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities\nhealth · goalPlans · baselines · loggingContext · toast"]
+        IDB[("IndexedDB v9\nitems · programs · sessions · itemLastUsed\nhabits · habitLogs · activities\nhealthReadings · goalPlans\nbaselines · baselineLogs (planned)")]
         LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
         SW["Service Worker\nprecaches app shell"]
     end
@@ -39,7 +39,7 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-The shipped routes: **Overview** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Goals** (`/goals`, `/goals/new`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout. There is no `/settings/appearance` route; appearance prefs stay at fixed defaults.
+The shipped routes: **Overview** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Lift plans** (`/goals`, `/goals/new` — UI name; code may still say “goals”), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout. **Planned (v1.9.0):** **Baselines** (`/baselines`, `/settings/baselines`). There is no `/settings/appearance` route; appearance prefs stay at fixed defaults.
 
 The UI reads and writes through the Svelte stores — no REST, no server state.
 

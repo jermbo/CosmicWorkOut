@@ -31,8 +31,10 @@ function headingSlugs(text) {
 	for (const line of stripCodeBlocks(text).split('\n')) {
 		const m = /^#{1,6}\s+(.*)$/.exec(line);
 		if (m) slugs.add(slugify(m[1]));
-		const explicit = /<a id="([^"]+)"><\/a>/.exec(line);
-		if (explicit) slugs.add(explicit[1]);
+		// Explicit fragment targets (prefer <span id>; legacy <a id> still accepted)
+		for (const explicit of line.matchAll(/<(?:a|span) id="([^"]+)"><\/(?:a|span)>/g)) {
+			slugs.add(explicit[1]);
+		}
 	}
 	return slugs;
 }

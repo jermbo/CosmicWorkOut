@@ -152,7 +152,7 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 ## Baselines _(roadmap — not built)_
 
-> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Spec: [Baselines](roadmap/baselines.md).
+> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Spec: [Baselines](roadmap/baselines.md) · [v1.9.0](features/v1.9.0/README.md) (Planned).
 
 ### Baseline
 

@@ -149,7 +149,7 @@ The [Features index](features/README.md) is the historical record of what shippe
 - [v1.6.0 — Belly Dance Catalog & Course Programs](features/v1.6.0/README.md)
 - [v1.7.0 — Full Strength Catalog, PWA, Health & Backup](features/v1.7.0/README.md)
 - [v1.8.0 — Granular Data Clearing](features/v1.8.0/README.md)
-- [v1.9.0 — Goal Progression Plans](features/v1.9.0/README.md)
+- [v1.9.0 — Lift Plans & Baselines](features/v1.9.0/README.md)
 
 See [Implementation Status](implementation/status.md) for the current built-vs-deferred checklist.
 

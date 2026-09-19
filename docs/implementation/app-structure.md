@@ -19,11 +19,13 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/calendar`           | `routes/calendar/+page.svelte`           | History — month grid, stats, day summary                                                                 |
 | `/insights`           | `routes/insights/+page.svelte`           | Insights — Chart.js charts with date-range picker                                                        |
 | `/health`             | `routes/health/+page.svelte`             | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))             |
-| `/goals`              | `routes/goals/+page.svelte`              | Goal progression plans — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)) |
-| `/goals/new`          | `routes/goals/new/+page.svelte`          | Create goal plan wizard                                                                                  |
+| `/goals`              | `routes/goals/+page.svelte`              | Lift plans (Goal progression plans) — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)) |
+| `/goals/new`          | `routes/goals/new/+page.svelte`          | Create lift plan wizard                                                                                  |
+| `/baselines`          | `routes/baselines/+page.svelte`          | **Planned** — Baselines daily logging + charts ([US-035](../features/v1.9.0/US-035-baselines-logging.md), [US-036](../features/v1.9.0/US-036-baselines-charts.md)) |
 | `/settings`           | `routes/settings/+page.svelte`           | Settings **hub** — navigation to sub-pages ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
 | `/settings/habits`    | `routes/settings/habits/+page.svelte`    | Habit CRUD and reorder                                                                                   |
-| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. goal plans), debug seed                                                |
+| `/settings/baselines` | `routes/settings/baselines/+page.svelte` | **Planned** — Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                   |
+| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. goal plans; Baselines when US-034 ships), debug seed                   |
 
 Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, and Health are reached from their summary cards and the Practice hub.
 
@@ -53,9 +55,11 @@ flowchart TB
     Main --> Calendar["/calendar"]
     Main --> Insights["/insights"]
     Main --> Health["/health"]
-    Main --> Goals["/goals (+ /new)"]
+    Main --> Goals["/goals (+ /new) — Lift plans"]
+    Main --> Baselines["/baselines (planned)"]
     Main --> Settings["/settings"]
     Settings --> SettingsHab["/settings/habits"]
+    Settings --> SettingsBaselines["/settings/baselines (planned)"]
     Settings --> SettingsData["/settings/data"]
 
     classDef shell fill:#465569,stroke:#28313e,color:#ffffff;
@@ -63,7 +67,7 @@ flowchart TB
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     class Layout,Main,Nav,Toast shell;
     class Overlay,Dance,Complete,Recovery overlay;
-    class Today,Habits,Practice,Workout,Program,Log,Calendar,Insights,Health,Goals,Settings,SettingsHab,SettingsData route;
+    class Today,Habits,Practice,Workout,Program,Log,Calendar,Insights,Health,Goals,Baselines,Settings,SettingsHab,SettingsBaselines,SettingsData route;
 ```
 
 `routes/+layout.ts` sets `ssr = false` — fully client-rendered.

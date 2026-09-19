@@ -216,6 +216,16 @@ Owns goal progression plans ([US-033](../features/v1.9.0/US-033-goal-progression
 
 ---
 
+## baselineStore _(planned — v1.9.0)_
+
+**File:** TBD (e.g. `src/lib/stores/baselines.svelte.ts`)
+
+Owns Baseline definitions and BaselineLog entries ([US-034](../features/v1.9.0/US-034-baselines-setup.md), [US-035](../features/v1.9.0/US-035-baselines-logging.md)). Gated by `prefsStore.baselinesEnabled`.
+
+Expected responsibilities: load definitions + logs; CRUD baselines; add/edit/delete log entries; day totals by sum; chart series helpers for [US-036](../features/v1.9.0/US-036-baselines-charts.md). Reads `loggingContext.date` for the active logging date.
+
+---
+
 ## Data Flow Diagram
 
 ```mermaid
@@ -229,6 +239,7 @@ flowchart TB
     AS[activityStore]
     HeS[healthStore]
     GP[goalPlanStore]
+    BS[baselineStore]
     LC[loggingContext]
     UI[Svelte UI]
 
@@ -238,12 +249,14 @@ flowchart TB
     IDB <-->|load / put| AS
     IDB <-->|load / put| HeS
     IDB <-->|load / put| GP
+    IDB <-->|load / put| BS
     LS <-->|persist activeSession| SS
     LS <-->|read/write prefs| PR
     LS <-->|lastActivityType| AS
     LC -->|date| HS
     LC -->|date| AS
     LC -->|date| HeS
+    LC -->|date| BS
     LC -->|date + workoutId| PS
     GP -->|prescribed targets| SS
     GP -->|setSoleActiveProgram| PS
@@ -253,13 +266,14 @@ flowchart TB
     AS -->|activitiesByDate| UI
     HeS -->|readings, charts| UI
     GP -->|activePlan, timelines| UI
+    BS -->|baselines, day totals, charts| UI
     PR -->|accent, density, feature toggles| UI
 
     classDef storage fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class IDB,LS storage;
-    class PS,SS,PR,HS,AS,HeS,GP,LC store;
+    class PS,SS,PR,HS,AS,HeS,GP,BS,LC store;
     class UI ui;
 ```
 

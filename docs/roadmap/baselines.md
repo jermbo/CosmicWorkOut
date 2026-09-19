@@ -1,12 +1,15 @@
 # Baselines
 
-> **Status:** Roadmap — discovery captured, not started
-> **Origin:** Real usage (walking, stretching, tiny daily movement, writing/drawing intent)
+> **Status:** Specced as **v1.9.0** (Planned — not built)  
+> **Stories:** [US-034](../features/v1.9.0/US-034-baselines-setup.md) · [US-035](../features/v1.9.0/US-035-baselines-logging.md) · [US-036](../features/v1.9.0/US-036-baselines-charts.md) · [v1.9.0 README](../features/v1.9.0/README.md)  
+> **Origin:** Real usage (walking, stretching, tiny daily movement, writing/drawing intent)  
 > **Product name:** Baselines. Distinct from [Lift plans](../features/v1.9.0/US-033-goal-progression-plans.md) (Strength wave-loading; older docs may say “Goal progression plans”).
 
 A separate tracking surface for **embarrassingly low, achievable daily targets** — show up even when motivation is gone — plus **growth over time** so improvement is visible. Inspired by “embarrassing low” habit floors and Atomic Habits (make the good thing the easy default).
 
 Vocabulary: [Glossary — Baseline](../glossary.md#baseline) · [Glossary — Lift plan](../glossary.md#lift-plan)
+
+This roadmap page remains the discovery record. **Authoritative build requirements** live in the v1.9.0 user stories.
 
 ---
 
@@ -159,6 +162,7 @@ Topics are **independent**. Movement, creative work, and screen-time baselines a
 
 ## Related
 
+- [v1.9.0 — Baselines](../features/v1.9.0/README.md) — feature stories (authoritative for build)
 - [Roadmap index](README.md)  
 - [Glossary — Baseline](../glossary.md#baseline)  
 - [Glossary — Lift plan](../glossary.md#lift-plan)  

@@ -14,7 +14,7 @@ flowchart TB
         PS[programStore]
         SS[sessionStore]
         PR[prefsStore]
-        HS[habit · activity · health · goalPlans]
+        HS[habit · activity · health · goalPlans · baselines]
     end
 
     subgraph data ["Data Layer"]
@@ -99,6 +99,7 @@ All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db
 // DB name: 'cosmic-workout', version 9
 // Stores: items, programs, sessions (indexed by date), itemLastUsed,
 //         activities, habits, habitLogs, healthReadings, goalPlans
+// Planned on same v9: baselines, baselineLogs
 ```
 
 Built-in items and programs are upserted on every boot (so new fields land on old records). Habits seed only on first run. Schema upgrades are **non-destructive** — `onupgradeneeded` creates only missing stores/indexes and never drops existing data. See [Data Model — IndexedDB stores](data-model.md#indexeddb-stores).
@@ -117,7 +118,8 @@ Class-based stores using Svelte 5 runes. The core ones:
 | `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood         |
 | `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                  |
 | `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)   |
-| `goalPlanStore`  | `goalPlans.svelte.ts`      | Goal progression plans (US-033)             |
+| `goalPlanStore`  | `goalPlans.svelte.ts`      | Lift plans / goal progression plans (US-033) |
+| `baselineStore`  | _(planned)_                | Baselines + logs (US-034 / US-035)           |
 | `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                |
 | `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications          |
 

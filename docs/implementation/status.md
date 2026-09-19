@@ -128,21 +128,24 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 
 ---
 
-## v1.9.0 — Goal Progression Plans
+## v1.9.0 — Lift Plans & Baselines
 
-| Feature                                         | Status | Notes                                                                                                      |
-| ----------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------- |
-| Goal progression plan type                      | Built  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9      |
-| Settings toggle (`goalProgressionPlansEnabled`) | Built  | Default off; hides UI, data persists — same pattern as health metrics                                      |
-| Modular implementation                          | Built  | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                  |
-| Plan generator (goal + start → blocks)          | Built  | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                     |
-| Starter scaffolds                               | Built  | Priority week / Focus only / From scratch                                                                  |
-| Focus wave (4-week block)                       | Built  | Build → build → peak → deload                                                                              |
-| Supporting weekly increment                     | Built  | Uses frozen `weightIncrement`; reps stay flat                                                              |
-| Block repeat                                    | Built  | Re-run current block from week 1 via `countOffset`                                                         |
-| Plan lifecycle (complete / pause)               | Built  | One active goal plan; sole active Strength program; backing programs hidden from generic pickers           |
+| Feature                                         | Status  | Notes                                                                                                      |
+| ----------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| Goal progression plan type (Lift plans)         | Built   | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9      |
+| Settings toggle (`goalProgressionPlansEnabled`) | Built   | Default off; hides UI, data persists — same pattern as health metrics                                      |
+| Modular implementation                          | Built   | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                  |
+| Plan generator (goal + start → blocks)          | Built   | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                     |
+| Starter scaffolds                               | Built   | Priority week / Focus only / From scratch                                                                  |
+| Focus wave (4-week block)                       | Built   | Build → build → peak → deload                                                                              |
+| Supporting weekly increment                     | Built   | Uses frozen `weightIncrement`; reps stay flat                                                              |
+| Block repeat                                    | Built   | Re-run current block from week 1 via `countOffset`                                                         |
+| Plan lifecycle (complete / pause)               | Built   | One active goal plan; sole active Strength program; backing programs hidden from generic pickers           |
+| Baselines feature flag + Settings CRUD          | Planned | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — same DB v9 as Lift plans                     |
+| Baselines daily logging (multi-entry, edit past)| Planned | [US-035](../features/v1.9.0/US-035-baselines-logging.md)                                                  |
+| Baselines progress charts                       | Planned | [US-036](../features/v1.9.0/US-036-baselines-charts.md)                                                   |
 
-See [v1.9.0 feature README](../features/v1.9.0/README.md).
+See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Baselines](../roadmap/baselines.md).
 
 ---
 
@@ -164,7 +167,7 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md).
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.9.0 Features](../features/v1.9.0/README.md) — Goal progression plans (shipped)
+- [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans (shipped) + Baselines (planned)
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)
 - [v1.4.0 Features](../features/v1.4.0/README.md) — Discipline model (shipped)
 - [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md) — Known deferred concerns

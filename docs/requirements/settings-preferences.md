@@ -11,8 +11,10 @@ User-configurable behavior and appearance.
 | Story                                        | Status    | Notes                                                                                                    |
 | -------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
 | Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                             |
-| Settings hub + sub-routes (`/settings`)      | Shipped   | Hub + `/settings/habits`, `/settings/data` ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| Settings hub + sub-routes (`/settings`)      | Shipped   | Hub + `/settings/habits`, `/settings/data` ([US-030](../features/v1.7.0/US-030-settings-restructure.md)); `/settings/baselines` planned (US-034) |
 | Health metrics master toggle                 | Shipped   | On the Settings hub ([US-029](../features/v1.7.0/US-029-health-metrics.md))                              |
+| Lift plans master toggle                     | Shipped   | On the Settings hub ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)); UI name **Lift plans** |
+| Baselines master toggle + Settings CRUD      | Planned   | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                 |
 | Weight unit applied in display/input         | Built     | Default `lb`; applied throughout                                                                         |
 | Accent / density / roundness applied on boot | Built     | Read from stored prefs and applied; see appearance-UI note below                                         |
 | Appearance settings page                     | Removed   | `/settings/appearance` UI dropped in US-030; prefs keep applying their stored/default values             |
@@ -29,11 +31,12 @@ User-configurable behavior and appearance.
 
 Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a short hub with sub-routes instead of one long scroll.
 
-| Route              | Contents                                                                                             |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| `/settings`        | **Hub** — navigation rows + health metrics toggle                                                    |
-| `/settings/habits` | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))           |
-| `/settings/data`   | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed |
+| Route                  | Contents                                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `/settings`            | **Hub** — navigation rows + health / lift-plan / (planned) baselines toggles                         |
+| `/settings/habits`     | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))           |
+| `/settings/baselines`  | **Planned** — Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))               |
+| `/settings/data`       | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed |
 
 ```mermaid
 flowchart LR

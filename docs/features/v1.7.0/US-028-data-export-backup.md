@@ -31,6 +31,9 @@ The app is client-only ([Design Principles](../../vision/principles.md)). Backup
 | `habits`                 | IndexedDB    | Yes                | Custom habits + edits to built-ins                            |
 | `habitLogs`              | IndexedDB    | Yes                | Habit history                                                 |
 | `healthReadings`         | IndexedDB    | Yes                | Health metric readings ([US-029](./US-029-health-metrics.md)) |
+| `goalPlans`              | IndexedDB    | Yes                | Lift plans ([US-033](../v1.9.0/US-033-goal-progression-plans.md)) — added when that store shipped |
+| `baselines`              | IndexedDB    | Yes _(planned)_    | Baseline definitions ([US-034](../v1.9.0/US-034-baselines-setup.md)) — include when v1.9.0 ships |
+| `baselineLogs`           | IndexedDB    | Yes _(planned)_    | Baseline log entries (US-034 / US-035) — include when v1.9.0 ships |
 | `cwout:prefs`            | localStorage | Optional           | User may choose to include preferences                        |
 | `cwout:activeProgramIds` | localStorage | Yes                | Per-Discipline active program                                 |
 | `cwout:lastActivityType` | localStorage | Yes                | Last-used activity type                                       |
