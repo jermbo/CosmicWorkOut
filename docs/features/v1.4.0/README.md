@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.4.0
+
 # v1.4.0 — Belly Dance & the Discipline Model
 
 This version adds **belly dance** — and, to do it without bolting on a parallel engine, generalizes the strength model into a single, schema-driven **Discipline** engine. Strength and belly dance become two Disciplines on the same machinery. Cardio and sports stay on the lightweight Activity path.
@@ -97,3 +99,15 @@ Deferred items moved to the [roadmap](../../roadmap/README.md) (session notes, a
 ## Story Writing Standards
 
 All stories follow the format defined in [user-story-standards.md](../../standards/user-story-standards.md).
+
+---
+
+## Related
+
+- [Map — Movement & Training](../../map-movement-and-training.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [v1.3.0](../v1.3.0/README.md) — adjacent release
+- [v1.5.0](../v1.5.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

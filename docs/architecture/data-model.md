@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › Data Model
+
 # Data Model
 
 All data is stored locally on the device. **Source of truth: `src/lib/db/types.ts`** (entity shapes) and `src/lib/db/database.ts` (stores + DB version). See [Offline Strategy](offline-strategy.md) for write timing.
@@ -375,7 +377,7 @@ type GoalPlan = {
 ```
 
 - **Feature gate:** `UserPrefs.goalProgressionPlansEnabled` (default `false`). When off, UI is hidden; plans remain in IndexedDB.
-- **Clear data:** "Clear goal plans" deletes `goalPlans` **and** their backing programs. "Clear custom programs" skips goal-backed programs so plans stay consistent.
+- **Clear data:** the "Clear goal plans" control (UI label still uses the old name) deletes `goalPlans` **and** their backing programs. "Clear custom programs" skips goal-backed programs so plans stay consistent.
 - **UI name:** Prefer **Lift plan** in product copy ([Glossary](../glossary.md#lift-plan)); routes/code may still say `goalPlan` / `/goals`.
 
 ### Baseline
@@ -468,7 +470,7 @@ erDiagram
 
 **Health readings** (`HealthReading`) are standalone rows keyed by `metricId` + `date` (+ `recordedAt` for blood pressure). Metric definitions are code-only — see [US-029](../features/v1.7.0/US-029-health-metrics.md).
 
-**Goal plans / Lift plans** (`GoalPlan`) pair with a generated `Program` for session rotation; prescribed loads come from the plan's blocks, not `itemLastUsed`.
+**Lift plans** (`GoalPlan`) pair with a generated `Program` for session rotation; prescribed loads come from the plan's blocks, not `itemLastUsed`.
 
 **Baselines** (`Baseline` + `BaselineLog`) are standalone daily growth tracking — see [US-034](../features/v1.9.0/US-034-baselines-setup.md).
 
@@ -500,7 +502,7 @@ DB name `cosmic-workout`, version **9**. The upgrade path is **non-destructive**
 | `habits`         | `id`     | —                        | Habit definitions                     |
 | `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                |
 | `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)       |
-| `goalPlans`      | `id`     | `by_status`              | Lift plans / goal plans (US-033)      |
+| `goalPlans`      | `id`     | `by_status`              | Lift plans (US-033)                   |
 | `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10) |
 | `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10) |
 

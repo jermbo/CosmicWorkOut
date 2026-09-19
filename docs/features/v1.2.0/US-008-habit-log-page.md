@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.2.0](README.md) › US-008
+
 # US-008 — Habit Log Page
 
 As a **health-conscious user**, I want a dedicated page for logging my daily habits

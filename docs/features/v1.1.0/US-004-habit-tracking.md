@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.1.0](README.md) › US-004
+
 # US-004 — Habit Tracking
 
 > **Status: Shipped (v1.1.0 / v1.2.0)**

@@ -1,6 +1,8 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › Components
+
 # Components
 
-Inventory of the UI components in `src/lib/components/` (plus `components/insights/` and `components/goals/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.9.0 goal progression plans.
+Inventory of the UI components in `src/lib/components/` (plus `components/insights/` and `components/goals/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.9.0 lift plans.
 
 > **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](../maintenance/audit-2026-06.md).
 
@@ -241,7 +243,7 @@ flowchart TB
         IFS[ItemFormSheet]
     end
 
-    subgraph goals ["Goal plans"]
+    subgraph goals ["Lift plans"]
         AGPC[ActiveGoalPlanCard]
         GBT[GoalBlockTimeline]
         GFS[GoalFocusStep]

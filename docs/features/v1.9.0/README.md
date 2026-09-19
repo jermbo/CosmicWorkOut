@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.9.0
+
 # v1.9.0 — Lift Plans & Baselines
 
 Two opt-in tracks in this release:
@@ -29,11 +31,11 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 | Area                           | Detail                                                                 | Story                                        |
 | ------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------- |
-| Goal plan creation             | Scaffold → focus + goal + starting point → generated blocks & timeline | [US-033](./US-033-goal-progression-plans.md) |
+| Lift plan creation             | Scaffold → focus + goal + starting point → generated blocks & timeline | [US-033](./US-033-goal-progression-plans.md) |
 | Wave loading (focus)           | 4-week blocks: build → build → peak → deload; final peak snaps to goal | US-033                                       |
 | Light progression (supporting) | Weekly +`weightIncrement` bumps; reps stay flat                        | US-033                                       |
 | Block repeat                   | Re-run the **current** 4-week block from week 1                        | US-033                                       |
-| Plan lifecycle                 | Active · Completed · Paused; one active goal plan at a time            | US-033                                       |
+| Plan lifecycle                 | Active · Completed · Paused; one active lift plan at a time            | US-033                                       |
 | Starter scaffolds              | Priority week / Focus only / From scratch                              | US-033                                       |
 | Settings toggle                | Master on/off switch; off hides all UI, data persists                  | US-033                                       |
 
@@ -52,7 +54,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 | **Plan instances**      | Each stint is its own plan record — back-to-back bench stints are separate instances                                              |
 | **Naming**              | Auto-name `"<Focus> Goal NN"` + optional rename                                                                                   |
 | **Lifecycle end**       | User chooses **Complete** or **Pause**; resting = simply not training (plan holds position)                                       |
-| **Concurrency**         | **One active goal plan at a time**; activating it makes its backing program the **sole active Strength program**                  |
+| **Concurrency**         | **One active lift plan at a time**; activating it makes its backing program the **sole active Strength program**                  |
 | **Backing programs**    | Generated `Program` rows power rotation/sessions but are hidden from Add Practice / Programs / plan pickers — managed on `/goals` |
 | **Optional feature**    | Settings master toggle (like [health metrics](../v1.7.0/US-029-health-metrics.md)); default **off**; off = no UI, data kept       |
 | **Modularity**          | Self-contained module — `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at session/program UI                                  |
@@ -65,7 +67,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 | Plan-switching handoff           | What happens when starting a new plan while another is active — complete vs auto-pause first |
 | Pro-authored templates           | Scaffold choices ship; professional plans come later                                         |
 | Plan comparison UI               | Data model supports it; Insights/charts are a follow-on                                      |
-| Coexistence with course programs | Activating a course program pauses the active goal plan; richer handoff UX later             |
+| Coexistence with course programs | Activating a course program pauses the active lift plan; richer handoff UX later             |
 
 ---
 

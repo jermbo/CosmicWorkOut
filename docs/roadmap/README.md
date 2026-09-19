@@ -1,3 +1,5 @@
+[Wiki](../README.md) › Roadmap
+
 # Roadmap
 
 > **Current phase:** Use the app, gather feedback. Versions v1.1–v1.9 are shipped; new work waits on what we learn from real usage.
@@ -57,16 +59,17 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Training intelligence
 
-| Item                           | Notes                                                                                                                       | Spec                                                                                               |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Lift plans (goal progression)  | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
-| Plan comparison visualizations | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                              | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
-| Plan-switching handoff         | UX when starting a new goal plan while another exists                                                                       | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
-| Pro-authored goal templates    | Scaffold choices in v1.9.0; professional templates later                                                                    | [v1.9.0](../features/v1.9.0/README.md)                                                             |
-| Additional Disciplines         | Engine supports more; only strength + belly dance ship                                                                      | —                                                                                                  |
-| Day-of-week scheduling         | Progression stays count-driven (`completedSessionCount % routineCount`)                                                     | —                                                                                                  |
+| Item                                                      | Notes                                                                                                                                                                                           | Spec                                                                                               |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Lift plans (goal progression)                             | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below                                                                     | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
+| Plan comparison visualizations                            | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                                                                                                  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
+| Plan-switching handoff                                    | UX when starting a new lift plan while another exists                                                                                                                                           | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
+| <span id="lift-plan-ui-rename"></span>Lift plan UI rename | Shipped UI still reads "Goal plans" in Settings, Clear data, Add Practice and the plan card. Docs already say **Lift plan**; the strings were never changed. Code identifiers may keep lagging. | [Glossary](../glossary.md#lift-plan)                                                               |
+| Pro-authored goal templates                               | Scaffold choices in v1.9.0; professional templates later                                                                                                                                        | [v1.9.0](../features/v1.9.0/README.md)                                                             |
+| Additional Disciplines                                    | Engine supports more; only strength + belly dance ship                                                                                                                                          | —                                                                                                  |
+| Day-of-week scheduling                                    | Progression stays count-driven (`completedSessionCount % routineCount`)                                                                                                                         | —                                                                                                  |
 
-**Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a goal plan.
+**Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a lift plan.
 
 ---
 

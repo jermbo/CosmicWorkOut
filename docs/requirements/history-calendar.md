@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [5k — Requirements](../README.md#5k--requirements) › History & Calendar
+
 # History & Calendar
 
 Viewing past sessions and tracking progress over time.

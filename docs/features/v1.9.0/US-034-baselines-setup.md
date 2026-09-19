@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.9.0](README.md) › US-034
+
 # US-034 — Baselines Setup
 
 > **As built:** `baselines` + `baselineLogs` stores at **DB_VERSION 10**; pure logic in `src/lib/baselines/logic.ts` with tests; `baselineStore` in `src/lib/stores/baselines.svelte.ts`; routes `/baselines` + `/settings/baselines`; Settings toggle `baselinesEnabled` (default off). Overview gets a gated `HomeBaselinesCard` beside Habits. Deleting a baseline retains its logs. Clearing is wired into Settings → Data, and both stores are in the backup envelope.

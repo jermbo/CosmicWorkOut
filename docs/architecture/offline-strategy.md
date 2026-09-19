@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › Offline Strategy
+
 # Offline Strategy
 
 Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers how local-first persistence and offline caching work today. Deferred portability work (device-to-device sync) lives on the [roadmap](../roadmap/device-sync.md).

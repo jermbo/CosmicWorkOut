@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.3.0](README.md) › US-009
+
 # US-009 — Habit Creation & Management
 
 > **Status: Shipped — v1.3.0**

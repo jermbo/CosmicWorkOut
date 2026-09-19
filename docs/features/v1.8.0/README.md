@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.8.0
+
 # v1.8.0 — Granular Data Clearing
 
 ## Design North Star

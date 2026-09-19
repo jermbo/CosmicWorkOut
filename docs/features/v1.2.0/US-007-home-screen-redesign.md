@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.2.0](README.md) › US-007
+
 # US-007 — Overview Screen Redesign
 
 As a **fitness user**, I want a home screen that shows me the status of my day at a glance

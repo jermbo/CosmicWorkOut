@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.7.0](README.md) › US-028
+
 # US-028 — Data Export, Backup & Device Sync
 
 > **Status: Shipped (Phase 1) — v1.7.0**

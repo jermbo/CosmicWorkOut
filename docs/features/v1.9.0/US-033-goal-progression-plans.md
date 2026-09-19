@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.9.0](README.md) › US-033
+
 # US-033 — Goal Progression Plans
 
 > **As built:** `goalPlans` store at **DB_VERSION 9**; module in `src/lib/goalPlans/`; `goalPlanStore`; routes `/goals` + `/goals/new`; Settings toggle `goalProgressionPlansEnabled` (default off). Activating a plan makes its backing program the sole active Strength program; backing programs are hidden from Add Practice / Programs pickers.

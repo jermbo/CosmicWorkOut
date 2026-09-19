@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.3.0](README.md) › US-013
+
 # US-013 — Activity Edit from Calendar
 
 > **Status: Shipped — v1.3.0**

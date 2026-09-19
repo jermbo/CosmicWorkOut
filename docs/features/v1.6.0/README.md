@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.6.0
+
 # v1.6.0 — Belly Dance Catalog & Course Programs
 
 > **Backfilled doc.** This version shipped before its feature folder existed. Reconstructed from the codebase and git history (commit `0224454`, DB version 6) during the June 2026 docs reconciliation — it was **not** written from per-story specs. Treat as an accurate summary, not an original design record.

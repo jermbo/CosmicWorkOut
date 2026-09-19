@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [30k — Vision](../README.md#30k--vision) › North Star
+
 # North Star
 
 > **CosmicWorkOut is the simplest possible tool for following a structured movement practice — offline, on your phone, with zero friction between you and logging what you did.**

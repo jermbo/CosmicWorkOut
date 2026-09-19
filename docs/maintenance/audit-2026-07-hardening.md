@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Maintenance](../README.md#maintenance) › Hardening Audit — July 2026
+
 # Hardening Audit — July 2026
 
 > A whole-codebase review for **performance, memory leaks, security, and correctness** —
@@ -145,3 +147,13 @@ Sequenced low-risk first, each independently reviewable:
 
 _Recorded as a deliberate "we saw this" register. The three data-loss fixes are done; the rest
 is deferred with explicit triggers, not dropped._
+
+---
+
+## Related
+
+- [June 2026 Audit](audit-2026-06.md) — the docs-and-clean-code counterpart to this review
+- [US-028 — Data Export, Backup & Device Sync](../features/v1.7.0/US-028-data-export-backup.md) — the restore path two of the fixes landed in
+- [Map — Data & Persistence](../map-data-and-persistence.md) — every doc about storage, backup and offline
+- [Offline Strategy](../architecture/offline-strategy.md) — write timing and the service worker
+- [Data Model](../architecture/data-model.md) — the schema these risks apply to

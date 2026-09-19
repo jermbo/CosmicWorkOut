@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.7.0
+
 # v1.7.0 — Full Strength Catalog & PWA
 
 > **Backfilled doc.** This version shipped before its feature folder existed. Reconstructed from the codebase and git history (commits `79dbd63`, `86ea3b0`, `9befba4`; DB version 7) during the June 2026 docs reconciliation — it was **not** written from per-story specs. Treat as an accurate summary, not an original design record.

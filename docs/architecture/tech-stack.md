@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › Tech Stack
+
 # Tech Stack
 
 Technology choices for CosmicWorkOut. All choices prioritize web-native approaches.
@@ -18,7 +20,7 @@ flowchart TB
     end
 
     subgraph data ["Data Layer"]
-        IDB[("IndexedDB v10")]
+        IDB[("IndexedDB")]
         LS[("localStorage")]
     end
 
@@ -112,18 +114,18 @@ Built-in items and programs are upserted on every boot (so new fields land on ol
 
 Class-based stores using Svelte 5 runes. The core ones:
 
-| Store            | File                       | Responsibility                               |
-| ---------------- | -------------------------- | -------------------------------------------- |
-| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine   |
-| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon  |
-| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density      |
-| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood          |
-| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                   |
-| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)    |
-| `goalPlanStore`  | `goalPlans.svelte.ts`      | Lift plans / goal progression plans (US-033) |
-| `baselineStore`  | _(planned)_                | Baselines + logs (US-034 / US-035)           |
-| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                 |
-| `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications           |
+| Store            | File                       | Responsibility                              |
+| ---------------- | -------------------------- | ------------------------------------------- |
+| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine  |
+| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon |
+| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density     |
+| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood         |
+| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                  |
+| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)   |
+| `goalPlanStore`  | `goalPlans.svelte.ts`      | Lift plans (US-033)                         |
+| `baselineStore`  | _(planned)_                | Baselines + logs (US-034 / US-035)          |
+| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                |
+| `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications          |
 
 See [State Management](../implementation/state.md) for the complete list and data flow.
 

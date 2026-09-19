@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › How It Works
+
 # How It Works
 
 The mental model for CosmicWorkOut — what actually happens when you use the app. No code, just behavior.
@@ -163,11 +165,11 @@ Off by default. Enable the toggle in Settings to reveal the **Health** screen an
 
 ---
 
-## Goal Progression Plans (opt-in)
+## Lift Plans (opt-in)
 
 Off by default — same contract as health metrics. Enable **Goal progression plans** in Settings to reveal `/goals` and the create wizard at `/goals/new`.
 
-A goal plan is an isolated Strength stint toward one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Only one goal plan may be **active** at a time; while active it is the sole active Strength program. You can pause, complete, or repeat a block. Turning the toggle off hides the UI; plan data stays in IndexedDB.
+A lift plan is an isolated Strength stint toward one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Only one lift plan may be **active** at a time; while active it is the sole active Strength program. You can pause, complete, or repeat a block. Turning the toggle off hides the UI; plan data stays in IndexedDB.
 
 Vocabulary: [Glossary — Lift plan](../glossary.md#lift-plan) (older name: Goal progression plan). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
 
@@ -207,7 +209,7 @@ flowchart TB
 ```
 
 - **Programs, items, habits** — IndexedDB; built-in content is seeded and refreshed on boot.
-- **Completed sessions, activities, habit logs, health readings, goal plans** — IndexedDB.
+- **Completed sessions, activities, habit logs, health readings, lift plans** — IndexedDB.
 - **Last-used weight/reps** — IndexedDB, updated each set.
 - **In-progress session, preferences, active plans** — localStorage.
 
@@ -227,11 +229,11 @@ Items and programs are upserted on every boot (built-in updates propagate; user 
 
 ## Related
 
-- [Glossary](../glossary.md) — Discipline, Item, Program, Goal plan, …
+- [Glossary](../glossary.md) — Discipline, Item, Program, Lift plan, …
 - [Program Progression](program-progression.md) — How the next routine and week are chosen
 - [State Management](state.md) — Which store owns what
 - [App Structure](app-structure.md) — Routes, layout, boot sequence
 - [Data Model](../architecture/data-model.md) — Entities and IndexedDB stores
-- [Goal plans (US-033)](../features/v1.9.0/US-033-goal-progression-plans.md) — Full goal-plan spec
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Full lift-plan spec
 - [Session Logging](../requirements/session-logging.md) — Target logging UX
 - [Implementation Status](status.md) — Built vs deferred checklist

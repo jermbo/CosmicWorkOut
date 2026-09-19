@@ -6,80 +6,105 @@
 
 ## How to read this wiki
 
-Docs are organized by **altitude**. Start high to understand _why_, work down to understand _what_, _how_, and _where in the code_.
+The wiki has **two ladders and one index**. Knowing which one you are on saves a lot of clicking.
 
-| Level  | Folder                             | Purpose                                  |
-| ------ | ---------------------------------- | ---------------------------------------- |
-| 30k    | [vision/](vision/)                 | North star — what we're building and why |
-| 15k    | [architecture/](architecture/)     | System structure, data, tech, offline    |
-| 5k     | [requirements/](requirements/)     | User stories per feature area            |
-| Ground | [implementation/](implementation/) | Code map, stores, components, status     |
-| —      | [features/](features/)             | Shipped version stories (v1.1–v1.8)      |
-| —      | [roadmap/](roadmap/)               | Deferred ideas — post–user-testing work  |
+### Ladder 1 — the product ladder (why the product is like this)
 
-Each doc is one complete thought — readable in ~60 seconds. Follow links to go deeper. Diagrams use **mermaid** for architecture, flows, entity relationships, and component trees.
+Applies to the product as a whole. Read top-down when you are new.
+
+| Level | Folder                         | Answers                                  |
+| ----- | ------------------------------ | ---------------------------------------- |
+| 30k   | [vision/](vision/)             | Why this product exists at all           |
+| 15k   | [architecture/](architecture/) | How the systems are shaped and connected |
+| 5k    | [requirements/](requirements/) | How a capability behaves, area by area   |
+
+### Ladder 2 — the feature ladder (why one feature is like this)
+
+Applies **per release**, inside [features/](features/README.md). This is the Epic → Feature →
+Story ladder, compressed: each version README carries its own 30k → 15k → 5k, then links down
+to the ground-level stories.
+
+| Level  | Where                                               | Answers                                           |
+| ------ | --------------------------------------------------- | ------------------------------------------------- |
+| 30k    | Version README → _Design North Star_                | Why we built this                                 |
+| 15k    | Version README → _What This Is_                     | The shape of it, and what it touches              |
+| 5k     | Version README → _What's Shipping_, _Key Decisions_ | The breakdown and the trade-offs                  |
+| Ground | `US-xxx` story files                                | Exactly what gets built, with acceptance criteria |
+
+### The index — where it lives in the code
+
+[implementation/](implementation/) is **not** a rung on either ladder. It is a separate axis
+answering _where in the code_ — routes, stores, components, status. Enter it from either ladder
+when you need to touch the source.
+
+### Maps of content
+
+Both ladders are vertical. The **maps** are horizontal: one page per subject that gathers every
+altitude, every release and the relevant code for that subject. Use them when you know roughly
+what you are looking for but not which folder it is in.
+
+- [Movement & Training](map-movement-and-training.md) — Disciplines, programs, routines, items, sessions, lift plans
+- [Daily Tracking](map-daily-tracking.md) — habits, activities, health metrics, baselines
+- [Data & Persistence](map-data-and-persistence.md) — IndexedDB, stores, backup, clearing, offline
+- [Interface & Navigation](map-interface-and-navigation.md) — routes, components, Overview, Settings
+- [History & Insights](map-history-and-insights.md) — calendar, streaks, charts
+
+### One complete thought per file
+
+A guideline, not a word count. Some subjects need more room. The test to apply while writing is:
+
+> **Does this detail belong here, or does it deserve its own file?**
+
+If a section starts answering a different question than the page title asks, split it and link.
+Diagrams use **mermaid** for architecture, flows, entity relationships, and component trees.
 
 ```mermaid
 flowchart TB
-    subgraph vision ["30k — Vision"]
-        NS[North Star]
-        DP[Design Principles]
+    subgraph product ["Ladder 1 — product"]
+        direction TB
+        V["30k  vision/"]
+        A["15k  architecture/"]
+        R["5k  requirements/"]
+        V --> A --> R
     end
 
-    subgraph arch ["15k — Architecture"]
-        SO[System Overview]
-        DM[Data Model]
-        TS[Tech Stack]
-        OS[Offline Strategy]
+    subgraph feature ["Ladder 2 — per release"]
+        direction TB
+        FR["30k-5k  features/vX/README"]
+        US["Ground  US-xxx stories"]
+        FR --> US
     end
 
-    subgraph req ["5k — Requirements"]
-        PM[Program Management]
-        SL[Session Logging]
-        HC[History & Calendar]
-        SP[Settings & Preferences]
-    end
+    MAPS["Maps of content<br/>(horizontal, by subject)"]
+    IMPL["implementation/<br/>where in the code"]
+    GLOS["glossary.md<br/>shared vocabulary"]
 
-    subgraph impl ["Ground — Implementation"]
-        HW[How It Works]
-        ST[Implementation Status]
-        AS[App Structure]
-        SM[State Management]
-        PP[Program Progression]
-        CO[Components]
-        DG[Dev Guide]
-    end
-
-    NS --> SO
-    DP --> SO
-    SO --> DM & TS & OS
-    DM --> PM & SL & HC & SP
-    SO --> HW
-    HW --> ST
-    ST --> AS & SM & PP & CO & DG
-    PM --> PP
-    SL --> SM & CO
+    R --> FR
+    MAPS -.-> V & A & R & FR & US & IMPL
+    US --> IMPL
+    R --> IMPL
+    GLOS -.-> MAPS
 
     classDef vision fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef arch fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef req fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef impl fill:#465569,stroke:#28313e,color:#ffffff;
-    class NS,DP vision;
-    class SO,DM,TS,OS arch;
-    class PM,SL,HC,SP req;
-    class HW,ST,AS,SM,PP,CO,DG impl;
+    class V vision;
+    class A,MAPS,GLOS arch;
+    class R,FR,US req;
+    class IMPL impl;
 ```
 
-**New here?** Follow one short trail, then click **Related** links at the bottom of each page:
+**New here?** Follow one short trail, then use the **Related** links at the bottom of each page:
 
 1. [North Star](vision/north-star.md) — why this product exists
 2. [How It Works](implementation/behavior.md) — what the app does (no code)
 3. [System Overview](architecture/overview.md) — how the pieces fit
 4. [Implementation Status](implementation/status.md) — what's built today
 
-**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit, Lift plan, Baseline — and the rule for where new movement types belong. Most concept pages link back to it.
+**Unsure what a word means?** The [Glossary](glossary.md) defines the shared vocabulary — Discipline, Routine, Item, Activity, Habit, Lift plan, Baseline — and the rule for where new movement types belong. It is **enforceable**: if a doc uses a different word for a glossary term, the doc is wrong.
 
-**Keeping the wiki honest:** relative links are checked by `npm run docs:links` (`scripts/check-doc-links.mjs`). When behavior or schema changes, update the docs in the same change — see [Documenting decisions](#documenting-decisions).
+**Keeping the wiki honest:** relative links and heading anchors are checked by `npm run docs:links` (`scripts/check-doc-links.mjs`). When behavior or schema changes, update the docs in the same change — see [Documenting decisions](#documenting-decisions) and the [Documentation Standards](standards/documentation-standards.md).
 
 ---
 
@@ -157,6 +182,7 @@ See [Implementation Status](implementation/status.md) for the current built-vs-d
 
 ## Standards
 
+- [Documentation Standards](standards/documentation-standards.md) — Page anatomy, breadcrumbs, the language-tightens-as-you-descend rule, and glossary enforcement.
 - [User Story Standards](standards/user-story-standards.md) — Personas, story format, and the acceptance-criteria template used in feature docs.
 
 ---

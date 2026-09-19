@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.7.0](README.md) › US-031
+
 # US-031 — Default Habits & Mood Scale Tweak
 
 > **Status: Shipped — v1.7.0**

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.9.0](README.md) › US-036
+
 # US-036 — Baselines Progress Charts
 
 > **As built:** `BaselineChart` (Chart.js line) renders inline inside each baseline's expandable section on `/baselines`, under a page-local `RangeBar` defaulting to `last-7`. One solid line per metric plus a dashed flat line at that metric's target. Days with no logs plot as `0` — for baselines a missing day genuinely means nothing was done, unlike the sparse health charts that use gaps.

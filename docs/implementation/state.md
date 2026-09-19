@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › State Management
+
 # State Management
 
 Eight Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
@@ -35,7 +37,7 @@ Owns the long-lived workout data — programs, items, sessions, and derived sche
 - `refreshSessions()` — reload sessions after finish
 - `getWorkoutById(id)` — lookup by ID
 - `getWorkoutForSession(session)` — lookup workout for a completed session
-- `setSoleActiveProgram(id)` — activate one program and deactivate others in its discipline (used by goal plans)
+- `setSoleActiveProgram(id)` — activate one program and deactivate others in its discipline (used by lift plans)
 
 ---
 
@@ -221,11 +223,11 @@ Reads `loggingContext.date` for the active logging date (same as `habitStore` an
 
 **File:** `src/lib/stores/goalPlans.svelte.ts`
 
-Owns goal progression plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.liftPlansEnabled` (Practice **and** Lift plans both on).
+Owns lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.liftPlansEnabled` (Practice **and** Lift plans both on).
 
 | State   | Source    | Purpose               |
 | ------- | --------- | --------------------- |
-| `plans` | IndexedDB | All goal plan records |
+| `plans` | IndexedDB | All lift plan records |
 
 **Key derived values:**
 
@@ -314,4 +316,4 @@ flowchart TB
 - [Program Progression](program-progression.md) — Schedule derivation
 - [Session Logging](../requirements/session-logging.md) — User-facing flow
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health store
-- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Goal plan store
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plan store

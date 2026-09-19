@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › System Overview
+
 # System Overview
 
 CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no auth. All data lives on the user's device.
@@ -98,7 +100,7 @@ sequenceDiagram
     Layout->>Hab: load() habits, habit logs
     Layout->>Act: load() activities
     Layout->>He: load() health readings
-    Layout->>GP: load() goal plans
+    Layout->>GP: load() lift plans
     Layout->>Sess: checkForRecovery()
     alt unfinished session from today
         Sess-->>Layout: show resume banner
@@ -171,7 +173,7 @@ See [Program Progression](../implementation/program-progression.md).
 ## Related
 
 - [How It Works](../implementation/behavior.md) — Mental model for the whole app
-- [Glossary](../glossary.md) — Discipline, Routine, Item, Goal plan, …
+- [Glossary](../glossary.md) — Discipline, Routine, Item, Lift plan, …
 - [Data Model](data-model.md) — What gets stored (DB v10)
 - [Tech Stack](tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
 - [Offline Strategy](offline-strategy.md) — Local-first persistence and caching

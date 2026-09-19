@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.9.0](README.md) › US-035
+
 # US-035 — Baselines Daily Logging
 
 > **As built:** `/baselines` lists active baselines as cards showing the selected date's total and target per metric, with a progress bar and a "Cleared" badge. "Log" opens `BaselineEntryDialog`, prefilled from the most recent entry. An expandable section per card lists that date's entries with time, values, edit, and two-tap delete. The date comes from the global `loggingContext`, so the page header's date picker handles backdating and corrections. An entry only stores the metrics the user filled in; a missing metric counts as `0`. Day totals are rounded to 4 decimals so `0.6 + 0.7` renders as `1.3`.

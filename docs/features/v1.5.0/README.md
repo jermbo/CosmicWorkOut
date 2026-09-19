@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.5.0
+
 # v1.5.0 — Data Insights & Visualization
 
 This version adds the first analytics layer to CosmicWorkOut — an **Insights** page that surfaces patterns across workout sessions, activities, and habits using Chart.js charts. The goal is to make the data the app already collects feel meaningful and motivating.
@@ -57,3 +59,15 @@ Implement in order — US-022 (hub + nav) must land first; charts can be built i
 ## Out of Scope for v1.5.0
 
 Deferred items are on the [roadmap](../../roadmap/README.md) (chart interactivity, per-discipline filtering, activity distance/pace, nutrition).
+
+---
+
+## Related
+
+- [Map — History & Insights](../../map-history-and-insights.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [v1.4.0](../v1.4.0/README.md) — adjacent release
+- [v1.6.0](../v1.6.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.3.0
+
 # v1.3.0 — Habit Management & Calendar History
 
 This version finishes the habit and calendar work deferred from v1.2.0 and closes a small activity-logging gap from v1.1.0.
@@ -72,3 +74,15 @@ See [roadmap](../../roadmap/README.md) for deferred ideas (e.g. habit icons). Vo
 ## Story Writing Standards
 
 All stories follow the format defined in [user-story-standards.md](../../standards/user-story-standards.md).
+
+---
+
+## Related
+
+- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
+- [Map — History & Insights](../../map-history-and-insights.md) — every doc on this subject, across releases
+- [v1.2.0](../v1.2.0/README.md) — adjacent release
+- [v1.4.0](../v1.4.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.5.0](README.md) › US-022
+
 # US-022 — Insights Hub & Navigation
 
 > **Status: Done — v1.5.0**

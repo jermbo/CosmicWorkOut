@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › Implementation Status
+
 # Implementation Status
 
 What's built today. **Current phase:** user testing and feedback — new work starts on the [roadmap](../roadmap/README.md).
@@ -140,7 +142,7 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 | Focus wave (4-week block)                        | Built  | Build → build → peak → deload                                                                                                                                                                       |
 | Supporting weekly increment                      | Built  | Uses frozen `weightIncrement`; reps stay flat                                                                                                                                                       |
 | Block repeat                                     | Built  | Re-run current block from week 1 via `countOffset`                                                                                                                                                  |
-| Plan lifecycle (complete / pause)                | Built  | One active goal plan; sole active Strength program; backing programs hidden from generic pickers                                                                                                    |
+| Plan lifecycle (complete / pause)                | Built  | One active lift plan; sole active Strength program; backing programs hidden from generic pickers                                                                                                    |
 | Baselines feature flag + Settings CRUD           | Built  | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — `baselines` / `baselineLogs` in DB v10                                                                                                     |
 | Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context                                                                                                        |
 | Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`                                                                                                    |

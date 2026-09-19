@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › App Structure
+
 # App Structure
 
 How the SvelteKit app is organized — routes, layout, and boot sequence.
@@ -26,7 +28,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/overview`  | `routes/settings/overview/+page.svelte`  | Overview card order — drag or arrow buttons                                                                                                          |
 | `/settings/habits`    | `routes/settings/habits/+page.svelte`    | Habit CRUD and reorder                                                                                                                               |
 | `/settings/baselines` | `routes/settings/baselines/+page.svelte` | Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                                                                               |
-| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. goal plans and Baselines), debug seed                                                                              |
+| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. lift plans and Baselines), debug seed                                                                              |
 
 Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, Health, and Baselines are reached from their summary cards and the Practice hub.
 
@@ -96,7 +98,7 @@ sequenceDiagram
     L->>DB: open IndexedDB v10, seed if empty, run migrations
     L->>P: load prefs, apply to DOM
     L->>Prog: load programs, exercises, sessions
-    L->>GP: load goal plans
+    L->>GP: load lift plans
     L->>H: load habits, habit logs
     L->>A: load activities
     L->>He: load health readings
@@ -107,7 +109,7 @@ sequenceDiagram
 1. `initDB()` — open IndexedDB (version 9), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
 2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
 3. `programStore.load()` — load programs, items, sessions; pick active program per Discipline
-4. `goalPlanStore.load()` — load goal progression plans _(US-033)_
+4. `goalPlanStore.load()` — load lift plans _(US-033)_
 5. `habitStore.load()` — load habits and all habit logs
 6. `activityStore.load()` — load all activity logs
 7. `healthStore.load()` — load health readings _(US-029)_

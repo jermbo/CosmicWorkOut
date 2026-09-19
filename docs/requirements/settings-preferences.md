@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [5k — Requirements](../README.md#5k--requirements) › Settings & Preferences
+
 # Settings & Preferences
 
 User-configurable behavior and appearance.

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.5.0](README.md) › US-026
+
 # US-026 — Habit Balance Radar Chart
 
 > **Status: Done — v1.5.0**

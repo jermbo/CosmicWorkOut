@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › Program Progression
+
 # Program Progression
 
 How the app decides which workout is "today" and how week numbers advance.
@@ -111,7 +113,7 @@ The logic above is unchanged — it just runs **per Discipline**. v1.4.0 tracks 
 
 ## Goal progression plans (v1.9.0)
 
-When a **goal progression plan** is active, routine rotation and week numbering use the **same count-driven formulas** as course programs (via a generated backing `Program`). What differs is **prescribed load**: the focus exercise follows 4-week wave blocks (final peak snaps to the goal weight × reps); supporting exercises bump by `weightIncrement` each week. Block repeat rewinds targets via `countOffset` and extends the backing program without erasing session history. Activating a goal plan makes it the sole active Strength program; activating a course plan pauses the goal plan. Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
+When a **lift plan** is active, routine rotation and week numbering use the **same count-driven formulas** as course programs (via a generated backing `Program`). What differs is **prescribed load**: the focus exercise follows 4-week wave blocks (final peak snaps to the goal weight × reps); supporting exercises bump by `weightIncrement` each week. Block repeat rewinds targets via `countOffset` and extends the backing program without erasing session history. Activating a lift plan makes it the sole active Strength program; activating a course plan pauses the lift plan. Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
 
 ---
 
