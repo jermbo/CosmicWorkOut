@@ -67,13 +67,20 @@
 	<PageHeader
 		title="Goal plans"
 		showBack
-		backHref="/practice/workout"
+		backHref={prefsStore.practiceEnabled ? '/practice/workout' : '/'}
 	/>
 
-	{#if !prefsStore.goalProgressionPlansEnabled}
+	{#if !prefsStore.liftPlansEnabled}
 		<section class="goals-disabled">
-			<p>Goal progression plans are turned off. Your plan data is kept either way.</p>
-			<a href={resolve('/settings')}>Enable them in Settings</a>
+			{#if !prefsStore.practiceEnabled}
+				<p>
+					Goal plans are part of Practice, which is turned off. Your plan data is kept either way.
+				</p>
+				<a href={resolve('/settings')}>Turn on Practice in Settings</a>
+			{:else}
+				<p>Goal progression plans are turned off. Your plan data is kept either way.</p>
+				<a href={resolve('/settings')}>Enable them in Settings</a>
+			{/if}
 		</section>
 	{:else}
 		<div class="goals-page__toolbar">

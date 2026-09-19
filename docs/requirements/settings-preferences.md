@@ -33,27 +33,44 @@ Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a sho
 
 | Route                 | Contents                                                                                             |
 | --------------------- | ---------------------------------------------------------------------------------------------------- |
-| `/settings`           | **Hub** — navigation rows + health / lift-plan / (planned) baselines toggles                         |
+| `/settings`           | **Hub** — navigation rows + practice / lift-plan / health / baselines toggles                        |
 | `/settings/habits`    | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))           |
-| `/settings/baselines` | **Planned** — Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                 |
+| `/settings/baselines` | Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                               |
 | `/settings/data`      | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed |
 
 ```mermaid
 flowchart LR
     Hub["/settings"]
     Hub --> Hab["/settings/habits"]
+    Hub --> Base["/settings/baselines"]
     Hub --> Data["/settings/data"]
+    Hub -->|toggle| Practice[practiceEnabled]
+    Practice -->|toggle, nested| Lift[goalProgressionPlansEnabled]
     Hub -->|toggle| Health[healthMetricsEnabled]
+    Hub -->|toggle| Baselines[baselinesEnabled]
 
     classDef hub fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef toggle fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class Hub hub;
-    class Hab,Data route;
-    class Health toggle;
+    class Hab,Base,Data route;
+    class Practice,Lift,Health,Baselines toggle;
 ```
 
 The hub stays short; destructive and infrequent actions live on **Data & backup**. There is no appearance page — see the Appearance UI note above.
+
+### Feature toggles
+
+Every feature toggle defaults **off** and hides UI only — data always persists ([state.md](../implementation/state.md#feature-flags-hide-ui-data-always-persists)).
+
+| Toggle                        | Covers                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------- |
+| `practiceEnabled`             | The whole Practice / session engine, plus its History & Insights marks  |
+| `goalProgressionPlansEnabled` | Lift plans — **nested under Practice**; only shown while Practice is on |
+| `healthMetricsEnabled`        | Weight and blood pressure                                               |
+| `baselinesEnabled`            | Daily floors and ceilings                                               |
+
+Lift plans are nested because a plan can only be trained through `/workout`, which Practice owns. Code reads the derived `prefsStore.liftPlansEnabled` rather than and-ing the two flags.
 
 ---
 
@@ -70,13 +87,14 @@ flowchart LR
     Apply --> Data["data-density / data-roundness"]
     Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight]
     Apply --> Health[healthMetricsEnabled → home / health / insights]
+    Apply --> Practice[practiceEnabled → nav / practice / workout / history / insights]
 
     classDef trigger fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef effect fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class Change trigger;
     class Store,LS,Apply store;
-    class CSS,Data,Unit,Health effect;
+    class CSS,Data,Unit,Health,Practice effect;
 ```
 
 ---

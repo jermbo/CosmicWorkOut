@@ -36,8 +36,15 @@
 
 	const todayStr = todayIso();
 
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+
+	/**
+	 * Empty while Practice is off, which is what drops session dots, the day sheets,
+	 * and the month workout/volume stats — the rows stay in IndexedDB.
+	 */
 	let sessionsByDate = $derived.by(() => {
 		const map = new SvelteMap<string, Session[]>();
+		if (!practiceEnabled) return map;
 		for (const s of programStore.sessions) {
 			const list = map.get(s.date) ?? [];
 			list.push(s);
@@ -172,7 +179,9 @@
 
 	let monthKey = $derived(monthIsoKey(viewDate));
 
-	let monthSessions = $derived(programStore.sessions.filter((s) => s.date.startsWith(monthKey)));
+	let monthSessions = $derived(
+		practiceEnabled ? programStore.sessions.filter((s) => s.date.startsWith(monthKey)) : [],
+	);
 
 	let monthActivities = $derived(
 		activityStore.activities.filter((a) => a.date.startsWith(monthKey)),
@@ -211,14 +220,16 @@
 	</header>
 
 	<div class="calendar-page__stats">
-		<div class="cal-stat">
-			<span class="cal-stat__value">{monthSessions.length}</span>
-			<span class="cal-stat__label">Workouts</span>
-		</div>
-		<div class="cal-stat">
-			<span class="cal-stat__value">{formatVolume(monthVolume)}</span>
-			<span class="cal-stat__label">lb lifted</span>
-		</div>
+		{#if practiceEnabled}
+			<div class="cal-stat">
+				<span class="cal-stat__value">{monthSessions.length}</span>
+				<span class="cal-stat__label">Workouts</span>
+			</div>
+			<div class="cal-stat">
+				<span class="cal-stat__value">{formatVolume(monthVolume)}</span>
+				<span class="cal-stat__label">lb lifted</span>
+			</div>
+		{/if}
 		<div class="cal-stat">
 			<span class="cal-stat__value">{monthActivities.length}</span>
 			<span class="cal-stat__label">Activities</span>
@@ -354,8 +365,10 @@
 		class="calendar-legend"
 		aria-label="Legend"
 	>
-		<span class="cal-legend-item cal-legend-item--session">Strength</span>
-		<span class="cal-legend-item cal-legend-item--dance">Dance</span>
+		{#if practiceEnabled}
+			<span class="cal-legend-item cal-legend-item--session">Strength</span>
+			<span class="cal-legend-item cal-legend-item--dance">Dance</span>
+		{/if}
 		<span class="cal-legend-item cal-legend-item--activity">Activity</span>
 		{#if healthEnabled}
 			<span class="cal-legend-item cal-legend-item--health">Health</span>

@@ -8,10 +8,13 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PracticeGroupCard from '$lib/components/PracticeGroupCard.svelte';
 	import AddPracticeSheet from '$lib/components/AddPracticeSheet.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	let contextDate = $derived(loggingContext.date);
 	let showAddPractice = $state(false);
-	let goalsEnabled = $derived(prefsStore.goalProgressionPlansEnabled);
+	let goalsEnabled = $derived(prefsStore.liftPlansEnabled);
 
 	function groupSummary(groupId: string): { summary: string; meta: string } {
 		const plans = programStore.activeProgramsForGroup(groupId);

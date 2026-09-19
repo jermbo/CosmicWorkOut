@@ -89,6 +89,7 @@
 		return 'Log activity';
 	});
 
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dayWeight = $derived(healthStore.weightForDate(date));
 	let dayBp = $derived(healthStore.bloodPressureForDate(date));
@@ -142,19 +143,21 @@
 				/>
 			{/if}
 
-			<DayActionItem
-				icon="edit"
-				label={strengthActionLabel}
-				description={strengthActionDescription}
-				onclick={() => navigate('/workout')}
-			/>
+			{#if practiceEnabled}
+				<DayActionItem
+					icon="edit"
+					label={strengthActionLabel}
+					description={strengthActionDescription}
+					onclick={() => navigate('/workout')}
+				/>
 
-			<DayActionItem
-				icon="edit"
-				label={danceActionLabel}
-				description={danceActionDescription}
-				onclick={() => navigate('/practice/dance')}
-			/>
+				<DayActionItem
+					icon="edit"
+					label={danceActionLabel}
+					description={danceActionDescription}
+					onclick={() => navigate('/practice/dance')}
+				/>
+			{/if}
 
 			<DayActionItem
 				icon="plus"

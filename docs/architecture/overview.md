@@ -11,7 +11,7 @@ flowchart TB
     subgraph browser ["Browser"]
         UI["SvelteKit UI\nroutes + overlays"]
         Stores["Svelte Stores\nprogram · session · prefs · habits · activities\nhealth · goalPlans · baselines · loggingContext · toast"]
-        IDB[("IndexedDB v9\nitems · programs · sessions · itemLastUsed\nhabits · habitLogs · activities\nhealthReadings · goalPlans\nbaselines · baselineLogs (planned)")]
+        IDB[("IndexedDB v10\nitems · programs · sessions · itemLastUsed\nhabits · habitLogs · activities\nhealthReadings · goalPlans\nbaselines · baselineLogs")]
         LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
         SW["Service Worker\nprecaches app shell"]
     end
@@ -92,7 +92,7 @@ sequenceDiagram
     participant Sess as sessionStore
     participant UI as Overview
 
-    Layout->>DB: open IndexedDB v9, seed data, run migrations
+    Layout->>DB: open IndexedDB v10, seed data, run migrations
     Layout->>Prefs: load() + apply CSS vars
     Layout->>Prog: load() programs, items, sessions
     Layout->>Hab: load() habits, habit logs
@@ -172,7 +172,7 @@ See [Program Progression](../implementation/program-progression.md).
 
 - [How It Works](../implementation/behavior.md) — Mental model for the whole app
 - [Glossary](../glossary.md) — Discipline, Routine, Item, Goal plan, …
-- [Data Model](data-model.md) — What gets stored (DB v9)
+- [Data Model](data-model.md) — What gets stored (DB v10)
 - [Tech Stack](tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
 - [Offline Strategy](offline-strategy.md) — Local-first persistence and caching
 - [App Structure](../implementation/app-structure.md) — Routes, layout, boot

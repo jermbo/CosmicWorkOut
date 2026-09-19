@@ -37,7 +37,8 @@
 				baselineStore.load(),
 			]);
 
-			if (sessionStore.checkForRecovery()) {
+			// Practice owns sessions — with it off, a leftover session must not resurface.
+			if (prefsStore.practiceEnabled && sessionStore.checkForRecovery()) {
 				hasRecoverableSession = true;
 			}
 		} catch (e) {
@@ -89,16 +90,18 @@
 
 		<BottomNav pathname={page.url.pathname} />
 
-		{#if sessionStore.isActive}
-			{#if sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID}
-				<DanceSessionOverlay />
-			{:else}
-				<SessionOverlay />
+		{#if prefsStore.practiceEnabled}
+			{#if sessionStore.isActive}
+				{#if sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID}
+					<DanceSessionOverlay />
+				{:else}
+					<SessionOverlay />
+				{/if}
 			{/if}
-		{/if}
 
-		{#if sessionStore.isComplete}
-			<SessionComplete />
+			{#if sessionStore.isComplete}
+				<SessionComplete />
+			{/if}
 		{/if}
 
 		{#if hasRecoverableSession}

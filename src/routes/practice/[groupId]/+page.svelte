@@ -17,6 +17,9 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import HomeCard from '$lib/components/HomeCard.svelte';
 	import AddPracticeSheet from '$lib/components/AddPracticeSheet.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	let groupId = $derived(page.params.groupId ?? '');
 	let group = $derived(practiceGroupById(groupId));
@@ -121,7 +124,7 @@
 				Add plan
 			</button>
 			<div class="group-page__links">
-				{#if group.id === WORKOUT_GROUP_ID && prefsStore.goalProgressionPlansEnabled}
+				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
 					<a
 						class="group-page__goals"
 						href={resolveHref('/goals')}>Goal plans</a
@@ -143,7 +146,7 @@
 					type="button"
 					onclick={() => (showAddPractice = true)}>Add a plan</button
 				>
-				{#if group.id === WORKOUT_GROUP_ID && prefsStore.goalProgressionPlansEnabled}
+				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
 					<a
 						class="group-empty__goals"
 						href={resolveHref('/goals')}>Or start a goal plan</a

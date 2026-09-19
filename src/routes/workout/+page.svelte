@@ -15,6 +15,9 @@
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
 	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	const todayStr = todayIso();
 
@@ -61,7 +64,7 @@
 	// Goal-plan hook: when the viewed program belongs to the active goal plan (and the
 	// feature is on), prescribe this week's wave targets instead of last-used prefill.
 	let goalPlan = $derived.by(() => {
-		if (!prefsStore.goalProgressionPlansEnabled || !programId) return null;
+		if (!prefsStore.liftPlansEnabled || !programId) return null;
 		const plan = goalPlanStore.activePlan;
 		if (plan && plan.programId === programId) return plan;
 		return null;
@@ -130,7 +133,7 @@
 	>
 		{#snippet trailing()}
 			<span class="workout-page__header-links">
-				{#if prefsStore.goalProgressionPlansEnabled}
+				{#if prefsStore.liftPlansEnabled}
 					<a
 						href={resolve('/goals')}
 						class="workout-page__programs-link">Goals</a
@@ -180,7 +183,7 @@
 			>
 				Choose a plan
 			</a>
-			{#if prefsStore.goalProgressionPlansEnabled}
+			{#if prefsStore.liftPlansEnabled}
 				<a
 					href={resolve('/goals/new')}
 					class="workout-page__goal-link">Or start a goal plan</a

@@ -18,7 +18,7 @@ flowchart TB
     end
 
     subgraph data ["Data Layer"]
-        IDB[("IndexedDB v9")]
+        IDB[("IndexedDB v10")]
         LS[("localStorage")]
     end
 

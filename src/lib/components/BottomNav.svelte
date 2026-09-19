@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 
 	let { pathname }: { pathname: string } = $props();
 
-	const navItems = [
+	const ALL_NAV_ITEMS = [
 		{ href: '/', label: 'Overview', exact: true },
 		{ href: '/practice', label: 'Practice', exact: false },
 		{ href: '/calendar', label: 'History', exact: false },
@@ -11,7 +12,11 @@
 		{ href: '/settings', label: 'Settings', exact: false },
 	] as const;
 
-	function isActive(item: (typeof navItems)[number]): boolean {
+	let navItems = $derived(
+		ALL_NAV_ITEMS.filter((item) => item.href !== '/practice' || prefsStore.practiceEnabled),
+	);
+
+	function isActive(item: (typeof ALL_NAV_ITEMS)[number]): boolean {
 		if (item.href === '/practice') {
 			return pathname.startsWith('/practice') || pathname.startsWith('/workout');
 		}
@@ -21,7 +26,7 @@
 		return pathname.startsWith(item.href);
 	}
 
-	function ariaCurrentFor(item: (typeof navItems)[number]): 'page' | undefined {
+	function ariaCurrentFor(item: (typeof ALL_NAV_ITEMS)[number]): 'page' | undefined {
 		if (isActive(item)) return 'page';
 		return undefined;
 	}

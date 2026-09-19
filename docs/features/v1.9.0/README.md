@@ -89,20 +89,20 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ### Key Decisions (Baselines)
 
-| Topic                  | Decision                                                                               |
-| ---------------------- | -------------------------------------------------------------------------------------- |
-| **Not Habits**         | Separate domain — multi-entry days, 1–2 metrics, up/under direction, growth charts     |
-| **Not Lift plans**     | Lift plans stay on `/goals`; Baselines use `/baselines`                                |
-| **Placement**          | Sibling of Habits                                                                      |
-| **Settings**           | Setup under **Settings → Baselines**; main route for logging + chart                   |
-| **Feature gate**       | `baselinesEnabled` — default **off**; off = hide UI, data persists                     |
-| **Direction**          | **go up** or **stay under**                                                            |
-| **Metrics**            | One or two; unit label(s) user-typed                                                   |
-| **Daily aggregation**  | Always many logs per day; totals = **sum**                                             |
-| **Target changes**     | Manual only — no auto-raise                                                            |
-| **Date / corrections** | Global date context; edit/delete any entry including past                              |
-| **Charts**             | Line + flat target; same Insights range chips                                          |
-| **DB**                 | Same IndexedDB **v9** as Lift plans — add `baselines` + `baselineLogs` to that upgrade |
+| Topic                  | Decision                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------- |
+| **Not Habits**         | Separate domain — multi-entry days, 1–2 metrics, up/under direction, growth charts    |
+| **Not Lift plans**     | Lift plans stay on `/goals`; Baselines use `/baselines`                               |
+| **Placement**          | Sibling of Habits                                                                     |
+| **Settings**           | Setup under **Settings → Baselines**; main route for logging + chart                  |
+| **Feature gate**       | `baselinesEnabled` — default **off**; off = hide UI, data persists                    |
+| **Direction**          | **go up** or **stay under**                                                           |
+| **Metrics**            | One or two; unit label(s) user-typed                                                  |
+| **Daily aggregation**  | Always many logs per day; totals = **sum**                                            |
+| **Target changes**     | Manual only — no auto-raise                                                           |
+| **Date / corrections** | Global date context; edit/delete any entry including past                             |
+| **Charts**             | Line + flat target; same Insights range chips                                         |
+| **DB**                 | IndexedDB **v10** — `baselines` + `baselineLogs` in their own bump (v9 is Lift plans) |
 
 ### Deferred / Future (Baselines)
 

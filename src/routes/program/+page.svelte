@@ -14,6 +14,10 @@
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	let editingWorkout = $state<Routine | null | undefined>(undefined);
 	let showCreateProgram = $state(false);

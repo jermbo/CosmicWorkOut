@@ -185,6 +185,7 @@ export interface UserPrefs {
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
+	practiceEnabled: boolean;
 	healthMetricsEnabled: boolean;
 	goalProgressionPlansEnabled: boolean;
 	baselinesEnabled: boolean;

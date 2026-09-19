@@ -196,21 +196,23 @@
 	</section>
 
 	<SettingsGroup title="Clear">
-		<SettingsActionRow
-			label="Custom exercises"
-			description="Built-in exercises are kept. Your workout log stays in place."
-			onclick={() => openClearDialog('exercises')}
-		/>
-		<SettingsActionRow
-			label="Custom programs"
-			description="Built-in programs are kept. Your workout log and exercises stay in place."
-			onclick={() => openClearDialog('programs')}
-		/>
-		<SettingsActionRow
-			label="Workout sessions"
-			description="Session history and weight memory. Activities, programs, and exercises stay in place."
-			onclick={() => openClearDialog('workoutSessions')}
-		/>
+		{#if prefsStore.practiceEnabled}
+			<SettingsActionRow
+				label="Custom exercises"
+				description="Built-in exercises are kept. Your workout log stays in place."
+				onclick={() => openClearDialog('exercises')}
+			/>
+			<SettingsActionRow
+				label="Custom programs"
+				description="Built-in programs are kept. Your workout log and exercises stay in place."
+				onclick={() => openClearDialog('programs')}
+			/>
+			<SettingsActionRow
+				label="Workout sessions"
+				description="Session history and weight memory. Activities, programs, and exercises stay in place."
+				onclick={() => openClearDialog('workoutSessions')}
+			/>
+		{/if}
 		<SettingsActionRow
 			label="Activity log"
 			description="Logged runs, walks, and other activities. Workout sessions stay in place."
@@ -226,7 +228,7 @@
 			description="Weight and blood pressure readings."
 			onclick={() => openClearDialog('health')}
 		/>
-		{#if prefsStore.goalProgressionPlansEnabled}
+		{#if prefsStore.liftPlansEnabled}
 			<SettingsActionRow
 				label="Goal plans"
 				description="Goal progression plan records. Their generated programs and sessions stay in place."

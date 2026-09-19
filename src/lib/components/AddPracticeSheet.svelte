@@ -32,9 +32,7 @@
 
 	let group = $derived(practiceGroupById(groupId));
 	let disciplineId = $derived(group?.disciplineIds[0] ?? '');
-	let showGoalPlans = $derived(
-		prefsStore.goalProgressionPlansEnabled && groupId === WORKOUT_GROUP_ID,
-	);
+	let showGoalPlans = $derived(prefsStore.liftPlansEnabled && groupId === WORKOUT_GROUP_ID);
 
 	let programs = $derived.by(() => {
 		if (!group) return [] as Program[];

@@ -1,8 +1,8 @@
 # US-034 — Baselines Setup
 
-> **As built:** `baselines` + `baselineLogs` stores at **DB_VERSION 9** (same bump as Lift plans); pure logic in `src/lib/baselines/logic.ts` with tests; `baselineStore` in `src/lib/stores/baselines.svelte.ts`; routes `/baselines` + `/settings/baselines`; Settings toggle `baselinesEnabled` (default off). Overview gets a gated `HomeBaselinesCard` beside Habits. Deleting a baseline retains its logs. Clearing is wired into Settings → Data, and both stores are in the backup envelope.
+> **As built:** `baselines` + `baselineLogs` stores at **DB_VERSION 10**; pure logic in `src/lib/baselines/logic.ts` with tests; `baselineStore` in `src/lib/stores/baselines.svelte.ts`; routes `/baselines` + `/settings/baselines`; Settings toggle `baselinesEnabled` (default off). Overview gets a gated `HomeBaselinesCard` beside Habits. Deleting a baseline retains its logs. Clearing is wired into Settings → Data, and both stores are in the backup envelope.
 >
-> **Local upgrade note:** because the stores were folded into the existing v9 upgrade rather than a new version, a browser DB already opened at v9 will not have them — clear IndexedDB once so the v9 upgrade re-runs.
+> **Deviation from plan:** this story specified folding the stores into the existing v9 bump. That only works on a fresh database — `onupgradeneeded` runs only when the version increases, so any install already at v9 would silently lack the two stores and every read would fail. Shipped as **v10** instead, which upgrades existing installs without a wipe.
 >
 > Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Roadmap — Baselines](../../roadmap/baselines.md).
 
@@ -32,7 +32,7 @@ so that I can set an embarrassingly low bar once in Settings and use it day to d
 
 ## Data Model (planned)
 
-IndexedDB **v9** (same bump as Lift plans / `goalPlans`): add stores `baselines` + `baselineLogs` in the existing v9 upgrade path. If a local DB was already opened at v9 without those stores, clear IndexedDB so the v9 upgrade runs clean. Exact TypeScript names may vary at implement time; shapes below are the contract.
+IndexedDB **v10** (shipped as its own bump — see the deviation note above): add stores `baselines` + `baselineLogs`. Exact TypeScript names may vary at implement time; shapes below are the contract.
 
 ```typescript
 type BaselineDirection = 'up' | 'under';

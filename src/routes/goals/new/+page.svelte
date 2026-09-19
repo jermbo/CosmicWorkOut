@@ -43,10 +43,15 @@
 		backHref="/goals"
 	/>
 
-	{#if !prefsStore.goalProgressionPlansEnabled}
+	{#if !prefsStore.liftPlansEnabled}
 		<section class="goal-new__disabled">
-			<p>Goal progression plans are turned off.</p>
-			<a href={resolve('/settings')}>Enable them in Settings</a>
+			{#if !prefsStore.practiceEnabled}
+				<p>Goal plans are part of Practice, which is turned off.</p>
+				<a href={resolve('/settings')}>Turn on Practice in Settings</a>
+			{:else}
+				<p>Goal progression plans are turned off.</p>
+				<a href={resolve('/settings')}>Enable them in Settings</a>
+			{/if}
 		</section>
 	{:else}
 		<GoalWizardSteps

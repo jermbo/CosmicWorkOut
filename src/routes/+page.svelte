@@ -36,6 +36,7 @@
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dateWeight = $derived(healthStore.weightForDate(contextDate));
 	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
@@ -72,10 +73,12 @@
 			if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
 		}
 
-		for (const session of programStore.sessions) {
-			let kind: 'dance' | 'strength' = 'strength';
-			if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
-			add(session.date, kind);
+		if (practiceEnabled) {
+			for (const session of programStore.sessions) {
+				let kind: 'dance' | 'strength' = 'strength';
+				if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
+				add(session.date, kind);
+			}
 		}
 
 		for (const activity of activityStore.activities) {
@@ -108,7 +111,9 @@
 		onDateChange={() => goto(resolve('/'), { replaceState: true })}
 	>
 		{#snippet trailing()}
-			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
+			{#if practiceEnabled}
+				<WeekStreakBadge streak={programStore.combinedWeekStreak} />
+			{/if}
 		{/snippet}
 	</PageHeader>
 
@@ -117,12 +122,14 @@
 			logged={habitsLogged}
 			total={habitsTotal}
 		/>
-		<HomePracticeHubCard
-			completedCount={practiceNextUp.completedCount}
-			live={practiceNextUp.live}
-			headline={practiceNextUp.headline}
-			detail={practiceNextUp.detail}
-		/>
+		{#if practiceEnabled}
+			<HomePracticeHubCard
+				completedCount={practiceNextUp.completedCount}
+				live={practiceNextUp.live}
+				headline={practiceNextUp.headline}
+				detail={practiceNextUp.detail}
+			/>
+		{/if}
 		<HomeActivityCard activities={dateActivities} />
 		{#if baselinesEnabled}
 			<HomeBaselinesCard

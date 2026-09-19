@@ -5,6 +5,7 @@
 	import { resolveHref } from '$lib/navigation';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { formatWeekdayShortDate, todayIso } from '$lib/date';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
@@ -34,8 +35,12 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let displayDate = $derived(formatWeekdayShortDate(contextDate, ' · '));
+	// Feeds the week strip's "done" pips — empty while Practice is off so other pages
+	// don't show session marks for a hidden feature.
 	let activeSessions = $derived(
-		programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id),
+		prefsStore.practiceEnabled
+			? programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id)
+			: [],
 	);
 
 	function openDatePicker() {

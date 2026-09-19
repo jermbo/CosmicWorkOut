@@ -7,6 +7,7 @@ const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
+	practiceEnabled: false,
 	healthMetricsEnabled: false,
 	goalProgressionPlansEnabled: false,
 	baselinesEnabled: false,
@@ -17,9 +18,17 @@ class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	practiceEnabled = $state(DEFAULTS.practiceEnabled);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
+
+	/**
+	 * Lift plans generate backing programs and can only be trained through `/workout`,
+	 * which Practice owns — so they are only ever live when Practice is on. Every
+	 * consumer reads this instead of and-ing the two flags itself.
+	 */
+	liftPlansEnabled = $derived(this.practiceEnabled && this.goalProgressionPlansEnabled);
 
 	load(): void {
 		try {
@@ -30,6 +39,7 @@ class PrefsStore {
 				this.density = parsed.density ?? DEFAULTS.density;
 				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.practiceEnabled = parsed.practiceEnabled ?? DEFAULTS.practiceEnabled;
 				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
 				this.goalProgressionPlansEnabled =
 					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
@@ -51,11 +61,17 @@ class PrefsStore {
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
+			practiceEnabled: this.practiceEnabled,
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
 			baselinesEnabled: this.baselinesEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+	}
+
+	setPracticeEnabled(enabled: boolean): void {
+		this.practiceEnabled = enabled;
+		this.save();
 	}
 
 	setHealthMetricsEnabled(enabled: boolean): void {

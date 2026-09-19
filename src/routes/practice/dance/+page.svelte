@@ -13,6 +13,10 @@
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import { toastStore } from '$lib/stores/toast.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	const disciplineId = BELLYDANCE_DISCIPLINE_ID;
 	const todayStr = todayIso();

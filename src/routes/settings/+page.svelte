@@ -27,24 +27,32 @@
 			detail="{activeHabitCount} active"
 		/>
 		<SettingsToggleRow
+			label="Practice"
+			description="Programs, routines, and guided workout & dance sessions. Your programs and session history are kept when off."
+			checked={prefsStore.practiceEnabled}
+			onchange={(v) => prefsStore.setPracticeEnabled(v)}
+		/>
+		{#if prefsStore.practiceEnabled}
+			<SettingsToggleRow
+				label="Goal progression plans"
+				description="Wave-loading strength plans that build toward a target lift. Your plan data is kept when off."
+				checked={prefsStore.goalProgressionPlansEnabled}
+				onchange={(v) => prefsStore.setGoalProgressionPlansEnabled(v)}
+			/>
+			{#if prefsStore.goalProgressionPlansEnabled}
+				<SettingsRow
+					href="/goals"
+					label="Goal plans"
+					detail="Manage & create"
+				/>
+			{/if}
+		{/if}
+		<SettingsToggleRow
 			label="Health metrics"
 			description="Track weight and blood pressure trends."
 			checked={prefsStore.healthMetricsEnabled}
 			onchange={(v) => prefsStore.setHealthMetricsEnabled(v)}
 		/>
-		<SettingsToggleRow
-			label="Goal progression plans"
-			description="Wave-loading strength plans that build toward a target lift. Your plan data is kept when off."
-			checked={prefsStore.goalProgressionPlansEnabled}
-			onchange={(v) => prefsStore.setGoalProgressionPlansEnabled(v)}
-		/>
-		{#if prefsStore.goalProgressionPlansEnabled}
-			<SettingsRow
-				href="/goals"
-				label="Goal plans"
-				detail="Manage & create"
-			/>
-		{/if}
 		<SettingsToggleRow
 			label="Baselines"
 			description="Embarrassingly low daily floors and ceilings. Your baseline data is kept when off."

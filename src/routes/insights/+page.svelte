@@ -64,7 +64,8 @@
 
 	let xLabels = $derived(xLabelsFor(dates));
 
-	let hasSessions = $derived(programStore.sessions.length > 0);
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+	let hasSessions = $derived(practiceEnabled && programStore.sessions.length > 0);
 	let hasActivities = $derived(activityStore.activities.length > 0);
 	let hasHabitLogs = $derived(habitStore.logs.length > 0);
 	let hasHabits = $derived(habitStore.activeHabits.length > 0);
@@ -96,7 +97,13 @@
 
 	{#if !hasAnyData}
 		<div class="empty-state">
-			<p class="empty-state__msg">Log workouts, activities, or habits to see your insights.</p>
+			<p class="empty-state__msg">
+				{#if practiceEnabled}
+					Log workouts, activities, or habits to see your insights.
+				{:else}
+					Log activities or habits to see your insights.
+				{/if}
+			</p>
 		</div>
 	{:else}
 		<div class="charts">

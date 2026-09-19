@@ -22,7 +22,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
 /** Every IndexedDB object store — keep in sync with onupgradeneeded. */
 export const ALL_STORE_NAMES = [

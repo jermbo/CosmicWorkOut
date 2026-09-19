@@ -78,10 +78,20 @@ User preferences. Loaded once at boot, saved on every change.
 | `density`                     | `comfortable` | `data-density` on `<html>`           |
 | `roundness`                   | `default`     | `data-roundness` on `<html>`         |
 | `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet      |
+| `practiceEnabled`             | `false`       | Gates the Practice engine (below)    |
 | `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI       |
 | `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI        |
+| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI    |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
+
+### Feature flags hide UI; data always persists
+
+Every flag defaults **off** and only controls visibility — IndexedDB rows and localStorage keys are untouched, so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/goals` and `/baselines` additionally show a short "turned off" panel.
+
+**`practiceEnabled` is the broad one.** Practice is the session engine, not a single screen, so the flag covers: the Practice bottom-nav tab; the routes `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, `/program`; the Overview practice card, week-streak badge, and strength/dance week-strip indicators; the session overlays, completion screen, and crash-recovery banner in `+layout.svelte`; History session dots, legend entries, month "Workouts" / "lb lifted" stats, and day-sheet session actions; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data.
+
+**Lift plans nest inside Practice.** A plan generates a backing program and can only be _trained_ through `/workout`, so `goalProgressionPlansEnabled` alone is not enough. `prefsStore.liftPlansEnabled` is a derived `practiceEnabled && goalProgressionPlansEnabled` — every consumer reads that instead of and-ing the two flags itself, and the Lift plans toggle is only shown while Practice is on.
 
 ---
 
@@ -193,7 +203,7 @@ Reads `loggingContext.date` for the active logging date (same as `habitStore` an
 
 **File:** `src/lib/stores/goalPlans.svelte.ts`
 
-Owns goal progression plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.goalProgressionPlansEnabled`.
+Owns goal progression plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.liftPlansEnabled` (Practice **and** Lift plans both on).
 
 | State   | Source    | Purpose               |
 | ------- | --------- | --------------------- |

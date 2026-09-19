@@ -428,8 +428,9 @@ type UserPrefs = {
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
+	practiceEnabled: boolean; // default false — gates the whole Practice / session engine
 	healthMetricsEnabled: boolean; // default false — US-029
-	goalProgressionPlansEnabled: boolean; // default false — US-033 (Lift plans)
+	goalProgressionPlansEnabled: boolean; // default false — US-033 (Lift plans); only live when practiceEnabled
 	baselinesEnabled: boolean; // default false — US-034
 };
 ```
@@ -476,28 +477,29 @@ DB name `cosmic-workout`, version **9**. The upgrade path is **non-destructive**
 
 **Version history** (bumps up to v9 predate the non-destructive upgrade and ran under the old wipe-and-reseed path; from now on bumps preserve data):
 
-| Version     | Change                                                                                                                                                                                                                                                                                                                     |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v4 (v1.4.0) | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                       |
-| v5 (v1.4.0) | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                              |
-| v6 (v1.6.0) | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                       |
-| v7 (v1.7.0) | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                  |
-| v8 (v1.7.0) | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                            |
-| v9 (v1.9.0) | `goalPlans` (Lift plans, US-033) + `baselines` / `baselineLogs` (US-034) — all three in the **same** bump. A local DB already opened at v9 before Baselines landed will be missing the two Baselines stores, because `onupgradeneeded` only runs when the version increases: clear IndexedDB so the v9 upgrade runs clean. |
+| Version      | Change                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v4 (v1.4.0)  | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                                                                                    |
+| v5 (v1.4.0)  | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                                                                                           |
+| v6 (v1.6.0)  | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                                                                                    |
+| v7 (v1.7.0)  | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                                                                               |
+| v8 (v1.7.0)  | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                                                                                         |
+| v9 (v1.9.0)  | `goalPlans` — Lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).                                                                                                                                                                                                                                                                                               |
+| v10 (v1.9.0) | `baselines` + `baselineLogs` — Baselines ([US-034](../features/v1.9.0/US-034-baselines-setup.md)). Originally planned to fold into the v9 bump, but `onupgradeneeded` only runs when the version **increases**, so any DB already opened at v9 would silently lack the two stores. A separate bump upgrades existing installs cleanly; the migration is idempotent and non-destructive. |
 
-| Store            | Key      | Indexes                  | Contents                                   |
-| ---------------- | -------- | ------------------------ | ------------------------------------------ |
-| `items`          | `id`     | —                        | Item library (built-in + custom)           |
-| `programs`       | `id`     | —                        | All programs                               |
-| `sessions`       | `id`     | `by_date`                | Completed sessions                         |
-| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item                  |
-| `activities`     | `id`     | `by_date`                | Activity log entries                       |
-| `habits`         | `id`     | —                        | Habit definitions                          |
-| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                     |
-| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)            |
-| `goalPlans`      | `id`     | `by_status`              | Lift plans / goal plans (US-033)           |
-| `baselines`      | `id`     | —                        | Baseline definitions (US-034 — same DB v9) |
-| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034 — same DB v9) |
+| Store            | Key      | Indexes                  | Contents                              |
+| ---------------- | -------- | ------------------------ | ------------------------------------- |
+| `items`          | `id`     | —                        | Item library (built-in + custom)      |
+| `programs`       | `id`     | —                        | All programs                          |
+| `sessions`       | `id`     | `by_date`                | Completed sessions                    |
+| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item             |
+| `activities`     | `id`     | `by_date`                | Activity log entries                  |
+| `habits`         | `id`     | —                        | Habit definitions                     |
+| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                |
+| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)       |
+| `goalPlans`      | `id`     | `by_status`              | Lift plans / goal plans (US-033)      |
+| `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10) |
+| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10) |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 

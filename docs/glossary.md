@@ -54,6 +54,8 @@ The **Practice destination** and page shell for guided sessions (`/practice`). O
 
 Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
 
+**Opt-in:** gated by `practiceEnabled` in Settings (default off). Practice is the session engine rather than a single screen, so the flag also hides `/workout`, `/program`, the session overlays, and the session marks on History and Insights — programs and session history stay in IndexedDB. [Lift plans](#lift-plan) are nested inside it. See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
+
 ### Section
 
 An ordered division of a routine. A Discipline defines its own sections.
@@ -100,7 +102,7 @@ Two program **flavors** exist for Strength today:
 **UI / product name:** Lift plan.
 **Older docs / code name:** Goal progression plan (`goalPlans` store, `goalProgressionPlansEnabled` pref, `/goals` routes) — rename in UI first; code identifiers may lag.
 
-A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics — and **nested under [Practice](#practice)**, since a plan can only be trained through `/workout`. Code reads the derived `prefsStore.liftPlansEnabled`. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
 
 Do **not** confuse with [Baseline](#baseline) — that is daily floor/ceiling tracking across any topic, not a Strength wave plan.
 
