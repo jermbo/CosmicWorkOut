@@ -281,16 +281,37 @@ function habitValue(habitId: string, workoutDay: boolean): number {
 	}
 }
 
-const WORKOUT_OFFSETS = [1, 3, 5, 8, 10, 12, 15, 17, 19, 20, 25, 29, 31, 33, 36, 38, 41, 43, 44];
-const WORKOUT_SEQUENCE: WorkoutKey[] = WORKOUT_OFFSETS.map(
-	(_, i) => (['A', 'B', 'C'] as WorkoutKey[])[i % 3],
-);
+/** ~6 months of history for stress-testing charts and insights. */
+const SEED_DAYS = 180;
 
-const DUAL_ACTIVITY_OFFSETS = new Set([3, 12, 19, 31, 41]);
+/** Tue / Thu / Sat each week (~3×/week), deterministic across the window. */
+function buildWorkoutOffsets(days: number): number[] {
+	const offsets: number[] = [];
+	for (let week = 0; week * 7 < days; week++) {
+		for (const d of [1, 3, 5]) {
+			const offset = week * 7 + d;
+			if (offset < days) offsets.push(offset);
+		}
+	}
+	return offsets;
+}
 
-const ACTIVITY_OFFSETS = [
-	0, 2, 4, 6, 7, 9, 11, 13, 14, 16, 18, 21, 22, 23, 24, 26, 27, 28, 30, 32, 34, 35, 37, 39, 40, 42,
-];
+/** Most non-workout days get an activity; skip every 5th rest day for gaps. */
+function buildActivityOffsets(days: number, workoutSet: Set<number>): number[] {
+	const offsets: number[] = [];
+	let restIdx = 0;
+	for (let i = 0; i < days; i++) {
+		if (workoutSet.has(i)) continue;
+		if (restIdx % 5 !== 4) offsets.push(i);
+		restIdx++;
+	}
+	return offsets;
+}
+
+/** Light second activity on every ~5th workout day. */
+function buildDualActivityOffsets(workoutOffsets: number[]): Set<number> {
+	return new Set(workoutOffsets.filter((_, i) => i % 5 === 2));
+}
 
 function adjustedLogRate(habitId: string, logRate: number): number {
 	if (habitId === 'habit-mood') return logRate * 0.85;
@@ -309,7 +330,7 @@ function round1(n: number): number {
 /** Weight readings: a gentle downward trend with daily noise, logged most days. */
 function buildWeightReading(date: Date, dayIndex: number): HealthReading | null {
 	if (!chance(0.78)) return null;
-	const trend = 165 - (dayIndex / 44) * 7; // ~165 → ~158 over the window
+	const trend = 165 - (dayIndex / (SEED_DAYS - 1)) * 10; // ~165 → ~155 over the window
 	const value = round1(trend + (Math.random() * 1.6 - 0.8));
 	const recordedAt = new Date(date);
 	recordedAt.setHours(7, rInt(0, 45), 0, 0);
@@ -353,27 +374,29 @@ export function generateDebugSeedData(): {
 } {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
-	const start = shiftDays(today, -45);
+	const start = shiftDays(today, -(SEED_DAYS - 1));
 
-	const workoutOffsetSet = new Set(WORKOUT_OFFSETS);
+	const workoutOffsets = buildWorkoutOffsets(SEED_DAYS);
+	const workoutOffsetSet = new Set(workoutOffsets);
+	const activityOffsets = buildActivityOffsets(SEED_DAYS, workoutOffsetSet);
+	const dualActivityOffsets = buildDualActivityOffsets(workoutOffsets);
+	const workoutKeys: WorkoutKey[] = ['A', 'B', 'C'];
 
-	const sessions: Session[] = WORKOUT_OFFSETS.map((offset, i) =>
-		buildSession(shiftDays(start, offset), WORKOUT_SEQUENCE[i], i),
+	const sessions: Session[] = workoutOffsets.map((offset, i) =>
+		buildSession(shiftDays(start, offset), workoutKeys[i % 3], i),
 	);
 
 	let actIdx = 0;
 	const activities: ActivityLog[] = [];
-	for (const offset of ACTIVITY_OFFSETS) {
-		if (!workoutOffsetSet.has(offset)) {
-			activities.push(buildActivity(shiftDays(start, offset), actIdx++));
-		}
+	for (const offset of activityOffsets) {
+		activities.push(buildActivity(shiftDays(start, offset), actIdx++));
 	}
-	for (const offset of DUAL_ACTIVITY_OFFSETS) {
+	for (const offset of dualActivityOffsets) {
 		activities.push(buildActivity(shiftDays(start, offset), actIdx++, true));
 	}
 
 	const habitLogs: HabitLog[] = [];
-	for (let i = 0; i < 45; i++) {
+	for (let i = 0; i < SEED_DAYS; i++) {
 		const date = shiftDays(start, i);
 		const isWorkoutDay = workoutOffsetSet.has(i);
 		const logRate = dayLogRate(isWorkoutDay);
@@ -395,7 +418,7 @@ export function generateDebugSeedData(): {
 	}
 
 	const healthReadings: HealthReading[] = [];
-	for (let i = 0; i < 45; i++) {
+	for (let i = 0; i < SEED_DAYS; i++) {
 		const date = shiftDays(start, i);
 		const weight = buildWeightReading(date, i);
 		if (weight) healthReadings.push(weight);

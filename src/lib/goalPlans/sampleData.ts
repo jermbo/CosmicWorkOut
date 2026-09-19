@@ -1,4 +1,4 @@
-import type { LoggedItem, LoggedSet, Program, Routine, Session, Week } from '../db/types';
+import type { Item, LoggedItem, LoggedSet, Program, Session } from '../db/types';
 import type { GoalPlan, SupportingBaseline } from './types';
 import {
 	generateBlocks,
@@ -6,36 +6,43 @@ import {
 	focusTargetForWeek,
 	supportingWeightForWeek,
 } from './generator';
-import { goalPlanTemplateById } from './templates';
+import { buildPriorityRoutines, PRIORITY_TEMPLATE_ID } from './templates';
+import { buildGoalProgram } from './buildProgram';
 
 /**
  * Debug-seed only — not used by the create-plan wizard or live UX.
  *
- * Seeds one completed bench stint and one active mid-plan stint (block 2, week 2),
+ * Seeds one completed bench stint and one active mid-plan stint (block 2, week 3),
  * each with its generated program and wave-following sessions. Ids are deterministic
  * so reloading the seed overwrites instead of duplicating. Wired from
  * `database.ts` sample/debug seeding paths only.
  */
 
 const STRENGTH = 'strength';
-const TEMPLATE_ID = 'gp-priority';
 const FOCUS_ITEM_ID = 'st-bb-bench-press';
 const DAYS_PER_WEEK = 3;
 
-/** Supporting start weights (lb) — increments mirror the built-in item defaults. */
+/** Minimal focus item for `buildPriorityRoutines` — matches the built-in bench seed. */
+const FOCUS_ITEM = {
+	id: FOCUS_ITEM_ID,
+	name: 'Barbell Bench Press',
+	cat: 'Chest',
+	defaultSets: 4,
+	defaultReps: '8',
+} as Item;
+
+/** Priority A/B/C scaffold for the sample focus lift (same path as the wizard). */
+const PRIORITY_ROUTINES = buildPriorityRoutines(FOCUS_ITEM);
+
+/** Supporting start weights (lb) — accessories from the priority bench scaffold. */
 const SUPPORTING: Record<string, { start: number; increment: number }> = {
 	'st-incline-db-bench': { start: 40, increment: 5 },
 	'st-pec-deck': { start: 70, increment: 2.5 },
 	'st-tricep-rope-pushdown': { start: 45, increment: 2.5 },
-	'st-bb-squat': { start: 165, increment: 5 },
-	'st-leg-press': { start: 200, increment: 5 },
-	'st-leg-curl': { start: 75, increment: 2.5 },
-	'st-standing-calf-raise': { start: 90, increment: 2.5 },
-	'st-bb-deadlift': { start: 205, increment: 5 },
-	'st-bb-bent-over-row': { start: 115, increment: 5 },
-	'st-lat-pulldown-wide': { start: 100, increment: 5 },
-	'st-db-curl': { start: 25, increment: 2.5 },
+	'st-db-ohp': { start: 35, increment: 5 },
+	'st-lateral-raise': { start: 15, increment: 2.5 },
 	'st-face-pull': { start: 40, increment: 2.5 },
+	'st-bb-bent-over-row': { start: 115, increment: 5 },
 };
 
 function toDateStr(d: Date): string {
@@ -59,44 +66,23 @@ function supportingBaselines(offset = 0): SupportingBaseline[] {
 	}));
 }
 
-function buildSampleProgram(idPrefix: string, name: string, durationWeeks: number): Program {
-	const template = goalPlanTemplateById(TEMPLATE_ID)!;
-	const weeks: Week[] = Array.from({ length: durationWeeks }, (_, wi) => ({
-		weekNumber: wi + 1,
-		routines: template.routines.map(
-			(tmpl, i): Routine => ({
-				id: `${idPrefix}-w${wi + 1}-${tmpl.letter.toLowerCase()}`,
-				disciplineId: STRENGTH,
-				name: tmpl.name,
-				letter: tmpl.letter,
-				focus: tmpl.focus,
-				color: (['lime', 'lavender', 'red'] as const)[i % 3],
-				estMin: tmpl.estMin,
-				sections: [
-					{
-						key: 'exercises',
-						items: tmpl.slots.map((s) => ({
-							itemId: s.itemId,
-							sets: s.sets,
-							reps: s.reps,
-						})),
-					},
-				],
-			}),
-		),
-	}));
-
-	return {
-		id: `${idPrefix}-program`,
-		disciplineId: STRENGTH,
+function buildSampleProgram(
+	idPrefix: string,
+	name: string,
+	goal: { weight: number; reps: number },
+	durationWeeks: number,
+): Program {
+	return buildGoalProgram({
 		name,
-		description: 'Goal progression plan (debug sample)',
-		durationWeeks,
+		goal,
+		routines: PRIORITY_ROUTINES,
 		daysPerWeek: DAYS_PER_WEEK,
-		weeks,
+		durationWeeks,
+		programId: `${idPrefix}-program`,
 		createdAt: new Date().toISOString(),
-		isBuiltIn: false,
-	};
+		makeRoutineId: (weekNumber, i) =>
+			`${idPrefix}-w${weekNumber}-${PRIORITY_ROUTINES[i].letter.toLowerCase()}`,
+	});
 }
 
 /** Log one session following that plan week's prescribed targets. */
@@ -106,10 +92,9 @@ function buildSampleSession(
 	sessionIndex: number,
 	date: Date,
 ): Session {
-	const template = goalPlanTemplateById(TEMPLATE_ID)!;
 	const planWeek = Math.floor(sessionIndex / DAYS_PER_WEEK) + 1;
 	const routineIndex = sessionIndex % DAYS_PER_WEEK;
-	const routine = template.routines[routineIndex];
+	const routine = PRIORITY_ROUTINES[routineIndex];
 	const focus = focusTargetForWeek(plan.blocks, planWeek);
 	const baselineByItem = new Map(plan.supporting.map((b) => [b.itemId, b]));
 
@@ -186,7 +171,7 @@ export function generateGoalPlanSampleData(): {
 		id: 'gp-seed-01',
 		disciplineId: STRENGTH,
 		programId: 'gp-seed-01-program',
-		templateId: TEMPLATE_ID,
+		templateId: PRIORITY_TEMPLATE_ID,
 		name: 'Barbell Bench Press Goal 01',
 		focusItemId: FOCUS_ITEM_ID,
 		goal: goal1,
@@ -201,14 +186,14 @@ export function generateGoalPlanSampleData(): {
 		createdAt: shiftDays(firstDay1, -2).toISOString(),
 		completedAt: shiftDays(today, -69).toISOString(),
 	};
-	const program1 = buildSampleProgram('gp-seed-01', plan1.name, weeks1);
+	const program1 = buildSampleProgram('gp-seed-01', plan1.name, goal1, weeks1);
 	const sessions1 = Array.from({ length: sessions1Count }, (_, i) => {
 		const week = Math.floor(i / DAYS_PER_WEEK);
 		const dayInWeek = [0, 2, 4][i % DAYS_PER_WEEK];
 		return buildSampleSession('gp-seed-01', plan1, i, shiftDays(firstDay1, week * 7 + dayInWeek));
 	});
 
-	// ── Stint 2 — active, mid-plan: 155x10 → 205x5, currently block 2 week 2 ──
+	// ── Stint 2 — active, mid-plan: 155x10 → 205x5, currently block 2 week 3 ──
 	const start2 = { weight: 155, reps: 10 };
 	const goal2 = { weight: 205, reps: 5 };
 	const blocks2 = generateBlocks(start2, goal2, 5);
@@ -217,7 +202,7 @@ export function generateGoalPlanSampleData(): {
 		id: 'gp-seed-02',
 		disciplineId: STRENGTH,
 		programId: 'gp-seed-02-program',
-		templateId: TEMPLATE_ID,
+		templateId: PRIORITY_TEMPLATE_ID,
 		name: 'Barbell Bench Press Goal 02',
 		focusItemId: FOCUS_ITEM_ID,
 		goal: goal2,
@@ -229,14 +214,16 @@ export function generateGoalPlanSampleData(): {
 		status: 'active',
 		countOffset: 0,
 		repeatEvents: [],
-		createdAt: shiftDays(today, -44).toISOString(),
+		createdAt: shiftDays(today, -90).toISOString(),
 	};
-	const program2 = buildSampleProgram('gp-seed-02', plan2.name, totalPlanWeeks(blocks2));
+	const program2 = buildSampleProgram('gp-seed-02', plan2.name, goal2, totalPlanWeeks(blocks2));
 
-	// 16 completed sessions → week 6 → block 2, week 2. Days avoid the generic
-	// debug seed's strength-session offsets so no date carries two workouts.
-	const start2Base = shiftDays(today, -45);
-	const session2Offsets = [2, 4, 6, 9, 11, 14, 16, 18, 22, 24, 26, 28, 32, 35, 39, 42];
+	// 21 completed sessions → week 7 → block 2, week 3. Prefer Mon/Wed/Fri-ish offsets
+	// so they rarely collide with the debug seed's Tue/Thu/Sat pattern.
+	const start2Base = shiftDays(today, -90);
+	const session2Offsets = [
+		0, 2, 4, 7, 9, 11, 14, 16, 18, 21, 23, 25, 28, 30, 32, 35, 37, 39, 42, 44, 46,
+	];
 	const sessions2 = session2Offsets.map((offset, i) =>
 		buildSampleSession('gp-seed-02', plan2, i, shiftDays(start2Base, offset)),
 	);

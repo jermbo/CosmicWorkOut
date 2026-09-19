@@ -243,7 +243,7 @@
 		<h2 class="settings-section__title">Advanced</h2>
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
-				Load 45 days of realistic debug data — workout sessions, activities, habit logs, health
+				Load ~6 months of realistic debug data — workout sessions, activities, habit logs, health
 				readings, and two sample goal plans (one completed, one mid-plan; visible when goal
 				progression plans are enabled) — for testing graphs and visualizations. Existing data is
 				kept. Remove with "Workout sessions", "Activity log", and "Goal plans" above.
@@ -418,7 +418,7 @@
 		onconfirm={handleLoadSeedData}
 		oncancel={() => (showSeedConfirm = false)}
 	>
-		Adds 45 days of randomized workout sessions, activities, habit logs, and health readings. Your
+		Adds ~6 months of randomized workout sessions, activities, habit logs, and health readings. Your
 		existing data is not removed. The page will reload when done.
 	</ConfirmDialog>
 {/if}
