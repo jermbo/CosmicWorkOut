@@ -428,6 +428,7 @@ type UserPrefs = {
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
+	homeCardOrder: string[]; // Overview card order; repaired on read via resolveHomeCardOrder()
 	habitsEnabled: boolean; // default false — gates Habits, including mood
 	activityLogEnabled: boolean; // default false — gates the Activity log
 	practiceEnabled: boolean; // default false — gates the whole Practice / session engine

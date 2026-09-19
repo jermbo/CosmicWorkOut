@@ -78,6 +78,7 @@ User preferences. Loaded once at boot, saved on every change.
 | `density`                     | `comfortable` | `data-density` on `<html>`            |
 | `roundness`                   | `default`     | `data-roundness` on `<html>`          |
 | `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet       |
+| `homeCardOrder`               | see below     | Order of the Overview summary cards   |
 | `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI |
 | `activityLogEnabled`          | `false`       | Gates `/log` and related UI           |
 | `practiceEnabled`             | `false`       | Gates the Practice engine (below)     |
@@ -86,6 +87,14 @@ User preferences. Loaded once at boot, saved on every change.
 | `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI     |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
+
+### Overview card order
+
+No tracking feature owns the top of Overview. `homeCardOrder` is a user-set list of card ids, edited by drag or arrow buttons on `/settings/overview`. Registry and pure logic live in `src/lib/homeCards.ts` (tested in `homeCards.test.ts`); default order is `habits · practice · activity · baselines · health`.
+
+The stored value comes from localStorage, so `resolveHomeCardOrder()` repairs it on every read: unknown and duplicate ids are dropped, and **any card the stored order doesn't mention is appended in default order**. That last rule is what makes a newly shipped card appear for existing users instead of silently vanishing — adding a card means adding it to `HOME_CARD_IDS`, nothing more.
+
+Order is stored for every card, including ones whose feature is off; Overview filters by the flags at render time, and the settings list marks those rows "Turned off" so their position still makes sense.
 
 ### Feature flags hide UI; data always persists
 

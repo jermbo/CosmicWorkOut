@@ -20,6 +20,7 @@
 	import HomeHealthCard from '$lib/components/HomeHealthCard.svelte';
 	import HomeBaselinesCard from '$lib/components/HomeBaselinesCard.svelte';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import type { HomeCardId } from '$lib/homeCards';
 
 	const todayStr = todayIso();
 
@@ -40,10 +41,20 @@
 	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
 	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
+
+	let cardEnabled = $derived<Record<HomeCardId, boolean>>({
+		habits: habitsEnabled,
+		practice: practiceEnabled,
+		activity: activityLogEnabled,
+		baselines: prefsStore.baselinesEnabled,
+		health: healthEnabled,
+	});
+
+	/** User-chosen order (Settings → Overview layout), minus whatever is turned off. */
+	let visibleCards = $derived(prefsStore.homeCardOrder.filter((id) => cardEnabled[id]));
 	let dateWeight = $derived(healthStore.weightForDate(contextDate));
 	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
 
-	let baselinesEnabled = $derived(prefsStore.baselinesEnabled);
 	let baselinesTotal = $derived(baselineStore.activeBaselines.length);
 	let baselinesCleared = $derived(baselineStore.clearedCountForDate(contextDate));
 
@@ -138,35 +149,33 @@
 	{/if}
 
 	<div class="home-cards">
-		{#if habitsEnabled}
-			<HomeHabitsCard
-				logged={habitsLogged}
-				total={habitsTotal}
-			/>
-		{/if}
-		{#if practiceEnabled}
-			<HomePracticeHubCard
-				completedCount={practiceNextUp.completedCount}
-				live={practiceNextUp.live}
-				headline={practiceNextUp.headline}
-				detail={practiceNextUp.detail}
-			/>
-		{/if}
-		{#if activityLogEnabled}
-			<HomeActivityCard activities={dateActivities} />
-		{/if}
-		{#if baselinesEnabled}
-			<HomeBaselinesCard
-				cleared={baselinesCleared}
-				total={baselinesTotal}
-			/>
-		{/if}
-		{#if healthEnabled}
-			<HomeHealthCard
-				weight={dateWeight}
-				latestBp={dateLatestBp}
-			/>
-		{/if}
+		{#each visibleCards as cardId (cardId)}
+			{#if cardId === 'habits'}
+				<HomeHabitsCard
+					logged={habitsLogged}
+					total={habitsTotal}
+				/>
+			{:else if cardId === 'practice'}
+				<HomePracticeHubCard
+					completedCount={practiceNextUp.completedCount}
+					live={practiceNextUp.live}
+					headline={practiceNextUp.headline}
+					detail={practiceNextUp.detail}
+				/>
+			{:else if cardId === 'activity'}
+				<HomeActivityCard activities={dateActivities} />
+			{:else if cardId === 'baselines'}
+				<HomeBaselinesCard
+					cleared={baselinesCleared}
+					total={baselinesTotal}
+				/>
+			{:else if cardId === 'health'}
+				<HomeHealthCard
+					weight={dateWeight}
+					latestBp={dateLatestBp}
+				/>
+			{/if}
+		{/each}
 	</div>
 </div>
 

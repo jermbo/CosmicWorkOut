@@ -1,4 +1,5 @@
 import type { UserPrefs, Density, Roundness } from '$lib/db/types';
+import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 
@@ -7,6 +8,7 @@ const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
+	homeCardOrder: [...DEFAULT_HOME_CARD_ORDER],
 	habitsEnabled: false,
 	activityLogEnabled: false,
 	practiceEnabled: false,
@@ -20,6 +22,7 @@ class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	homeCardOrder = $state<HomeCardId[]>([...DEFAULT_HOME_CARD_ORDER]);
 	habitsEnabled = $state(DEFAULTS.habitsEnabled);
 	activityLogEnabled = $state(DEFAULTS.activityLogEnabled);
 	practiceEnabled = $state(DEFAULTS.practiceEnabled);
@@ -55,6 +58,7 @@ class PrefsStore {
 				this.density = parsed.density ?? DEFAULTS.density;
 				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.homeCardOrder = resolveHomeCardOrder(parsed.homeCardOrder);
 				this.habitsEnabled = parsed.habitsEnabled ?? DEFAULTS.habitsEnabled;
 				this.activityLogEnabled = parsed.activityLogEnabled ?? DEFAULTS.activityLogEnabled;
 				this.practiceEnabled = parsed.practiceEnabled ?? DEFAULTS.practiceEnabled;
@@ -79,6 +83,7 @@ class PrefsStore {
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
+			homeCardOrder: this.homeCardOrder,
 			habitsEnabled: this.habitsEnabled,
 			activityLogEnabled: this.activityLogEnabled,
 			practiceEnabled: this.practiceEnabled,
@@ -87,6 +92,15 @@ class PrefsStore {
 			baselinesEnabled: this.baselinesEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+	}
+
+	setHomeCardOrder(order: HomeCardId[]): void {
+		this.homeCardOrder = resolveHomeCardOrder(order);
+		this.save();
+	}
+
+	resetHomeCardOrder(): void {
+		this.setHomeCardOrder([...DEFAULT_HOME_CARD_ORDER]);
 	}
 
 	setHabitsEnabled(enabled: boolean): void {

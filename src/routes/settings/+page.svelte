@@ -2,12 +2,27 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import { HOME_CARD_LABELS, type HomeCardId } from '$lib/homeCards';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsRow from '$lib/components/SettingsRow.svelte';
 	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
 
 	let activeHabitCount = $derived(habitStore.activeHabits.filter((h) => h.type !== 'mood').length);
 	let activeBaselineCount = $derived(baselineStore.activeBaselines.length);
+
+	let cardEnabled = $derived<Record<HomeCardId, boolean>>({
+		habits: prefsStore.habitsEnabled,
+		practice: prefsStore.practiceEnabled,
+		activity: prefsStore.activityLogEnabled,
+		baselines: prefsStore.baselinesEnabled,
+		health: prefsStore.healthMetricsEnabled,
+	});
+
+	let firstCardLabel = $derived.by(() => {
+		const first = prefsStore.homeCardOrder.find((id) => cardEnabled[id]);
+		if (!first) return 'No cards shown';
+		return `${HOME_CARD_LABELS[first]} first`;
+	});
 </script>
 
 <svelte:head>
@@ -80,6 +95,14 @@
 				detail="{activeBaselineCount} active"
 			/>
 		{/if}
+	</SettingsGroup>
+
+	<SettingsGroup title="Appearance">
+		<SettingsRow
+			href="/settings/overview"
+			label="Overview layout"
+			detail={firstCardLabel}
+		/>
 	</SettingsGroup>
 
 	<SettingsGroup title="Data">

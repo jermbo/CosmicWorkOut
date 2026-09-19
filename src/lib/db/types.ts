@@ -185,6 +185,8 @@ export interface UserPrefs {
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
+	/** Overview card order, by card id. Partial or stale values are repaired on read. */
+	homeCardOrder: string[];
 	habitsEnabled: boolean;
 	activityLogEnabled: boolean;
 	practiceEnabled: boolean;
