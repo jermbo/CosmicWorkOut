@@ -32,7 +32,7 @@
 
 <div class="form-field">
 	<span
-		class="form-field__label"
+		class="field-label"
 		id="focus-label">Focus lift</span
 	>
 	{#if focusItem}
@@ -107,14 +107,6 @@
 		flex-direction: column;
 		gap: var(--space-2);
 		margin-block-end: var(--space-5);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
 	}
 
 	.focus-selected {

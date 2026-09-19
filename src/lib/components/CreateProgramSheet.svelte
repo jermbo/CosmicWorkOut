@@ -170,7 +170,7 @@
 						class:form-field--error={errors.name}
 					>
 						<label
-							class="form-field__label"
+							class="field-label"
 							for="prog-name">Program name</label
 						>
 						<input
@@ -186,8 +186,8 @@
 
 					<div class="form-field">
 						<label
-							class="form-field__label"
-							for="prog-desc">Description <span class="form-field__optional">optional</span></label
+							class="field-label"
+							for="prog-desc">Description <span class="field-hint">optional</span></label
 						>
 						<textarea
 							id="prog-desc"
@@ -203,7 +203,7 @@
 						class:form-field--error={errors.weeks}
 					>
 						<label
-							class="form-field__label"
+							class="field-label"
 							for="prog-weeks">Duration (weeks)</label
 						>
 						<div class="stepper">
@@ -231,7 +231,7 @@
 						class:form-field--error={errors.days}
 					>
 						<span
-							class="form-field__label"
+							class="field-label"
 							id="days-label">Days per week</span
 						>
 						<div
@@ -416,21 +416,6 @@
 	.form-field--error .form-field__input,
 	.form-field--error .stepper {
 		border-color: var(--color-red);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.form-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.form-field__input {

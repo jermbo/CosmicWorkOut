@@ -3,7 +3,8 @@
 	import type { Program, Routine, RoutineItem, RoutineSection, Item } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { disciplineById, routineALetter } from '$lib/discipline';
-	import ItemLibrarySheet from './ItemLibrarySheet.svelte';
+	import LibrarySheet from './LibrarySheet.svelte';
+	import { danceLibrary } from '$lib/itemLibrary';
 	import Icon from './Icon.svelte';
 
 	type Props = {
@@ -178,7 +179,7 @@
 		<div class="dance-editor__body">
 			<div class="dance-field">
 				<label
-					class="dance-field__label"
+					class="field-label"
 					for="dance-name">Name</label
 				>
 				<input
@@ -191,8 +192,8 @@
 			</div>
 			<div class="dance-field">
 				<label
-					class="dance-field__label"
-					for="dance-focus">Focus <span class="dance-field__optional">optional</span></label
+					class="field-label"
+					for="dance-focus">Focus <span class="field-hint">optional</span></label
 				>
 				<input
 					id="dance-focus"
@@ -315,9 +316,8 @@
 </dialog>
 
 {#if librarySection}
-	<ItemLibrarySheet
-		disciplineId={routine.disciplineId}
-		defaultSection={librarySection}
+	<LibrarySheet
+		config={danceLibrary(routine.disciplineId, librarySection)}
 		onAdd={(item) => addFromLibrary(librarySection!, item)}
 		onClose={() => (librarySection = null)}
 	/>
@@ -419,21 +419,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.dance-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.dance-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.dance-field__input {

@@ -82,7 +82,7 @@
 	aria-modal="true"
 >
 	<p
-		class="modal__title"
+		class="modal-title"
 		id={titleId}
 	>
 		{#if editing}Edit Baseline{:else}New Baseline{/if}
@@ -90,7 +90,7 @@
 
 	{#if showPresets && !editing}
 		<div class="bf-presets">
-			<p class="bf-label">Start from a preset</p>
+			<p class="field-label">Start from a preset</p>
 			<div class="bf-presets__grid">
 				{#each BASELINE_PRESETS as preset (preset.name)}
 					<button
@@ -109,8 +109,8 @@
 	{:else}
 		<div class="bf-field">
 			<label
-				class="bf-label"
-				for="baseline-name">Name <span class="bf-hint">max 40 chars</span></label
+				class="field-label"
+				for="baseline-name">Name <span class="field-hint">max 40 chars</span></label
 			>
 			<input
 				id="baseline-name"
@@ -123,7 +123,7 @@
 		</div>
 
 		<div class="bf-field">
-			<span class="bf-label">Direction</span>
+			<span class="field-label">Direction</span>
 			<div class="bf-directions">
 				{#each BASELINE_DIRECTIONS as option (option.value)}
 					<button
@@ -140,12 +140,12 @@
 		</div>
 
 		<div class="bf-field">
-			<span class="bf-label">
+			<span class="field-label">
 				Daily target
 				{#if metricCountLocked}
-					<span class="bf-hint">metric count locked after creation</span>
+					<span class="field-hint">metric count locked after creation</span>
 				{:else}
-					<span class="bf-hint">one or two metrics</span>
+					<span class="field-hint">one or two metrics</span>
 				{/if}
 			</span>
 
@@ -190,12 +190,12 @@
 
 		<div class="modal__actions">
 			<button
-				class="modal__btn modal__btn--ghost"
+				class="btn btn--grow btn--ghost"
 				onclick={onclose}
 				disabled={saving}>Cancel</button
 			>
 			<button
-				class="modal__btn modal__btn--primary"
+				class="btn btn--grow btn--primary"
 				onclick={save}
 				disabled={!valid || saving}
 			>
@@ -230,41 +230,10 @@
 		box-shadow: var(--shadow-lg);
 	}
 
-	.modal__title {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
-	}
-
 	.modal__actions {
 		display: flex;
 		gap: var(--space-2);
 		margin-block-start: var(--space-4);
-	}
-
-	.modal__btn {
-		flex: 1;
-		min-block-size: 48px;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-	}
-
-	.modal__btn--ghost {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.modal__btn--primary {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.bf-field {
@@ -272,21 +241,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.bf-label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.bf-hint {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.bf-input {

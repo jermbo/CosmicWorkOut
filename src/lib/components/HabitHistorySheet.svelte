@@ -63,7 +63,7 @@
 
 <BottomSheet onclose={onClose}>
 	<div class="hh-sheet">
-		<p class="hh-sheet__date">{formatLongDate(date)}</p>
+		<p class="modal-title">{formatLongDate(date)}</p>
 		<p class="hh-sheet__heading">Habits</p>
 
 		{#if gridHabits.length === 0}
@@ -102,13 +102,6 @@
 	.hh-sheet {
 		padding-inline: var(--space-5);
 		padding-block: var(--space-2) var(--space-6);
-	}
-
-	.hh-sheet__date {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.hh-sheet__heading {

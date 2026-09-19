@@ -264,7 +264,7 @@
 				{#if viewingIsActive}
 					<div class="schedule__progress">
 						<div class="schedule__progress-labels">
-							<span class="schedule__progress-label">Progress</span>
+							<span class="field-label">Progress</span>
 							<span class="schedule__progress-wk">
 								Week {programStore.currentWeekFor(disciplineId)} of {viewingProgram.durationWeeks}
 							</span>
@@ -721,14 +721,6 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-	}
-
-	.schedule__progress-label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
 	}
 
 	.schedule__progress-wk {

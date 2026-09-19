@@ -81,7 +81,7 @@
 	aria-modal="true"
 >
 	<p
-		class="modal__title"
+		class="modal-title"
 		id={titleId}
 	>
 		{#if editing}Edit Habit{:else}New Habit{/if}
@@ -108,8 +108,8 @@
 	{:else}
 		<div class="hf-field">
 			<label
-				class="hf-label"
-				for="habit-name">Name <span class="hf-hint">max 40 chars</span></label
+				class="field-label"
+				for="habit-name">Name <span class="field-hint">max 40 chars</span></label
 			>
 			<input
 				id="habit-name"
@@ -123,12 +123,12 @@
 
 		{#if editing}
 			<div class="hf-field">
-				<span class="hf-label">Type <span class="hf-hint">locked after creation</span></span>
+				<span class="field-label">Type <span class="field-hint">locked after creation</span></span>
 				<div class="hf-type-locked">{habitTypeLabel(type)}</div>
 			</div>
 		{:else}
 			<div class="hf-field">
-				<span class="hf-label">Type</span>
+				<span class="field-label">Type</span>
 				<div class="hf-types">
 					{#each CREATABLE_HABIT_TYPES as ht (ht)}
 						<button
@@ -148,8 +148,8 @@
 		{#if type === 'count'}
 			<div class="hf-field">
 				<label
-					class="hf-label"
-					for="habit-unit">Unit label <span class="hf-hint">required · max 20 chars</span></label
+					class="field-label"
+					for="habit-unit">Unit label <span class="field-hint">required · max 20 chars</span></label
 				>
 				<input
 					id="habit-unit"
@@ -165,8 +165,8 @@
 		{#if typeHasGoal}
 			<div class="hf-field">
 				<label
-					class="hf-label"
-					for="habit-goal">Daily goal <span class="hf-hint">optional</span></label
+					class="field-label"
+					for="habit-goal">Daily goal <span class="field-hint">optional</span></label
 				>
 				<input
 					id="habit-goal"
@@ -181,12 +181,12 @@
 
 		<div class="modal__actions">
 			<button
-				class="modal__btn modal__btn--ghost"
+				class="btn btn--grow btn--ghost"
 				onclick={onclose}
 				disabled={saving}>Cancel</button
 			>
 			<button
-				class="modal__btn modal__btn--primary"
+				class="btn btn--grow btn--primary"
 				onclick={save}
 				disabled={!name.trim() || saving || (typeRequiresUnit && !unit.trim())}
 			>
@@ -221,41 +221,10 @@
 		box-shadow: var(--shadow-lg);
 	}
 
-	.modal__title {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
-	}
-
 	.modal__actions {
 		display: flex;
 		gap: var(--space-2);
 		margin-block-start: var(--space-4);
-	}
-
-	.modal__btn {
-		flex: 1;
-		min-block-size: 48px;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-	}
-
-	.modal__btn--ghost {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.modal__btn--primary {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.hf-field {
@@ -263,21 +232,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.hf-label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.hf-hint {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.hf-input {

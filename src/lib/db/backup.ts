@@ -1,86 +1,25 @@
-import type {
-	Item,
-	Program,
-	Session,
-	ItemLastUsed,
-	ActivityLog,
-	Habit,
-	HabitLog,
-	HealthReading,
-	Baseline,
-	BaselineLog,
-} from './types';
-import type { GoalPlan } from '$lib/goalPlans/types';
 import { db, clearWorkoutData, putAllRecords, countRecords, initDB } from './database';
+import {
+	BACKUP_FORMAT,
+	BACKUP_VERSION,
+	BACKUP_LOCAL_KEYS,
+	DB_STORES,
+	STORE_KEY_PATH,
+	BackupValidationError,
+	assertCountsMatch,
+	assertStoresAreArrays,
+	expectedCounts,
+	localEntriesOf,
+	toPlainEnvelope,
+} from './backupPayload';
+import type { BackupEnvelope, StoreCounts } from './backupPayload';
 
-const BACKUP_FORMAT = 'cosmic-workout-backup';
-const BACKUP_VERSION = 1;
+export { BackupValidationError, parseBackup } from './backupPayload';
+export type { BackupEnvelope } from './backupPayload';
 
 /** Temporary IndexedDB used to prove a backup is writable before touching live data. */
 const STAGING_DB_NAME = 'cosmic-workout-restore';
 const STAGING_DB_VERSION = 1;
-
-/** localStorage keys included in a backup. Transient keys (activeSession, habitDay) are excluded. */
-const BACKUP_LOCAL_KEYS = [
-	'cwout:prefs',
-	'cwout:activeProgramIds',
-	'cwout:lastActivityType',
-] as const;
-
-interface BackupDb {
-	items: Item[];
-	programs: Program[];
-	sessions: Session[];
-	itemLastUsed: ItemLastUsed[];
-	activities: ActivityLog[];
-	habits: Habit[];
-	habitLogs: HabitLog[];
-	healthReadings: HealthReading[];
-	/** Absent in pre-v1.9.0 backups. */
-	goalPlans?: GoalPlan[];
-	/** Absent in pre-v1.9.0 backups. */
-	baselines?: Baseline[];
-	/** Absent in pre-v1.9.0 backups. */
-	baselineLogs?: BaselineLog[];
-}
-
-export interface BackupEnvelope {
-	format: typeof BACKUP_FORMAT;
-	version: number;
-	exportedAt: string;
-	db: BackupDb;
-	localStorage: Record<string, unknown>;
-}
-
-const DB_STORES: (keyof BackupDb)[] = [
-	'items',
-	'programs',
-	'sessions',
-	'itemLastUsed',
-	'activities',
-	'habits',
-	'habitLogs',
-	'healthReadings',
-	'goalPlans',
-	'baselines',
-	'baselineLogs',
-];
-
-const STORE_KEY_PATH: Record<keyof BackupDb, string> = {
-	items: 'id',
-	programs: 'id',
-	sessions: 'id',
-	itemLastUsed: 'itemId',
-	activities: 'id',
-	habits: 'id',
-	habitLogs: 'id',
-	healthReadings: 'id',
-	goalPlans: 'id',
-	baselines: 'id',
-	baselineLogs: 'id',
-};
-
-type StoreCounts = Record<keyof BackupDb, number>;
 
 /** Read a localStorage value, parsing JSON when possible, else keeping the raw string. */
 function readLocal(key: string): unknown {
@@ -99,24 +38,6 @@ function writeLocal(key: string, value: unknown): void {
 		localStorage.setItem(key, value);
 	} else {
 		localStorage.setItem(key, JSON.stringify(value));
-	}
-}
-
-function expectedCounts(plain: BackupEnvelope): StoreCounts {
-	const counts = {} as StoreCounts;
-	for (const store of DB_STORES) {
-		counts[store] = plain.db[store]?.length ?? 0;
-	}
-	return counts;
-}
-
-function assertCountsMatch(expected: StoreCounts, actual: StoreCounts, phase: string): void {
-	for (const store of DB_STORES) {
-		if (actual[store] !== expected[store]) {
-			throw new Error(
-				`Restore ${phase} count mismatch for "${store}": expected ${expected[store]}, got ${actual[store]}.`,
-			);
-		}
 	}
 }
 
@@ -244,40 +165,6 @@ export async function downloadBackup(): Promise<BackupExportResult> {
 
 	triggerDownload(blob, fileName);
 	return { method: 'download' };
-}
-
-export class BackupValidationError extends Error {}
-
-/** Parse and validate a backup file's contents. Throws BackupValidationError on bad input. */
-export function parseBackup(text: string): BackupEnvelope {
-	let parsed: unknown;
-	try {
-		parsed = JSON.parse(text);
-	} catch {
-		throw new BackupValidationError('This file is not valid JSON.');
-	}
-
-	if (typeof parsed !== 'object' || parsed === null) {
-		throw new BackupValidationError('This file is not a CosmicWorkOut backup.');
-	}
-
-	const env = parsed as Partial<BackupEnvelope>;
-	if (env.format !== BACKUP_FORMAT) {
-		throw new BackupValidationError('This file is not a CosmicWorkOut backup.');
-	}
-	if (typeof env.version !== 'number') {
-		throw new BackupValidationError('This backup is missing a version and cannot be restored.');
-	}
-	if (env.version > BACKUP_VERSION) {
-		throw new BackupValidationError(
-			'This backup was made by a newer version of the app. Please update first.',
-		);
-	}
-	if (typeof env.db !== 'object' || env.db === null) {
-		throw new BackupValidationError('This backup is missing its data and cannot be restored.');
-	}
-
-	return env as BackupEnvelope;
 }
 
 function openStagingDb(): Promise<IDBDatabase> {
@@ -408,8 +295,7 @@ async function commitLiveFromPlain(plain: BackupEnvelope, expected: StoreCounts)
  * Does not reload — the caller decides when to refresh.
  */
 export async function importBackup(envelope: BackupEnvelope): Promise<void> {
-	// Svelte $state (and other Proxies) cannot be structured-cloned into IndexedDB.
-	const plain = JSON.parse(JSON.stringify(envelope)) as BackupEnvelope;
+	const plain = toPlainEnvelope(envelope);
 	const expected = expectedCounts(plain);
 
 	console.info('[backup-restore] starting', {
@@ -418,14 +304,7 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 		stores: expected,
 	});
 
-	for (const store of DB_STORES) {
-		const records = plain.db[store];
-		if (records !== undefined && !Array.isArray(records)) {
-			throw new BackupValidationError(
-				`This backup's "${store}" data is malformed and cannot be restored.`,
-			);
-		}
-	}
+	assertStoresAreArrays(plain);
 
 	try {
 		structuredClone(plain.db);
@@ -436,8 +315,7 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 		);
 	}
 
-	const localEntries =
-		plain.localStorage && typeof plain.localStorage === 'object' ? plain.localStorage : {};
+	const localEntries = localEntriesOf(plain);
 
 	// Phase A — prove the backup is writable without touching live data.
 	try {

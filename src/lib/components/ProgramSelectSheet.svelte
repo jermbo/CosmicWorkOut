@@ -3,6 +3,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 
 	type Props = {
 		onClose: () => void;
@@ -34,37 +35,11 @@
 	onclose={onClose}
 	maxHeight="80dvh"
 >
-	<div class="prog-sheet">
-		<div class="prog-sheet__header">
-			<h2 class="prog-sheet__title">Plans</h2>
-			<button
-				class="prog-sheet__close"
-				onclick={onClose}
-				aria-label="Close"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line
-						x1="18"
-						y1="6"
-						x2="6"
-						y2="18"
-					/>
-					<line
-						x1="6"
-						y1="6"
-						x2="18"
-						y2="18"
-					/>
-				</svg>
-			</button>
-		</div>
+	<div class="sheet-body">
+		<SheetHeader
+			title="Plans"
+			{onClose}
+		/>
 
 		<div class="prog-sheet__list">
 			{#each programs as program (program.id)}
@@ -132,42 +107,6 @@
 </BottomSheet>
 
 <style>
-	.prog-sheet {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.prog-sheet__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.prog-sheet__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.prog-sheet__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.prog-sheet__list {
 		display: flex;
 		flex-direction: column;

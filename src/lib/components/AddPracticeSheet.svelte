@@ -8,6 +8,7 @@
 	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import { practiceGroupById, practiceGroups, WORKOUT_GROUP_ID } from '$lib/practice';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 	import CreateProgramSheet from './CreateProgramSheet.svelte';
 
 	type Props = {
@@ -66,42 +67,12 @@
 	onclose={onClose}
 	maxHeight="85dvh"
 >
-	<div class="add-practice">
-		<div class="add-practice__header">
-			<h2 class="add-practice__title">
-				{#if step === 'group'}
-					Add practice
-				{:else}
-					{group?.label ?? 'Plans'}
-				{/if}
-			</h2>
-			<button
-				class="add-practice__close"
-				onclick={onClose}
-				aria-label="Close"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					aria-hidden="true"
-				>
-					<line
-						x1="18"
-						y1="6"
-						x2="6"
-						y2="18"
-					/>
-					<line
-						x1="6"
-						y1="6"
-						x2="18"
-						y2="18"
-					/>
-				</svg>
-			</button>
-		</div>
+	<div class="sheet-body add-practice">
+		<SheetHeader
+			title={step === 'group' ? 'Add practice' : (group?.label ?? 'Plans')}
+			{onClose}
+			tight
+		/>
 
 		{#if step === 'group'}
 			<p class="add-practice__lead">Choose a practice area to browse plans.</p>
@@ -159,8 +130,8 @@
 				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
 					<button
 						type="button"
-						class="add-practice__filter"
-						class:add-practice__filter--active={filter === value}
+						class="chip"
+						class:chip--active={filter === value}
 						role="tab"
 						aria-selected={filter === value}
 						onclick={() => (filter = value as Filter)}
@@ -233,40 +204,7 @@
 
 <style>
 	.add-practice {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
 		min-block-size: 200px;
-	}
-
-	.add-practice__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-3);
-	}
-
-	.add-practice__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.add-practice__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
 	}
 
 	.add-practice__lead {
@@ -354,23 +292,6 @@
 		gap: var(--space-2);
 		padding-inline: var(--space-5);
 		margin-block-end: var(--space-3);
-	}
-
-	.add-practice__filter {
-		padding-inline: var(--space-3);
-		block-size: 32px;
-		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-	}
-
-	.add-practice__filter--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.add-practice__list {

@@ -13,7 +13,8 @@ Reusable building blocks with no feature knowledge.
 | Component          | Purpose                                                                                                                             |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `Icon`             | Single SVG icon component, keyed by name. Imported by 11 files — but **61 inline `<svg>` blocks still bypass it** (cleanup target). |
-| `BottomSheet`      | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 14 sheets.**                              |
+| `BottomSheet`      | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 13 sheets.**                              |
+| `SheetHeader`      | Sheet title row: title, optional action buttons, close button. Used by 7 sheets.                                                    |
 | `ConfirmDialog`    | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 7 callers.                                              |
 | `ValueDialog`      | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`).                                                        |
 | `SegmentedControl` | Generic `role="radiogroup"` segmented toggle (`options`, typed value).                                                              |
@@ -78,15 +79,31 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Program & routine editing (`/program`)
 
-| Component              | Purpose                                                                    |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `WorkoutEditor`        | Full-screen routine editor (name, items, sets/reps).                       |
-| `ExerciseLibrarySheet` | Browse/filter the strength item library by category.                       |
-| `ExerciseFormSheet`    | Create or edit a custom strength item.                                     |
-| `ProgramSelectSheet`   | List all programs; activate one (built-ins copy-first).                    |
-| `CreateProgramSheet`   | 2-step full-screen flow — details then routine names; scaffolds all weeks. |
+| Component            | Purpose                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `WorkoutEditor`      | Full-screen routine editor (name, items, sets/reps).                       |
+| `LibrarySheet`       | Browse/filter an item library; configured per Discipline (see below).      |
+| `ExerciseFormSheet`  | Create or edit a custom strength item.                                     |
+| `ProgramSelectSheet` | List all programs; activate one (built-ins copy-first).                    |
+| `CreateProgramSheet` | 2-step full-screen flow — details then routine names; scaffolds all weeks. |
 
 `ProgramSelectSheet` and `CreateProgramSheet` are also used on `/workout` for the program-complete state.
+
+### Configuring `LibrarySheet`
+
+One sheet serves every Discipline. It owns the chrome — search, filter chips, expandable
+rows, add/edit/delete — and reads everything Discipline-specific from a `LibraryConfig`
+built in [`$lib/itemLibrary.ts`](../../src/lib/itemLibrary.ts):
+
+| Builder                                | Used by                       |
+| -------------------------------------- | ----------------------------- |
+| `strengthLibrary()`                    | `WorkoutEditor`, `/goals/new` |
+| `danceLibrary(disciplineId, section?)` | `DanceRoutineEditor`          |
+
+The config supplies the copy, which items belong in the list, how free-text search
+matches, the chip filter rows, and how one row renders (dot colour, subtitle, tag,
+optional right-hand readout). `kind` picks which form sheet the New/Edit buttons open.
+**A new movement type needs a builder here, not another copy of the sheet.**
 
 ---
 
@@ -96,7 +113,7 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 | -------------------- | --------------------------------------------------------- |
 | `AddPracticeSheet`   | Add a plan/practice (activate a program into a group).    |
 | `DanceRoutineEditor` | Edit a belly dance routine across its four sections.      |
-| `ItemLibrarySheet`   | Browse/filter the Discipline-scoped item library (dance). |
+| `LibrarySheet`       | Browse/filter an item library; configured per Discipline. |
 | `ItemFormSheet`      | Create or edit a custom dance item.                       |
 
 ---
@@ -206,13 +223,12 @@ flowchart TB
 
     subgraph editor ["Program editing"]
         WE[WorkoutEditor]
-        ELS[ExerciseLibrarySheet]
+        LIB[LibrarySheet]
         EFS[ExerciseFormSheet]
     end
 
     subgraph dance ["Belly dance"]
         DRE[DanceRoutineEditor]
-        ILS[ItemLibrarySheet]
         IFS[ItemFormSheet]
     end
 
@@ -232,8 +248,8 @@ flowchart TB
 
     SO --> EC --> PR & ST
     SO --> LS
-    WE --> ELS --> EFS
-    DRE --> ILS --> IFS
+    WE --> LIB --> EFS
+    DRE --> LIB --> IFS
     AGPC --> GBT
     GFS --> WRI
     DAS --> DAI & DAAL & DAWS

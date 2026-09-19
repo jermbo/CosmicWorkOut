@@ -4,7 +4,8 @@
 	import { formatCountWithWord } from '$lib/format';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '$lib/discipline';
-	import ExerciseLibrarySheet from './ExerciseLibrarySheet.svelte';
+	import LibrarySheet from './LibrarySheet.svelte';
+	import { strengthLibrary } from '$lib/itemLibrary';
 
 	type Props = {
 		workout: Routine | null;
@@ -408,8 +409,8 @@
 </dialog>
 
 {#if showLibrary}
-	<ExerciseLibrarySheet
-		exercises={programStore.items}
+	<LibrarySheet
+		config={strengthLibrary()}
 		onAdd={addFromLibrary}
 		onClose={() => (showLibrary = false)}
 	/>

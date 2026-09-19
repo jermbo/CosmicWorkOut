@@ -5,6 +5,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { disciplineById, sectionMetric } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 
 	type Props = {
 		disciplineId: string;
@@ -91,39 +92,11 @@
 	onclose={onClose}
 	maxHeight="92dvh"
 >
-	<div class="item-form">
-		<div class="item-form__header">
-			<h2 class="item-form__title">
-				{#if item}Edit Item{:else}New Item{/if}
-			</h2>
-			<button
-				class="item-form__close"
-				onclick={onClose}
-				aria-label="Close"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line
-						x1="18"
-						y1="6"
-						x2="6"
-						y2="18"
-					/>
-					<line
-						x1="6"
-						y1="6"
-						x2="18"
-						y2="18"
-					/>
-				</svg>
-			</button>
-		</div>
+	<div class="sheet-body">
+		<SheetHeader
+			title={item ? 'Edit Item' : 'New Item'}
+			{onClose}
+		/>
 
 		<form
 			class="item-form__body"
@@ -137,7 +110,7 @@
 				class:form-field--error={errors.name}
 			>
 				<label
-					class="form-field__label"
+					class="field-label"
 					for="item-name">Name</label
 				>
 				<input
@@ -153,8 +126,8 @@
 
 			<div class="form-field">
 				<label
-					class="form-field__label"
-					for="item-cue">Cue <span class="form-field__optional">optional</span></label
+					class="field-label"
+					for="item-cue">Cue <span class="field-hint">optional</span></label
 				>
 				<input
 					id="item-cue"
@@ -168,7 +141,7 @@
 
 			<div class="form-field">
 				<span
-					class="form-field__label"
+					class="field-label"
 					id="item-section-label">Section</span
 				>
 				<div
@@ -179,7 +152,7 @@
 					{#each sections as s (s.key)}
 						<button
 							type="button"
-							class="chip"
+							class="chip chip--caps"
 							class:chip--active={section === s.key}
 							role="radio"
 							aria-checked={section === s.key}
@@ -197,7 +170,7 @@
 				class:form-field--error={errors.focus}
 			>
 				<span
-					class="form-field__label"
+					class="field-label"
 					id="item-focus-label">Focus</span
 				>
 				<div
@@ -208,7 +181,7 @@
 					{#each FOCUS_TAGS as tag (tag)}
 						<button
 							type="button"
-							class="chip"
+							class="chip chip--caps"
 							class:chip--active={focus.includes(tag)}
 							aria-pressed={focus.includes(tag)}
 							onclick={() => toggleFocus(tag)}
@@ -233,42 +206,6 @@
 </BottomSheet>
 
 <style>
-	.item-form {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.item-form__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.item-form__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.item-form__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.item-form__body {
 		display: flex;
 		flex-direction: column;
@@ -285,21 +222,6 @@
 
 	.form-field--error .form-field__input {
 		border-color: var(--color-red);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.form-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.form-field__hint {
@@ -336,27 +258,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-	}
-
-	.chip {
-		padding-inline: var(--space-3);
-		block-size: 32px;
-		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-		text-transform: capitalize;
-		transition:
-			background-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
-	}
-
-	.chip--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.item-form__submit {

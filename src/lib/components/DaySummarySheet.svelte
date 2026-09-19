@@ -75,7 +75,7 @@
 			{formatWeekdayShortDate(session.date, ' · ')}
 		</div>
 
-		<h2 class="day-summary__workout-name">{workoutName}</h2>
+		<h2 class="modal-title">{workoutName}</h2>
 
 		<div class="day-summary__stats">
 			<div class="day-summary__stat">
@@ -207,13 +207,6 @@
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		margin-block-end: var(--space-2);
-	}
-
-	.day-summary__workout-name {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.day-summary__stats {

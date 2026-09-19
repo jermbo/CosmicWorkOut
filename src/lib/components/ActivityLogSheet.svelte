@@ -5,6 +5,7 @@
 	import { todayIso } from '$lib/date';
 	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
 		'Run',
@@ -106,39 +107,11 @@
 	onclose={onClose}
 	maxHeight="80dvh"
 >
-	<div class="act-sheet">
-		<div class="act-sheet__header">
-			<h2 class="act-sheet__title">
-				{#if editing}Edit Activity{:else}Log Activity{/if}
-			</h2>
-			<button
-				class="act-sheet__close"
-				onclick={onClose}
-				aria-label="Close"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line
-						x1="18"
-						y1="6"
-						x2="6"
-						y2="18"
-					/>
-					<line
-						x1="6"
-						y1="6"
-						x2="18"
-						y2="18"
-					/>
-				</svg>
-			</button>
-		</div>
+	<div class="sheet-body">
+		<SheetHeader
+			title={editing ? 'Edit Activity' : 'Log Activity'}
+			{onClose}
+		/>
 
 		<div class="act-sheet__body">
 			<div class="act-field">
@@ -234,43 +207,6 @@
 </BottomSheet>
 
 <style>
-	.act-sheet {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.act-sheet__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.act-sheet__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
-	}
-
-	.act-sheet__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.act-sheet__body {
 		overflow-y: auto;
 		padding-inline: var(--space-5);

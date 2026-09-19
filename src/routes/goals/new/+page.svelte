@@ -2,11 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import { GoalWizard } from '$lib/goalPlans/wizard.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import ExerciseLibrarySheet from '$lib/components/ExerciseLibrarySheet.svelte';
+	import LibrarySheet from '$lib/components/LibrarySheet.svelte';
+	import { strengthLibrary } from '$lib/itemLibrary';
 	import GoalWizardSteps from '$lib/components/goals/GoalWizardSteps.svelte';
 	import GoalFocusStep from '$lib/components/goals/GoalFocusStep.svelte';
 	import GoalSetupStep from '$lib/components/goals/GoalSetupStep.svelte';
@@ -169,16 +169,16 @@
 </div>
 
 {#if wizard.addingToLetter}
-	<ExerciseLibrarySheet
-		exercises={programStore.items}
+	<LibrarySheet
+		config={strengthLibrary()}
 		onAdd={(item) => wizard.addExercise(item)}
 		onClose={() => (wizard.addingToLetter = null)}
 	/>
 {/if}
 
 {#if wizard.pickingFocus}
-	<ExerciseLibrarySheet
-		exercises={programStore.items}
+	<LibrarySheet
+		config={strengthLibrary()}
 		onAdd={(item) => wizard.setFocus(item)}
 		onClose={() => (wizard.pickingFocus = false)}
 	/>

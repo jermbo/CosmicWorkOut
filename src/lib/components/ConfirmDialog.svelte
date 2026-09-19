@@ -60,16 +60,16 @@
 	{/if}
 	<div class="confirm__actions">
 		<button
-			class="confirm__btn confirm__btn--ghost"
+			class="btn btn--grow btn--bold btn--ghost"
 			onclick={oncancel}
 			disabled={busy}
 		>
 			{cancelLabel}
 		</button>
 		<button
-			class="confirm__btn"
-			class:confirm__btn--danger={danger}
-			class:confirm__btn--primary={!danger}
+			class="btn btn--grow btn--bold"
+			class:btn--danger={danger}
+			class:btn--primary={!danger}
 			onclick={onconfirm}
 			disabled={busy}
 		>
@@ -125,35 +125,5 @@
 	.confirm__actions {
 		display: flex;
 		gap: var(--space-2);
-	}
-
-	.confirm__btn {
-		flex: 1;
-		min-block-size: 48px;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 700;
-		transition: opacity var(--duration-fast) var(--ease-out);
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-	}
-
-	.confirm__btn--ghost {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.confirm__btn--danger {
-		background: var(--color-red);
-		color: #ffffff;
-	}
-
-	.confirm__btn--primary {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 </style>

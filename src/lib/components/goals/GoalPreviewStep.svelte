@@ -35,7 +35,7 @@
 
 <div class="form-field">
 	<label
-		class="form-field__label"
+		class="field-label"
 		for="plan-name">Plan name</label
 	>
 	<input
@@ -92,14 +92,6 @@
 		flex-direction: column;
 		gap: var(--space-2);
 		margin-block-end: var(--space-5);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
 	}
 
 	.form-field__input {

@@ -4,6 +4,7 @@
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 
 	type Props = {
 		date: string;
@@ -55,39 +56,11 @@
 	onclose={onClose}
 	maxHeight="60dvh"
 >
-	<div class="wt-sheet">
-		<div class="wt-sheet__header">
-			<h2 class="wt-sheet__title">
-				{#if editing}Edit Weight{:else}Log Weight{/if}
-			</h2>
-			<button
-				class="wt-sheet__close"
-				onclick={onClose}
-				aria-label="Close"
-			>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line
-						x1="18"
-						y1="6"
-						x2="6"
-						y2="18"
-					/>
-					<line
-						x1="6"
-						y1="6"
-						x2="18"
-						y2="18"
-					/>
-				</svg>
-			</button>
-		</div>
+	<div class="sheet-body">
+		<SheetHeader
+			title={editing ? 'Edit Weight' : 'Log Weight'}
+			{onClose}
+		/>
 
 		<div class="wt-sheet__body">
 			<div
@@ -141,43 +114,6 @@
 </BottomSheet>
 
 <style>
-	.wt-sheet {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.wt-sheet__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.wt-sheet__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
-	}
-
-	.wt-sheet__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.wt-sheet__body {
 		padding-inline: var(--space-5);
 	}

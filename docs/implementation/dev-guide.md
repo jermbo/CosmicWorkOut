@@ -20,7 +20,7 @@ Other scripts:
 | `npm run build`      | Production build                            |
 | `npm run preview`    | Preview production build                    |
 | `npm run check`      | TypeScript + Svelte type checking           |
-| `npm run test`       | Goal-plan unit tests                        |
+| `npm run test`       | Pure-logic unit tests (see below)           |
 | `npm run docs:links` | Check wiki relative links + heading anchors |
 | `npm run lint`       | Prettier + ESLint                           |
 | `npm run format`     | Auto-format with Prettier                   |
@@ -56,14 +56,56 @@ flowchart TB
 
 ## Key Files to Know
 
-| File                         | Why it matters                  |
-| ---------------------------- | ------------------------------- |
-| `src/routes/+layout.svelte`  | App boot, global overlays       |
-| `src/lib/db/database.ts`     | IndexedDB open, read, write     |
-| `src/lib/db/seed.ts`         | Built-in exercises and programs |
-| `src/lib/db/types.ts`        | All data interfaces             |
-| `src/lib/stores/*.svelte.ts` | Application state               |
-| `src/app.css`                | Design tokens and global styles |
+| File                          | Why it matters                                 |
+| ----------------------------- | ---------------------------------------------- |
+| `src/routes/+layout.svelte`   | App boot, global overlays                      |
+| `src/lib/db/database.ts`      | IndexedDB open, read, write                    |
+| `src/lib/db/seed.ts`          | Built-in exercises and programs                |
+| `src/lib/db/types.ts`         | All data interfaces                            |
+| `src/lib/stores/*.svelte.ts`  | Application state                              |
+| `src/app.css`                 | Design tokens and global styles                |
+| `src/lib/itemLibrary.ts`      | Per-Discipline `LibrarySheet` config           |
+| `src/lib/db/backupPayload.ts` | Backup envelope, validation, restore preflight |
+
+---
+
+## Testing
+
+`npm test` runs Node's built-in test runner over `*.test.ts` files with type
+stripping — no framework, no browser, no new dependencies. Covered today:
+goal-plan generation, baseline aggregation, Overview card ordering, and the
+backup/restore payload path.
+
+Tests therefore reach **pure modules only**. A file is testable when it imports
+nothing at runtime beyond other pure modules — `import type` from `$lib/...` is
+fine (type stripping erases it), but a runtime `$lib` import or a `.svelte.ts`
+store is not resolvable and will fail.
+
+> When logic worth testing sits behind IndexedDB or the DOM, split the decision
+> out into a pure module and leave the plumbing behind. That is why
+> `backupPayload.ts` exists apart from `backup.ts`: restore is the one failure the
+> user cannot recover from, so the checks that run before `clearWorkoutData()` are
+> tested even though the transactions around them are not.
+
+Add a new test directory to the `test` script's globs in `package.json`.
+
+---
+
+## Styling: tokens, globals, scoped CSS
+
+Three layers, in order of preference:
+
+1. **Design tokens** (`:root` in `app.css`) — colours, spacing, radii, easing. Never
+   hard-code a value a token already covers.
+2. **Shared primitives** (`app.css`) — single-class globals for patterns that recur
+   across components: `.field-label`, `.field-hint`, `.chip` (`--active`, `--caps`),
+   `.btn` (`--primary`, `--ghost`, `--danger`, `--grow`, `--bold`), `.sheet-body`,
+   `.sheet-header` (`--tight`), `.modal-title`.
+3. **Scoped component CSS** — everything genuinely local to one component.
+
+> Scoped selectors carry a `.svelte-*` hash, so they **outrank** the globals. A component
+> opting into a shared primitive must delete its local copy rather than layering on top
+> of it — a leftover local rule silently wins and the global looks broken.
 
 ---
 

@@ -110,7 +110,7 @@
 
 <BottomSheet onclose={onClose}>
 	<div class="day-actions">
-		<p class="day-actions__date">{formatLongDate(date)}</p>
+		<p class="modal-title">{formatLongDate(date)}</p>
 
 		{#if strengthSession}
 			<DayActionsWorkoutSummary
@@ -216,13 +216,6 @@
 	.day-actions {
 		padding-inline: var(--space-5);
 		padding-block: var(--space-2) var(--space-4);
-	}
-
-	.day-actions__date {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.day-actions__list {
