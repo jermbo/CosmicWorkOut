@@ -15,7 +15,6 @@
 		parseBackup,
 		importBackup,
 		BackupValidationError,
-		type BackupEnvelope,
 	} from '$lib/db/backup';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
@@ -57,7 +56,9 @@
 
 	let exporting = $state(false);
 	let fileInput = $state<HTMLInputElement>();
-	let pendingBackup = $state<BackupEnvelope | null>(null);
+	/** Raw file text — parse at confirm time so restore never touches a reactive tree. */
+	let pendingBackupText = $state.raw<string | null>(null);
+	let pendingExportedAt = $state.raw<string | null>(null);
 	let restoring = $state(false);
 	let restoreError = $state<string | null>(null);
 
@@ -65,9 +66,12 @@
 		if (exporting) return;
 		exporting = true;
 		try {
-			await downloadBackup();
-			toastStore.show('Backup downloaded.', 'info');
-		} catch {
+			const { method } = await downloadBackup();
+			if (method === 'share') toastStore.show('Backup shared.', 'info');
+			else if (method === 'download') toastStore.show('Backup downloaded.', 'info');
+			// cancelled: user closed the share sheet — no toast
+		} catch (err) {
+			console.error('[backup-export] failed', err);
 			toastStore.error('Could not create the backup. Please try again.');
 		} finally {
 			exporting = false;
@@ -87,8 +91,12 @@
 
 		try {
 			const text = await file.text();
-			pendingBackup = parseBackup(text);
+			const parsed = parseBackup(text);
+			pendingBackupText = text;
+			pendingExportedAt = parsed.exportedAt;
 		} catch (err) {
+			pendingBackupText = null;
+			pendingExportedAt = null;
 			if (err instanceof BackupValidationError) {
 				toastStore.error(err.message);
 			} else {
@@ -98,17 +106,19 @@
 	}
 
 	async function handleRestoreConfirm() {
-		if (!pendingBackup || restoring) return;
+		if (!pendingBackupText || restoring) return;
 		restoring = true;
 		restoreError = null;
 		try {
-			await importBackup(pendingBackup);
+			await importBackup(parseBackup(pendingBackupText));
 			location.reload();
 		} catch (err) {
 			restoreError =
 				err instanceof BackupValidationError
 					? `${err.message} Your existing data is unchanged.`
-					: 'Restore failed partway through. Some data may have been lost — re-import a valid backup.';
+					: err instanceof Error
+						? `${err.message} Some data may have been lost — re-import a valid backup.`
+						: 'Restore failed partway through. Some data may have been lost — re-import a valid backup.';
 			restoring = false;
 		}
 	}
@@ -147,8 +157,11 @@
 		<h2 class="settings-section__title">Backup</h2>
 		<div class="data-action">
 			<p class="data-action__desc">
-				Download all your workout data — sessions, programs, exercises, habits, activities, and
-				health readings — as a single JSON file. Works fully offline.
+				Export all your workout data — sessions, programs, exercises, habits, activities, and
+				health readings — as a JSON file. On a phone, Export opens the share sheet so you can
+				<strong>Save to Files</strong>, Mail, or AirDrop. On desktop it downloads the file. Keep
+				the file until you've confirmed the restore on the other device. A few months of history
+				is typically around 1&nbsp;MB — fine as an email attachment.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--primary"
@@ -162,8 +175,9 @@
 
 		<div class="data-action">
 			<p class="data-action__desc">
-				Restore from a backup file. This <strong>replaces</strong> all workout data currently on this
-				device.
+				Restore from a backup file. This <strong>replaces</strong> all workout data on this device.
+				The file is fully written and verified in a staging area first — if that fails, your
+				existing data is left unchanged.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--secondary"
@@ -258,7 +272,7 @@
 	</section>
 </div>
 
-{#if pendingBackup}
+{#if pendingBackupText && pendingExportedAt}
 	<ConfirmDialog
 		title="Restore this backup?"
 		confirmLabel="Replace & restore"
@@ -268,14 +282,16 @@
 		error={restoreError}
 		onconfirm={handleRestoreConfirm}
 		oncancel={() => {
-			pendingBackup = null;
+			pendingBackupText = null;
+			pendingExportedAt = null;
 			restoreError = null;
 		}}
 	>
 		This replaces <strong>all</strong> workout data on this device with the contents of the backup
 		from
-		{new Date(pendingBackup.exportedAt).toLocaleDateString()}. This cannot be undone. The app will
-		reload when done.
+		{new Date(pendingExportedAt).toLocaleDateString()}. Existing data is not touched until the
+		backup has been fully staged and verified. Keep your backup file until you confirm everything
+		looks right after reload. This cannot be undone.
 	</ConfirmDialog>
 {/if}
 

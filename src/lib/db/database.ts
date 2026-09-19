@@ -22,14 +22,28 @@ function reportWriteError(error: unknown): void {
 const DB_NAME = 'cosmic-workout';
 const DB_VERSION = 9;
 
+/** Every IndexedDB object store — keep in sync with onupgradeneeded. */
+export const ALL_STORE_NAMES = [
+	'items',
+	'programs',
+	'sessions',
+	'itemLastUsed',
+	'activities',
+	'habits',
+	'habitLogs',
+	'healthReadings',
+	'goalPlans',
+] as const;
+
 let dbInstance: IDBDatabase | null = null;
+/** In-flight open — prevents leaked connections when callers race before dbInstance is set. */
+let opening: Promise<IDBDatabase> | null = null;
 
 function openDB(): Promise<IDBDatabase> {
-	if (dbInstance) {
-		return Promise.resolve(dbInstance);
-	}
+	if (dbInstance) return Promise.resolve(dbInstance);
+	if (opening) return opening;
 
-	return new Promise((resolve, reject) => {
+	opening = new Promise((resolve, reject) => {
 		const request = indexedDB.open(DB_NAME, DB_VERSION);
 
 		request.onupgradeneeded = (event) => {
@@ -77,14 +91,23 @@ function openDB(): Promise<IDBDatabase> {
 		};
 
 		request.onsuccess = (event) => {
-			dbInstance = (event.target as IDBOpenDBRequest).result;
-			resolve(dbInstance);
+			const db = (event.target as IDBOpenDBRequest).result;
+			db.onversionchange = () => {
+				db.close();
+				if (dbInstance === db) dbInstance = null;
+			};
+			dbInstance = db;
+			opening = null;
+			resolve(db);
 		};
 
 		request.onerror = (event) => {
+			opening = null;
 			reject((event.target as IDBOpenDBRequest).error);
 		};
 	});
+
+	return opening;
 }
 
 async function getAll<T>(storeName: string): Promise<T[]> {
@@ -126,19 +149,53 @@ async function putRecord<T>(storeName: string, value: T): Promise<void> {
 	});
 }
 
-export async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
+export async function putAllRecords<T>(
+	storeName: string,
+	values: T[],
+	opts?: { silent?: boolean },
+): Promise<void> {
 	const db = await openDB();
 	return new Promise((resolve, reject) => {
 		const tx = db.transaction(storeName, 'readwrite');
 		const store = tx.objectStore(storeName);
+		let settled = false;
 		tx.oncomplete = () => resolve();
 		tx.onerror = () => {
-			reportWriteError(tx.error);
+			if (settled) return;
+			settled = true;
+			if (!opts?.silent) reportWriteError(tx.error);
+			else console.error('[idb] write failed:', storeName, tx.error);
 			reject(tx.error);
 		};
-		for (const value of values) {
-			store.put(value);
+		for (let i = 0; i < values.length; i++) {
+			try {
+				store.put(values[i]);
+			} catch (err) {
+				settled = true;
+				const row = values[i] as { id?: unknown; itemId?: unknown };
+				const key = row?.id ?? row?.itemId ?? i;
+				const message = `IndexedDB put failed in "${storeName}" (index ${i}, key ${String(key)}): ${err instanceof Error ? err.message : String(err)}`;
+				console.error(`[idb] ${message}`, values[i]);
+				try {
+					tx.abort();
+				} catch {
+					/* already failing */
+				}
+				reject(new Error(message, { cause: err }));
+				return;
+			}
 		}
+	});
+}
+
+/** Count records in a live store without loading them. */
+export async function countRecords(storeName: string): Promise<number> {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeName, 'readonly');
+		const request = tx.objectStore(storeName).count();
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
 	});
 }
 
@@ -157,18 +214,23 @@ async function removeRecord(storeName: string, key: string): Promise<void> {
 	});
 }
 
+/**
+ * Wipe every object store without deleting the database.
+ * Prefer this over `deleteDatabase` — an open connection (this tab) blocks deletion
+ * and was causing backup restore to fail with a generic mid-write error.
+ */
 export async function clearWorkoutData(): Promise<void> {
-	if (dbInstance) {
-		dbInstance.close();
-		dbInstance = null;
-	}
-
+	const db = await openDB();
 	return new Promise((resolve, reject) => {
-		const request = indexedDB.deleteDatabase(DB_NAME);
-		request.onsuccess = () => resolve();
-		request.onerror = () => reject(request.error);
-		request.onblocked = () =>
-			reject(new Error('Database deletion blocked — close other CosmicWorkOut tabs and try again'));
+		const tx = db.transaction([...ALL_STORE_NAMES], 'readwrite');
+		for (const name of ALL_STORE_NAMES) {
+			tx.objectStore(name).clear();
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
 	});
 }
 

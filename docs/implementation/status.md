@@ -111,7 +111,7 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 | Full gym exercise catalog      | Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                                           |
 | Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                        |
 | Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                    |
-| Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) Phase 1 — JSON export/import on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
+| Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON export (share sheet or download) + staged restore on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
 | Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                                    |
 | Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults) |
 | Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                   |

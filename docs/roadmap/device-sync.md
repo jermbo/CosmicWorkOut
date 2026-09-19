@@ -65,9 +65,9 @@ Future syncs may send only records changed since `lastSyncAt` to keep payloads s
 
 ---
 
-## Optional: Web Share API
+## Web Share API (shipped)
 
-On supported mobile browsers, after building the export blob, offer **Share** (`navigator.share({ files })`) so the user can save to Files or AirDrop without hunting Downloads. Falls back to download where Share is unavailable. Still fully offline. Can ship independently of full device sync.
+On supported mobile browsers, Export builds a `File` and calls **`navigator.share({ files })`** (files only — no title/text, which breaks some Android browsers) so the user can **Save to Files**, Mail, or AirDrop. If `canShare` throws or `share` rejects (common on Brave desktop/Android), Export **falls back to download**. User dismiss (`AbortError`) is cancel, not failure. Still fully offline.
 
 ---
 

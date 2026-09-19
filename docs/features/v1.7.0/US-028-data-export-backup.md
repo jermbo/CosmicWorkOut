@@ -4,7 +4,7 @@
 >
 > Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
 >
-> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope; `putAllRecords` and `itemLastUsed.getAll` were exposed from `database.ts`. Export/Restore live on `settings/data` — restore is **Replace-only**. Validation (envelope `format`/`version`, plus each store value is an array) runs **before** wipe; mid-write failures warn that data may have been lost. Confirm via dialog, then wipe + write + re-seed built-ins + reload. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
+> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -82,15 +82,28 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 
 1. Read all IndexedDB stores listed above.
 2. Read selected localStorage keys.
-3. Build envelope → `Blob` → trigger browser download.
-4. Filename pattern: `cosmic-workout-backup-YYYY-MM-DD.json`.
+3. Build envelope → verify JSON round-trip counts → `File` (`cosmic-workout-backup-YYYY-MM-DD.json`).
+4. If the browser can share files, open the **share sheet** (`navigator.share`); user cancel is not an error. Otherwise trigger a normal download.
+5. Typical size after months of use is around **1&nbsp;MB** — fine as an email attachment when Save to Files / AirDrop aren’t convenient.
 
 ### Restore
 
 1. Hidden `<input type="file" accept=".json,application/json">`.
-2. Parse and validate envelope.
+2. Parse and validate envelope (format, version, each store is an array).
 3. Show confirm dialog — restore **replaces** all workout data on this device.
-4. Clear IndexedDB (`clearWorkoutData()`), write imported records, write localStorage keys, call `initDB()` to re-upsert built-ins, reload.
+4. **Stage then commit** (safe for device transfer — months of history must not be wiped on a failed write):
+   1. JSON-flatten the payload (avoids Svelte `$state` Proxy → `DataCloneError`).
+   2. Write every store into a temporary IndexedDB (`cosmic-workout-restore`) and verify record counts.
+   3. Only after staging succeeds: clear live object stores in-place (not `deleteDatabase`), write the same payload, verify live counts.
+   4. Delete the staging DB, restore backed-up localStorage keys, `initDB()` to re-upsert built-ins, reload.
+5. If staging fails, **live data is unchanged**. Keep the backup file until the destination device looks correct.
+
+**Safe device transfer checklist**
+
+1. On the old device: **Export backup**. On a phone, prefer **Save to Files** or **AirDrop** from the share sheet; **Mail to yourself** is fine for ~1&nbsp;MB attachments. Confirm you have the `.json` file.
+2. Open or copy that file on the new device.
+3. On the new device: Restore from backup → confirm replace.
+4. Spot-check history, habits, and active program before deleting the file or wiping the old device.
 
 **Restore modes for v1:**
 
@@ -103,7 +116,7 @@ Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time fi
 ### Requirements (Phase 1)
 
 1. Export
-   a. `/settings/data` shall expose an **Export backup** action that downloads a JSON file.
+   a. `/settings/data` shall expose an **Export backup** action that produces a JSON file via share sheet (when available) or download.
    b. Export shall include all IndexedDB stores in the table above except transient keys.
    c. Export shall succeed offline with no network calls.
 
