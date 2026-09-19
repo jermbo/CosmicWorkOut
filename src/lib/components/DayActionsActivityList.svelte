@@ -27,7 +27,10 @@
 					}}
 					aria-label="Edit {activity.type} activity"
 				>
-					<Icon name="edit" size={14} />
+					<Icon
+						name="edit"
+						size={14}
+					/>
 					Edit
 				</button>
 			{/if}

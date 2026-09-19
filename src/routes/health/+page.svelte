@@ -5,6 +5,7 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { formatTime } from '$lib/date';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import HealthWeightSheet from '$lib/components/HealthWeightSheet.svelte';
 	import HealthBloodPressureSheet from '$lib/components/HealthBloodPressureSheet.svelte';
@@ -31,10 +32,6 @@
 		editingBp = reading;
 		showBpSheet = true;
 	}
-
-	function formatTime(iso: string): string {
-		return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-	}
 </script>
 
 <svelte:head>
@@ -42,13 +39,19 @@
 </svelte:head>
 
 <div class="page health-page">
-	<PageHeader title="Health" showBack />
+	<PageHeader
+		title="Health"
+		showBack
+	/>
 
 	<section class="health-block">
 		<div class="health-block__head">
 			<h2 class="health-block__title">Weight</h2>
 		</div>
-		<button class="weight-card" onclick={() => (showWeightSheet = true)}>
+		<button
+			class="weight-card"
+			onclick={() => (showWeightSheet = true)}
+		>
 			{#if weight}
 				<span class="weight-card__value">
 					{weight.values.value}<span class="weight-card__unit">{prefsStore.weightUnit}</span>
@@ -64,7 +67,11 @@
 	<section class="health-block">
 		<div class="health-block__head">
 			<h2 class="health-block__title">Blood Pressure</h2>
-			<button class="health-block__add" onclick={openBpNew} aria-label="Add blood pressure reading">+ Add</button>
+			<button
+				class="health-block__add"
+				onclick={openBpNew}
+				aria-label="Add blood pressure reading">+ Add</button
+			>
 		</div>
 
 		{#if bpReadings.length === 0}
@@ -73,7 +80,10 @@
 			<ul class="bp-list">
 				{#each bpReadings as reading (reading.id)}
 					<li>
-						<button class="bp-item" onclick={() => openBpEdit(reading)}>
+						<button
+							class="bp-item"
+							onclick={() => openBpEdit(reading)}
+						>
 							<span class="bp-item__value">
 								{reading.values.systolic}/{reading.values.diastolic}
 								<span class="bp-item__unit">mmHg</span>
@@ -91,7 +101,11 @@
 </div>
 
 {#if showWeightSheet}
-	<HealthWeightSheet date={contextDate} editing={weight ?? null} onClose={() => (showWeightSheet = false)} />
+	<HealthWeightSheet
+		date={contextDate}
+		editing={weight ?? null}
+		onClose={() => (showWeightSheet = false)}
+	/>
 {/if}
 
 {#if showBpSheet}

@@ -6,10 +6,12 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 	import BottomSheet from './BottomSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		session: Session;
@@ -21,14 +23,19 @@
 
 	let { session, exerciseMap, onClose, onEdit, onDelete }: Props = $props();
 
-	let habitLogsForDay = $derived(habitStore.logsForDate(session.date));
+	let habitLogsForDay = $derived(
+		prefsStore.habitsEnabled ? habitStore.logsForDate(session.date) : [],
+	);
 
 	let habitEntries = $derived.by(() => {
 		return habitLogsForDay
 			.map((log) => {
 				const habit = habitStore.habits.find((h) => h.id === log.habitId);
 				if (!habit) return null;
-				return { name: habit.name, valueStr: formatHabitLogValue(habit, log.value) };
+				return {
+					name: habit.name,
+					valueStr: formatHabitLogValue(habit, log.value),
+				};
 			})
 			.filter((e): e is { name: string; valueStr: string } => e !== null);
 	});
@@ -69,14 +76,17 @@
 			{formatWeekdayShortDate(session.date, ' · ')}
 		</div>
 
-		<h2 class="day-summary__workout-name">{workoutName}</h2>
+		<DialogTitle as="h2">{workoutName}</DialogTitle>
 
 		<div class="day-summary__stats">
 			<div class="day-summary__stat">
 				<span class="day-summary__stat-value">{formatDuration(session.durationSeconds ?? 0)}</span>
 				<span class="day-summary__stat-label">Duration</span>
 			</div>
-			<div class="day-summary__stat-sep" aria-hidden="true"></div>
+			<div
+				class="day-summary__stat-sep"
+				aria-hidden="true"
+			></div>
 			<div class="day-summary__stat">
 				<span class="day-summary__stat-value">{session.items.length}</span>
 				<span class="day-summary__stat-label"
@@ -84,7 +94,10 @@
 				>
 			</div>
 			{#if !isDance}
-				<div class="day-summary__stat-sep" aria-hidden="true"></div>
+				<div
+					class="day-summary__stat-sep"
+					aria-hidden="true"
+				></div>
 				<div class="day-summary__stat">
 					<span class="day-summary__stat-value">{formatVolume(session.totalVolume, 'zero')}</span>
 					<span class="day-summary__stat-label">lb lifted</span>
@@ -111,14 +124,18 @@
 									{/if}
 								</span>
 							{:else}
-								<span class="day-summary__exercise-sets">{formatCountWithWord(loggedEx.sets.length, 'set')}</span>
+								<span class="day-summary__exercise-sets"
+									>{formatCountWithWord(loggedEx.sets.length, 'set')}</span
+								>
 							{/if}
 						</div>
 						{#if !isDance && loggedEx.sets.length > 0}
 							<p class="day-summary__exercise-top">
 								{#if typeof loggedEx.sets[0].weight === 'number' && loggedEx.sets[0].weight > 0}
 									Top: {Math.max(
-										...loggedEx.sets.filter((s) => typeof s.weight === 'number').map((s) => s.weight as number),
+										...loggedEx.sets
+											.filter((s) => typeof s.weight === 'number')
+											.map((s) => s.weight as number),
 									)} lb
 								{:else if typeof loggedEx.sets[0].weight === 'string'}
 									{loggedEx.sets[0].weight}
@@ -145,8 +162,16 @@
 		{/if}
 
 		<div class="day-summary__actions">
-			<button class="day-summary__edit-btn" onclick={handleEdit}>Edit session</button>
-			<button class="day-summary__delete-btn" onclick={() => (showDeleteConfirm = true)}> Delete </button>
+			<button
+				class="day-summary__edit-btn"
+				onclick={handleEdit}>Edit session</button
+			>
+			<button
+				class="day-summary__delete-btn"
+				onclick={() => (showDeleteConfirm = true)}
+			>
+				Delete
+			</button>
 		</div>
 	</div>
 
@@ -183,13 +208,6 @@
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
 		margin-block-end: var(--space-2);
-	}
-
-	.day-summary__workout-name {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.day-summary__stats {

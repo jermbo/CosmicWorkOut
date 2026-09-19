@@ -18,6 +18,9 @@
 	import HomePracticeHubCard from '$lib/components/HomePracticeHubCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
 	import HomeHealthCard from '$lib/components/HomeHealthCard.svelte';
+	import HomeBaselinesCard from '$lib/components/HomeBaselinesCard.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import type { HomeCardId } from '$lib/homeCards';
 
 	const todayStr = todayIso();
 
@@ -34,9 +37,26 @@
 	let habitsLogged = $derived(habitStore.loggedCountForDate(contextDate));
 	let dateActivities = $derived(activityStore.activitiesByDate.get(contextDate) ?? []);
 
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
+
+	let cardEnabled = $derived<Record<HomeCardId, boolean>>({
+		habits: habitsEnabled,
+		practice: practiceEnabled,
+		activity: activityLogEnabled,
+		baselines: prefsStore.baselinesEnabled,
+		health: healthEnabled,
+	});
+
+	/** User-chosen order (Settings → Overview layout), minus whatever is turned off. */
+	let visibleCards = $derived(prefsStore.homeCardOrder.filter((id) => cardEnabled[id]));
 	let dateWeight = $derived(healthStore.weightForDate(contextDate));
 	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
+
+	let baselinesTotal = $derived(baselineStore.activeBaselines.length);
+	let baselinesCleared = $derived(baselineStore.clearedCountForDate(contextDate));
 
 	let liveDiscipline = $derived.by(() => {
 		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
@@ -50,31 +70,41 @@
 			liveDisciplineId: liveDiscipline,
 			liveRoutineName: sessionStore.active?.routineName ?? null,
 			sessionsForProgram: (programId, date) => programStore.sessionForProgramDate(programId, date),
-			suggestedRoutineForProgram: (programId) => programStore.suggestedRoutineInCurrentWeekForProgram(programId),
+			suggestedRoutineForProgram: (programId) =>
+				programStore.suggestedRoutineInCurrentWeekForProgram(programId),
 		}),
 	);
 
 	let weekIndicators = $derived.by(() => {
-		const indicators: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>> = {};
+		const indicators: Record<
+			string,
+			Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>
+		> = {};
 
 		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'health') {
 			if (!indicators[date]) indicators[date] = [];
 			if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
 		}
 
-		for (const session of programStore.sessions) {
-			let kind: 'dance' | 'strength' = 'strength';
-			if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
-			add(session.date, kind);
+		if (practiceEnabled) {
+			for (const session of programStore.sessions) {
+				let kind: 'dance' | 'strength' = 'strength';
+				if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
+				add(session.date, kind);
+			}
 		}
 
-		for (const activity of activityStore.activities) {
-			add(activity.date, 'activity');
+		if (activityLogEnabled) {
+			for (const activity of activityStore.activities) {
+				add(activity.date, 'activity');
+			}
 		}
 
-		const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
-		for (const log of habitStore.logs) {
-			if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+		if (habitsEnabled) {
+			const activeHabitIds = new Set(habitStore.trackableHabits.map((habit) => habit.id));
+			for (const log of habitStore.logs) {
+				if (activeHabitIds.has(log.habitId)) add(log.date, 'habits');
+			}
 		}
 
 		if (healthEnabled) {
@@ -98,22 +128,54 @@
 		onDateChange={() => goto(resolve('/'), { replaceState: true })}
 	>
 		{#snippet trailing()}
-			<WeekStreakBadge streak={programStore.combinedWeekStreak} />
+			{#if practiceEnabled}
+				<WeekStreakBadge streak={programStore.combinedWeekStreak} />
+			{/if}
 		{/snippet}
 	</PageHeader>
 
+	{#if !prefsStore.anyTrackingEnabled}
+		<div class="home-empty">
+			<p class="home-empty__msg">Nothing is being tracked yet.</p>
+			<p class="home-empty__hint">
+				Habits, Activity log, Practice, Health metrics, and Baselines are each opt-in — turn on what
+				you want to track.
+			</p>
+			<a
+				class="home-empty__link"
+				href={resolve('/settings')}>Choose what to track</a
+			>
+		</div>
+	{/if}
+
 	<div class="home-cards">
-		<HomeHabitsCard logged={habitsLogged} total={habitsTotal} />
-		<HomePracticeHubCard
-			completedCount={practiceNextUp.completedCount}
-			live={practiceNextUp.live}
-			headline={practiceNextUp.headline}
-			detail={practiceNextUp.detail}
-		/>
-		<HomeActivityCard activities={dateActivities} />
-		{#if healthEnabled}
-			<HomeHealthCard weight={dateWeight} latestBp={dateLatestBp} />
-		{/if}
+		{#each visibleCards as cardId (cardId)}
+			{#if cardId === 'habits'}
+				<HomeHabitsCard
+					logged={habitsLogged}
+					total={habitsTotal}
+				/>
+			{:else if cardId === 'practice'}
+				<HomePracticeHubCard
+					completedCount={practiceNextUp.completedCount}
+					live={practiceNextUp.live}
+					headline={practiceNextUp.headline}
+					detail={practiceNextUp.detail}
+				/>
+			{:else if cardId === 'activity'}
+				<HomeActivityCard activities={dateActivities} />
+			{:else if cardId === 'baselines'}
+				<HomeBaselinesCard
+					cleared={baselinesCleared}
+					total={baselinesTotal}
+				/>
+			{:else if cardId === 'health'}
+				<HomeHealthCard
+					weight={dateWeight}
+					latestBp={dateLatestBp}
+				/>
+			{/if}
+		{/each}
 	</div>
 </div>
 
@@ -126,6 +188,40 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-3);
+	}
+
+	.home-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-8) var(--space-4);
+		text-align: center;
+		background: var(--color-surface-2);
+		border: 1px solid var(--color-border);
+		border-radius: var(--r-xl);
+	}
+
+	.home-empty__msg {
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 700;
+	}
+
+	.home-empty__hint {
+		max-inline-size: 42ch;
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+	}
+
+	.home-empty__link {
+		margin-block-start: var(--space-2);
+		padding: var(--space-3) var(--space-5);
+		border-radius: var(--radius-full);
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
+		font-size: 0.9375rem;
+		font-weight: 700;
 	}
 
 	@container page (inline-size >= 520px) {

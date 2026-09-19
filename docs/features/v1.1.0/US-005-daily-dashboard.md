@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.1.0](README.md) › US-005
+
 # US-005 — Daily Dashboard
 
 > **Status: Shipped — superseded by v1.2.0**

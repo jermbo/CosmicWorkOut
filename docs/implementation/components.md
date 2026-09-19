@@ -1,6 +1,8 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › Components
+
 # Components
 
-Inventory of the **52** UI components in `src/lib/components/` (plus `components/insights/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Generated against the code on branch `feature/v1.6.0`.
+Inventory of the UI components in `src/lib/components/` (plus `components/insights/` and `components/goals/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.9.0 lift plans.
 
 > **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](../maintenance/audit-2026-06.md).
 
@@ -10,16 +12,26 @@ Inventory of the **52** UI components in `src/lib/components/` (plus `components
 
 Reusable building blocks with no feature knowledge.
 
-| Component          | Purpose                                                                                                                             |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `Icon`             | Single SVG icon component, keyed by name. Imported by 11 files — but **61 inline `<svg>` blocks still bypass it** (cleanup target). |
-| `BottomSheet`      | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 14 sheets.**                              |
-| `ConfirmDialog`    | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 7 callers.                                              |
-| `ValueDialog`      | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`).                                                        |
-| `SegmentedControl` | Generic `role="radiogroup"` segmented toggle (`options`, typed value).                                                              |
-| `ProgressRing`     | Circular SVG progress indicator (exercise cards, habit cards).                                                                      |
-| `PageHeader`       | Standard page title bar; embeds `WeekStrip`. Used by 7 routes.                                                                      |
-| `Toaster`          | Global toast notification host (mounted in layout).                                                                                 |
+| Component       | Purpose                                                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`        | Dialog/modal action button. `variant` primary \| ghost \| danger, plus `grow`, `bold`. Used by 4 callers.                           |
+| `Chip`          | Pill-shaped filter/choice button. `active`, `caps`, `small`, and `select` (toggle \| radio \| tab) for the right ARIA. 4 callers.   |
+| `FieldLabel`    | Form field label with optional muted `hint`. Renders `<label for>` or a `<span>` caption. Used by 11 callers.                       |
+| `DialogTitle`   | Heading at the top of a modal surface (`as` p \| h2). Used by 6 callers.                                                            |
+| `SheetBody`     | Flex-column wrapper inside `BottomSheet`. Used by 8 sheets.                                                                         |
+| `SheetHeader`   | Sheet title row: title, optional action buttons, close button. Used by 8 sheets.                                                    |
+| `BottomSheet`   | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 15 sheets.**                              |
+| `ConfirmDialog` | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 8 callers.                                              |
+| `ValueDialog`   | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`). Used by 3 callers.                                     |
+| `Icon`          | Single SVG icon component, keyed by name. Imported by 15 files — but **48 inline `<svg>` blocks still bypass it** (cleanup target). |
+| `ProgressRing`  | Circular SVG progress indicator (exercise cards, habit cards).                                                                      |
+| `PageHeader`    | Standard page title bar; embeds `WeekStrip`. Used by 11 routes.                                                                     |
+| `Toaster`       | Global toast notification host (mounted in layout).                                                                                 |
+
+The first six are the **UI primitive layer** the [June 2026 audit](../maintenance/audit-2026-06.md#3-css)
+called for — wrapper components rather than global utility classes, per Decision 4. A pattern
+that recurs across components belongs here; `app.css` stays tokens, reset and app shell only.
+See [Styling](dev-guide.md#styling-tokens-and-primitive-components).
 
 ---
 
@@ -55,11 +67,11 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Habits (`/habits`)
 
-| Component           | Purpose                                                         |
-| ------------------- | --------------------------------------------------------------- |
-| `HabitCard`         | A single habit with progress ring, +/− stepper, boolean toggle. |
-| `HabitRow`          | Compact habit row variant.                                      |
-| `HabitForm`         | Create / edit a custom habit (Settings).                        |
+| Component           | Purpose                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `HabitCard`         | A single habit with progress ring, +/− stepper, boolean toggle.                                             |
+| `HabitRow`          | Compact habit row variant.                                                                                  |
+| `HabitForm`         | Create / edit a custom habit (Settings).                                                                    |
 | `HabitHistorySheet` | Editable habit sheet for a past calendar day (add/subtract/toggle/exact-value, same controls as `/habits`). |
 
 ---
@@ -78,15 +90,31 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Program & routine editing (`/program`)
 
-| Component              | Purpose                                                                    |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `WorkoutEditor`        | Full-screen routine editor (name, items, sets/reps).                       |
-| `ExerciseLibrarySheet` | Browse/filter the strength item library by category.                       |
-| `ExerciseFormSheet`    | Create or edit a custom strength item.                                     |
-| `ProgramSelectSheet`   | List all programs; activate one (built-ins copy-first).                    |
-| `CreateProgramSheet`   | 2-step full-screen flow — details then routine names; scaffolds all weeks. |
+| Component            | Purpose                                                                    |
+| -------------------- | -------------------------------------------------------------------------- |
+| `WorkoutEditor`      | Full-screen routine editor (name, items, sets/reps).                       |
+| `LibrarySheet`       | Browse/filter an item library; configured per Discipline (see below).      |
+| `ExerciseFormSheet`  | Create or edit a custom strength item.                                     |
+| `ProgramSelectSheet` | List all programs; activate one (built-ins copy-first).                    |
+| `CreateProgramSheet` | 2-step full-screen flow — details then routine names; scaffolds all weeks. |
 
 `ProgramSelectSheet` and `CreateProgramSheet` are also used on `/workout` for the program-complete state.
+
+### Configuring `LibrarySheet`
+
+One sheet serves every Discipline. It owns the chrome — search, filter chips, expandable
+rows, add/edit/delete — and reads everything Discipline-specific from a `LibraryConfig`
+built in [`$lib/itemLibrary.ts`](../../src/lib/itemLibrary.ts):
+
+| Builder                                | Used by                       |
+| -------------------------------------- | ----------------------------- |
+| `strengthLibrary()`                    | `WorkoutEditor`, `/goals/new` |
+| `danceLibrary(disciplineId, section?)` | `DanceRoutineEditor`          |
+
+The config supplies the copy, which items belong in the list, how free-text search
+matches, the chip filter rows, and how one row renders (dot colour, subtitle, tag,
+optional right-hand readout). `kind` picks which form sheet the New/Edit buttons open.
+**A new movement type needs a builder here, not another copy of the sheet.**
 
 ---
 
@@ -96,8 +124,27 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 | -------------------- | --------------------------------------------------------- |
 | `AddPracticeSheet`   | Add a plan/practice (activate a program into a group).    |
 | `DanceRoutineEditor` | Edit a belly dance routine across its four sections.      |
-| `ItemLibrarySheet`   | Browse/filter the Discipline-scoped item library (dance). |
+| `LibrarySheet`       | Browse/filter an item library; configured per Discipline. |
 | `ItemFormSheet`      | Create or edit a custom dance item.                       |
+
+---
+
+## Goal progression plans (`/goals`, `/goals/new`) — v1.9.0
+
+Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.ts`.
+
+| Component            | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `WeightRepsInputs`   | Shared weight × reps pair inputs (goal + starting point steps). |
+| `GoalWizardSteps`    | Step indicator for the create-plan wizard.                      |
+| `GoalFocusStep`      | Pick focus lift + goal weight × reps.                           |
+| `GoalSetupStep`      | Choose Priority / Focus-only / Scratch week scaffold.           |
+| `GoalExercisesStep`  | Edit A/B/C exercise slots; keep focus lift in the week.         |
+| `GoalStartStep`      | Confirm starting point (history prefill or manual).             |
+| `GoalPreviewStep`    | Plan name + generated block preview before create.              |
+| `ActiveGoalPlanCard` | Active plan: rename, now/finished state, actions.               |
+| `GoalBlockTimeline`  | Wave-block progress strip inside the active card.               |
+| `GoalPlanRow`        | Paused / completed plan list row.                               |
 
 ---
 
@@ -132,12 +179,12 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Settings (`/settings`)
 
-| Component              | Purpose                                                                                                     |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
-| `SettingsRow`          | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| `SettingsToggleRow`    | Hub row with inline switch (e.g. health metrics)                                                            |
-| `SettingsGroup`        | Section header + grouped rows on hub                                                                        |
+| Component           | Purpose                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `AccentColorPicker` | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
+| `SettingsRow`       | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `SettingsToggleRow` | Hub row with inline switch (e.g. health metrics)                                                            |
+| `SettingsGroup`     | Section header + grouped rows on hub                                                                        |
 
 Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits` with US-030.
 
@@ -187,14 +234,20 @@ flowchart TB
 
     subgraph editor ["Program editing"]
         WE[WorkoutEditor]
-        ELS[ExerciseLibrarySheet]
+        LIB[LibrarySheet]
         EFS[ExerciseFormSheet]
     end
 
     subgraph dance ["Belly dance"]
         DRE[DanceRoutineEditor]
-        ILS[ItemLibrarySheet]
         IFS[ItemFormSheet]
+    end
+
+    subgraph goals ["Lift plans"]
+        AGPC[ActiveGoalPlanCard]
+        GBT[GoalBlockTimeline]
+        GFS[GoalFocusStep]
+        WRI[WeightRepsInputs]
     end
 
     subgraph dayactions ["Calendar day"]
@@ -206,8 +259,10 @@ flowchart TB
 
     SO --> EC --> PR & ST
     SO --> LS
-    WE --> ELS --> EFS
-    DRE --> ILS --> IFS
+    WE --> LIB --> EFS
+    DRE --> LIB --> IFS
+    AGPC --> GBT
+    GFS --> WRI
     DAS --> DAI & DAAL & DAWS
     PH --> WeekStrip
     LS & EFS & ILS & IFS & ELS & DAS --> BS
@@ -217,12 +272,14 @@ flowchart TB
     classDef strength fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef editor fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef dance fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
+    classDef goals fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
     classDef day fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class BN,SO,DSO,SC,TO layout;
     class BS,IC,CD,PH shared;
     class EC,ST,LS,PR strength;
     class WE,ELS,EFS editor;
     class DRE,ILS,IFS dance;
+    class AGPC,GBT,GFS,WRI goals;
     class DAS,DAI,DAAL,DAWS day;
 ```
 

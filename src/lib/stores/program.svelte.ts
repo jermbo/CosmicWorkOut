@@ -1,9 +1,24 @@
-import type { Program, Item, Routine, RoutineItem, RoutineSection, Session, Week, RoutineColor } from '$lib/db/types';
+import type {
+	Program,
+	Item,
+	Routine,
+	RoutineItem,
+	RoutineSection,
+	Session,
+	Week,
+	RoutineColor,
+} from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
-import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines, emptySections } from '$lib/discipline';
+import {
+	STRENGTH_DISCIPLINE_ID,
+	flattenItems,
+	singleSection,
+	disciplines,
+	emptySections,
+} from '$lib/discipline';
 import { practiceGroups, practiceGroupById } from '$lib/practice';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -40,7 +55,9 @@ class ProgramStore {
 	}
 
 	activePrograms = $derived.by(() =>
-		this.activeProgramIds.map((id) => this.programs.find((p) => p.id === id)).filter((p): p is Program => !!p),
+		this.activeProgramIds
+			.map((id) => this.programs.find((p) => p.id === id))
+			.filter((p): p is Program => !!p),
 	);
 
 	activeProgramsForGroup(groupId: string): Program[] {
@@ -89,7 +106,9 @@ class ProgramStore {
 
 	sessionsForDiscipline(disciplineId: string): Session[] {
 		const activeIds = new Set(this.activeProgramsForDiscipline(disciplineId).map((p) => p.id));
-		return this.sessions.filter((s) => activeIds.has(s.programId) || s.disciplineId === disciplineId);
+		return this.sessions.filter(
+			(s) => activeIds.has(s.programId) || s.disciplineId === disciplineId,
+		);
 	}
 
 	completedCountForProgram(programId: string): number {
@@ -97,7 +116,10 @@ class ProgramStore {
 	}
 
 	completedCountFor(disciplineId: string): number {
-		return this.activeProgramsForDiscipline(disciplineId).reduce((n, p) => n + this.completedCountForProgram(p.id), 0);
+		return this.activeProgramsForDiscipline(disciplineId).reduce(
+			(n, p) => n + this.completedCountForProgram(p.id),
+			0,
+		);
 	}
 
 	weekStreakFor(disciplineId: string): number {
@@ -111,7 +133,9 @@ class ProgramStore {
 
 	combinedWeekStreak = $derived(
 		computeCombinedStreak(
-			disciplines.map((d) => this.sessions.filter((s) => s.disciplineId === d.id).map((s) => s.date)),
+			disciplines.map((d) =>
+				this.sessions.filter((s) => s.disciplineId === d.id).map((s) => s.date),
+			),
 			1,
 		),
 	);
@@ -380,7 +404,13 @@ class ProgramStore {
 
 	async saveRoutine(
 		originalName: string,
-		updates: { name: string; letter?: string; focus?: string; color?: RoutineColor; items: RoutineItem[] },
+		updates: {
+			name: string;
+			letter?: string;
+			focus?: string;
+			color?: RoutineColor;
+			items: RoutineItem[];
+		},
 	): Promise<void> {
 		const program = this.activeProgram;
 		if (!program) return;
@@ -406,7 +436,12 @@ class ProgramStore {
 	async saveRoutineSections(
 		programId: string,
 		originalName: string,
-		updates: { name: string; focus?: string; color?: RoutineColor; sections: RoutineSection[] },
+		updates: {
+			name: string;
+			focus?: string;
+			color?: RoutineColor;
+			sections: RoutineSection[];
+		},
 	): Promise<void> {
 		const program = this.programs.find((p) => p.id === programId);
 		if (!program) return;
@@ -440,6 +475,21 @@ class ProgramStore {
 		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
+	/** Write a fully-built program record (used by generators like goal plans). */
+	async upsertProgram(program: Program): Promise<void> {
+		try {
+			await db.programs.put($state.snapshot(program) as Program);
+		} catch (e) {
+			console.error('Failed to save program:', e);
+			throw e;
+		}
+		if (this.programs.some((p) => p.id === program.id)) {
+			this.programs = this.programs.map((p) => (p.id === program.id ? program : p));
+		} else {
+			this.programs = [...this.programs, program];
+		}
+	}
+
 	private async commitActiveProgram(updated: Program): Promise<void> {
 		try {
 			await db.programs.put($state.snapshot(updated));
@@ -456,6 +506,23 @@ class ProgramStore {
 	setActiveProgram(programId: string): void {
 		if (!this.programs.some((p) => p.id === programId) || this.isProgramActive(programId)) return;
 		this.activeProgramIds = [...this.activeProgramIds, programId];
+		this.persistActiveProgramIds();
+	}
+
+	/**
+	 * Activate `programId` and deactivate every other active program in the same
+	 * discipline — used when a goal plan must be the sole Strength plan.
+	 */
+	setSoleActiveProgram(programId: string): void {
+		const program = this.programById(programId);
+		if (!program) return;
+		const keep = new Set([programId]);
+		const next = this.activeProgramIds.filter((id) => {
+			const other = this.programById(id);
+			return !other || other.disciplineId !== program.disciplineId || keep.has(id);
+		});
+		if (!next.includes(programId)) next.push(programId);
+		this.activeProgramIds = next;
 		this.persistActiveProgramIds();
 	}
 

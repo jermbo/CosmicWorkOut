@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Standards](../README.md#standards) › User Story Guide
+
 # User Story Guide
 
 This document defines the standard format for all user stories in this project. Every story must follow this structure to ensure consistency, traceability, and a shared understanding of intent before any implementation begins.
@@ -134,6 +136,6 @@ so that I can track hydration throughout the day without breaking my flow.
 
 ### Related Docs
 
-- [Data Model](../../docs/architecture/data-model.md)
+- [Data Model](../../architecture/data-model.md)
 - [US-004 — Habit Tracking](./US-004-habit-tracking.md)
 ```

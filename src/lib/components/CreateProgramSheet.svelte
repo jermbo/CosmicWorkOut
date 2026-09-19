@@ -3,6 +3,7 @@
 	import { programStore } from '$lib/stores/program.svelte';
 
 	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+	import FieldLabel from './FieldLabel.svelte';
 
 	type Props = { onClose: () => void; disciplineId?: string };
 
@@ -81,7 +82,11 @@
 		<div class="create-overlay__top">
 			<div class="create-overlay__bar">
 				{#if step === 'workouts'}
-					<button class="icon-btn" onclick={() => (step = 'details')} aria-label="Back">
+					<button
+						class="icon-btn"
+						onclick={() => (step = 'details')}
+						aria-label="Back"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -95,7 +100,11 @@
 						</svg>
 					</button>
 				{:else}
-					<button class="icon-btn" onclick={onClose} aria-label="Cancel">
+					<button
+						class="icon-btn"
+						onclick={onClose}
+						aria-label="Cancel"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -104,13 +113,26 @@
 							stroke-linecap="round"
 							aria-hidden="true"
 						>
-							<line x1="18" y1="6" x2="6" y2="18" />
-							<line x1="6" y1="6" x2="18" y2="18" />
+							<line
+								x1="18"
+								y1="6"
+								x2="6"
+								y2="18"
+							/>
+							<line
+								x1="6"
+								y1="6"
+								x2="18"
+								y2="18"
+							/>
 						</svg>
 					</button>
 				{/if}
 				<div class="create-overlay__titles">
-					<h1 class="create-overlay__title" id="create-title">
+					<h1
+						class="create-overlay__title"
+						id="create-title"
+					>
 						{#if step === 'details'}New Program{:else}Name Your Workouts{/if}
 					</h1>
 					<p class="create-overlay__subtitle">
@@ -122,9 +144,19 @@
 					</p>
 				</div>
 				{#if step === 'details'}
-					<button class="create-overlay__next-btn" onclick={goToWorkouts}> Next → </button>
+					<button
+						class="create-overlay__next-btn"
+						onclick={goToWorkouts}
+					>
+						Next →
+					</button>
 				{:else}
-					<button class="create-overlay__next-btn" onclick={handleCreate} disabled={saving} aria-busy={saving}>
+					<button
+						class="create-overlay__next-btn"
+						onclick={handleCreate}
+						disabled={saving}
+						aria-busy={saving}
+					>
 						{#if saving}Creating…{:else}Create{/if}
 					</button>
 				{/if}
@@ -134,8 +166,11 @@
 		<div class="create-overlay__scroll">
 			{#if step === 'details'}
 				<div class="create-form">
-					<div class="form-field" class:form-field--error={errors.name}>
-						<label class="form-field__label" for="prog-name">Program name</label>
+					<div
+						class="form-field"
+						class:form-field--error={errors.name}
+					>
+						<FieldLabel for="prog-name">Program name</FieldLabel>
 						<input
 							id="prog-name"
 							class="form-field__input"
@@ -148,8 +183,9 @@
 					</div>
 
 					<div class="form-field">
-						<label class="form-field__label" for="prog-desc"
-							>Description <span class="form-field__optional">optional</span></label
+						<FieldLabel
+							for="prog-desc"
+							hint="optional">Description</FieldLabel
 						>
 						<textarea
 							id="prog-desc"
@@ -160,8 +196,11 @@
 						></textarea>
 					</div>
 
-					<div class="form-field" class:form-field--error={errors.weeks}>
-						<label class="form-field__label" for="prog-weeks">Duration (weeks)</label>
+					<div
+						class="form-field"
+						class:form-field--error={errors.weeks}
+					>
+						<FieldLabel for="prog-weeks">Duration (weeks)</FieldLabel>
 						<div class="stepper">
 							<button
 								type="button"
@@ -182,9 +221,16 @@
 						{#if errors.weeks}<span class="form-field__error">{errors.weeks}</span>{/if}
 					</div>
 
-					<div class="form-field" class:form-field--error={errors.days}>
-						<span class="form-field__label" id="days-label">Days per week</span>
-						<div class="days-chips" role="radiogroup" aria-labelledby="days-label">
+					<div
+						class="form-field"
+						class:form-field--error={errors.days}
+					>
+						<FieldLabel id="days-label">Days per week</FieldLabel>
+						<div
+							class="days-chips"
+							role="radiogroup"
+							aria-labelledby="days-label"
+						>
 							{#each [1, 2, 3, 4, 5, 6, 7] as d (d)}
 								<button
 									type="button"
@@ -201,7 +247,9 @@
 				</div>
 			{:else}
 				<div class="create-form">
-					<p class="create-form__hint">Give each workout a name. You can add exercises after the program is created.</p>
+					<p class="create-form__hint">
+						Give each workout a name. You can add exercises after the program is created.
+					</p>
 					{#each templates as tmpl, i (i)}
 						<div class="workout-template">
 							<span class="workout-template__letter">{String.fromCharCode(65 + i)}</span>
@@ -360,21 +408,6 @@
 	.form-field--error .form-field__input,
 	.form-field--error .stepper {
 		border-color: var(--color-red);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.form-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.form-field__input {

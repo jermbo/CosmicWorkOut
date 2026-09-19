@@ -2,12 +2,23 @@
 	import { page } from '$app/state';
 	import type { Program, Routine } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { flattenItems, effectiveSections, STRENGTH_DISCIPLINE_ID, BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
+	import {
+		flattenItems,
+		effectiveSections,
+		STRENGTH_DISCIPLINE_ID,
+		BELLYDANCE_DISCIPLINE_ID,
+	} from '$lib/discipline';
 	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
 	import DanceRoutineEditor from '$lib/components/DanceRoutineEditor.svelte';
 	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import FieldLabel from '$lib/components/FieldLabel.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	let editingWorkout = $state<Routine | null | undefined>(undefined);
 	let showCreateProgram = $state(false);
@@ -22,13 +33,18 @@
 			: STRENGTH_DISCIPLINE_ID,
 	);
 
-	let disciplinePrograms = $derived(programStore.programs.filter((p) => p.disciplineId === disciplineId));
+	let disciplinePrograms = $derived(
+		programStore.programs.filter(
+			(p) => p.disciplineId === disciplineId && !goalPlanStore.planForProgram(p.id),
+		),
+	);
 
 	let viewingProgramId = $state<string | undefined>(undefined);
 
 	$effect(() => {
 		if (viewingProgramId === undefined && disciplinePrograms.length > 0) {
-			viewingProgramId = programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
+			viewingProgramId =
+				programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		}
 	});
 
@@ -93,10 +109,12 @@
 
 	async function handleDeleteProgram() {
 		if (!viewingProgram || deletingProgram) return;
+		if (goalPlanStore.planForProgram(viewingProgram.id)) return;
 		deletingProgram = true;
 		try {
 			await programStore.deleteProgram(viewingProgram.id);
-			viewingProgramId = programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
+			viewingProgramId =
+				programStore.activeProgramFor(disciplineId)?.id ?? disciplinePrograms[0]?.id;
 		} finally {
 			deletingProgram = false;
 			showDeleteProgramConfirm = false;
@@ -121,13 +139,24 @@
 <div class="page page--wide program-page">
 	<div class="prog-header">
 		<h1 class="prog-header__title">Programs</h1>
-		<button class="prog-header__new" onclick={() => (showCreateProgram = true)}>
-			<Icon name="plus" size={14} stroke={2.5} />
+		<button
+			class="prog-header__new"
+			onclick={() => (showCreateProgram = true)}
+		>
+			<Icon
+				name="plus"
+				size={14}
+				stroke={2.5}
+			/>
 			New Program
 		</button>
 	</div>
 
-	<div class="prog-list" role="list" aria-label="Available programs">
+	<div
+		class="prog-list"
+		role="list"
+		aria-label="Available programs"
+	>
 		{#each disciplinePrograms as program (program.id)}
 			{@const isActive = programStore.isProgramActive(program.id)}
 			{@const isViewing = program.id === viewingProgramId}
@@ -164,13 +193,18 @@
 
 				<div class="prog-card__actions">
 					{#if isActive}
-						<button class="prog-card__deactivate-btn" onclick={() => programStore.deactivateProgram(program.id)}>
+						<button
+							class="prog-card__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(program.id)}
+						>
 							Deactivate
 						</button>
 					{:else}
 						<button
 							class="prog-card__activate-btn"
-							onclick={() => {
+							onclick={async () => {
+								const activeGoal = goalPlanStore.activePlan;
+								if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 								programStore.setActiveProgram(program.id);
 								viewingProgramId = program.id;
 							}}
@@ -187,7 +221,10 @@
 							}}
 							aria-label="Delete {program.name}"
 						>
-							<Icon name="trash" size={15} />
+							<Icon
+								name="trash"
+								size={15}
+							/>
 						</button>
 					{/if}
 				</div>
@@ -196,16 +233,30 @@
 	</div>
 
 	{#if viewingProgram}
-		<section class="schedule" aria-labelledby="schedule-heading">
+		<section
+			class="schedule"
+			aria-labelledby="schedule-heading"
+		>
 			<div class="schedule__header">
 				<div class="schedule__title-row">
-					<h2 class="schedule__title" id="schedule-heading">{viewingProgram.name}</h2>
+					<h2
+						class="schedule__title"
+						id="schedule-heading"
+					>
+						{viewingProgram.name}
+					</h2>
 					{#if viewingIsActive}
-						<button class="schedule__deactivate-btn" onclick={() => programStore.deactivateProgram(viewingProgram!.id)}>
+						<button
+							class="schedule__deactivate-btn"
+							onclick={() => programStore.deactivateProgram(viewingProgram!.id)}
+						>
 							Deactivate
 						</button>
 					{:else}
-						<button class="schedule__activate-btn" onclick={() => programStore.setActiveProgram(viewingProgram!.id)}>
+						<button
+							class="schedule__activate-btn"
+							onclick={() => programStore.setActiveProgram(viewingProgram!.id)}
+						>
 							Activate this program
 						</button>
 					{/if}
@@ -214,7 +265,7 @@
 				{#if viewingIsActive}
 					<div class="schedule__progress">
 						<div class="schedule__progress-labels">
-							<span class="schedule__progress-label">Progress</span>
+							<FieldLabel>Progress</FieldLabel>
 							<span class="schedule__progress-wk">
 								Week {programStore.currentWeekFor(disciplineId)} of {viewingProgram.durationWeeks}
 							</span>
@@ -228,7 +279,8 @@
 						>
 							<div
 								class="schedule__progress-fill"
-								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) / viewingProgram.durationWeeks) *
+								style:inline-size="{((programStore.currentWeekFor(disciplineId) - 1) /
+									viewingProgram.durationWeeks) *
 									100}%"
 							></div>
 						</div>
@@ -236,7 +288,10 @@
 				{/if}
 			</div>
 
-			<div class="week-picker" aria-label="Browse weeks">
+			<div
+				class="week-picker"
+				aria-label="Browse weeks"
+			>
 				<button
 					class="week-picker__btn"
 					onclick={() => {
@@ -245,7 +300,11 @@
 					disabled={selectedWeek <= 1}
 					aria-label="Previous week"
 				>
-					<Icon name="chevron-left" size={16} stroke={2.5} />
+					<Icon
+						name="chevron-left"
+						size={16}
+						stroke={2.5}
+					/>
 				</button>
 				<span class="week-picker__label">
 					Week {selectedWeek}
@@ -261,7 +320,11 @@
 					disabled={selectedWeek >= totalWeeks}
 					aria-label="Next week"
 				>
-					<Icon name="chevron-right" size={16} stroke={2.5} />
+					<Icon
+						name="chevron-right"
+						size={16}
+						stroke={2.5}
+					/>
 				</button>
 			</div>
 
@@ -277,7 +340,10 @@
 						style:--wshadow={shadow}
 					>
 						<div class="workout-card__head">
-							<span class="workout-card__letter" aria-hidden="true">
+							<span
+								class="workout-card__letter"
+								aria-hidden="true"
+							>
 								{workout.letter ?? '?'}
 							</span>
 							<div class="workout-card__info">
@@ -297,7 +363,10 @@
 									onclick={() => (editingWorkout = workout)}
 									aria-label="Edit {workout.name}"
 								>
-									<Icon name="edit" size={13} />
+									<Icon
+										name="edit"
+										size={13}
+									/>
 									Edit
 								</button>
 								{#if weekWorkouts.length > 1}
@@ -306,18 +375,28 @@
 										onclick={() => (removeWorkoutName = workout.name)}
 										aria-label="Remove {workout.name}"
 									>
-										<Icon name="close" size={13} />
+										<Icon
+											name="close"
+											size={13}
+										/>
 									</button>
 								{/if}
 							</div>
 						</div>
 
 						{#if displayItemsForRoutine(workout).length > 0}
-							<div class="workout-card__chips" role="list" aria-label="Items in {workout.name}">
+							<div
+								class="workout-card__chips"
+								role="list"
+								aria-label="Items in {workout.name}"
+							>
 								{#each displayItemsForRoutine(workout) as we (we.itemId)}
 									{@const ex = programStore.itemMap.get(we.itemId)}
 									{#if ex}
-										<span class="workout-card__chip" role="listitem">{ex.name}</span>
+										<span
+											class="workout-card__chip"
+											role="listitem">{ex.name}</span
+										>
 									{/if}
 								{/each}
 							</div>
@@ -326,8 +405,15 @@
 				{/each}
 
 				{#if disciplineId === STRENGTH_DISCIPLINE_ID}
-					<button class="schedule__add-workout-btn" onclick={() => (editingWorkout = null)}>
-						<Icon name="plus" size={18} stroke={2.5} />
+					<button
+						class="schedule__add-workout-btn"
+						onclick={() => (editingWorkout = null)}
+					>
+						<Icon
+							name="plus"
+							size={18}
+							stroke={2.5}
+						/>
 						Add workout
 					</button>
 				{/if}
@@ -364,14 +450,24 @@
 
 {#if editingWorkout !== undefined}
 	{#if disciplineId === BELLYDANCE_DISCIPLINE_ID && editingWorkout && viewingProgram}
-		<DanceRoutineEditor program={viewingProgram} routine={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+		<DanceRoutineEditor
+			program={viewingProgram}
+			routine={editingWorkout}
+			onBack={() => (editingWorkout = undefined)}
+		/>
 	{:else}
-		<WorkoutEditor workout={editingWorkout} onBack={() => (editingWorkout = undefined)} />
+		<WorkoutEditor
+			workout={editingWorkout}
+			onBack={() => (editingWorkout = undefined)}
+		/>
 	{/if}
 {/if}
 
 {#if showCreateProgram}
-	<CreateProgramSheet {disciplineId} onClose={() => (showCreateProgram = false)} />
+	<CreateProgramSheet
+		{disciplineId}
+		onClose={() => (showCreateProgram = false)}
+	/>
 {/if}
 
 <style>
@@ -626,14 +722,6 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-	}
-
-	.schedule__progress-label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
 	}
 
 	.schedule__progress-wk {

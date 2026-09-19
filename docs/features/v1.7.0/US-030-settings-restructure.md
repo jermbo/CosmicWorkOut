@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.7.0](README.md) › US-030
+
 # US-030 — Settings Hub Restructure
 
 > **Status: Shipped — v1.7.0**

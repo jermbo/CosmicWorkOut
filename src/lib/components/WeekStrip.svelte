@@ -3,7 +3,15 @@
 	import type { Session } from '$lib/db/types';
 	import { goto } from '$app/navigation';
 	import { resolveHref } from '$lib/navigation';
-	import { addDays, formatWeekRange, formatWeekdayNarrow, fromIso, mondayOf, todayIso, toLocalIso } from '$lib/date';
+	import {
+		addDays,
+		formatWeekRange,
+		formatWeekdayNarrow,
+		fromIso,
+		mondayOf,
+		todayIso,
+		toLocalIso,
+	} from '$lib/date';
 	import { formatWeeksAgo } from '$lib/format';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
@@ -21,7 +29,12 @@
 	const todayStr = todayIso();
 
 	function getWeekDays(weekStartStr: string) {
-		const days: { dow: string; date: number; dateStr: string; status: string }[] = [];
+		const days: {
+			dow: string;
+			date: number;
+			dateStr: string;
+			status: string;
+		}[] = [];
 		const monday = fromIso(weekStartStr);
 
 		for (let i = 0; i < 7; i++) {
@@ -38,7 +51,12 @@
 				status = 'rest';
 			}
 
-			days.push({ dow: formatWeekdayNarrow(d), date: d.getDate(), dateStr, status });
+			days.push({
+				dow: formatWeekdayNarrow(d),
+				date: d.getDate(),
+				dateStr,
+				status,
+			});
 		}
 
 		return days;
@@ -90,7 +108,9 @@
 		return null;
 	}
 
-	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'> {
+	function indicatorsForDay(
+		dateStr: string,
+	): Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'> {
 		return dayIndicators[dateStr] ?? [];
 	}
 
@@ -118,11 +138,25 @@
 	}
 </script>
 
-<section class="week-strip" aria-label="{weekLabel} schedule">
+<section
+	class="week-strip"
+	aria-label="{weekLabel} schedule"
+>
 	<div class="week-strip__header">
 		<div class="week-strip__nav-row">
-			<button type="button" class="week-strip__nav-btn" aria-label="Previous week" onclick={() => shiftWeek(-1)}>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+			<button
+				type="button"
+				class="week-strip__nav-btn"
+				aria-label="Previous week"
+				onclick={() => shiftWeek(-1)}
+			>
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					aria-hidden="true"
+				>
 					<polyline points="15 18 9 12 15 6" />
 				</svg>
 			</button>
@@ -141,14 +175,23 @@
 				disabled={!canGoNextWeek}
 				onclick={() => shiftWeek(1)}
 			>
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					aria-hidden="true"
+				>
 					<polyline points="9 18 15 12 9 6" />
 				</svg>
 			</button>
 		</div>
 	</div>
 
-	<div class="week-strip__days" aria-label="Days in {weekLabel}">
+	<div
+		class="week-strip__days"
+		aria-label="Days in {weekLabel}"
+	>
 		{#each weekDays as day (day.dateStr)}
 			<button
 				type="button"
@@ -176,20 +219,29 @@
 						aria-hidden="true"
 					></span>
 				{:else if indicatorsForDay(day.dateStr).length > 0}
-					<span class="week-day__indicators" aria-hidden="true">
+					<span
+						class="week-day__indicators"
+						aria-hidden="true"
+					>
 						{#each indicatorsForDay(day.dateStr) as indicator (indicator)}
 							<span class="week-day__indicator-dot week-day__indicator-dot--{indicator}"></span>
 						{/each}
 					</span>
 				{:else}
-					<span class="week-day__indicator" aria-hidden="true"></span>
+					<span
+						class="week-day__indicator"
+						aria-hidden="true"
+					></span>
 				{/if}
 			</button>
 		{/each}
 	</div>
 
 	<div class="week-strip__footer">
-		<p class="week-strip__legend" class:week-strip__legend--hidden={!stayOnPage && !viewingPastDate && isCurrentWeek}>
+		<p
+			class="week-strip__legend"
+			class:week-strip__legend--hidden={!stayOnPage && !viewingPastDate && isCurrentWeek}
+		>
 			{#if viewingPastDate}
 				<span class="week-strip__legend-item week-strip__legend-item--selected">Selected</span>
 			{/if}
@@ -200,7 +252,11 @@
 			{/if}
 		</p>
 		{#if viewingPastDate}
-			<button type="button" class="week-strip__back-today" onclick={() => navigateToDate(todayStr)}>
+			<button
+				type="button"
+				class="week-strip__back-today"
+				onclick={() => navigateToDate(todayStr)}
+			>
 				Back to today
 			</button>
 		{/if}

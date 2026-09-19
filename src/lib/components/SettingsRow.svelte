@@ -14,7 +14,10 @@
 	let { href, label, detail, preview }: Props = $props();
 </script>
 
-<a href={resolveHref(href)} class="settings-row">
+<a
+	href={resolveHref(href)}
+	class="settings-row"
+>
 	<span class="settings-row__label">{label}</span>
 	<span class="settings-row__trailing">
 		{#if preview}
@@ -22,7 +25,10 @@
 		{:else if detail}
 			<span class="settings-row__detail">{detail}</span>
 		{/if}
-		<Icon name="chevron-right" size={18} />
+		<Icon
+			name="chevron-right"
+			size={18}
+		/>
 	</span>
 </a>
 

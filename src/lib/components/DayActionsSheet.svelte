@@ -12,6 +12,7 @@
 	import DayActionItem from './DayActionItem.svelte';
 	import DayActionsActivityList from './DayActionsActivityList.svelte';
 	import DayActionsWorkoutSummary from './DayActionsWorkoutSummary.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		date: string;
@@ -89,6 +90,9 @@
 		return 'Log activity';
 	});
 
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let dayWeight = $derived(healthStore.weightForDate(date));
 	let dayBp = $derived(healthStore.bloodPressureForDate(date));
@@ -107,7 +111,7 @@
 
 <BottomSheet onclose={onClose}>
 	<div class="day-actions">
-		<p class="day-actions__date">{formatLongDate(date)}</p>
+		<DialogTitle>{formatLongDate(date)}</DialogTitle>
 
 		{#if strengthSession}
 			<DayActionsWorkoutSummary
@@ -125,43 +129,49 @@
 		{/if}
 
 		<div class="day-actions__list">
-			<DayActionItem
-				icon="check"
-				label={habitsActionLabel}
-				description="Mood, water, meditation, and more"
-				onclick={() => navigate('/habits')}
-			/>
-
-			{#if hasHabits && onViewHabits}
+			{#if habitsEnabled}
 				<DayActionItem
 					icon="check"
-					label="View logged habits"
-					description="See what was logged on this day"
-					secondary
-					onclick={onViewHabits}
+					label={habitsActionLabel}
+					description="Mood, water, meditation, and more"
+					onclick={() => navigate('/habits')}
+				/>
+
+				{#if hasHabits && onViewHabits}
+					<DayActionItem
+						icon="check"
+						label="View logged habits"
+						description="See what was logged on this day"
+						secondary
+						onclick={onViewHabits}
+					/>
+				{/if}
+			{/if}
+
+			{#if practiceEnabled}
+				<DayActionItem
+					icon="edit"
+					label={strengthActionLabel}
+					description={strengthActionDescription}
+					onclick={() => navigate('/workout')}
+				/>
+
+				<DayActionItem
+					icon="edit"
+					label={danceActionLabel}
+					description={danceActionDescription}
+					onclick={() => navigate('/practice/dance')}
 				/>
 			{/if}
 
-			<DayActionItem
-				icon="edit"
-				label={strengthActionLabel}
-				description={strengthActionDescription}
-				onclick={() => navigate('/workout')}
-			/>
-
-			<DayActionItem
-				icon="edit"
-				label={danceActionLabel}
-				description={danceActionDescription}
-				onclick={() => navigate('/practice/dance')}
-			/>
-
-			<DayActionItem
-				icon="plus"
-				label={activityActionLabel}
-				description="Runs, walks, yoga, and more"
-				onclick={() => navigate('/log')}
-			/>
+			{#if activityLogEnabled}
+				<DayActionItem
+					icon="plus"
+					label={activityActionLabel}
+					description="Runs, walks, yoga, and more"
+					onclick={() => navigate('/log')}
+				/>
+			{/if}
 
 			{#if healthEnabled}
 				<DayActionItem
@@ -194,7 +204,11 @@
 		</div>
 
 		{#if activities.length > 0}
-			<DayActionsActivityList {activities} {onClose} onEdit={onEditActivity} />
+			<DayActionsActivityList
+				{activities}
+				{onClose}
+				onEdit={onEditActivity}
+			/>
 		{/if}
 	</div>
 </BottomSheet>
@@ -203,13 +217,6 @@
 	.day-actions {
 		padding-inline: var(--space-5);
 		padding-block: var(--space-2) var(--space-4);
-	}
-
-	.day-actions__date {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.day-actions__list {

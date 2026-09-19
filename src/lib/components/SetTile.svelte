@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 
@@ -10,6 +11,9 @@
 	let { set, onTap }: Props = $props();
 
 	let isAnimating = $state(false);
+	let animTimer: ReturnType<typeof setTimeout> | undefined;
+
+	onDestroy(() => clearTimeout(animTimer));
 
 	function formatWeight(w: number | string): string {
 		if (typeof w === 'string') {
@@ -36,7 +40,8 @@
 		}
 		if (!set.completed) {
 			isAnimating = true;
-			setTimeout(() => {
+			clearTimeout(animTimer);
+			animTimer = setTimeout(() => {
 				isAnimating = false;
 			}, 400);
 		}
@@ -60,8 +65,14 @@
 	aria-label={buildAriaLabel()}
 >
 	{#if set.completed}
-		<span class="set-tile__set-num" aria-hidden="true">Set {set.setNumber}</span>
-		<span class="set-tile__logged-weight" aria-hidden="true">
+		<span
+			class="set-tile__set-num"
+			aria-hidden="true">Set {set.setNumber}</span
+		>
+		<span
+			class="set-tile__logged-weight"
+			aria-hidden="true"
+		>
 			{#if typeof set.weight === 'number' && set.weight > 0}
 				{set.weight}<span class="set-tile__unit">{prefsStore.weightUnit}</span>
 			{:else if typeof set.weight === 'string'}
@@ -70,10 +81,19 @@
 				BW
 			{/if}
 		</span>
-		<span class="set-tile__logged-reps" aria-hidden="true">×{set.reps}</span>
+		<span
+			class="set-tile__logged-reps"
+			aria-hidden="true">×{set.reps}</span
+		>
 	{:else}
-		<span class="set-tile__plus" aria-hidden="true">+</span>
-		<span class="set-tile__set-num" aria-hidden="true">Set {set.setNumber}</span>
+		<span
+			class="set-tile__plus"
+			aria-hidden="true">+</span
+		>
+		<span
+			class="set-tile__set-num"
+			aria-hidden="true">Set {set.setNumber}</span
+		>
 	{/if}
 </button>
 

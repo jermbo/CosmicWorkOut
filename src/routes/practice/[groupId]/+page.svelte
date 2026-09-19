@@ -5,12 +5,21 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { effectiveSections } from '$lib/discipline';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
-	import { practiceGroupById, sessionRouteForProgram, programRouteForDiscipline } from '$lib/practice';
+	import {
+		practiceGroupById,
+		sessionRouteForProgram,
+		programRouteForDiscipline,
+		WORKOUT_GROUP_ID,
+	} from '$lib/practice';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import HomeCard from '$lib/components/HomeCard.svelte';
 	import AddPracticeSheet from '$lib/components/AddPracticeSheet.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	let groupId = $derived(page.params.groupId ?? '');
 	let group = $derived(practiceGroupById(groupId));
@@ -40,7 +49,13 @@
 
 	function planMeta(programId: string) {
 		const program = programStore.programById(programId);
-		if (!program) return { name: 'Plan', meta: null as string | null, done: false, live: false };
+		if (!program)
+			return {
+				name: 'Plan',
+				meta: null as string | null,
+				done: false,
+				live: false,
+			};
 
 		const session = programStore.sessionForProgramDate(programId, contextDate);
 		const suggested = programStore.suggestedRoutineInCurrentWeekForProgram(programId);
@@ -48,7 +63,12 @@
 		const complete = programStore.isProgramCompleteForProgram(programId);
 
 		if (complete && !session) {
-			return { name: 'Program complete!', meta: 'Time for something new.', done: false, live: false };
+			return {
+				name: 'Program complete!',
+				meta: 'Time for something new.',
+				done: false,
+				live: false,
+			};
 		}
 
 		if (session) {
@@ -74,7 +94,12 @@
 			};
 		}
 
-		return { name: program.name, meta: 'No routine scheduled', done: false, live };
+		return {
+			name: program.name,
+			meta: 'No routine scheduled',
+			done: false,
+			live,
+		};
 	}
 </script>
 
@@ -84,19 +109,49 @@
 
 {#if group}
 	<div class="page page--wide group-page">
-		<PageHeader title={group.label} showBack backHref="/practice" />
+		<PageHeader
+			title={group.label}
+			showBack
+			backHref="/practice"
+		/>
 
 		<div class="group-page__toolbar">
-			<button class="group-page__add" type="button" onclick={() => (showAddPractice = true)}> Add plan </button>
-			<a class="group-page__manage" href={resolveHref(programRouteForDiscipline(group.disciplineIds[0]))}>
-				Manage plans
-			</a>
+			<button
+				class="group-page__add"
+				type="button"
+				onclick={() => (showAddPractice = true)}
+			>
+				Add plan
+			</button>
+			<div class="group-page__links">
+				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
+					<a
+						class="group-page__goals"
+						href={resolveHref('/goals')}>Goal plans</a
+					>
+				{/if}
+				<a
+					class="group-page__manage"
+					href={resolveHref(programRouteForDiscipline(group.disciplineIds[0]))}
+				>
+					Manage plans
+				</a>
+			</div>
 		</div>
 
 		{#if activePlans.length === 0}
 			<section class="group-empty">
 				<p>No active plans in {group.label.toLowerCase()} right now.</p>
-				<button type="button" onclick={() => (showAddPractice = true)}>Add a plan</button>
+				<button
+					type="button"
+					onclick={() => (showAddPractice = true)}>Add a plan</button
+				>
+				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
+					<a
+						class="group-empty__goals"
+						href={resolveHref('/goals')}>Or start a goal plan</a
+					>
+				{/if}
 			</section>
 		{:else}
 			<div class="group-page__plans">
@@ -134,13 +189,20 @@
 	</div>
 {:else}
 	<div class="page">
-		<PageHeader title="Practice" showBack backHref="/practice" />
+		<PageHeader
+			title="Practice"
+			showBack
+			backHref="/practice"
+		/>
 		<p class="group-missing">Practice area not found.</p>
 	</div>
 {/if}
 
 {#if showAddPractice && group}
-	<AddPracticeSheet groupId={group.id} onClose={() => (showAddPractice = false)} />
+	<AddPracticeSheet
+		groupId={group.id}
+		onClose={() => (showAddPractice = false)}
+	/>
 {/if}
 
 <style>
@@ -160,6 +222,33 @@
 		color: var(--color-accent-ink);
 		font-size: 0.875rem;
 		font-weight: 700;
+	}
+
+	.group-page__links {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	.group-page__goals {
+		display: inline-flex;
+		align-items: center;
+		block-size: 40px;
+		padding-inline: var(--space-4);
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-strong);
+		background: var(--color-surface-2);
+		color: var(--color-text-primary);
+		font-size: 0.875rem;
+		font-weight: 700;
+		text-decoration: none;
+
+		&:hover {
+			border-color: var(--color-accent);
+			color: var(--color-accent);
+		}
 	}
 
 	.group-page__manage {
@@ -219,6 +308,19 @@
 			margin-block-start: var(--space-4);
 			color: var(--color-accent);
 			font-weight: 700;
+		}
+	}
+
+	.group-empty__goals {
+		display: block;
+		margin-block-start: var(--space-3);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		text-decoration: none;
+
+		&:hover {
+			color: var(--color-accent);
 		}
 	}
 

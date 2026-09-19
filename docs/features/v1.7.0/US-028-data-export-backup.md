@@ -1,10 +1,12 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.7.0](README.md) › US-028
+
 # US-028 — Data Export, Backup & Device Sync
 
 > **Status: Shipped (Phase 1) — v1.7.0**
 >
 > Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
 >
-> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope; `putAllRecords` and `itemLastUsed.getAll` were exposed from `database.ts`. Export/Restore live on `settings/data` — restore is **Replace-only**, validates `format`/`version`, confirms via dialog, then wipes + writes + re-seeds built-ins + reloads. Parse/validation errors surface as toasts and leave data untouched.
+> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. The envelope shape, `parseBackup()`, count verification and the pre-wipe preflight live in `src/lib/db/backupPayload.ts` — kept free of IndexedDB so they can be unit-tested (`backupPayload.test.ts`, 21 tests); `backup.ts` keeps the transaction plumbing. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -21,21 +23,24 @@ The app is client-only ([Design Principles](../../vision/principles.md)). Backup
 
 ## What Gets Backed Up
 
-| Store                    | Technology   | Include in backup? | Notes                                                         |
-| ------------------------ | ------------ | ------------------ | ------------------------------------------------------------- |
-| `items`                  | IndexedDB    | Yes                | User-created / user-edited; built-ins re-seed on boot         |
-| `programs`               | IndexedDB    | Yes                | Same                                                          |
-| `sessions`               | IndexedDB    | Yes                | Core history                                                  |
-| `itemLastUsed`           | IndexedDB    | Yes                | Weight/rep memory                                             |
-| `activities`             | IndexedDB    | Yes                | Activity log                                                  |
-| `habits`                 | IndexedDB    | Yes                | Custom habits + edits to built-ins                            |
-| `habitLogs`              | IndexedDB    | Yes                | Habit history                                                 |
-| `healthReadings`         | IndexedDB    | Yes                | Health metric readings ([US-029](./US-029-health-metrics.md)) |
-| `cwout:prefs`            | localStorage | Optional           | User may choose to include preferences                        |
-| `cwout:activeProgramIds` | localStorage | Yes                | Per-Discipline active program                                 |
-| `cwout:lastActivityType` | localStorage | Yes                | Last-used activity type                                       |
-| `cwout:activeSession`    | localStorage | **No**             | Transient crash-recovery state                                |
-| `cwout:habitDay`         | localStorage | **No**             | Ephemeral UI cache                                            |
+| Store                    | Technology   | Include in backup? | Notes                                                                                             |
+| ------------------------ | ------------ | ------------------ | ------------------------------------------------------------------------------------------------- |
+| `items`                  | IndexedDB    | Yes                | User-created / user-edited; built-ins re-seed on boot                                             |
+| `programs`               | IndexedDB    | Yes                | Same                                                                                              |
+| `sessions`               | IndexedDB    | Yes                | Core history                                                                                      |
+| `itemLastUsed`           | IndexedDB    | Yes                | Weight/rep memory                                                                                 |
+| `activities`             | IndexedDB    | Yes                | Activity log                                                                                      |
+| `habits`                 | IndexedDB    | Yes                | Custom habits + edits to built-ins                                                                |
+| `habitLogs`              | IndexedDB    | Yes                | Habit history                                                                                     |
+| `healthReadings`         | IndexedDB    | Yes                | Health metric readings ([US-029](./US-029-health-metrics.md))                                     |
+| `goalPlans`              | IndexedDB    | Yes                | Lift plans ([US-033](../v1.9.0/US-033-goal-progression-plans.md)) — added when that store shipped |
+| `baselines`              | IndexedDB    | Yes _(planned)_    | Baseline definitions ([US-034](../v1.9.0/US-034-baselines-setup.md)) — include when v1.9.0 ships  |
+| `baselineLogs`           | IndexedDB    | Yes _(planned)_    | Baseline log entries (US-034 / US-035) — include when v1.9.0 ships                                |
+| `cwout:prefs`            | localStorage | Optional           | User may choose to include preferences                                                            |
+| `cwout:activeProgramIds` | localStorage | Yes                | Per-Discipline active program                                                                     |
+| `cwout:lastActivityType` | localStorage | Yes                | Last-used activity type                                                                           |
+| `cwout:activeSession`    | localStorage | **No**             | Transient crash-recovery state                                                                    |
+| `cwout:habitDay`         | localStorage | **No**             | Ephemeral UI cache                                                                                |
 
 Built-in items, programs, and habits ship in code (`src/lib/db/seed.ts`) and are upserted on every boot via `initDB()`. A backup may include built-in records for a complete snapshot, but restore does not depend on them.
 
@@ -82,15 +87,28 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 
 1. Read all IndexedDB stores listed above.
 2. Read selected localStorage keys.
-3. Build envelope → `Blob` → trigger browser download.
-4. Filename pattern: `cosmic-workout-backup-YYYY-MM-DD.json`.
+3. Build envelope → verify JSON round-trip counts → `File` (`cosmic-workout-backup-YYYY-MM-DD.json`).
+4. If the browser can share files, open the **share sheet** (`navigator.share`); user cancel is not an error. Otherwise trigger a normal download.
+5. Typical size after months of use is around **1&nbsp;MB** — fine as an email attachment when Save to Files / AirDrop aren’t convenient.
 
 ### Restore
 
 1. Hidden `<input type="file" accept=".json,application/json">`.
-2. Parse and validate envelope.
+2. Parse and validate envelope (format, version, each store is an array).
 3. Show confirm dialog — restore **replaces** all workout data on this device.
-4. Clear IndexedDB (`clearWorkoutData()`), write imported records, write localStorage keys, call `initDB()` to re-upsert built-ins, reload.
+4. **Stage then commit** (safe for device transfer — months of history must not be wiped on a failed write):
+   1. JSON-flatten the payload (avoids Svelte `$state` Proxy → `DataCloneError`).
+   2. Write every store into a temporary IndexedDB (`cosmic-workout-restore`) and verify record counts.
+   3. Only after staging succeeds: clear live object stores in-place (not `deleteDatabase`), write the same payload, verify live counts.
+   4. Delete the staging DB, restore backed-up localStorage keys, `initDB()` to re-upsert built-ins, reload.
+5. If staging fails, **live data is unchanged**. Keep the backup file until the destination device looks correct.
+
+**Safe device transfer checklist**
+
+1. On the old device: **Export backup**. On a phone, prefer **Save to Files** or **AirDrop** from the share sheet; **Mail to yourself** is fine for ~1&nbsp;MB attachments. Confirm you have the `.json` file.
+2. Open or copy that file on the new device.
+3. On the new device: Restore from backup → confirm replace.
+4. Spot-check history, habits, and active program before deleting the file or wiping the old device.
 
 **Restore modes for v1:**
 
@@ -103,7 +121,7 @@ Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time fi
 ### Requirements (Phase 1)
 
 1. Export
-   a. `/settings/data` shall expose an **Export backup** action that downloads a JSON file.
+   a. `/settings/data` shall expose an **Export backup** action that produces a JSON file via share sheet (when available) or download.
    b. Export shall include all IndexedDB stores in the table above except transient keys.
    c. Export shall succeed offline with no network calls.
 
@@ -128,6 +146,7 @@ Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time fi
 ### Implementation Notes
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
+- Pure payload logic split into `src/lib/db/backupPayload.ts` (2026-09-19) so the restore path is testable without a browser.
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.
 - UI: export / restore on `/settings/data` ([US-030](./US-030-settings-restructure.md)); not on the hub.
 

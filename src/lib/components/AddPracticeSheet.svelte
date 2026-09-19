@@ -1,10 +1,17 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { Program } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { practiceGroupById, practiceGroups } from '$lib/practice';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
+	import { practiceGroupById, practiceGroups, WORKOUT_GROUP_ID } from '$lib/practice';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
 	import CreateProgramSheet from './CreateProgramSheet.svelte';
+	import Chip from './Chip.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		onClose: () => void;
@@ -28,10 +35,13 @@
 
 	let group = $derived(practiceGroupById(groupId));
 	let disciplineId = $derived(group?.disciplineIds[0] ?? '');
+	let showGoalPlans = $derived(prefsStore.liftPlansEnabled && groupId === WORKOUT_GROUP_ID);
 
 	let programs = $derived.by(() => {
 		if (!group) return [] as Program[];
 		let list = programStore.programs.filter((p) => group.disciplineIds.includes(p.disciplineId));
+		// Backing programs for goal plans are managed on /goals — hide them here.
+		list = list.filter((p) => !goalPlanStore.planForProgram(p.id));
 		if (filter === 'mine') list = list.filter((p) => !p.isBuiltIn);
 		if (filter === 'builtin') list = list.filter((p) => p.isBuiltIn);
 		return list;
@@ -42,7 +52,10 @@
 		step = 'plans';
 	}
 
-	function activate(program: Program) {
+	async function activate(program: Program) {
+		// Switching to a course/custom plan pauses any running goal plan.
+		const activeGoal = goalPlanStore.activePlan;
+		if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 		programStore.setActiveProgram(program.id);
 		onClose();
 	}
@@ -52,133 +65,149 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="85dvh">
-	<div class="add-practice">
-		<div class="add-practice__header">
-			<h2 class="add-practice__title">
-				{#if step === 'group'}
-					Add practice
-				{:else}
-					{group?.label ?? 'Plans'}
-				{/if}
-			</h2>
-			<button class="add-practice__close" onclick={onClose} aria-label="Close">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
-			</button>
-		</div>
+<BottomSheet
+	onclose={onClose}
+	maxHeight="85dvh"
+>
+	<SheetBody>
+		<div class="add-practice">
+			<SheetHeader
+				title={step === 'group' ? 'Add practice' : (group?.label ?? 'Plans')}
+				{onClose}
+				tight
+			/>
 
-		{#if step === 'group'}
-			<p class="add-practice__lead">Choose a practice area to browse plans.</p>
-			<div class="add-practice__groups">
-				{#each practiceGroups as g (g.id)}
-					<button class="add-practice__group" onclick={() => pickGroup(g.id)}>
-						<span class="add-practice__group-label">{g.label}</span>
-						<span class="add-practice__group-desc">{g.description}</span>
-					</button>
-				{/each}
-			</div>
-		{:else if group}
-			{#if !initialGroupId}
-				<button class="add-practice__back" type="button" onclick={() => (step = 'group')}> ← All areas </button>
-			{/if}
-
-			<p class="add-practice__lead">Turn plans on or off. History is always kept when you pause.</p>
-
-			<div class="add-practice__filters" role="tablist" aria-label="Plan filter">
-				{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
+			{#if step === 'group'}
+				<p class="add-practice__lead">Choose a practice area to browse plans.</p>
+				<div class="add-practice__groups">
+					{#each practiceGroups as g (g.id)}
+						<button
+							class="add-practice__group"
+							onclick={() => pickGroup(g.id)}
+						>
+							<span class="add-practice__group-label">{g.label}</span>
+							<span class="add-practice__group-desc">{g.description}</span>
+						</button>
+					{/each}
+				</div>
+			{:else if group}
+				{#if !initialGroupId}
 					<button
+						class="add-practice__back"
 						type="button"
-						class="add-practice__filter"
-						class:add-practice__filter--active={filter === value}
-						role="tab"
-						aria-selected={filter === value}
-						onclick={() => (filter = value as Filter)}
+						onclick={() => (step = 'group')}
 					>
-						{label}
+						← All areas
 					</button>
-				{/each}
-			</div>
+				{/if}
 
-			<div class="add-practice__list">
-				{#each programs as program (program.id)}
-					{@const isActive = programStore.isProgramActive(program.id)}
-					<div class="add-practice__row" class:add-practice__row--active={isActive}>
-						<div class="add-practice__row-info">
-							<div class="add-practice__row-name-row">
-								<span class="add-practice__row-name">{program.name}</span>
-								{#if program.isBuiltIn}
-									<span class="add-practice__tag">Built-in</span>
-								{:else}
-									<span class="add-practice__tag add-practice__tag--mine">Mine</span>
-								{/if}
+				{#if showGoalPlans}
+					<button
+						class="add-practice__goal-card"
+						type="button"
+						onclick={() => {
+							onClose();
+							goto(resolve('/goals/new'));
+						}}
+					>
+						<span class="add-practice__goal-card-label">Start a goal plan</span>
+						<span class="add-practice__goal-card-desc">
+							Wave-loading plan toward one lift target — generated from a template.
+						</span>
+					</button>
+				{/if}
+
+				<p class="add-practice__lead">
+					{#if showGoalPlans}
+						Or turn on a course or custom plan. History is kept when you pause.
+					{:else}
+						Turn plans on or off. History is always kept when you pause.
+					{/if}
+				</p>
+
+				<div
+					class="add-practice__filters"
+					role="tablist"
+					aria-label="Plan filter"
+				>
+					{#each [['all', 'All'], ['mine', 'Mine'], ['builtin', 'Built-in']] as [value, label] (value)}
+						<Chip
+							select="tab"
+							active={filter === value}
+							onclick={() => (filter = value as Filter)}
+						>
+							{label}
+						</Chip>
+					{/each}
+				</div>
+
+				<div class="add-practice__list">
+					{#each programs as program (program.id)}
+						{@const isActive = programStore.isProgramActive(program.id)}
+						<div
+							class="add-practice__row"
+							class:add-practice__row--active={isActive}
+						>
+							<div class="add-practice__row-info">
+								<div class="add-practice__row-name-row">
+									<span class="add-practice__row-name">{program.name}</span>
+									{#if program.isBuiltIn}
+										<span class="add-practice__tag">Built-in</span>
+									{:else}
+										<span class="add-practice__tag add-practice__tag--mine">Mine</span>
+									{/if}
+								</div>
+								<span class="add-practice__row-meta">
+									{program.durationWeeks} wk · {program.daysPerWeek}×/wk
+								</span>
 							</div>
-							<span class="add-practice__row-meta">
-								{program.durationWeeks} wk · {program.daysPerWeek}×/wk
-							</span>
+							{#if isActive}
+								<button
+									class="add-practice__pause"
+									type="button"
+									onclick={() => pause(program)}>Pause</button
+								>
+							{:else}
+								<button
+									class="add-practice__activate"
+									type="button"
+									onclick={() => activate(program)}
+								>
+									Activate
+								</button>
+							{/if}
 						</div>
-						{#if isActive}
-							<button class="add-practice__pause" type="button" onclick={() => pause(program)}>Pause</button>
-						{:else}
-							<button class="add-practice__activate" type="button" onclick={() => activate(program)}> Activate </button>
-						{/if}
-					</div>
-				{:else}
-					<p class="add-practice__empty">No plans match this filter.</p>
-				{/each}
-			</div>
+					{:else}
+						<p class="add-practice__empty">No plans match this filter.</p>
+					{/each}
+				</div>
 
-			<div class="add-practice__footer">
-				<button class="add-practice__create" type="button" onclick={() => (createDisciplineId = disciplineId)}>
-					Create new plan
-				</button>
-			</div>
-		{/if}
-	</div>
+				<div class="add-practice__footer">
+					<button
+						class="add-practice__create"
+						type="button"
+						onclick={() => (createDisciplineId = disciplineId)}
+					>
+						Create custom plan
+					</button>
+				</div>
+			{/if}
+		</div>
+	</SheetBody>
 </BottomSheet>
 
 {#if createDisciplineId}
-	<CreateProgramSheet disciplineId={createDisciplineId} onClose={() => (createDisciplineId = null)} />
+	<CreateProgramSheet
+		disciplineId={createDisciplineId}
+		onClose={() => (createDisciplineId = null)}
+	/>
 {/if}
 
 <style>
 	.add-practice {
 		display: flex;
 		flex-direction: column;
-		padding-block-start: var(--space-2);
 		min-block-size: 200px;
-	}
-
-	.add-practice__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-3);
-	}
-
-	.add-practice__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.add-practice__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
 	}
 
 	.add-practice__lead {
@@ -186,6 +215,36 @@
 		font-size: 0.9375rem;
 		color: var(--color-text-secondary);
 		margin-block-end: var(--space-4);
+	}
+
+	.add-practice__goal-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-1);
+		margin-inline: var(--space-5);
+		margin-block-end: var(--space-4);
+		padding: var(--space-4) var(--space-5);
+		border-radius: var(--r-xl);
+		border: 1px solid var(--color-accent);
+		background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-2));
+		text-align: start;
+
+		&:hover {
+			background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface-2));
+		}
+	}
+
+	.add-practice__goal-card-label {
+		font-size: 1.0625rem;
+		font-weight: 700;
+		color: var(--color-text-primary);
+	}
+
+	.add-practice__goal-card-desc {
+		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
+		line-height: 1.4;
 	}
 
 	.add-practice__groups {
@@ -236,23 +295,6 @@
 		gap: var(--space-2);
 		padding-inline: var(--space-5);
 		margin-block-end: var(--space-3);
-	}
-
-	.add-practice__filter {
-		padding-inline: var(--space-3);
-		block-size: 32px;
-		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-	}
-
-	.add-practice__filter--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.add-practice__list {
@@ -355,6 +397,9 @@
 	}
 
 	.add-practice__footer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
 		padding: var(--space-4) var(--space-5);
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
 	}

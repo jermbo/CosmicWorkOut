@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.4.0](README.md) › US-016
+
 # US-016 — Item Library (Discipline-scoped)
 
 > **Status: Shipped — v1.4.0**

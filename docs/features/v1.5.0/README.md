@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.5.0
+
 # v1.5.0 — Data Insights & Visualization
 
 This version adds the first analytics layer to CosmicWorkOut — an **Insights** page that surfaces patterns across workout sessions, activities, and habits using Chart.js charts. The goal is to make the data the app already collects feel meaningful and motivating.
@@ -37,14 +39,14 @@ The charts don't introduce new data — they reveal patterns in what you're alre
 
 Implement in order — US-022 (hub + nav) must land first; charts can be built in parallel after.
 
-| ID                                             | Title                         | Status  | Depends on |
-| ---------------------------------------------- | ----------------------------- | ------- | ---------- |
-| [US-022](./US-022-insights-hub.md)             | Insights Hub & Navigation     | Done    | —          |
-| [US-023](./US-023-mood-habits-chart.md)        | Mood vs Coffee & Water Chart  | Done    | US-022     |
-| [US-024](./US-024-weekly-volume-chart.md)      | Weekly Training Volume Chart  | Done    | US-022     |
-| [US-025](./US-025-activity-breakdown-chart.md) | Activity Type Breakdown Chart | Done    | US-022     |
-| [US-026](./US-026-habit-radar-chart.md)        | Habit Balance Radar Chart     | Done    | US-022     |
-| [US-027](./US-027-exercise-progress-chart.md)  | Top Exercise Progress Chart   | Done    | US-022     |
+| ID                                             | Title                         | Status | Depends on |
+| ---------------------------------------------- | ----------------------------- | ------ | ---------- |
+| [US-022](./US-022-insights-hub.md)             | Insights Hub & Navigation     | Done   | —          |
+| [US-023](./US-023-mood-habits-chart.md)        | Mood vs Coffee & Water Chart  | Done   | US-022     |
+| [US-024](./US-024-weekly-volume-chart.md)      | Weekly Training Volume Chart  | Done   | US-022     |
+| [US-025](./US-025-activity-breakdown-chart.md) | Activity Type Breakdown Chart | Done   | US-022     |
+| [US-026](./US-026-habit-radar-chart.md)        | Habit Balance Radar Chart     | Done   | US-022     |
+| [US-027](./US-027-exercise-progress-chart.md)  | Top Exercise Progress Chart   | Done   | US-022     |
 
 ---
 
@@ -57,3 +59,15 @@ Implement in order — US-022 (hub + nav) must land first; charts can be built i
 ## Out of Scope for v1.5.0
 
 Deferred items are on the [roadmap](../../roadmap/README.md) (chart interactivity, per-discipline filtering, activity distance/pace, nutrition).
+
+---
+
+## Related
+
+- [Map — History & Insights](../../map-history-and-insights.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [v1.4.0](../v1.4.0/README.md) — adjacent release
+- [v1.6.0](../v1.6.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

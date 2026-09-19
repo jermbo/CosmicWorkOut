@@ -4,6 +4,10 @@
 	import { STRENGTH_CATS } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
+	import Chip from './Chip.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	const CATS: ItemCat[] = [...STRENGTH_CATS];
 	const UNITS: WeightUnit[] = ['lb', 'kg', 'bodyweight', 'band'];
@@ -92,26 +96,15 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="92dvh">
-	<div class="ex-form">
-		<div class="ex-form__header">
-			<h2 class="ex-form__title">
-				{#if exercise}Edit Exercise{:else}New Exercise{/if}
-			</h2>
-			<button class="ex-form__close" onclick={onClose} aria-label="Close">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
-			</button>
-		</div>
+<BottomSheet
+	onclose={onClose}
+	maxHeight="92dvh"
+>
+	<SheetBody>
+		<SheetHeader
+			title={exercise ? 'Edit Exercise' : 'New Exercise'}
+			{onClose}
+		/>
 
 		<form
 			class="ex-form__body"
@@ -120,8 +113,11 @@
 				handleSave();
 			}}
 		>
-			<div class="form-field" class:form-field--error={errors.name}>
-				<label class="form-field__label" for="ex-name">Name</label>
+			<div
+				class="form-field"
+				class:form-field--error={errors.name}
+			>
+				<FieldLabel for="ex-name">Name</FieldLabel>
 				<input
 					id="ex-name"
 					class="form-field__input"
@@ -134,8 +130,9 @@
 			</div>
 
 			<div class="form-field">
-				<label class="form-field__label" for="ex-cue"
-					>Coaching cue <span class="form-field__optional">optional</span></label
+				<FieldLabel
+					for="ex-cue"
+					hint="optional">Coaching cue</FieldLabel
 				>
 				<input
 					id="ex-cue"
@@ -147,8 +144,11 @@
 				/>
 			</div>
 
-			<div class="form-field" class:form-field--error={errors.muscles}>
-				<label class="form-field__label" for="ex-muscles">Muscles worked</label>
+			<div
+				class="form-field"
+				class:form-field--error={errors.muscles}
+			>
+				<FieldLabel for="ex-muscles">Muscles worked</FieldLabel>
 				<input
 					id="ex-muscles"
 					class="form-field__input"
@@ -161,16 +161,17 @@
 			</div>
 
 			<div class="form-field">
-				<span class="form-field__label" id="ex-cat-label">Category</span>
-				<div class="cat-chips" role="radiogroup" aria-labelledby="ex-cat-label">
+				<FieldLabel id="ex-cat-label">Category</FieldLabel>
+				<div
+					class="cat-chips"
+					role="radiogroup"
+					aria-labelledby="ex-cat-label"
+				>
 					{#each CATS as c (c)}
-						<button
-							type="button"
-							class="cat-chip"
-							class:cat-chip--active={cat === c}
-							role="radio"
-							aria-checked={cat === c}
-							onclick={() => (cat = c)}>{c}</button
+						<Chip
+							select="radio"
+							active={cat === c}
+							onclick={() => (cat = c)}>{c}</Chip
 						>
 					{/each}
 				</div>
@@ -178,8 +179,12 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<span class="form-field__label" id="ex-unit-label">Weight type</span>
-					<div class="seg-control" role="radiogroup" aria-labelledby="ex-unit-label">
+					<FieldLabel id="ex-unit-label">Weight type</FieldLabel>
+					<div
+						class="seg-control"
+						role="radiogroup"
+						aria-labelledby="ex-unit-label"
+					>
 						{#each UNITS as u (u)}
 							<button
 								type="button"
@@ -196,7 +201,7 @@
 
 			<div class="form-row">
 				<div class="form-field">
-					<label class="form-field__label" for="ex-sets">Default sets</label>
+					<FieldLabel for="ex-sets">Default sets</FieldLabel>
 					<div class="stepper">
 						<button
 							type="button"
@@ -216,15 +221,25 @@
 					</div>
 				</div>
 				<div class="form-field">
-					<label class="form-field__label" for="ex-reps">Default reps</label>
-					<input id="ex-reps" class="form-field__input" type="text" bind:value={defaultReps} placeholder="e.g. 8-10" />
+					<FieldLabel for="ex-reps">Default reps</FieldLabel>
+					<input
+						id="ex-reps"
+						class="form-field__input"
+						type="text"
+						bind:value={defaultReps}
+						placeholder="e.g. 8-10"
+					/>
 				</div>
 			</div>
 
 			{#if unit === 'lb' || unit === 'kg'}
 				<div class="form-field">
-					<span class="form-field__label" id="ex-increment-label">Weight increment ({unit})</span>
-					<div class="seg-control" role="radiogroup" aria-labelledby="ex-increment-label">
+					<FieldLabel id="ex-increment-label">Weight increment ({unit})</FieldLabel>
+					<div
+						class="seg-control"
+						role="radiogroup"
+						aria-labelledby="ex-increment-label"
+					>
 						{#each WEIGHT_INCREMENTS as inc (inc)}
 							<button
 								type="button"
@@ -239,50 +254,19 @@
 				</div>
 			{/if}
 
-			<button type="submit" class="ex-form__submit" disabled={saving} aria-busy={saving}>
+			<button
+				type="submit"
+				class="ex-form__submit"
+				disabled={saving}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if exercise}Save changes{:else}Add exercise{/if}
 			</button>
 		</form>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>
-	.ex-form {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.ex-form__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.ex-form__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-	}
-
-	.ex-form__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.ex-form__body {
 		display: flex;
 		flex-direction: column;
@@ -299,21 +283,6 @@
 
 	.form-field--error .form-field__input {
 		border-color: var(--color-red);
-	}
-
-	.form-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.form-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.form-field__input {
@@ -345,26 +314,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-	}
-
-	.cat-chip {
-		padding-inline: var(--space-3);
-		block-size: 32px;
-		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
-		transition:
-			background-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
-	}
-
-	.cat-chip--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.form-row {

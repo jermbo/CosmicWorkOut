@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [30k — Vision](../README.md#30k--vision) › Design Principles
+
 # Design Principles
 
 These principles are derived from the [North Star](north-star.md). When a product or technical decision is unclear, test it against these.

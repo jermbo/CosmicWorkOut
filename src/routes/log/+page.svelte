@@ -4,6 +4,10 @@
 	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import { formatActivitySummary } from '$lib/activities';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.activityLogEnabled);
 
 	let contextDate = $derived(loggingContext.date);
 
@@ -37,9 +41,15 @@
 </svelte:head>
 
 <div class="page log-page">
-	<PageHeader title="Activity" showBack />
+	<PageHeader
+		title="Activity"
+		showBack
+	/>
 
-	<button class="log-page__add-btn" onclick={openNew}>
+	<button
+		class="log-page__add-btn"
+		onclick={openNew}
+	>
 		<svg
 			viewBox="0 0 24 24"
 			fill="none"
@@ -48,8 +58,18 @@
 			stroke-linecap="round"
 			aria-hidden="true"
 		>
-			<line x1="12" y1="5" x2="12" y2="19" />
-			<line x1="5" y1="12" x2="19" y2="12" />
+			<line
+				x1="12"
+				y1="5"
+				x2="12"
+				y2="19"
+			/>
+			<line
+				x1="5"
+				y1="12"
+				x2="19"
+				y2="12"
+			/>
 		</svg>
 		Log Activity
 	</button>
@@ -62,10 +82,15 @@
 		<ul class="activity-list">
 			{#each dateActivities as activity (activity.id)}
 				<li>
-					<button class="activity-item" onclick={() => openEdit(activity)} aria-label="Edit: {chipLabel(activity)}">
+					<button
+						class="activity-item"
+						onclick={() => openEdit(activity)}
+						aria-label="Edit: {chipLabel(activity)}"
+					>
 						<div class="activity-item__info">
 							<span class="activity-item__name">
-								{#if activity.type === 'Other'}{activity.customType || 'Other'}{:else}{activity.type}{/if}
+								{#if activity.type === 'Other'}{activity.customType ||
+										'Other'}{:else}{activity.type}{/if}
 							</span>
 							<span class="activity-item__meta">
 								{formatActivitySummary(activity)}

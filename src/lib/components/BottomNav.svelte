@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 
 	let { pathname }: { pathname: string } = $props();
 
-	const navItems = [
+	const ALL_NAV_ITEMS = [
 		{ href: '/', label: 'Overview', exact: true },
 		{ href: '/practice', label: 'Practice', exact: false },
 		{ href: '/calendar', label: 'History', exact: false },
@@ -11,7 +12,11 @@
 		{ href: '/settings', label: 'Settings', exact: false },
 	] as const;
 
-	function isActive(item: (typeof navItems)[number]): boolean {
+	let navItems = $derived(
+		ALL_NAV_ITEMS.filter((item) => item.href !== '/practice' || prefsStore.practiceEnabled),
+	);
+
+	function isActive(item: (typeof ALL_NAV_ITEMS)[number]): boolean {
 		if (item.href === '/practice') {
 			return pathname.startsWith('/practice') || pathname.startsWith('/workout');
 		}
@@ -21,14 +26,20 @@
 		return pathname.startsWith(item.href);
 	}
 
-	function ariaCurrentFor(item: (typeof navItems)[number]): 'page' | undefined {
+	function ariaCurrentFor(item: (typeof ALL_NAV_ITEMS)[number]): 'page' | undefined {
 		if (isActive(item)) return 'page';
 		return undefined;
 	}
 </script>
 
-<nav class="bottom-nav" aria-label="Main navigation">
-	<ul class="bottom-nav__list" role="list">
+<nav
+	class="bottom-nav"
+	aria-label="Main navigation"
+>
+	<ul
+		class="bottom-nav__list"
+		role="list"
+	>
 		{#each navItems as item (item.href)}
 			<li class="bottom-nav__item">
 				<a
@@ -74,10 +85,32 @@
 							stroke-linecap="round"
 							stroke-linejoin="round"
 						>
-							<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-							<line x1="16" y1="2" x2="16" y2="6" />
-							<line x1="8" y1="2" x2="8" y2="6" />
-							<line x1="3" y1="10" x2="21" y2="10" />
+							<rect
+								x="3"
+								y="4"
+								width="18"
+								height="18"
+								rx="2"
+								ry="2"
+							/>
+							<line
+								x1="16"
+								y1="2"
+								x2="16"
+								y2="6"
+							/>
+							<line
+								x1="8"
+								y1="2"
+								x2="8"
+								y2="6"
+							/>
+							<line
+								x1="3"
+								y1="10"
+								x2="21"
+								y2="10"
+							/>
 						</svg>
 					{:else if item.label === 'Insights'}
 						<svg
@@ -90,9 +123,24 @@
 							stroke-linecap="round"
 							stroke-linejoin="round"
 						>
-							<line x1="18" y1="20" x2="18" y2="10" />
-							<line x1="12" y1="20" x2="12" y2="4" />
-							<line x1="6" y1="20" x2="6" y2="14" />
+							<line
+								x1="18"
+								y1="20"
+								x2="18"
+								y2="10"
+							/>
+							<line
+								x1="12"
+								y1="20"
+								x2="12"
+								y2="4"
+							/>
+							<line
+								x1="6"
+								y1="20"
+								x2="6"
+								y2="14"
+							/>
 						</svg>
 					{:else}
 						<svg
@@ -105,7 +153,11 @@
 							stroke-linecap="round"
 							stroke-linejoin="round"
 						>
-							<circle cx="12" cy="12" r="3" />
+							<circle
+								cx="12"
+								cy="12"
+								r="3"
+							/>
 							<path
 								d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
 							/>

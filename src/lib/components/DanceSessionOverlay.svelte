@@ -12,7 +12,10 @@
 	let showAbandonConfirm = $state(false);
 	let elapsed = $state(0);
 	let sectionIdx = $state(0);
-	let measureTarget = $state<{ itemIndex: number; mode: 'duration' | 'reps' } | null>(null);
+	let measureTarget = $state<{
+		itemIndex: number;
+		mode: 'duration' | 'reps';
+	} | null>(null);
 	let timerInterval: ReturnType<typeof setInterval>;
 
 	onMount(() => {
@@ -34,9 +37,18 @@
 
 	let sectionItems = $derived.by(() => {
 		const key = currentSection?.key;
-		if (!key) return [] as Array<{ item: ActiveItem; index: number; def: Item | undefined }>;
+		if (!key)
+			return [] as Array<{
+				item: ActiveItem;
+				index: number;
+				def: Item | undefined;
+			}>;
 		return activeItems
-			.map((item, index) => ({ item, index, def: programStore.getItemById(item.itemId) }))
+			.map((item, index) => ({
+				item,
+				index,
+				def: programStore.getItemById(item.itemId),
+			}))
 			.filter(({ item }) => item.section === key);
 	});
 
@@ -104,11 +116,24 @@
 	}
 </script>
 
-<BottomSheet onclose={handleAbandonRequest} maxHeight="100dvh" hideHandle fixedHeight>
-	<div class="dance-session" aria-labelledby="dance-session-title" aria-modal="true">
+<BottomSheet
+	onclose={handleAbandonRequest}
+	maxHeight="100dvh"
+	hideHandle
+	fixedHeight
+>
+	<div
+		class="dance-session"
+		aria-labelledby="dance-session-title"
+		aria-modal="true"
+	>
 		<header class="dance-session__header">
 			<div class="dance-session__top">
-				<button class="dance-session__back" onclick={handleAbandonRequest} aria-label="End session">
+				<button
+					class="dance-session__back"
+					onclick={handleAbandonRequest}
+					aria-label="End session"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -121,7 +146,12 @@
 					</svg>
 				</button>
 				<div class="dance-session__titles">
-					<p class="dance-session__name" id="dance-session-title">{sessionStore.activeRoutineName}</p>
+					<p
+						class="dance-session__name"
+						id="dance-session-title"
+					>
+						{sessionStore.activeRoutineName}
+					</p>
 					<p class="dance-session__context">
 						{#if isEditing}
 							Editing · {formatCountWithWord(doneItems, 'item')} logged
@@ -130,7 +160,10 @@
 						{/if}
 					</p>
 				</div>
-				<div class="dance-session__timer" aria-label="Elapsed time {elapsedFormatted}">
+				<div
+					class="dance-session__timer"
+					aria-label="Elapsed time {elapsedFormatted}"
+				>
 					<span class="dance-session__timer-label">Elapsed</span>
 					<span class="dance-session__timer-value">{elapsedFormatted}</span>
 				</div>
@@ -142,9 +175,16 @@
 				aria-valuemin={0}
 				aria-valuemax={totalItems}
 			>
-				<div class="dance-session__progress-fill" style:inline-size="{progressPct}%"></div>
+				<div
+					class="dance-session__progress-fill"
+					style:inline-size="{progressPct}%"
+				></div>
 			</div>
-			<div class="dance-session__sections" role="tablist" aria-label="Routine sections">
+			<div
+				class="dance-session__sections"
+				role="tablist"
+				aria-label="Routine sections"
+			>
 				{#each sections as section, i (section.key)}
 					<button
 						class="dance-session__sec-tab"
@@ -162,7 +202,10 @@
 		<div class="dance-session__items">
 			{#each sectionItems as { item, index, def } (item.itemId)}
 				{#if def}
-					<div class="dance-item" class:dance-item--done={isItemDone(item)}>
+					<div
+						class="dance-item"
+						class:dance-item--done={isItemDone(item)}
+					>
 						{#if item.metric === 'check'}
 							<label class="dance-item__check">
 								<input
@@ -205,7 +248,10 @@
 									>
 										Reps
 									</button>
-									<button class="dance-item__skip" onclick={() => sessionStore.skipItem(index)}>Skip</button>
+									<button
+										class="dance-item__skip"
+										onclick={() => sessionStore.skipItem(index)}>Skip</button
+									>
 								</div>
 							</div>
 						{/if}
@@ -216,7 +262,10 @@
 
 		<div class="dance-session__footer">
 			<div class="dance-session__nav">
-				<button class="dance-session__nav-btn" disabled={sectionIdx === 0} onclick={() => sectionIdx--}>Previous</button
+				<button
+					class="dance-session__nav-btn"
+					disabled={sectionIdx === 0}
+					onclick={() => sectionIdx--}>Previous</button
 				>
 				<button
 					class="dance-session__nav-btn"
@@ -226,7 +275,11 @@
 					Next
 				</button>
 			</div>
-			<button class="dance-session__finish" class:dance-session__finish--all-done={allDone} onclick={handleFinish}>
+			<button
+				class="dance-session__finish"
+				class:dance-session__finish--all-done={allDone}
+				onclick={handleFinish}
+			>
 				{#if isEditing}
 					Save changes
 				{:else if allDone}

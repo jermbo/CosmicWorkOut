@@ -1,6 +1,19 @@
-import type { Item, Program, Session, ItemLastUsed, ActivityLog, Habit, HabitLog, HealthReading } from './types';
+import type {
+	Item,
+	Program,
+	Session,
+	ItemLastUsed,
+	ActivityLog,
+	Habit,
+	HabitLog,
+	HealthReading,
+	Baseline,
+	BaselineLog,
+} from './types';
+import type { GoalPlan } from '$lib/goalPlans/types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';
+import { generateGoalPlanSampleData } from '$lib/goalPlans/sampleData';
 import { toastStore } from '$lib/stores/toast.svelte';
 
 function reportWriteError(error: unknown): void {
@@ -9,57 +22,102 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 8;
+const DB_VERSION = 10;
+
+/** Every IndexedDB object store — keep in sync with onupgradeneeded. */
+export const ALL_STORE_NAMES = [
+	'items',
+	'programs',
+	'sessions',
+	'itemLastUsed',
+	'activities',
+	'habits',
+	'habitLogs',
+	'healthReadings',
+	'goalPlans',
+	'baselines',
+	'baselineLogs',
+] as const;
 
 let dbInstance: IDBDatabase | null = null;
+/** In-flight open — prevents leaked connections when callers race before dbInstance is set. */
+let opening: Promise<IDBDatabase> | null = null;
 
 function openDB(): Promise<IDBDatabase> {
-	if (dbInstance) {
-		return Promise.resolve(dbInstance);
-	}
+	if (dbInstance) return Promise.resolve(dbInstance);
+	if (opening) return opening;
 
-	return new Promise((resolve, reject) => {
+	opening = new Promise((resolve, reject) => {
 		const request = indexedDB.open(DB_NAME, DB_VERSION);
 
 		request.onupgradeneeded = (event) => {
-			const db = (event.target as IDBOpenDBRequest).result;
+			const req = event.target as IDBOpenDBRequest;
+			const db = req.result;
+			const tx = req.transaction!;
 
-			for (const name of Array.from(db.objectStoreNames)) {
-				db.deleteObjectStore(name);
-			}
+			// Idempotent, non-destructive migration: create only stores/indexes that
+			// don't already exist so bumping DB_VERSION never wipes user data.
+			// Future schema changes append new ensureStore/ensureIndex calls (and
+			// data transforms keyed on event.oldVersion when needed).
+			const ensureStore = (name: string, opts: IDBObjectStoreParameters): IDBObjectStore =>
+				db.objectStoreNames.contains(name)
+					? tx.objectStore(name)
+					: db.createObjectStore(name, opts);
 
-			db.createObjectStore('items', { keyPath: 'id' });
+			const ensureIndex = (store: IDBObjectStore, name: string, keyPath: string): void => {
+				if (!store.indexNames.contains(name)) store.createIndex(name, keyPath);
+			};
 
-			db.createObjectStore('programs', { keyPath: 'id' });
+			ensureStore('items', { keyPath: 'id' });
 
-			const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
-			sessionStore.createIndex('by_date', 'date');
+			ensureStore('programs', { keyPath: 'id' });
 
-			db.createObjectStore('itemLastUsed', { keyPath: 'itemId' });
+			const sessionStore = ensureStore('sessions', { keyPath: 'id' });
+			ensureIndex(sessionStore, 'by_date', 'date');
 
-			const actStore = db.createObjectStore('activities', { keyPath: 'id' });
-			actStore.createIndex('by_date', 'date');
+			ensureStore('itemLastUsed', { keyPath: 'itemId' });
 
-			db.createObjectStore('habits', { keyPath: 'id' });
+			const actStore = ensureStore('activities', { keyPath: 'id' });
+			ensureIndex(actStore, 'by_date', 'date');
 
-			const hlStore = db.createObjectStore('habitLogs', { keyPath: 'id' });
-			hlStore.createIndex('by_date', 'date');
-			hlStore.createIndex('by_habit', 'habitId');
+			ensureStore('habits', { keyPath: 'id' });
 
-			const hrStore = db.createObjectStore('healthReadings', { keyPath: 'id' });
-			hrStore.createIndex('by_date', 'date');
-			hrStore.createIndex('by_metric', 'metricId');
+			const hlStore = ensureStore('habitLogs', { keyPath: 'id' });
+			ensureIndex(hlStore, 'by_date', 'date');
+			ensureIndex(hlStore, 'by_habit', 'habitId');
+
+			const hrStore = ensureStore('healthReadings', { keyPath: 'id' });
+			ensureIndex(hrStore, 'by_date', 'date');
+			ensureIndex(hrStore, 'by_metric', 'metricId');
+
+			const gpStore = ensureStore('goalPlans', { keyPath: 'id' });
+			ensureIndex(gpStore, 'by_status', 'status');
+
+			ensureStore('baselines', { keyPath: 'id' });
+
+			const blStore = ensureStore('baselineLogs', { keyPath: 'id' });
+			ensureIndex(blStore, 'by_date', 'date');
+			ensureIndex(blStore, 'by_baseline', 'baselineId');
 		};
 
 		request.onsuccess = (event) => {
-			dbInstance = (event.target as IDBOpenDBRequest).result;
-			resolve(dbInstance);
+			const db = (event.target as IDBOpenDBRequest).result;
+			db.onversionchange = () => {
+				db.close();
+				if (dbInstance === db) dbInstance = null;
+			};
+			dbInstance = db;
+			opening = null;
+			resolve(db);
 		};
 
 		request.onerror = (event) => {
+			opening = null;
 			reject((event.target as IDBOpenDBRequest).error);
 		};
 	});
+
+	return opening;
 }
 
 async function getAll<T>(storeName: string): Promise<T[]> {
@@ -101,19 +159,53 @@ async function putRecord<T>(storeName: string, value: T): Promise<void> {
 	});
 }
 
-export async function putAllRecords<T>(storeName: string, values: T[]): Promise<void> {
+export async function putAllRecords<T>(
+	storeName: string,
+	values: T[],
+	opts?: { silent?: boolean },
+): Promise<void> {
 	const db = await openDB();
 	return new Promise((resolve, reject) => {
 		const tx = db.transaction(storeName, 'readwrite');
 		const store = tx.objectStore(storeName);
+		let settled = false;
 		tx.oncomplete = () => resolve();
 		tx.onerror = () => {
-			reportWriteError(tx.error);
+			if (settled) return;
+			settled = true;
+			if (!opts?.silent) reportWriteError(tx.error);
+			else console.error('[idb] write failed:', storeName, tx.error);
 			reject(tx.error);
 		};
-		for (const value of values) {
-			store.put(value);
+		for (let i = 0; i < values.length; i++) {
+			try {
+				store.put(values[i]);
+			} catch (err) {
+				settled = true;
+				const row = values[i] as { id?: unknown; itemId?: unknown };
+				const key = row?.id ?? row?.itemId ?? i;
+				const message = `IndexedDB put failed in "${storeName}" (index ${i}, key ${String(key)}): ${err instanceof Error ? err.message : String(err)}`;
+				console.error(`[idb] ${message}`, values[i]);
+				try {
+					tx.abort();
+				} catch {
+					/* already failing */
+				}
+				reject(new Error(message, { cause: err }));
+				return;
+			}
 		}
+	});
+}
+
+/** Count records in a live store without loading them. */
+export async function countRecords(storeName: string): Promise<number> {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeName, 'readonly');
+		const request = tx.objectStore(storeName).count();
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
 	});
 }
 
@@ -132,18 +224,23 @@ async function removeRecord(storeName: string, key: string): Promise<void> {
 	});
 }
 
+/**
+ * Wipe every object store without deleting the database.
+ * Prefer this over `deleteDatabase` — an open connection (this tab) blocks deletion
+ * and was causing backup restore to fail with a generic mid-write error.
+ */
 export async function clearWorkoutData(): Promise<void> {
-	if (dbInstance) {
-		dbInstance.close();
-		dbInstance = null;
-	}
-
+	const db = await openDB();
 	return new Promise((resolve, reject) => {
-		const request = indexedDB.deleteDatabase(DB_NAME);
-		request.onsuccess = () => resolve();
-		request.onerror = () => reject(request.error);
-		request.onblocked = () =>
-			reject(new Error('Database deletion blocked — close other CosmicWorkOut tabs and try again'));
+		const tx = db.transaction([...ALL_STORE_NAMES], 'readwrite');
+		for (const name of ALL_STORE_NAMES) {
+			tx.objectStore(name).clear();
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
 	});
 }
 
@@ -183,12 +280,35 @@ async function clearNonBuiltIn(storeName: string): Promise<void> {
 }
 
 export async function loadDebugSeedData(): Promise<void> {
-	const { sessions, activities, habitLogs, healthReadings } = generateDebugSeedData();
+	const { sessions, activities, habitLogs, healthReadings, baselines, baselineLogs } =
+		generateDebugSeedData();
 	await putAllRecords('sessions', sessions);
 	await putAllRecords('activities', activities);
 	await putAllRecords('habitLogs', habitLogs);
 	await putAllRecords('healthReadings', healthReadings);
+	await putAllRecords('baselines', baselines);
+	await putAllRecords('baselineLogs', baselineLogs);
+
+	const goalSample = generateGoalPlanSampleData();
+	await putAllRecords('goalPlans', goalSample.goalPlans);
+	await putAllRecords('programs', goalSample.programs);
+	await putAllRecords('sessions', goalSample.sessions);
+	activateSeededProgram(goalSample.activeProgramId);
+
 	location.reload();
+}
+
+/** Add a seeded program to the active list so it shows up on Practice/Workout. */
+function activateSeededProgram(programId: string): void {
+	try {
+		const raw = localStorage.getItem('cwout:activeProgramIds');
+		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
+		if (Array.isArray(ids) && !ids.includes(programId)) {
+			localStorage.setItem('cwout:activeProgramIds', JSON.stringify([...ids, programId]));
+		}
+	} catch {
+		localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
+	}
 }
 
 export async function clearCustomExercises(): Promise<void> {
@@ -197,7 +317,27 @@ export async function clearCustomExercises(): Promise<void> {
 }
 
 export async function clearCustomPrograms(): Promise<void> {
-	await clearNonBuiltIn('programs');
+	const [programs, plans] = await Promise.all([
+		getAll<{ id: string; isBuiltIn: boolean }>('programs'),
+		getAll<{ programId: string }>('goalPlans'),
+	]);
+	const goalProgramIds = new Set(plans.map((p) => p.programId));
+	const customIds = programs
+		.filter((r) => !r.isBuiltIn && !goalProgramIds.has(r.id))
+		.map((r) => r.id);
+	if (customIds.length > 0) {
+		const db = await openDB();
+		await new Promise<void>((resolve, reject) => {
+			const tx = db.transaction('programs', 'readwrite');
+			const store = tx.objectStore('programs');
+			for (const id of customIds) store.delete(id);
+			tx.oncomplete = () => resolve();
+			tx.onerror = () => {
+				reportWriteError(tx.error);
+				reject(tx.error);
+			};
+		});
+	}
 	location.reload();
 }
 
@@ -221,6 +361,46 @@ export async function clearHabitsData(): Promise<void> {
 
 export async function clearHealthData(): Promise<void> {
 	await clearStores(['healthReadings']);
+	location.reload();
+}
+
+export async function clearBaselinesData(): Promise<void> {
+	await clearStores(['baselines', 'baselineLogs']);
+	location.reload();
+}
+
+export async function clearGoalPlansData(): Promise<void> {
+	const plans = await getAll<{ programId: string }>('goalPlans');
+	const programIds = plans.map((p) => p.programId);
+	const db = await openDB();
+	await new Promise<void>((resolve, reject) => {
+		const storeNames = programIds.length > 0 ? ['goalPlans', 'programs'] : ['goalPlans'];
+		const tx = db.transaction(storeNames, 'readwrite');
+		tx.objectStore('goalPlans').clear();
+		if (programIds.length > 0) {
+			const programs = tx.objectStore('programs');
+			for (const id of programIds) programs.delete(id);
+		}
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => {
+			reportWriteError(tx.error);
+			reject(tx.error);
+		};
+	});
+	// Drop backing programs from the active list if they were running.
+	try {
+		const raw = localStorage.getItem('cwout:activeProgramIds');
+		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
+		if (Array.isArray(ids) && programIds.length > 0) {
+			const drop = new Set(programIds);
+			localStorage.setItem(
+				'cwout:activeProgramIds',
+				JSON.stringify(ids.filter((id) => !drop.has(id))),
+			);
+		}
+	} catch {
+		/* ignore */
+	}
 	location.reload();
 }
 
@@ -314,5 +494,24 @@ export const db = {
 		getAll: () => getAll<HealthReading>('healthReadings'),
 		put: (reading: HealthReading) => putRecord('healthReadings', reading),
 		remove: (id: string) => removeRecord('healthReadings', id),
+	},
+
+	goalPlans: {
+		getAll: () => getAll<GoalPlan>('goalPlans'),
+		getOne: (id: string) => getOne<GoalPlan>('goalPlans', id),
+		put: (plan: GoalPlan) => putRecord('goalPlans', plan),
+		remove: (id: string) => removeRecord('goalPlans', id),
+	},
+
+	baselines: {
+		getAll: () => getAll<Baseline>('baselines'),
+		put: (baseline: Baseline) => putRecord('baselines', baseline),
+		remove: (id: string) => removeRecord('baselines', id),
+	},
+
+	baselineLogs: {
+		getAll: () => getAll<BaselineLog>('baselineLogs'),
+		put: (log: BaselineLog) => putRecord('baselineLogs', log),
+		remove: (id: string) => removeRecord('baselineLogs', id),
 	},
 };

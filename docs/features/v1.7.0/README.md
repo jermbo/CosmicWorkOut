@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.7.0
+
 # v1.7.0 — Full Strength Catalog & PWA
 
 > **Backfilled doc.** This version shipped before its feature folder existed. Reconstructed from the codebase and git history (commits `79dbd63`, `86ea3b0`, `9befba4`; DB version 7) during the June 2026 docs reconciliation — it was **not** written from per-story specs. Treat as an accurate summary, not an original design record.
@@ -33,12 +35,12 @@ This version does for Strength what v1.6.0 did for Belly Dance — expands a sta
 
 All v1.7.0 stories shipped. Ongoing portability work lives on the [roadmap](../../roadmap/README.md).
 
-| ID                                         | Title                             | Status      | Notes                                                                                          |
-| ------------------------------------------ | --------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| [US-028](./US-028-data-export-backup.md)   | Data Export, Backup & Device Sync | Phase 1     | JSON export/import on `settings/data`. Phase 2 → [roadmap](../../roadmap/device-sync.md).      |
-| [US-029](./US-029-health-metrics.md)       | Health Metrics                    | Shipped     | Weight + blood pressure; optional Settings toggle; `/health` + home card + Insights + calendar |
-| [US-030](./US-030-settings-restructure.md) | Settings Hub Restructure          | Shipped     | Hub `/settings` + sub-routes for appearance, habits, data                                      |
-| [US-031](./US-031-default-habits-tweak.md) | Default Habits & Mood Scale       | Shipped     | Water/Coffee first; remove Alcohol; Reading → minutes; mood always on; −2 Agitated            |
+| ID                                         | Title                             | Status  | Notes                                                                                          |
+| ------------------------------------------ | --------------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| [US-028](./US-028-data-export-backup.md)   | Data Export, Backup & Device Sync | Phase 1 | JSON export/import on `settings/data`. Phase 2 → [roadmap](../../roadmap/device-sync.md).      |
+| [US-029](./US-029-health-metrics.md)       | Health Metrics                    | Shipped | Weight + blood pressure; optional Settings toggle; `/health` + home card + Insights + calendar |
+| [US-030](./US-030-settings-restructure.md) | Settings Hub Restructure          | Shipped | Hub `/settings` + sub-routes for appearance, habits, data                                      |
+| [US-031](./US-031-default-habits-tweak.md) | Default Habits & Mood Scale       | Shipped | Water/Coffee first; remove Alcohol; Reading → minutes; mood always on; −2 Agitated             |
 
 ---
 

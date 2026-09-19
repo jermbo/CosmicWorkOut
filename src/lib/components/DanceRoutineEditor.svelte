@@ -3,8 +3,10 @@
 	import type { Program, Routine, RoutineItem, RoutineSection, Item } from '$lib/db/types';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { disciplineById, routineALetter } from '$lib/discipline';
-	import ItemLibrarySheet from './ItemLibrarySheet.svelte';
+	import LibrarySheet from './LibrarySheet.svelte';
+	import { danceLibrary } from '$lib/itemLibrary';
 	import Icon from './Icon.svelte';
+	import FieldLabel from './FieldLabel.svelte';
 
 	type Props = {
 		program: Program;
@@ -40,7 +42,9 @@
 				const isA = routine.letter === 'A';
 				const own = routine.sections.find((rs) => rs.key === s.key);
 				const inherits = !!s.isBookend && !isA && own?.overridesBookends !== true;
-				const items = inherits ? (routineA?.sections.find((rs) => rs.key === s.key)?.items ?? []) : (own?.items ?? []);
+				const items = inherits
+					? (routineA?.sections.find((rs) => rs.key === s.key)?.items ?? [])
+					: (own?.items ?? []);
 				return {
 					key: s.key,
 					label: s.label,
@@ -84,7 +88,8 @@
 
 	function resetBookend(secIdx: number) {
 		const routineA = routineALetter(program);
-		const inheritedItems = routineA?.sections.find((rs) => rs.key === sections[secIdx].key)?.items ?? [];
+		const inheritedItems =
+			routineA?.sections.find((rs) => rs.key === sections[secIdx].key)?.items ?? [];
 		sections[secIdx].inherits = true;
 		sections[secIdx].items = withKeys(inheritedItems);
 	}
@@ -144,24 +149,49 @@
 >
 	<div class="dance-editor__inner">
 		<div class="dance-editor__top">
-			<button class="icon-btn" onclick={onBack} aria-label="Back">
-				<Icon name="chevron-left" size={20} stroke={2.5} />
+			<button
+				class="icon-btn"
+				onclick={onBack}
+				aria-label="Back"
+			>
+				<Icon
+					name="chevron-left"
+					size={20}
+					stroke={2.5}
+				/>
 			</button>
 			<span class="dance-editor__letter">{routine.letter ?? '?'}</span>
-			<h2 class="dance-editor__title" id="dance-editor-title">Edit Routine</h2>
-			<button class="dance-editor__save" onclick={handleSave} disabled={saving} aria-busy={saving}>
+			<h2
+				class="dance-editor__title"
+				id="dance-editor-title"
+			>
+				Edit Routine
+			</h2>
+			<button
+				class="dance-editor__save"
+				onclick={handleSave}
+				disabled={saving}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else}Save{/if}
 			</button>
 		</div>
 
 		<div class="dance-editor__body">
 			<div class="dance-field">
-				<label class="dance-field__label" for="dance-name">Name</label>
-				<input id="dance-name" class="dance-field__input" type="text" bind:value={name} autocomplete="off" />
+				<FieldLabel for="dance-name">Name</FieldLabel>
+				<input
+					id="dance-name"
+					class="dance-field__input"
+					type="text"
+					bind:value={name}
+					autocomplete="off"
+				/>
 			</div>
 			<div class="dance-field">
-				<label class="dance-field__label" for="dance-focus"
-					>Focus <span class="dance-field__optional">optional</span></label
+				<FieldLabel
+					for="dance-focus"
+					hint="optional">Focus</FieldLabel
 				>
 				<input
 					id="dance-focus"
@@ -187,18 +217,30 @@
 					</div>
 
 					{#if section.inherits}
-						<ul class="sec__list sec__list--readonly" aria-label="{section.label} items (inherited)">
+						<ul
+							class="sec__list sec__list--readonly"
+							aria-label="{section.label} items (inherited)"
+						>
 							{#if section.items.length === 0}
-								<li class="sec__empty">Routine A has no {section.label.toLowerCase()} items yet.</li>
+								<li class="sec__empty">
+									Routine A has no {section.label.toLowerCase()} items yet.
+								</li>
 							{/if}
 							{#each section.items as it (it._key)}
-								<li class="sec__row sec__row--readonly">{itemName(it.itemId)}</li>
+								<li class="sec__row sec__row--readonly">
+									{itemName(it.itemId)}
+								</li>
 							{/each}
 						</ul>
-						<button class="sec__bookend-btn" onclick={() => customizeBookend(secIdx)}>Customize for this routine</button
+						<button
+							class="sec__bookend-btn"
+							onclick={() => customizeBookend(secIdx)}>Customize for this routine</button
 						>
 					{:else}
-						<ul class="sec__list" aria-label="{section.label} items">
+						<ul
+							class="sec__list"
+							aria-label="{section.label} items"
+						>
 							{#if section.items.length === 0}
 								<li class="sec__empty">No items yet.</li>
 							{/if}
@@ -212,7 +254,11 @@
 											disabled={i === 0}
 											aria-label="Move up"
 										>
-											<Icon name="chevron-left" size={14} stroke={2.5} />
+											<Icon
+												name="chevron-left"
+												size={14}
+												stroke={2.5}
+											/>
 										</button>
 										<button
 											class="sec__icon"
@@ -220,27 +266,43 @@
 											disabled={i === section.items.length - 1}
 											aria-label="Move down"
 										>
-											<Icon name="chevron-right" size={14} stroke={2.5} />
+											<Icon
+												name="chevron-right"
+												size={14}
+												stroke={2.5}
+											/>
 										</button>
 										<button
 											class="sec__icon sec__icon--remove"
 											onclick={() => remove(secIdx, i)}
 											aria-label="Remove {itemName(it.itemId)}"
 										>
-											<Icon name="close" size={14} stroke={2.5} />
+											<Icon
+												name="close"
+												size={14}
+												stroke={2.5}
+											/>
 										</button>
 									</div>
 								</li>
 							{/each}
 						</ul>
 						<div class="sec__foot">
-							<button class="sec__add" onclick={() => (librarySection = section.key)}>
-								<Icon name="plus" size={14} stroke={2.5} />
+							<button
+								class="sec__add"
+								onclick={() => (librarySection = section.key)}
+							>
+								<Icon
+									name="plus"
+									size={14}
+									stroke={2.5}
+								/>
 								Add item
 							</button>
 							{#if section.isBookend && !isRoutineA}
-								<button class="sec__bookend-btn sec__bookend-btn--reset" onclick={() => resetBookend(secIdx)}
-									>Reset to inherit</button
+								<button
+									class="sec__bookend-btn sec__bookend-btn--reset"
+									onclick={() => resetBookend(secIdx)}>Reset to inherit</button
 								>
 							{/if}
 						</div>
@@ -252,9 +314,8 @@
 </dialog>
 
 {#if librarySection}
-	<ItemLibrarySheet
-		disciplineId={routine.disciplineId}
-		defaultSection={librarySection}
+	<LibrarySheet
+		config={danceLibrary(routine.disciplineId, librarySection)}
 		onAdd={(item) => addFromLibrary(librarySection!, item)}
 		onClose={() => (librarySection = null)}
 	/>
@@ -356,21 +417,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.dance-field__label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.dance-field__optional {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.dance-field__input {

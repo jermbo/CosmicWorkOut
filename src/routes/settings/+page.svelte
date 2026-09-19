@@ -1,11 +1,28 @@
 <script lang="ts">
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import { HOME_CARD_LABELS, type HomeCardId } from '$lib/homeCards';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsRow from '$lib/components/SettingsRow.svelte';
 	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
 
 	let activeHabitCount = $derived(habitStore.activeHabits.filter((h) => h.type !== 'mood').length);
+	let activeBaselineCount = $derived(baselineStore.activeBaselines.length);
+
+	let cardEnabled = $derived<Record<HomeCardId, boolean>>({
+		habits: prefsStore.habitsEnabled,
+		practice: prefsStore.practiceEnabled,
+		activity: prefsStore.activityLogEnabled,
+		baselines: prefsStore.baselinesEnabled,
+		health: prefsStore.healthMetricsEnabled,
+	});
+
+	let firstCardLabel = $derived.by(() => {
+		const first = prefsStore.homeCardOrder.find((id) => cardEnabled[id]);
+		if (!first) return 'No cards shown';
+		return `${HOME_CARD_LABELS[first]} first`;
+	});
 </script>
 
 <svelte:head>
@@ -19,17 +36,80 @@
 	</header>
 
 	<SettingsGroup title="Tracking">
-		<SettingsRow href="/settings/habits" label="Habits" detail="{activeHabitCount} active" />
+		<SettingsToggleRow
+			label="Habits"
+			description="Daily check-in for mood, water, meditation, and more. Your habits and logs are kept when off."
+			checked={prefsStore.habitsEnabled}
+			onchange={(v) => prefsStore.setHabitsEnabled(v)}
+		/>
+		{#if prefsStore.habitsEnabled}
+			<SettingsRow
+				href="/settings/habits"
+				label="Manage habits"
+				detail="{activeHabitCount} active"
+			/>
+		{/if}
+		<SettingsToggleRow
+			label="Activity log"
+			description="Runs, walks, yoga, and other one-off activities. Your logged activities are kept when off."
+			checked={prefsStore.activityLogEnabled}
+			onchange={(v) => prefsStore.setActivityLogEnabled(v)}
+		/>
+		<SettingsToggleRow
+			label="Practice"
+			description="Programs, routines, and guided workout & dance sessions. Your programs and session history are kept when off."
+			checked={prefsStore.practiceEnabled}
+			onchange={(v) => prefsStore.setPracticeEnabled(v)}
+		/>
+		{#if prefsStore.practiceEnabled}
+			<SettingsToggleRow
+				label="Goal progression plans"
+				description="Wave-loading strength plans that build toward a target lift. Your plan data is kept when off."
+				checked={prefsStore.goalProgressionPlansEnabled}
+				onchange={(v) => prefsStore.setGoalProgressionPlansEnabled(v)}
+			/>
+			{#if prefsStore.goalProgressionPlansEnabled}
+				<SettingsRow
+					href="/goals"
+					label="Goal plans"
+					detail="Manage & create"
+				/>
+			{/if}
+		{/if}
 		<SettingsToggleRow
 			label="Health metrics"
 			description="Track weight and blood pressure trends."
 			checked={prefsStore.healthMetricsEnabled}
 			onchange={(v) => prefsStore.setHealthMetricsEnabled(v)}
 		/>
+		<SettingsToggleRow
+			label="Baselines"
+			description="Embarrassingly low daily floors and ceilings. Your baseline data is kept when off."
+			checked={prefsStore.baselinesEnabled}
+			onchange={(v) => prefsStore.setBaselinesEnabled(v)}
+		/>
+		{#if prefsStore.baselinesEnabled}
+			<SettingsRow
+				href="/settings/baselines"
+				label="Manage baselines"
+				detail="{activeBaselineCount} active"
+			/>
+		{/if}
+	</SettingsGroup>
+
+	<SettingsGroup title="Appearance">
+		<SettingsRow
+			href="/settings/overview"
+			label="Overview layout"
+			detail={firstCardLabel}
+		/>
 	</SettingsGroup>
 
 	<SettingsGroup title="Data">
-		<SettingsRow href="/settings/data" label="Data & backup" />
+		<SettingsRow
+			href="/settings/data"
+			label="Data & backup"
+		/>
 	</SettingsGroup>
 </div>
 

@@ -1,17 +1,22 @@
 type DurationInput = { hours?: number; minutes?: number; seconds?: number };
-type DurationFormatOptions = { style?: 'long' | 'short' | 'narrow' | 'digital' };
+type DurationFormatOptions = {
+	style?: 'long' | 'short' | 'narrow' | 'digital';
+};
 type DurationFormatConstructor = new (
 	locales?: Intl.LocalesArgument,
 	options?: DurationFormatOptions,
 ) => { format: (duration: DurationInput) => string };
 
-const DurationFormat = (Intl as typeof Intl & { DurationFormat?: DurationFormatConstructor }).DurationFormat;
+const DurationFormat = (Intl as typeof Intl & { DurationFormat?: DurationFormatConstructor })
+	.DurationFormat;
 
 const fmtCompact = new Intl.NumberFormat(undefined, {
 	notation: 'compact',
 	maximumFractionDigits: 1,
 });
-const fmtInteger = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
+const fmtInteger = new Intl.NumberFormat(undefined, {
+	maximumFractionDigits: 0,
+});
 const fmtTwoDigits = new Intl.NumberFormat(undefined, {
 	minimumIntegerDigits: 2,
 	maximumFractionDigits: 0,
@@ -21,7 +26,9 @@ const fmtMinutes = new Intl.NumberFormat(undefined, {
 	unit: 'minute',
 	unitDisplay: 'short',
 });
-const fmtRelativeWeeks = new Intl.RelativeTimeFormat(undefined, { style: 'long' });
+const fmtRelativeWeeks = new Intl.RelativeTimeFormat(undefined, {
+	style: 'long',
+});
 const pluralRules = new Intl.PluralRules(undefined);
 
 function makeDurationFormat(style: DurationFormatOptions['style']) {
@@ -80,7 +87,11 @@ export function formatCount(value: number, unit?: string): string {
 	return n;
 }
 
-export function formatCountWithWord(count: number, singular: string, plural = `${singular}s`): string {
+export function formatCountWithWord(
+	count: number,
+	singular: string,
+	plural = `${singular}s`,
+): string {
 	const isSingular = pluralRules.select(count) === 'one';
 	if (isSingular) {
 		return `${fmtInteger.format(count)} ${singular}`;

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.1.0](README.md) › US-003
+
 # US-003 — Activity Logging
 
 > **Status: Shipped**

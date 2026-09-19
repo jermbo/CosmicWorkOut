@@ -5,11 +5,31 @@ import { formatCount, formatMinutes } from '$lib/format';
 export const MOOD_HABIT_ID = 'habit-mood';
 
 export const HABIT_TYPES: { value: HabitType; label: string; desc: string }[] = [
-	{ value: 'times', label: 'Times', desc: 'Tap to increment — no unit (e.g. coffee, supplements)' },
-	{ value: 'minutes', label: 'Minutes', desc: 'Numeric duration input (e.g. meditation)' },
-	{ value: 'count', label: 'Count', desc: 'Counter with a custom unit label (e.g. glasses, pages)' },
-	{ value: 'boolean', label: 'Yes / No', desc: 'Simple toggle — done or not done' },
-	{ value: 'mood', label: 'Mood', desc: 'Track how you feel on a - 5 to +5 scale' },
+	{
+		value: 'times',
+		label: 'Times',
+		desc: 'Tap to increment — no unit (e.g. coffee, supplements)',
+	},
+	{
+		value: 'minutes',
+		label: 'Minutes',
+		desc: 'Numeric duration input (e.g. meditation)',
+	},
+	{
+		value: 'count',
+		label: 'Count',
+		desc: 'Counter with a custom unit label (e.g. glasses, pages)',
+	},
+	{
+		value: 'boolean',
+		label: 'Yes / No',
+		desc: 'Simple toggle — done or not done',
+	},
+	{
+		value: 'mood',
+		label: 'Mood',
+		desc: 'Track how you feel on a - 5 to +5 scale',
+	},
 ];
 
 export const HABIT_PRESETS: { name: string; type: HabitType; unit: string }[] = [

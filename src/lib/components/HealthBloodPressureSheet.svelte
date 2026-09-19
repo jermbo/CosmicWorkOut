@@ -3,6 +3,8 @@
 	import type { HealthReading, BloodPressureValues } from '$lib/db/types';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	type Props = {
 		date: string;
@@ -56,26 +58,15 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="70dvh">
-	<div class="bp-sheet">
-		<div class="bp-sheet__header">
-			<h2 class="bp-sheet__title">
-				{#if editing}Edit Reading{:else}Log Blood Pressure{/if}
-			</h2>
-			<button class="bp-sheet__close" onclick={onClose} aria-label="Close">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
-			</button>
-		</div>
+<BottomSheet
+	onclose={onClose}
+	maxHeight="70dvh"
+>
+	<SheetBody>
+		<SheetHeader
+			title={editing ? 'Edit Reading' : 'Log Blood Pressure'}
+			{onClose}
+		/>
 
 		<div class="bp-sheet__body">
 			<div class="bp-row">
@@ -92,7 +83,10 @@
 					/>
 					<span class="bp-field__unit">mmHg</span>
 				</label>
-				<span class="bp-row__sep" aria-hidden="true">/</span>
+				<span
+					class="bp-row__sep"
+					aria-hidden="true">/</span
+				>
 				<label class="bp-field">
 					<span class="bp-field__label">Diastolic</span>
 					<input
@@ -109,7 +103,8 @@
 			</div>
 
 			<label class="bp-field bp-field--full">
-				<span class="bp-field__label">Pulse <span class="bp-field__optional">(optional)</span></span>
+				<span class="bp-field__label">Pulse <span class="bp-field__optional">(optional)</span></span
+				>
 				<input
 					class="bp-field__input"
 					type="number"
@@ -124,56 +119,28 @@
 		</div>
 
 		<div class="bp-sheet__footer">
-			<button class="bp-sheet__save-btn" onclick={handleSave} disabled={saving || !canSave} aria-busy={saving}>
+			<button
+				class="bp-sheet__save-btn"
+				onclick={handleSave}
+				disabled={saving || !canSave}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if editing}Save changes{:else}Log reading{/if}
 			</button>
 			{#if editing}
-				<button class="bp-sheet__delete-btn" class:bp-sheet__delete-btn--confirm={confirming} onclick={handleDelete}>
+				<button
+					class="bp-sheet__delete-btn"
+					class:bp-sheet__delete-btn--confirm={confirming}
+					onclick={handleDelete}
+				>
 					{#if confirming}Tap to confirm delete{:else}Delete{/if}
 				</button>
 			{/if}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>
-	.bp-sheet {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.bp-sheet__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.bp-sheet__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
-	}
-
-	.bp-sheet__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.bp-sheet__body {
 		padding-inline: var(--space-5);
 		display: flex;

@@ -126,7 +126,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-pec-deck',
@@ -140,7 +140,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-db-pullover',
@@ -154,7 +154,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	// ── BACK ─────────────────────────────────────────────────────────
 	{
@@ -293,7 +293,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-reverse-fly-machine',
@@ -307,7 +307,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-pendlay-row',
@@ -420,7 +420,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '15',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-face-pull',
@@ -434,7 +434,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '15',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-bent-over-reverse-fly',
@@ -476,7 +476,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-db-curl',
@@ -490,7 +490,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-hammer-curl',
@@ -504,7 +504,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-preacher-curl',
@@ -518,7 +518,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-concentration-curl',
@@ -546,7 +546,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-cable-curl',
@@ -560,7 +560,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-chin-up',
@@ -601,7 +601,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-tricep-bar-pushdown',
@@ -615,7 +615,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-tricep-overhead-extension',
@@ -629,7 +629,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-db-tricep-extension',
@@ -643,7 +643,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '10',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-tricep-kickback',
@@ -756,7 +756,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-rdl',
@@ -784,7 +784,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-nordic-curl',
@@ -881,7 +881,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '12',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-seated-calf-raise',
@@ -895,7 +895,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 4,
 		defaultReps: '15',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	// ── CORE ─────────────────────────────────────────────────────────
 	{
@@ -910,7 +910,7 @@ export const strengthExerciseSeeds: StrengthExerciseSeed[] = [
 		unit: 'lb',
 		defaultSets: 3,
 		defaultReps: '15',
-		weightIncrement: 5,
+		weightIncrement: 2.5,
 	},
 	{
 		id: 'st-hanging-knee-raise',

@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › System Overview
+
 # System Overview
 
 CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no auth. All data lives on the user's device.
@@ -10,8 +12,8 @@ CosmicWorkOut is a **client-only** SvelteKit web app. No backend, no API, no aut
 flowchart TB
     subgraph browser ["Browser"]
         UI["SvelteKit UI\nroutes + overlays"]
-        Stores["Svelte Stores\nprogram · session · prefs · habits · activities · health · loggingContext · toast"]
-        IDB[("IndexedDB v8\nitems · programs · sessions\nitemLastUsed · habits · habitLogs · activities\nhealthReadings")]
+        Stores["Svelte Stores\nprogram · session · prefs · habits · activities\nhealth · goalPlans · baselines · loggingContext · toast"]
+        IDB[("IndexedDB v10\nitems · programs · sessions · itemLastUsed\nhabits · habitLogs · activities\nhealthReadings · goalPlans\nbaselines · baselineLogs")]
         LS[("localStorage\nprefs · activeSession · activeProgramIds · lastActivityType")]
         SW["Service Worker\nprecaches app shell"]
     end
@@ -39,7 +41,7 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-The shipped routes: **Today** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `appearance` / `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout.
+The shipped routes: **Overview** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Lift plans** (`/goals`, `/goals/new` — UI name; code may still say “goals”), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout. **Planned (v1.9.0):** **Baselines** (`/baselines`, `/settings/baselines`). There is no `/settings/appearance` route; appearance prefs stay at fixed defaults.
 
 The UI reads and writes through the Svelte stores — no REST, no server state.
 
@@ -47,7 +49,7 @@ See [App Structure](../implementation/app-structure.md) and [Tech Stack](tech-st
 
 ### Data Layer — IndexedDB + localStorage
 
-Persistent data in IndexedDB (version 8) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, per-Discipline active programs, and last-used activity type in localStorage for synchronous access.
+Persistent data in IndexedDB (version **9**) via a thin Promise wrapper (`src/lib/db/database.ts`). Preferences, in-progress sessions, per-Discipline active programs, and last-used activity type in localStorage for synchronous access.
 
 See [Data Model](data-model.md) and [State Management](../implementation/state.md).
 
@@ -87,20 +89,26 @@ sequenceDiagram
     participant Prog as programStore
     participant Hab as habitStore
     participant Act as activityStore
+    participant He as healthStore
+    participant GP as goalPlanStore
     participant Sess as sessionStore
-    participant UI as Today view
+    participant UI as Overview
 
-    Layout->>DB: open IndexedDB v8, seed data, run migrations
+    Layout->>DB: open IndexedDB v10, seed data, run migrations
     Layout->>Prefs: load() + apply CSS vars
-    Layout->>Prog: load() programs, exercises, sessions
+    Layout->>Prog: load() programs, items, sessions
     Layout->>Hab: load() habits, habit logs
     Layout->>Act: load() activities
+    Layout->>He: load() health readings
+    Layout->>GP: load() lift plans
     Layout->>Sess: checkForRecovery()
     alt unfinished session from today
         Sess-->>Layout: show resume banner
     end
     Layout->>UI: appReady = true
 ```
+
+Boot failures surface a reload prompt instead of a permanent spinner — see [App Structure — Boot Sequence](../implementation/app-structure.md#boot-sequence).
 
 ### Logging a habit
 
@@ -165,8 +173,10 @@ See [Program Progression](../implementation/program-progression.md).
 ## Related
 
 - [How It Works](../implementation/behavior.md) — Mental model for the whole app
-- [Data Model](data-model.md) — What gets stored
+- [Glossary](../glossary.md) — Discipline, Routine, Item, Lift plan, …
+- [Data Model](data-model.md) — What gets stored (DB v10)
 - [Tech Stack](tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
 - [Offline Strategy](offline-strategy.md) — Local-first persistence and caching
+- [App Structure](../implementation/app-structure.md) — Routes, layout, boot
 - [Implementation Status](../implementation/status.md) — Feature checklist
 - [North Star](../vision/north-star.md) — Why this architecture

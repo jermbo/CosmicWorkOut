@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.1.0
+
 # v1.1.0 — Health Habit & Activity Expansion
 
 **Status: Shipped** — remaining habit/calendar work tracked in [v1.3.0](../v1.3.0/README.md).
@@ -53,3 +55,14 @@ All stories in this folder follow the format defined in [\_guide.md](../../stand
 - US-003 and US-004 both surface on the dashboard defined in US-005. US-005 was superseded by v1.2.0 US-007.
 - US-001 and US-002 are largely independent of the habit/activity work but share the Program page UI.
 - Activity calendar integration shipped in US-003. Habit calendar history is tracked in [v1.3.0 US-010](../v1.3.0/US-010-habit-calendar-history.md).
+
+---
+
+## Related
+
+- [Map — Movement & Training](../../map-movement-and-training.md) — every doc on this subject, across releases
+- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
+- [v1.2.0](../v1.2.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

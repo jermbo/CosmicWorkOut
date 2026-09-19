@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › Offline Strategy
+
 # Offline Strategy
 
 Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers how local-first persistence and offline caching work today. Deferred portability work (device-to-device sync) lives on the [roadmap](../roadmap/device-sync.md).
@@ -36,16 +38,18 @@ flowchart LR
     class PREFS,ACTIVE,PROGID sync;
 ```
 
-| Store                    | Technology   | Written When                                |
-| ------------------------ | ------------ | ------------------------------------------- |
-| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor |
-| `programs`               | IndexedDB    | On routine save in editor                   |
-| `sessions`               | IndexedDB    | On session finish                           |
-| `itemLastUsed`           | IndexedDB    | On each set confirm                         |
-| `healthReadings`         | IndexedDB    | On each health log / edit / delete (US-029) |
-| `cwout:prefs`            | localStorage | On every preference change                  |
-| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)       |
-| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)            |
+| Store                    | Technology   | Written When                                  |
+| ------------------------ | ------------ | --------------------------------------------- |
+| `items`                  | IndexedDB    | On boot (upsert built-ins) + routine editor   |
+| `programs`               | IndexedDB    | On routine save in editor                     |
+| `sessions`               | IndexedDB    | On session finish                             |
+| `itemLastUsed`           | IndexedDB    | On each set confirm                           |
+| `healthReadings`         | IndexedDB    | On each health log / edit / delete (US-029)   |
+| `baselines`              | IndexedDB    | On baseline create / edit / reorder (US-034)  |
+| `baselineLogs`           | IndexedDB    | On each baseline log / edit / delete (US-035) |
+| `cwout:prefs`            | localStorage | On every preference change                    |
+| `cwout:activeSession`    | localStorage | On every set confirm (crash recovery)         |
+| `cwout:activeProgramIds` | localStorage | On program load (per Discipline)              |
 
 ---
 
@@ -129,7 +133,7 @@ Device-to-device sync (QR + LAN merge) is on the [roadmap](../roadmap/device-syn
 Optional body measurements (weight, blood pressure). See [US-029](../features/v1.7.0/US-029-health-metrics.md):
 
 - Readings write immediately to `healthReadings` on log, edit, or delete.
-- `healthMetricsEnabled` in `cwout:prefs` gates UI only — data persists when the toggle is off.
+- Feature flags in `cwout:prefs` (`habitsEnabled`, `activityLogEnabled`, `practiceEnabled`, `healthMetricsEnabled`, `goalProgressionPlansEnabled`, `baselinesEnabled`) gate UI only — every store still loads and seeds at boot, so data persists when a toggle is off.
 
 ---
 

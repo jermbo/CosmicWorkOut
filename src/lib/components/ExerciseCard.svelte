@@ -49,8 +49,15 @@
 	aria-label={exercise.name}
 >
 	<header class="exercise-card__header">
-		<div class="exercise-card__ring-wrap" aria-hidden="true">
-			<ProgressRing done={doneSets} total={totalSets} complete={allSetsCompleted} />
+		<div
+			class="exercise-card__ring-wrap"
+			aria-hidden="true"
+		>
+			<ProgressRing
+				done={doneSets}
+				total={totalSets}
+				complete={allSetsCompleted}
+			/>
 			{#if allSetsCompleted}
 				<span class="exercise-card__ring-check">✓</span>
 			{:else}
@@ -61,7 +68,10 @@
 			<div class="exercise-card__title-row">
 				<h3 class="exercise-card__name">{exercise.name}</h3>
 				{#if allSetsCompleted}
-					<span class="exercise-card__done-badge" aria-label="All sets complete">
+					<span
+						class="exercise-card__done-badge"
+						aria-label="All sets complete"
+					>
 						<svg
 							viewBox="0 0 16 16"
 							fill="none"
@@ -80,7 +90,10 @@
 				<p class="exercise-card__cue">{exercise.cue}</p>
 			{/if}
 		</div>
-		<div class="exercise-card__target" aria-label="Target: {totalSets} sets">
+		<div
+			class="exercise-card__target"
+			aria-label="Target: {totalSets} sets"
+		>
 			<span class="exercise-card__target-value">
 				{activeExercise.sets[0]?.targetReps ?? '—'}
 			</span>
@@ -88,9 +101,16 @@
 		</div>
 	</header>
 
-	<div class="exercise-card__sets" role="group" aria-label={`Sets for ${exercise.name}`}>
+	<div
+		class="exercise-card__sets"
+		role="group"
+		aria-label={`Sets for ${exercise.name}`}
+	>
 		{#each activeExercise.sets as set, setIndex (setIndex)}
-			<SetTile {set} onTap={() => onSetTap(exerciseIndex, setIndex)} />
+			<SetTile
+				{set}
+				onTap={() => onSetTap(exerciseIndex, setIndex)}
+			/>
 		{/each}
 	</div>
 </article>

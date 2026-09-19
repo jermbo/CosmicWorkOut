@@ -17,7 +17,12 @@
 	});
 </script>
 
-<HomeCard href="/practice/{group.id}" title={group.label} ariaLabel="{group.label}: {summary}" {variant}>
+<HomeCard
+	href="/practice/{group.id}"
+	title={group.label}
+	ariaLabel="{group.label}: {summary}"
+	{variant}
+>
 	<p class="practice-group-card__summary">{summary}</p>
 	<p class="practice-group-card__meta">{meta}</p>
 	<p class="practice-group-card__count">

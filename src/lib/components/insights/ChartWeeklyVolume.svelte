@@ -80,7 +80,10 @@
 					},
 				},
 				scales: {
-					x: { grid: { display: false }, ticks: { ...tickOpts, maxTicksLimit: 7 } },
+					x: {
+						grid: { display: false },
+						ticks: { ...tickOpts, maxTicksLimit: 7 },
+					},
 					y: {
 						min: 0,
 						grid: gridOpts,
@@ -95,4 +98,7 @@
 	});
 </script>
 
-<canvas bind:this={canvas} aria-label="Bar chart: total pounds lifted per week over the selected period"></canvas>
+<canvas
+	bind:this={canvas}
+	aria-label="Bar chart: total pounds lifted per week over the selected period"
+></canvas>

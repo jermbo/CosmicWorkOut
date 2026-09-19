@@ -23,7 +23,20 @@
 
 	let rangeLabel = $derived.by(() => {
 		const { start, end } = effectiveRange;
-		const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const MONTHS = [
+			'Jan',
+			'Feb',
+			'Mar',
+			'Apr',
+			'May',
+			'Jun',
+			'Jul',
+			'Aug',
+			'Sep',
+			'Oct',
+			'Nov',
+			'Dec',
+		];
 		const fmt = (d: string) => {
 			const [, m, day] = d.split('-');
 			return `${MONTHS[parseInt(m) - 1]} ${parseInt(day)}`;
@@ -51,18 +64,44 @@
 
 	let xLabels = $derived(xLabelsFor(dates));
 
-	let hasSessions = $derived(programStore.sessions.length > 0);
-	let hasActivities = $derived(activityStore.activities.length > 0);
-	let hasHabitLogs = $derived(habitStore.logs.length > 0);
-	let hasHabits = $derived(habitStore.activeHabits.length > 0);
+	let practiceEnabled = $derived(prefsStore.practiceEnabled);
+	let hasSessions = $derived(practiceEnabled && programStore.sessions.length > 0);
+	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
+	let habitsEnabled = $derived(prefsStore.habitsEnabled);
+	let hasActivities = $derived(activityLogEnabled && activityStore.activities.length > 0);
+	let hasHabitLogs = $derived(habitsEnabled && habitStore.logs.length > 0);
+	let hasHabits = $derived(habitsEnabled && habitStore.activeHabits.length > 0);
 
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
-	let hasWeight = $derived(healthEnabled && healthStore.readings.some((r) => r.metricId === 'weight'));
-	let hasBp = $derived(healthEnabled && healthStore.readings.some((r) => r.metricId === 'bloodPressure'));
+	let hasWeight = $derived(
+		healthEnabled && healthStore.readings.some((r) => r.metricId === 'weight'),
+	);
+	let hasBp = $derived(
+		healthEnabled && healthStore.readings.some((r) => r.metricId === 'bloodPressure'),
+	);
 	let latestWeight = $derived(healthStore.latestWeight());
 	let bp7day = $derived(rollingBpAverage(healthStore.readings, 7, todayIso()));
 
 	let hasAnyData = $derived(hasSessions || hasActivities || hasHabitLogs || hasWeight || hasBp);
+
+	/** Only name the things the user has actually turned on. */
+	let trackableNames = $derived.by(() => {
+		const names: string[] = [];
+		if (practiceEnabled) names.push('workouts');
+		if (activityLogEnabled) names.push('activities');
+		if (habitsEnabled) names.push('habits');
+		if (healthEnabled) names.push('health metrics');
+		return names;
+	});
+
+	let emptyMessage = $derived.by(() => {
+		if (trackableNames.length === 0) {
+			return 'Turn on something to track in Settings to see your insights.';
+		}
+		if (trackableNames.length === 1) return `Log ${trackableNames[0]} to see your insights.`;
+		const last = trackableNames[trackableNames.length - 1];
+		return `Log ${trackableNames.slice(0, -1).join(', ')}, or ${last} to see your insights.`;
+	});
 </script>
 
 <div class="insights-page">
@@ -71,11 +110,15 @@
 		<p class="insights-page__subtitle">{rangeLabel}</p>
 	</header>
 
-	<RangeBar bind:rangeKey bind:customStart bind:customEnd />
+	<RangeBar
+		bind:rangeKey
+		bind:customStart
+		bind:customEnd
+	/>
 
 	{#if !hasAnyData}
 		<div class="empty-state">
-			<p class="empty-state__msg">Log workouts, activities, or habits to see your insights.</p>
+			<p class="empty-state__msg">{emptyMessage}</p>
 		</div>
 	{:else}
 		<div class="charts">
@@ -84,7 +127,10 @@
 					<h2 class="chart-section__title">Mood vs Habits</h2>
 					<p class="chart-section__desc">Mood compared to daily coffee and water intake.</p>
 					<div class="chart-wrap">
-						<ChartMoodHabits {dates} {xLabels} />
+						<ChartMoodHabits
+							{dates}
+							{xLabels}
+						/>
 					</div>
 				</section>
 			{/if}
@@ -104,7 +150,10 @@
 					<h2 class="chart-section__title">Activity Mix</h2>
 					<p class="chart-section__desc">Breakdown of activities logged in the selected period.</p>
 					<div class="chart-wrap chart-wrap--doughnut">
-						<ChartActivityMix {dates} {rangeLabel} />
+						<ChartActivityMix
+							{dates}
+							{rangeLabel}
+						/>
 					</div>
 				</section>
 			{/if}
@@ -126,7 +175,9 @@
 						{#if latestWeight}
 							<div class="health-summary__stat">
 								<span class="health-summary__num"
-									>{latestWeight.values.value}<span class="health-summary__unit">{prefsStore.weightUnit}</span></span
+									>{latestWeight.values.value}<span class="health-summary__unit"
+										>{prefsStore.weightUnit}</span
+									></span
 								>
 								<span class="health-summary__label">Latest weight</span>
 							</div>
@@ -146,7 +197,10 @@
 					<h2 class="chart-section__title">Weight Trend</h2>
 					<p class="chart-section__desc">Body weight over the selected period.</p>
 					<div class="chart-wrap">
-						<ChartHealthWeight {dates} {xLabels} />
+						<ChartHealthWeight
+							{dates}
+							{xLabels}
+						/>
 					</div>
 				</section>
 			{/if}
@@ -156,7 +210,10 @@
 					<h2 class="chart-section__title">Blood Pressure</h2>
 					<p class="chart-section__desc">Daily average systolic and diastolic.</p>
 					<div class="chart-wrap">
-						<ChartHealthBP {dates} {xLabels} />
+						<ChartHealthBP
+							{dates}
+							{xLabels}
+						/>
 					</div>
 				</section>
 			{/if}

@@ -17,7 +17,11 @@
 	};
 </script>
 
-<div class="workout-picker" role="radiogroup" aria-label="Select workout">
+<div
+	class="workout-picker"
+	role="radiogroup"
+	aria-label="Select workout"
+>
 	{#each workouts as workout (workout.id)}
 		{@const isSelected = workout.id === selectedId}
 		{@const isSuggested = workout.id === suggestedId && workout.id !== selectedId}

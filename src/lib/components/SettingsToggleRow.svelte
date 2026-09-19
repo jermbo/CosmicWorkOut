@@ -13,7 +13,10 @@
 
 <div class="settings-toggle-row">
 	<div class="settings-toggle-row__text">
-		<span class="settings-toggle-row__label" id={labelId}>{label}</span>
+		<span
+			class="settings-toggle-row__label"
+			id={labelId}>{label}</span
+		>
 		{#if description}
 			<span class="settings-toggle-row__desc">{description}</span>
 		{/if}

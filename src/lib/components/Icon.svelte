@@ -60,15 +60,40 @@
 	aria-label={title}
 >
 	{#if name === 'plus'}
-		<line x1="12" y1="5" x2="12" y2="19" />
-		<line x1="5" y1="12" x2="19" y2="12" />
+		<line
+			x1="12"
+			y1="5"
+			x2="12"
+			y2="19"
+		/>
+		<line
+			x1="5"
+			y1="12"
+			x2="19"
+			y2="12"
+		/>
 	{:else if name === 'minus'}
-		<line x1="5" y1="12" x2="19" y2="12" />
+		<line
+			x1="5"
+			y1="12"
+			x2="19"
+			y2="12"
+		/>
 	{:else if name === 'check'}
 		<polyline points="20 6 9 17 4 12" />
 	{:else if name === 'close'}
-		<line x1="18" y1="6" x2="6" y2="18" />
-		<line x1="6" y1="6" x2="18" y2="18" />
+		<line
+			x1="18"
+			y1="6"
+			x2="6"
+			y2="18"
+		/>
+		<line
+			x1="6"
+			y1="6"
+			x2="18"
+			y2="18"
+		/>
 	{:else if name === 'chevron-left' || name === 'back'}
 		<polyline points="15 18 9 12 15 6" />
 	{:else if name === 'chevron-right'}
@@ -84,14 +109,40 @@
 		<path d="M10 11v6M14 11v6" />
 		<path d="M9 6V4h6v2" />
 	{:else if name === 'flame'}
-		<path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z" />
+		<path
+			d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"
+		/>
 	{:else if name === 'drag'}
-		<circle cx="9" cy="6" r="1.5" />
-		<circle cx="15" cy="6" r="1.5" />
-		<circle cx="9" cy="12" r="1.5" />
-		<circle cx="15" cy="12" r="1.5" />
-		<circle cx="9" cy="18" r="1.5" />
-		<circle cx="15" cy="18" r="1.5" />
+		<circle
+			cx="9"
+			cy="6"
+			r="1.5"
+		/>
+		<circle
+			cx="15"
+			cy="6"
+			r="1.5"
+		/>
+		<circle
+			cx="9"
+			cy="12"
+			r="1.5"
+		/>
+		<circle
+			cx="15"
+			cy="12"
+			r="1.5"
+		/>
+		<circle
+			cx="9"
+			cy="18"
+			r="1.5"
+		/>
+		<circle
+			cx="15"
+			cy="18"
+			r="1.5"
+		/>
 	{/if}
 </svg>
 

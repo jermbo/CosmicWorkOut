@@ -1,6 +1,8 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › State Management
+
 # State Management
 
-Seven Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
+Eight Svelte 5 class stores hold application state (plus a small `toastStore` for transient notifications). No external state library.
 
 ---
 
@@ -35,6 +37,7 @@ Owns the long-lived workout data — programs, items, sessions, and derived sche
 - `refreshSessions()` — reload sessions after finish
 - `getWorkoutById(id)` — lookup by ID
 - `getWorkoutForSession(session)` — lookup workout for a completed session
+- `setSoleActiveProgram(id)` — activate one program and deactivate others in its discipline (used by lift plans)
 
 ---
 
@@ -53,7 +56,7 @@ Owns the ephemeral active session lifecycle.
 
 **Key actions:**
 
-- `start(workout, program, exerciseMap, opts)` — build ActiveSession from workout template; `opts.date` sets the session date
+- `start(workout, program, exerciseMap, opts)` — build ActiveSession from workout template; `opts.date` sets the session date; `opts.prescribed` applies goal-plan targets when present
 - `editSession(session, workout, exerciseMap)` — reopen a completed session for editing
 - `completeSet(ex, set)` — instant mode: mark set done at current weight/reps
 - `logSet(ex, set, weight, reps)` — sheet mode: mark set done with explicit values
@@ -71,14 +74,44 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref          | Default       | Applied via                          |
-| ------------- | ------------- | ------------------------------------ |
-| `accentColor` | `#b2f042`     | `--color-accent` CSS var + ink color |
-| `density`     | `comfortable` | `data-density` on `<html>`           |
-| `roundness`   | `default`     | `data-roundness` on `<html>`         |
-| `weightUnit`  | `lb`          | Display in SetTile, LogSetSheet      |
+| Pref                          | Default       | Applied via                           |
+| ----------------------------- | ------------- | ------------------------------------- |
+| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color  |
+| `density`                     | `comfortable` | `data-density` on `<html>`            |
+| `roundness`                   | `default`     | `data-roundness` on `<html>`          |
+| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet       |
+| `homeCardOrder`               | see below     | Order of the Overview summary cards   |
+| `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI |
+| `activityLogEnabled`          | `false`       | Gates `/log` and related UI           |
+| `practiceEnabled`             | `false`       | Gates the Practice engine (below)     |
+| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI        |
+| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI         |
+| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI     |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
+
+### Overview card order
+
+No tracking feature owns the top of Overview. `homeCardOrder` is a user-set list of card ids, edited by drag or arrow buttons on `/settings/overview`. Registry and pure logic live in `src/lib/homeCards.ts` (tested in `homeCards.test.ts`); default order is `habits · practice · activity · baselines · health`.
+
+The stored value comes from localStorage, so `resolveHomeCardOrder()` repairs it on every read: unknown and duplicate ids are dropped, and **any card the stored order doesn't mention is appended in default order**. That last rule is what makes a newly shipped card appear for existing users instead of silently vanishing — adding a card means adding it to `HOME_CARD_IDS`, nothing more.
+
+Order is stored for every card, including ones whose feature is off; Overview filters by the flags at render time, and the settings list marks those rows "Turned off" so their position still makes sense.
+
+### Feature flags hide UI; data always persists
+
+**Every tracking feature is opt-in and defaults off** — Habits, Activity log, Practice, Health metrics, and Baselines. A flag only controls visibility: IndexedDB rows and localStorage keys are untouched (boot still runs every store's `load()` and `seedHabitsIfEmpty()`), so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/goals` and `/baselines` additionally show a short "turned off" panel.
+
+Because nothing is on for a fresh install, `prefsStore.anyTrackingEnabled` drives an Overview empty state pointing at Settings, and History day cells stop being tappable (the day sheet would otherwise open with no actions in it).
+
+Each flag covers its own Overview card, week-strip indicator, History dots / legend entry / month stat tile / day-sheet actions, Insights charts, and Settings → Data clear row. Two wrinkles are worth knowing:
+
+- **Mood belongs to Habits.** Mood is a protected `Habit` row (`type: 'mood'`) that can't be deactivated _within_ Habits, but it is not exempt from the flag — the mood strip, the week-strip mood pips, the History mood dot and legend entry, and the Mood vs Habits chart all hide with `habitsEnabled`.
+- **Practice is the broad one** (see below), and Lift plans nest inside it.
+
+**`practiceEnabled` reaches furthest.** Practice is the session engine, not a single screen, so the flag covers: the Practice bottom-nav tab; the routes `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, `/program`; the Overview practice card, week-streak badge, and strength/dance week-strip indicators; the session overlays, completion screen, and crash-recovery banner in `+layout.svelte`; History session dots, legend entries, month "Workouts" / "lb lifted" stats, and day-sheet session actions; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data.
+
+**Lift plans nest inside Practice.** A plan generates a backing program and can only be _trained_ through `/workout`, so `goalProgressionPlansEnabled` alone is not enough. `prefsStore.liftPlansEnabled` is a derived `practiceEnabled && goalProgressionPlansEnabled` — every consumer reads that instead of and-ing the two flags itself, and the Lift plans toggle is only shown while Practice is on.
 
 ---
 
@@ -186,6 +219,43 @@ Reads `loggingContext.date` for the active logging date (same as `habitStore` an
 
 ---
 
+## goalPlanStore
+
+**File:** `src/lib/stores/goalPlans.svelte.ts`
+
+Owns lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.liftPlansEnabled` (Practice **and** Lift plans both on).
+
+| State   | Source    | Purpose               |
+| ------- | --------- | --------------------- |
+| `plans` | IndexedDB | All lift plan records |
+
+**Key derived values:**
+
+- `activePlan` — the single active plan, or null
+- `pausedPlans` / `completedPlans` — history lists
+- `prescribedTargets(plan)` — this week's focus + supporting targets for session start
+
+**Key actions:**
+
+- `load()` — boot-time data load
+- `createPlan(input)` — generate blocks, upsert backing Program, store paused plan
+- `activatePlan(id)` — sole active Strength program via `setSoleActiveProgram`
+- `pausePlan(id)` / `completePlan(id)` — lifecycle; deactivate backing program
+- `repeatCurrentBlock(id)` — rewind targets via `countOffset`; extend backing program weeks
+- `renamePlan(id, name)` — rename plan + backing program
+
+---
+
+## baselineStore _(planned — v1.9.0)_
+
+**File:** TBD (e.g. `src/lib/stores/baselines.svelte.ts`)
+
+Owns Baseline definitions and BaselineLog entries ([US-034](../features/v1.9.0/US-034-baselines-setup.md), [US-035](../features/v1.9.0/US-035-baselines-logging.md)). Gated by `prefsStore.baselinesEnabled`.
+
+Expected responsibilities: load definitions + logs; CRUD baselines; add/edit/delete log entries; day totals by sum; chart series helpers for [US-036](../features/v1.9.0/US-036-baselines-charts.md). Reads `loggingContext.date` for the active logging date.
+
+---
+
 ## Data Flow Diagram
 
 ```mermaid
@@ -198,6 +268,8 @@ flowchart TB
     HS[habitStore]
     AS[activityStore]
     HeS[healthStore]
+    GP[goalPlanStore]
+    BS[baselineStore]
     LC[loggingContext]
     UI[Svelte UI]
 
@@ -206,25 +278,32 @@ flowchart TB
     IDB <-->|load / put| HS
     IDB <-->|load / put| AS
     IDB <-->|load / put| HeS
+    IDB <-->|load / put| GP
+    IDB <-->|load / put| BS
     LS <-->|persist activeSession| SS
     LS <-->|read/write prefs| PR
     LS <-->|lastActivityType| AS
     LC -->|date| HS
     LC -->|date| AS
     LC -->|date| HeS
+    LC -->|date| BS
     LC -->|date + workoutId| PS
+    GP -->|prescribed targets| SS
+    GP -->|setSoleActiveProgram| PS
     PS -->|suggestedWorkout, sessions| UI
     SS -->|isActive / isComplete| UI
     HS -->|activeHabits, logs| UI
     AS -->|activitiesByDate| UI
     HeS -->|readings, charts| UI
-    PR -->|accent, density, roundness, healthMetricsEnabled| UI
+    GP -->|activePlan, timelines| UI
+    BS -->|baselines, day totals, charts| UI
+    PR -->|accent, density, feature toggles| UI
 
     classDef storage fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class IDB,LS storage;
-    class PS,SS,PR,HS,AS,HeS,LC store;
+    class PS,SS,PR,HS,AS,HeS,GP,BS,LC store;
     class UI ui;
 ```
 
@@ -237,3 +316,4 @@ flowchart TB
 - [Program Progression](program-progression.md) — Schedule derivation
 - [Session Logging](../requirements/session-logging.md) — User-facing flow
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health store
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plan store

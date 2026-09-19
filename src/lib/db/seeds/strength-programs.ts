@@ -78,7 +78,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'st-beginner-102',
 		name: 'Beginner 102',
-		description: 'Dumbbell fundamentals — presses, rows, curls, and unilateral leg work. Build on Beginner 101.',
+		description:
+			'Dumbbell fundamentals — presses, rows, curls, and unilateral leg work. Build on Beginner 101.',
 		durationWeeks: 4,
 		routines: [
 			{
@@ -131,7 +132,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'st-beginner-103',
 		name: 'Beginner 103',
-		description: 'Barbell introduction — squat, bench, row, and deadlift patterns. Graduate from dumbbells to the bar.',
+		description:
+			'Barbell introduction — squat, bench, row, and deadlift patterns. Graduate from dumbbells to the bar.',
 		durationWeeks: 4,
 		routines: [
 			{
@@ -184,7 +186,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'st-intermediate-101',
 		name: 'Intermediate 101',
-		description: 'Push day specialization — chest, shoulders, and triceps with compounds first, isolation finishers.',
+		description:
+			'Push day specialization — chest, shoulders, and triceps with compounds first, isolation finishers.',
 		durationWeeks: 4,
 		routines: [
 			{
@@ -237,7 +240,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'st-intermediate-102',
 		name: 'Intermediate 102',
-		description: 'Pull day specialization — deadlifts, rows, pull-ups, and arm work. Compounds before curls.',
+		description:
+			'Pull day specialization — deadlifts, rows, pull-ups, and arm work. Compounds before curls.',
 		durationWeeks: 4,
 		routines: [
 			{

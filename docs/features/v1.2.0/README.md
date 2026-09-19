@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.2.0
+
 # v1.2.0 — Home Screen Redesign & Habit Log
 
 This version reshapes the home screen into a unified daily dashboard of overview cards, each acting as a gateway to its own route. It introduces a dedicated Habit Log page with a mood tracking type, and a date context that flows from the home screen across all pages.
@@ -77,3 +79,15 @@ Items still open from v1.1.0 are tracked in [v1.3.0](../v1.3.0/README.md).
 ## Story Writing Standards
 
 All stories follow the format defined in [user-story-standards.md](../../standards/user-story-standards.md).
+
+---
+
+## Related
+
+- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
+- [v1.1.0](../v1.1.0/README.md) — adjacent release
+- [v1.3.0](../v1.3.0/README.md) — adjacent release
+- [Features index](../README.md) — the full release history
+- [Implementation Status](../../implementation/status.md) — what is built today
+- [Glossary](../../glossary.md) — shared vocabulary

@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.5.0](README.md) › US-027
+
 # US-027 — Top Exercise Progress Chart
 
 > **Status: Done — v1.5.0**
@@ -57,4 +59,4 @@ so that I can track whether I'm getting stronger on my key lifts.
 - [v1.5.0 README](./README.md)
 - [US-022 — Insights Hub](./US-022-insights-hub.md)
 - [US-024 — Weekly Training Volume](./US-024-weekly-volume-chart.md)
-- [US-002 — Workout Logging](../v1.1.0/US-002-workout-logging.md)
+- [Session Logging (requirements)](../../requirements/session-logging.md)

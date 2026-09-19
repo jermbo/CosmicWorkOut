@@ -2,7 +2,16 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
-export const STRENGTH_CATS = ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps', 'Legs', 'Core', 'Full Body'] as const;
+export const STRENGTH_CATS = [
+	'Chest',
+	'Back',
+	'Shoulders',
+	'Biceps',
+	'Triceps',
+	'Legs',
+	'Core',
+	'Full Body',
+] as const;
 export type ItemCat = (typeof STRENGTH_CATS)[number];
 export type ExerciseType = 'compound' | 'isolation' | 'dynamic' | 'isometric';
 export type CatalogDifficulty = 'beginner' | 'intermediate' | 'advanced';
@@ -176,7 +185,14 @@ export interface UserPrefs {
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
+	/** Overview card order, by card id. Partial or stale values are repaired on read. */
+	homeCardOrder: string[];
+	habitsEnabled: boolean;
+	activityLogEnabled: boolean;
+	practiceEnabled: boolean;
 	healthMetricsEnabled: boolean;
+	goalProgressionPlansEnabled: boolean;
+	baselinesEnabled: boolean;
 }
 
 export interface ActiveSet {
@@ -260,4 +276,32 @@ export interface HealthReading {
 	date: string; // ISO date YYYY-MM-DD — global logging date
 	recordedAt: string; // ISO datetime — orders multiple readings per day
 	values: WeightValues | BloodPressureValues;
+}
+
+/** 'up' = daily floor to meet or beat; 'under' = daily ceiling to stay at or below. */
+export type BaselineDirection = 'up' | 'under';
+
+export interface BaselineMetric {
+	id: string;
+	label: string;
+	target: number;
+}
+
+export interface Baseline {
+	id: string;
+	name: string;
+	direction: BaselineDirection;
+	/** One or two metrics; count is fixed after creation so log history stays readable. */
+	metrics: BaselineMetric[];
+	sortOrder: number;
+	active: boolean;
+	createdAt: string;
+}
+
+export interface BaselineLog {
+	id: string;
+	baselineId: string;
+	date: string; // ISO date YYYY-MM-DD — global logging date
+	recordedAt: string; // ISO datetime — orders multiple entries per day
+	values: Record<string, number>; // metricId → amount for this entry
 }

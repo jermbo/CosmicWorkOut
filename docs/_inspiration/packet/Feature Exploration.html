@@ -2,15 +2,28 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1"
+		/>
 		<title>Packet — Feature Exploration</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="preconnect"
+			href="https://fonts.googleapis.com"
+		/>
+		<link
+			rel="preconnect"
+			href="https://fonts.gstatic.com"
+			crossorigin
+		/>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
 			rel="stylesheet"
 		/>
-		<link rel="stylesheet" href="tokens.css" />
+		<link
+			rel="stylesheet"
+			href="tokens.css"
+		/>
 		<script
 			src="https://unpkg.com/react@18.3.1/umd/react.development.js"
 			integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
@@ -236,7 +249,10 @@
 	</head>
 	<body>
 		<div id="root"></div>
-		<script type="text/babel" src="../design-canvas.jsx"></script>
+		<script
+			type="text/babel"
+			src="../design-canvas.jsx"
+		></script>
 		<script type="text/babel">
 			function Chevron() {
 				return (
@@ -280,7 +296,10 @@
 					c = 2 * Math.PI * r;
 				const pct = 84 / 90; // 1:24 remaining of 1:30
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column' }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column' }}
+					>
 						{/* blurred session context behind */}
 						<div className="ses-hd">
 							<div className="ses-bar">
@@ -310,11 +329,18 @@
 							}}
 						>
 							{['Goblet Squat', 'Romanian Deadlift'].map((n, i) => (
-								<div key={i} className="surf2" style={{ padding: '14px 14px', opacity: i === 0 ? 1 : 0.6 }}>
+								<div
+									key={i}
+									className="surf2"
+									style={{ padding: '14px 14px', opacity: i === 0 ? 1 : 0.6 }}
+								>
 									<div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>{n}</div>
 									<div style={{ display: 'flex', gap: 7 }}>
 										{[1, 2, 3, 4].map((s) => (
-											<div key={s} className={`tile${s <= 4 && i === 0 ? ' done' : ''}`}>
+											<div
+												key={s}
+												className={`tile${s <= 4 && i === 0 ? ' done' : ''}`}
+											>
 												<span className="tw">{i === 0 ? '35' : '–'}</span>
 											</div>
 										))}
@@ -336,14 +362,36 @@
 								gap: 0,
 							}}
 						>
-							<div className="ey" style={{ marginBottom: 16 }}>
+							<div
+								className="ey"
+								style={{ marginBottom: 16 }}
+							>
 								Rest
 							</div>
 
 							{/* Ring */}
-							<div style={{ position: 'relative', width: 158, height: 158, marginBottom: 20 }}>
-								<svg width="158" height="158" viewBox="0 0 158 158" style={{ transform: 'rotate(-90deg)' }}>
-									<circle cx="79" cy="79" r={r} fill="none" stroke="var(--color-surface-4)" strokeWidth={sw} />
+							<div
+								style={{
+									position: 'relative',
+									width: 158,
+									height: 158,
+									marginBottom: 20,
+								}}
+							>
+								<svg
+									width="158"
+									height="158"
+									viewBox="0 0 158 158"
+									style={{ transform: 'rotate(-90deg)' }}
+								>
+									<circle
+										cx="79"
+										cy="79"
+										r={r}
+										fill="none"
+										stroke="var(--color-surface-4)"
+										strokeWidth={sw}
+									/>
 									<circle
 										cx="79"
 										cy="79"
@@ -368,11 +416,24 @@
 								>
 									<div
 										className="mn dp"
-										style={{ fontSize: 38, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}
+										style={{
+											fontSize: 38,
+											fontWeight: 700,
+											letterSpacing: '-0.02em',
+											lineHeight: 1,
+										}}
 									>
 										1:24
 									</div>
-									<div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 4 }}>of 1:30</div>
+									<div
+										style={{
+											fontSize: 12,
+											color: 'var(--color-text-secondary)',
+											marginTop: 4,
+										}}
+									>
+										of 1:30
+									</div>
 								</div>
 							</div>
 
@@ -389,8 +450,17 @@
 									border: '1px solid rgba(255,255,255,.05)',
 								}}
 							>
-								<div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-lime)' }} />
-								<span style={{ fontSize: 13, fontWeight: 600 }}>Next · Set 3 of 4 · Goblet Squat</span>
+								<div
+									style={{
+										width: 8,
+										height: 8,
+										borderRadius: '50%',
+										background: 'var(--color-lime)',
+									}}
+								/>
+								<span style={{ fontSize: 13, fontWeight: 600 }}>
+									Next · Set 3 of 4 · Goblet Squat
+								</span>
 							</div>
 
 							{/* Timer controls */}
@@ -438,8 +508,14 @@
 			// 2. Progressive Overload Nudge
 			function ArtOverloadNudge() {
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}>
-						<div className="ses-hd" style={{ paddingTop: 8 }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}
+					>
+						<div
+							className="ses-hd"
+							style={{ paddingTop: 8 }}
+						>
 							<div className="ses-bar">
 								<div className="ses-back">
 									<Chevron />
@@ -455,16 +531,36 @@
 							</div>
 						</div>
 
-						<div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+						<div
+							style={{
+								padding: '14px 16px',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 10,
+							}}
+						>
 							{/* Completed exercise (goblet) */}
 							<div
 								className="surf2 excard"
-								style={{ margin: 0, borderColor: 'rgba(178,240,66,.35)', background: 'rgba(178,240,66,.06)' }}
+								style={{
+									margin: 0,
+									borderColor: 'rgba(178,240,66,.35)',
+									background: 'rgba(178,240,66,.06)',
+								}}
 							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">
-											Goblet Squat <span style={{ marginLeft: 6, fontSize: 13, color: 'var(--color-lime)' }}>✓</span>
+											Goblet Squat{' '}
+											<span
+												style={{
+													marginLeft: 6,
+													fontSize: 13,
+													color: 'var(--color-lime)',
+												}}
+											>
+												✓
+											</span>
 										</div>
 										<div className="excue">Sit tall between the heels</div>
 									</div>
@@ -474,7 +570,10 @@
 								</div>
 								<div className="tiles">
 									{[1, 2, 3, 4].map((s) => (
-										<div key={s} className="tile done">
+										<div
+											key={s}
+											className="tile done"
+										>
 											<span className="tp">Set {s}</span>
 											<span className="tw">35</span>
 											<span className="tr">×8</span>
@@ -484,7 +583,10 @@
 							</div>
 
 							{/* Exercise with nudge */}
-							<div className="surf2 excard" style={{ margin: 0 }}>
+							<div
+								className="surf2 excard"
+								style={{ margin: 0 }}
+							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">Romanian Deadlift</div>
@@ -520,8 +622,22 @@
 										<path d="M12 19V5M5 12l7-7 7 7" />
 									</svg>
 									<div style={{ flex: 1 }}>
-										<div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--color-lime)' }}>Try 100 lb today</div>
-										<div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 1 }}>
+										<div
+											style={{
+												fontSize: 12.5,
+												fontWeight: 600,
+												color: 'var(--color-lime)',
+											}}
+										>
+											Try 100 lb today
+										</div>
+										<div
+											style={{
+												fontSize: 11,
+												color: 'var(--color-text-secondary)',
+												marginTop: 1,
+											}}
+										>
 											You hit 95 lb × 10 last week
 										</div>
 									</div>
@@ -542,7 +658,10 @@
 
 								<div className="tiles">
 									{[1, 2, 3].map((s) => (
-										<div key={s} className="tile">
+										<div
+											key={s}
+											className="tile"
+										>
 											<span className="plus">+</span>
 											<span className="tp">Set {s}</span>
 										</div>
@@ -557,8 +676,14 @@
 			// 3. Personal Record
 			function ArtPRBadge() {
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}>
-						<div className="ses-hd" style={{ paddingTop: 8 }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}
+					>
+						<div
+							className="ses-hd"
+							style={{ paddingTop: 8 }}
+						>
 							<div className="ses-bar">
 								<div className="ses-back">
 									<Chevron />
@@ -574,16 +699,35 @@
 							</div>
 						</div>
 
-						<div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+						<div
+							style={{
+								padding: '14px 16px',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 10,
+							}}
+						>
 							<div
 								className="surf2 excard"
-								style={{ margin: 0, borderColor: 'rgba(178,240,66,.35)', background: 'rgba(178,240,66,.06)' }}
+								style={{
+									margin: 0,
+									borderColor: 'rgba(178,240,66,.35)',
+									background: 'rgba(178,240,66,.06)',
+								}}
 							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">
 											Romanian Deadlift{' '}
-											<span style={{ marginLeft: 6, fontSize: 13, color: 'var(--color-lime)' }}>✓</span>
+											<span
+												style={{
+													marginLeft: 6,
+													fontSize: 13,
+													color: 'var(--color-lime)',
+												}}
+											>
+												✓
+											</span>
 										</div>
 										<div className="excue">Hinge — feel the hamstrings load</div>
 									</div>
@@ -598,7 +742,11 @@
 										{ w: 95, r: 10 },
 										{ w: 105, r: 10, pr: true },
 									].map((s, i) => (
-										<div key={i} className="tile done" style={{ position: 'relative' }}>
+										<div
+											key={i}
+											className="tile done"
+											style={{ position: 'relative' }}
+										>
 											{s.pr && (
 												<div
 													style={{
@@ -657,8 +805,21 @@
 										<path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
 									</svg>
 									<div>
-										<div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-lime)' }}>New personal best</div>
-										<div style={{ fontSize: 11.5, color: 'var(--color-text-secondary)' }}>
+										<div
+											style={{
+												fontSize: 13,
+												fontWeight: 700,
+												color: 'var(--color-lime)',
+											}}
+										>
+											New personal best
+										</div>
+										<div
+											style={{
+												fontSize: 11.5,
+												color: 'var(--color-text-secondary)',
+											}}
+										>
 											105 lb × 10 — up 10 lb from last PR
 										</div>
 									</div>
@@ -666,7 +827,10 @@
 							</div>
 
 							{/* next exercise */}
-							<div className="surf2 excard" style={{ margin: 0, opacity: 0.55 }}>
+							<div
+								className="surf2 excard"
+								style={{ margin: 0, opacity: 0.55 }}
+							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">Bulgarian Split Squat</div>
@@ -679,7 +843,10 @@
 								</div>
 								<div className="tiles">
 									{[1, 2, 3].map((s) => (
-										<div key={s} className="tile">
+										<div
+											key={s}
+											className="tile"
+										>
 											<span className="plus">+</span>
 											<span className="tp">Set {s}</span>
 										</div>
@@ -701,12 +868,20 @@
 				const W = 296,
 					H = 52;
 				const coords = pts.map((v, i) => [i * (W / 7), H - ((v - min) / range) * H]);
-				const path = coords.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+				const path = coords
+					.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+					.join(' ');
 				const area = path + ` L ${W},${H} L 0,${H} Z`;
 
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}>
-						<div className="ses-hd" style={{ paddingTop: 8 }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column', paddingTop: 16 }}
+					>
+						<div
+							className="ses-hd"
+							style={{ paddingTop: 8 }}
+						>
 							<div className="ses-bar">
 								<div className="ses-back">
 									<Chevron />
@@ -721,15 +896,35 @@
 							</div>
 						</div>
 
-						<div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+						<div
+							style={{
+								padding: '14px 16px',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 10,
+							}}
+						>
 							<div
 								className="surf2 excard"
-								style={{ margin: 0, borderColor: 'rgba(178,240,66,.35)', background: 'rgba(178,240,66,.06)' }}
+								style={{
+									margin: 0,
+									borderColor: 'rgba(178,240,66,.35)',
+									background: 'rgba(178,240,66,.06)',
+								}}
 							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">
-											Goblet Squat <span style={{ marginLeft: 6, fontSize: 13, color: 'var(--color-lime)' }}>✓</span>
+											Goblet Squat{' '}
+											<span
+												style={{
+													marginLeft: 6,
+													fontSize: 13,
+													color: 'var(--color-lime)',
+												}}
+											>
+												✓
+											</span>
 										</div>
 										<div className="excue">Sit tall between the heels</div>
 									</div>
@@ -737,14 +932,20 @@
 										<div className="v mn">4×8</div>
 									</div>
 								</div>
-								<div className="tiles" style={{ marginBottom: 14 }}>
+								<div
+									className="tiles"
+									style={{ marginBottom: 14 }}
+								>
 									{[
 										{ w: 40, r: 8 },
 										{ w: 40, r: 8 },
 										{ w: 40, r: 8 },
 										{ w: 40, r: 8 },
 									].map((s, i) => (
-										<div key={i} className="tile done">
+										<div
+											key={i}
+											className="tile done"
+										>
 											<span className="tp">Set {i + 1}</span>
 											<span className="tw">{s.w}</span>
 											<span className="tr">×{s.r}</span>
@@ -753,11 +954,24 @@
 								</div>
 
 								{/* Sparkline */}
-								<div style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 12 }}>
+								<div
+									style={{
+										borderTop: '1px solid rgba(255,255,255,.07)',
+										paddingTop: 12,
+									}}
+								>
 									<div
-										style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											marginBottom: 8,
+										}}
 									>
-										<span className="ey" style={{ fontSize: 10 }}>
+										<span
+											className="ey"
+											style={{ fontSize: 10 }}
+										>
 											Volume · 8 weeks
 										</span>
 										<span
@@ -784,14 +998,36 @@
 											+50% this packet
 										</span>
 									</div>
-									<svg viewBox={`0 0 ${W} ${H + 4}`} width="100%" height="56" style={{ overflow: 'visible' }}>
+									<svg
+										viewBox={`0 0 ${W} ${H + 4}`}
+										width="100%"
+										height="56"
+										style={{ overflow: 'visible' }}
+									>
 										<defs>
-											<linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-												<stop offset="0%" stopColor="#B2F042" stopOpacity="0.2" />
-												<stop offset="100%" stopColor="#B2F042" stopOpacity="0" />
+											<linearGradient
+												id="sg"
+												x1="0"
+												y1="0"
+												x2="0"
+												y2="1"
+											>
+												<stop
+													offset="0%"
+													stopColor="#B2F042"
+													stopOpacity="0.2"
+												/>
+												<stop
+													offset="100%"
+													stopColor="#B2F042"
+													stopOpacity="0"
+												/>
 											</linearGradient>
 										</defs>
-										<path d={area} fill="url(#sg)" />
+										<path
+											d={area}
+											fill="url(#sg)"
+										/>
 										<path
 											d={path}
 											fill="none"
@@ -812,7 +1048,13 @@
 											/>
 										))}
 									</svg>
-									<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+									<div
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											marginTop: 4,
+										}}
+									>
 										{['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'].map((w) => (
 											<span
 												key={w}
@@ -830,7 +1072,10 @@
 								</div>
 							</div>
 
-							<div className="surf2 excard" style={{ margin: 0, opacity: 0.5 }}>
+							<div
+								className="surf2 excard"
+								style={{ margin: 0, opacity: 0.5 }}
+							>
 								<div className="exhead">
 									<div style={{ flex: 1 }}>
 										<div className="exname">Romanian Deadlift</div>
@@ -841,7 +1086,10 @@
 								</div>
 								<div className="tiles">
 									{[1, 2, 3].map((s) => (
-										<div key={s} className="tile">
+										<div
+											key={s}
+											className="tile"
+										>
 											<span className="plus">+</span>
 											<span className="tp">Set {s}</span>
 										</div>
@@ -858,14 +1106,25 @@
 				const levels = ['Rough', 'Off', 'Solid', 'Good', 'Fire'];
 				const sel = 3;
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column' }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column' }}
+					>
 						{/* Today header */}
 						<div style={{ padding: '20px 18px 16px' }}>
-							<div className="ey" style={{ marginBottom: 5 }}>
+							<div
+								className="ey"
+								style={{ marginBottom: 5 }}
+							>
 								Tue · Jun 9
 							</div>
 							<div
-								style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28, letterSpacing: '-.03em' }}
+								style={{
+									fontFamily: 'var(--font-display)',
+									fontWeight: 700,
+									fontSize: 28,
+									letterSpacing: '-.03em',
+								}}
 							>
 								Today
 							</div>
@@ -926,7 +1185,13 @@
 										Skip
 									</button>
 								</div>
-								<div style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 16 }}>
+								<div
+									style={{
+										fontSize: 12,
+										color: 'var(--color-text-secondary)',
+										marginBottom: 16,
+									}}
+								>
 									Rate today's session on court
 								</div>
 
@@ -935,7 +1200,13 @@
 									{levels.map((l, i) => (
 										<div
 											key={i}
-											style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}
+											style={{
+												flex: 1,
+												display: 'flex',
+												flexDirection: 'column',
+												alignItems: 'center',
+												gap: 7,
+											}}
 										>
 											<div
 												style={{
@@ -998,7 +1269,9 @@
 									>
 										<path d="M4 20h4L18 10l-4-4L4 16v4ZM13 7l4 4" />
 									</svg>
-									<span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Add a note about your game…</span>
+									<span style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
+										Add a note about your game…
+									</span>
 								</div>
 							</div>
 						</div>
@@ -1083,10 +1356,18 @@
 				return (
 					<div
 						className="ab"
-						style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', padding: '24px 22px 22px' }}
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'stretch',
+							padding: '24px 22px 22px',
+						}}
 					>
 						<div style={{ marginBottom: 8 }}>
-							<div className="ey" style={{ marginBottom: 10 }}>
+							<div
+								className="ey"
+								style={{ marginBottom: 10 }}
+							>
 								Before you start
 							</div>
 							<div
@@ -1103,12 +1384,25 @@
 								<br />
 								feeling today?
 							</div>
-							<div style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 24 }}>
+							<div
+								style={{
+									fontSize: 13,
+									color: 'var(--color-text-secondary)',
+									marginBottom: 24,
+								}}
+							>
 								10 seconds. Adjusts intensity suggestions.
 							</div>
 						</div>
 
-						<div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
+						<div
+							style={{
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 10,
+								marginBottom: 18,
+							}}
+						>
 							{metrics.map((m, i) => (
 								<div
 									key={i}
@@ -1120,10 +1414,22 @@
 									}}
 								>
 									<div
-										style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											alignItems: 'center',
+											marginBottom: 12,
+										}}
 									>
 										<span style={{ fontSize: 14, fontWeight: 700 }}>{m.label}</span>
-										<span style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>{m.hint}</span>
+										<span
+											style={{
+												fontSize: 11,
+												color: 'var(--color-text-secondary)',
+											}}
+										>
+											{m.hint}
+										</span>
 									</div>
 									<div style={{ display: 'flex', gap: 8 }}>
 										{[1, 2, 3, 4, 5].map((n) => (
@@ -1144,9 +1450,31 @@
 											/>
 										))}
 									</div>
-									<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
-										<span style={{ fontSize: 9, color: 'var(--color-text-muted)', fontWeight: 700 }}>Low</span>
-										<span style={{ fontSize: 9, color: 'var(--color-text-muted)', fontWeight: 700 }}>High</span>
+									<div
+										style={{
+											display: 'flex',
+											justifyContent: 'space-between',
+											marginTop: 5,
+										}}
+									>
+										<span
+											style={{
+												fontSize: 9,
+												color: 'var(--color-text-muted)',
+												fontWeight: 700,
+											}}
+										>
+											Low
+										</span>
+										<span
+											style={{
+												fontSize: 9,
+												color: 'var(--color-text-muted)',
+												fontWeight: 700,
+											}}
+										>
+											High
+										</span>
 									</div>
 								</div>
 							))}
@@ -1175,11 +1503,22 @@
 								strokeLinecap="round"
 								style={{ flexShrink: 0, marginTop: 1 }}
 							>
-								<circle cx="12" cy="12" r="9" />
+								<circle
+									cx="12"
+									cy="12"
+									r="9"
+								/>
 								<path d="M12 8v4M12 16h.01" />
 							</svg>
 							<div>
-								<div style={{ fontSize: 12.5, fontWeight: 700, color: '#E55733', marginBottom: 2 }}>
+								<div
+									style={{
+										fontSize: 12.5,
+										fontWeight: 700,
+										color: '#E55733',
+										marginBottom: 2,
+									}}
+								>
 									High soreness detected
 								</div>
 								<div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
@@ -1204,7 +1543,14 @@
 						>
 							I'm ready — let's go
 						</button>
-						<div style={{ textAlign: 'center', fontSize: 12.5, color: 'var(--color-text-muted)', cursor: 'pointer' }}>
+						<div
+							style={{
+								textAlign: 'center',
+								fontSize: 12.5,
+								color: 'var(--color-text-muted)',
+								cursor: 'pointer',
+							}}
+						>
 							Skip readiness check
 						</div>
 					</div>
@@ -1227,18 +1573,34 @@
 				const totalDone = 8 * 3 - 3; // approx
 
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column' }}>
+					<div
+						className="ab"
+						style={{ display: 'flex', flexDirection: 'column' }}
+					>
 						<div style={{ padding: '20px 18px 0' }}>
-							<div className="ey" style={{ marginBottom: 8 }}>
+							<div
+								className="ey"
+								style={{ marginBottom: 8 }}
+							>
 								Tue · Jun 9
 							</div>
 
 							{/* Enhanced header */}
 							<div
-								style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}
+								style={{
+									display: 'flex',
+									alignItems: 'flex-start',
+									justifyContent: 'space-between',
+									marginBottom: 18,
+								}}
 							>
 								<div
-									style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 28, letterSpacing: '-.03em' }}
+									style={{
+										fontFamily: 'var(--font-display)',
+										fontWeight: 700,
+										fontSize: 28,
+										letterSpacing: '-.03em',
+									}}
 								>
 									Today
 								</div>
@@ -1288,7 +1650,12 @@
 								}}
 							>
 								<div
-									style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}
+									style={{
+										display: 'flex',
+										justifyContent: 'space-between',
+										alignItems: 'center',
+										marginBottom: 12,
+									}}
 								>
 									<span style={{ fontSize: 13, fontWeight: 700 }}>June consistency</span>
 									<span
@@ -1304,9 +1671,19 @@
 								</div>
 
 								{/* Heatmap grid */}
-								<div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										gap: 6,
+										marginBottom: 14,
+									}}
+								>
 									{weeks.map((week, wi) => (
-										<div key={wi} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+										<div
+											key={wi}
+											style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+										>
 											<span
 												style={{
 													fontFamily: 'var(--font-mono)',
@@ -1376,12 +1753,47 @@
 								</div>
 
 								{/* Progress bar */}
-								<div style={{ height: 5, borderRadius: 999, background: 'var(--color-surface-4)', overflow: 'hidden' }}>
-									<div style={{ height: '100%', width: '87.5%', background: 'var(--color-lime)', borderRadius: 999 }} />
+								<div
+									style={{
+										height: 5,
+										borderRadius: 999,
+										background: 'var(--color-surface-4)',
+										overflow: 'hidden',
+									}}
+								>
+									<div
+										style={{
+											height: '100%',
+											width: '87.5%',
+											background: 'var(--color-lime)',
+											borderRadius: 999,
+										}}
+									/>
 								</div>
-								<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
-									<span style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>21 sessions completed</span>
-									<span style={{ fontSize: 11, color: 'var(--color-lime)', fontWeight: 700 }}>87.5%</span>
+								<div
+									style={{
+										display: 'flex',
+										justifyContent: 'space-between',
+										marginTop: 5,
+									}}
+								>
+									<span
+										style={{
+											fontSize: 11,
+											color: 'var(--color-text-secondary)',
+										}}
+									>
+										21 sessions completed
+									</span>
+									<span
+										style={{
+											fontSize: 11,
+											color: 'var(--color-lime)',
+											fontWeight: 700,
+										}}
+									>
+										87.5%
+									</span>
 								</div>
 							</div>
 
@@ -1430,9 +1842,22 @@
 			// 8. Packet 2 Preview
 			function ArtPacket2() {
 				return (
-					<div className="ab" style={{ display: 'flex', flexDirection: 'column', padding: '24px 20px 22px' }}>
+					<div
+						className="ab"
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							padding: '24px 20px 22px',
+						}}
+					>
 						{/* Completion badge */}
-						<div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'center',
+								marginBottom: 20,
+							}}
+						>
 							<div
 								style={{
 									width: 72,
@@ -1461,7 +1886,10 @@
 						</div>
 
 						<div style={{ textAlign: 'center', marginBottom: 22 }}>
-							<div className="ey" style={{ color: 'var(--color-lime)', marginBottom: 8 }}>
+							<div
+								className="ey"
+								style={{ color: 'var(--color-lime)', marginBottom: 8 }}
+							>
 								Packet 1 Complete
 							</div>
 							<div
@@ -1549,7 +1977,10 @@
 									background: 'linear-gradient(90deg, var(--color-lavender), transparent)',
 								}}
 							/>
-							<div className="ey" style={{ color: 'var(--color-lavender)', marginBottom: 8 }}>
+							<div
+								className="ey"
+								style={{ color: 'var(--color-lavender)', marginBottom: 8 }}
+							>
 								Up next
 							</div>
 							<div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
@@ -1577,7 +2008,13 @@
 							>
 								Progressive Overload
 							</div>
-							<div style={{ fontSize: 12.5, color: 'var(--color-text-secondary)', marginBottom: 14 }}>
+							<div
+								style={{
+									fontSize: 12.5,
+									color: 'var(--color-text-secondary)',
+									marginBottom: 14,
+								}}
+							>
 								Heavier loads, longer sets, trap-bar progression. 12 weeks.
 							</div>
 							<div style={{ display: 'flex', gap: 8 }}>
@@ -1639,9 +2076,17 @@
 				return (
 					<div
 						className="ab"
-						style={{ display: 'flex', flexDirection: 'column', padding: '18px 18px 16px', alignItems: 'center' }}
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							padding: '18px 18px 16px',
+							alignItems: 'center',
+						}}
 					>
-						<div className="ey" style={{ marginBottom: 14, alignSelf: 'flex-start' }}>
+						<div
+							className="ey"
+							style={{ marginBottom: 14, alignSelf: 'flex-start' }}
+						>
 							Share session
 						</div>
 
@@ -1714,7 +2159,13 @@
 										Packet
 									</span>
 								</div>
-								<span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-muted)' }}>
+								<span
+									style={{
+										fontFamily: 'var(--font-mono)',
+										fontSize: 11,
+										color: 'var(--color-text-muted)',
+									}}
+								>
 									Jun 9 · W2A
 								</span>
 							</div>
@@ -1733,13 +2184,27 @@
 								>
 									18
 								</div>
-								<div style={{ fontSize: 14, color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+								<div
+									style={{
+										fontSize: 14,
+										color: 'var(--color-text-secondary)',
+										fontWeight: 600,
+									}}
+								>
 									sets · 7,240 lb lifted
 								</div>
 							</div>
 
 							{/* Exercise list */}
-							<div style={{ display: 'flex', flexDirection: 'column', gap: 0, marginBottom: 14, position: 'relative' }}>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									gap: 0,
+									marginBottom: 14,
+									position: 'relative',
+								}}
+							>
 								{[
 									['Goblet Squat', '4×8', '40 lb'],
 									['Romanian Deadlift', '3×10', '105 lb'],
@@ -1756,9 +2221,22 @@
 											borderBottom: i < 3 ? '1px solid rgba(255,255,255,.06)' : 'none',
 										}}
 									>
-										<span style={{ flex: 1, fontSize: 12.5, fontWeight: 500, color: '#ccc' }}>{n}</span>
 										<span
-											style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)' }}
+											style={{
+												flex: 1,
+												fontSize: 12.5,
+												fontWeight: 500,
+												color: '#ccc',
+											}}
+										>
+											{n}
+										</span>
+										<span
+											style={{
+												fontFamily: 'var(--font-mono)',
+												fontSize: 12,
+												color: 'var(--color-text-secondary)',
+											}}
 										>
 											{s}
 										</span>
@@ -1780,10 +2258,23 @@
 
 							{/* Footer */}
 							<div
-								style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+									position: 'relative',
+								}}
 							>
-								<span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Packet 1 · Foundation · 45 min</span>
-								<span style={{ fontSize: 10, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+								<span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+									Packet 1 · Foundation · 45 min
+								</span>
+								<span
+									style={{
+										fontSize: 10,
+										color: 'var(--color-text-muted)',
+										fontFamily: 'var(--font-mono)',
+									}}
+								>
 									🏓
 								</span>
 							</div>
@@ -1853,16 +2344,36 @@
 							title="In the Gym"
 							subtitle="Session enhancements — features that make logging faster and more rewarding"
 						>
-							<DCArtboard id="rt" label="Rest Timer" width={390} height={700}>
+							<DCArtboard
+								id="rt"
+								label="Rest Timer"
+								width={390}
+								height={700}
+							>
 								<ArtRestTimer />
 							</DCArtboard>
-							<DCArtboard id="on" label="Overload Nudge" width={390} height={540}>
+							<DCArtboard
+								id="on"
+								label="Overload Nudge"
+								width={390}
+								height={540}
+							>
 								<ArtOverloadNudge />
 							</DCArtboard>
-							<DCArtboard id="pr" label="Personal Record" width={390} height={540}>
+							<DCArtboard
+								id="pr"
+								label="Personal Record"
+								width={390}
+								height={540}
+							>
 								<ArtPRBadge />
 							</DCArtboard>
-							<DCArtboard id="sp" label="Volume Sparkline" width={390} height={600}>
+							<DCArtboard
+								id="sp"
+								label="Volume Sparkline"
+								width={390}
+								height={600}
+							>
 								<ArtSparkline />
 							</DCArtboard>
 						</DCSection>
@@ -1872,10 +2383,20 @@
 							title="Before You Start"
 							subtitle="Pre-session context that connects training to how you actually feel"
 						>
-							<DCArtboard id="pm" label="Post-Match Logging" width={390} height={680}>
+							<DCArtboard
+								id="pm"
+								label="Post-Match Logging"
+								width={390}
+								height={680}
+							>
 								<ArtPostMatch />
 							</DCArtboard>
-							<DCArtboard id="rc" label="Readiness Check" width={390} height={700}>
+							<DCArtboard
+								id="rc"
+								label="Readiness Check"
+								width={390}
+								height={700}
+							>
 								<ArtReadiness />
 							</DCArtboard>
 						</DCSection>
@@ -1885,13 +2406,28 @@
 							title="Progress & Sharing"
 							subtitle="Features that make the habit visible and worth showing off"
 						>
-							<DCArtboard id="st" label="Streak & Consistency" width={390} height={680}>
+							<DCArtboard
+								id="st"
+								label="Streak & Consistency"
+								width={390}
+								height={680}
+							>
 								<ArtStreak />
 							</DCArtboard>
-							<DCArtboard id="p2" label="Packet 2 Preview" width={390} height={740}>
+							<DCArtboard
+								id="p2"
+								label="Packet 2 Preview"
+								width={390}
+								height={740}
+							>
 								<ArtPacket2 />
 							</DCArtboard>
-							<DCArtboard id="sc" label="Session Share Card" width={390} height={620}>
+							<DCArtboard
+								id="sc"
+								label="Session Share Card"
+								width={390}
+								height={620}
+							>
 								<ArtShareCard />
 							</DCArtboard>
 						</DCSection>

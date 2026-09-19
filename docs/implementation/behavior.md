@@ -1,3 +1,5 @@
+[Wiki](../README.md) › [Implementation](../README.md#ground--implementation) › How It Works
+
 # How It Works
 
 The mental model for CosmicWorkOut — what actually happens when you use the app. No code, just behavior.
@@ -6,9 +8,10 @@ The mental model for CosmicWorkOut — what actually happens when you use the ap
 
 ## The Big Picture
 
-CosmicWorkOut is a **single-user, local-only** movement tracker. There is no server, no account, and no sync — everything lives on your device. It tracks four kinds of things, each with its own logging style (see the [Glossary](../glossary.md) archetypes):
+CosmicWorkOut is a **single-user, local-only** movement tracker. There is no server, no account, and no sync — everything lives on your device. It tracks several kinds of things, each with its own logging style (see the [Glossary](../glossary.md) archetypes):
 
 - **Structured practice** — multi-week programs you're guided through, one session at a time. Two Disciplines ship today: **Strength** and **Belly Dance**.
+- **Goal progression plans** _(opt-in)_ — wave-loading Strength stints toward one focus lift (see [below](#goal-progression-plans-opt-in)).
 - **Activities** — quick one-line records of things you did (Run, Bike, Pickleball, Yoga, …).
 - **Habits** — daily counters, toggles, and a mood check-in.
 - **Health metrics** — optional weight and blood-pressure readings (off by default).
@@ -66,12 +69,12 @@ Each card is a jumping-off point to its dedicated screen.
 
 The app does **not** know your weekly schedule. For each active plan it gives you the **next routine in sequence**, based on how many sessions you've already finished for that plan:
 
-| You've completed | You see next                    |
-| ---------------- | ------------------------------- |
-| 0 sessions       | Routine A (week 1)              |
-| 1 session        | Routine B                       |
-| 2 sessions       | Routine C                       |
-| 3 sessions       | Routine A (week 2)              |
+| You've completed | You see next       |
+| ---------------- | ------------------ |
+| 0 sessions       | Routine A (week 1) |
+| 1 session        | Routine B          |
+| 2 sessions       | Routine C          |
+| 3 sessions       | Routine A (week 2) |
 
 The index is `completedSessions % routineCount`, computed **per Discipline**. If you already logged a session for a plan **today**, that plan shows a "complete for today" state — one session per plan per calendar day. See [Program Progression](program-progression.md) for the full logic.
 
@@ -109,10 +112,10 @@ Haptic feedback fires when you **complete an item** (all its sets done), not on 
 
 ### Finishing vs abandoning
 
-| Action      | How                                            | What gets saved                                            |
-| ----------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| Action      | How                                            | What gets saved                                               |
+| ----------- | ---------------------------------------------- | ------------------------------------------------------------- |
 | **Finish**  | Footer button (says "Finish early" if partial) | Only completed work is saved as a Session. No confirm dialog. |
-| **Abandon** | Back arrow → "End session" confirm             | Nothing saved. All progress lost.                          |
+| **Abandon** | Back arrow → "End session" confirm             | Nothing saved. All progress lost.                             |
 
 Both clear the in-progress session from local storage. Finishing shows a completion overlay with duration, volume, and counts (confetti plays).
 
@@ -162,6 +165,16 @@ Off by default. Enable the toggle in Settings to reveal the **Health** screen an
 
 ---
 
+## Lift Plans (opt-in)
+
+Off by default — same contract as health metrics. Enable **Goal progression plans** in Settings to reveal `/goals` and the create wizard at `/goals/new`.
+
+A lift plan is an isolated Strength stint toward one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Only one lift plan may be **active** at a time; while active it is the sole active Strength program. You can pause, complete, or repeat a block. Turning the toggle off hides the UI; plan data stays in IndexedDB.
+
+Vocabulary: [Glossary — Lift plan](../glossary.md#lift-plan) (older name: Goal progression plan). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
+
+---
+
 ## Data & Persistence
 
 ```mermaid
@@ -184,18 +197,19 @@ flowchart TB
     IDB --- Hab[habits + habitLogs]
     IDB --- Act[activities]
     IDB --- HR[healthReadings]
+    IDB --- GP[goalPlans]
 
     classDef transient fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef gone fill:#465569,stroke:#28313e,color:#ffffff;
     class AS transient;
-    class IDB,Prog,Items,Logs,Last,Hab,Act,HR store;
+    class IDB,Prog,Items,Logs,Last,Hab,Act,HR,GP store;
     class Gone gone;
     class Sess store;
 ```
 
 - **Programs, items, habits** — IndexedDB; built-in content is seeded and refreshed on boot.
-- **Completed sessions, activities, habit logs, health readings** — IndexedDB.
+- **Completed sessions, activities, habit logs, health readings, lift plans** — IndexedDB.
 - **Last-used weight/reps** — IndexedDB, updated each set.
 - **In-progress session, preferences, active plans** — localStorage.
 
@@ -215,8 +229,11 @@ Items and programs are upserted on every boot (built-in updates propagate; user 
 
 ## Related
 
+- [Glossary](../glossary.md) — Discipline, Item, Program, Lift plan, …
 - [Program Progression](program-progression.md) — How the next routine and week are chosen
 - [State Management](state.md) — Which store owns what
 - [App Structure](app-structure.md) — Routes, layout, boot sequence
+- [Data Model](../architecture/data-model.md) — Entities and IndexedDB stores
+- [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Full lift-plan spec
 - [Session Logging](../requirements/session-logging.md) — Target logging UX
 - [Implementation Status](status.md) — Built vs deferred checklist

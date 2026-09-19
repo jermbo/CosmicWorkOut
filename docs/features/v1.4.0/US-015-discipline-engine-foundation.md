@@ -1,8 +1,10 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.4.0](README.md) › US-015
+
 # US-015 — Discipline Engine Foundation
 
 > **Status: Shipped — v1.4.0**
 >
-> The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model--planned-v140).
+> The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model).
 
 As a **fitness user**, I want my existing strength program, history, and session flow to keep working exactly as before while the app gains a flexible foundation for other movement practices,
 so that adding belly dance (and future practices) never forces me to relearn or lose what I already use.
@@ -20,7 +22,7 @@ so that adding belly dance (and future practices) never forces me to relearn or 
 
 2. Generalized entities
    a. Items, routines, programs, and sessions shall each be associated with a Discipline.
-   b. The current strength entities shall be generalized — Exercise → **Item**, Workout → **Routine**, SessionLog → **Session**, and Program gains a Discipline association — with behaviour preserved (see the [naming map](../../architecture/data-model.md#naming-map-current--generalized)).
+   b. The current strength entities shall be generalized — Exercise → **Item**, Workout → **Routine**, SessionLog → **Session**, and Program gains a Discipline association — with behaviour preserved (see the [naming map](../../glossary.md#naming-map-original--current)).
    c. A routine shall be composed of one or more ordered sections; a strength routine has a single `setsReps` section.
    d. Linear progression — next routine = `completedSessionCount % routineCount`, week = `floor(count / daysPerWeek) + 1` — shall be a Discipline-level behaviour, identical to today's strength logic.
    e. The "one session per program per day" rule shall apply per Discipline, allowing one strength and one belly dance session on the same date.
@@ -90,7 +92,7 @@ These were decided up front so the engine doesn't grow scope it doesn't need. Th
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model--planned-v140)
+- [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model)
 - [Glossary](../../glossary.md)
 - [Program Progression](../../implementation/program-progression.md)
 - [US-016 — Item Library (Discipline-scoped)](./US-016-practice-item-library.md)

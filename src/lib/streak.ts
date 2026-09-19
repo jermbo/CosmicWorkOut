@@ -18,7 +18,11 @@ export function weekCounts(sessionDates: string[]): Map<string, number> {
 	return counts;
 }
 
-export function computeWeekStreak(sessionDates: string[], daysPerWeek: number, today: Date = new Date()): number {
+export function computeWeekStreak(
+	sessionDates: string[],
+	daysPerWeek: number,
+	today: Date = new Date(),
+): number {
 	if (sessionDates.length === 0 || daysPerWeek <= 0) return 0;
 
 	const counts = weekCounts(sessionDates);
@@ -38,7 +42,11 @@ export function computeWeekStreak(sessionDates: string[], daysPerWeek: number, t
 	return streak;
 }
 
-export function computeCombinedStreak(dateSets: string[][], threshold = 1, today: Date = new Date()): number {
+export function computeCombinedStreak(
+	dateSets: string[][],
+	threshold = 1,
+	today: Date = new Date(),
+): number {
 	const union = new Set<string>();
 	for (const dates of dateSets) {
 		for (const d of dates) union.add(d);

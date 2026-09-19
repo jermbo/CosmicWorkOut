@@ -22,9 +22,21 @@
 	let itemsCompleted = $derived(session?.items.length ?? 0);
 </script>
 
-<BottomSheet onclose={handleBackToToday} maxHeight="100dvh" hideHandle fixedHeight>
-	<div class="session-complete" aria-labelledby="complete-title" aria-modal="true">
-		<div class="session-complete__graphic" aria-hidden="true">
+<BottomSheet
+	onclose={handleBackToToday}
+	maxHeight="100dvh"
+	hideHandle
+	fixedHeight
+>
+	<div
+		class="session-complete"
+		aria-labelledby="complete-title"
+		aria-modal="true"
+	>
+		<div
+			class="session-complete__graphic"
+			aria-hidden="true"
+		>
 			<div class="session-complete__circle">
 				<svg
 					viewBox="0 0 48 48"
@@ -41,21 +53,40 @@
 		</div>
 
 		<div class="session-complete__text">
-			<p class="session-complete__eyebrow" aria-hidden="true">Filed away.</p>
-			<h2 class="session-complete__title" id="complete-title">Session logged.</h2>
+			<p
+				class="session-complete__eyebrow"
+				aria-hidden="true"
+			>
+				Filed away.
+			</p>
+			<h2
+				class="session-complete__title"
+				id="complete-title"
+			>
+				Session logged.
+			</h2>
 			<p class="session-complete__subtitle">Nice work today.</p>
 		</div>
 
 		{#if session}
-			<div class="session-complete__stats" role="region" aria-label="Session summary">
+			<div
+				class="session-complete__stats"
+				role="region"
+				aria-label="Session summary"
+			>
 				{#if isDance}
 					<div class="session-complete__stat">
 						<span class="session-complete__stat-value">{itemsCompleted}</span>
 						<span class="session-complete__stat-label">items</span>
 					</div>
-					<div class="session-complete__stat-sep" aria-hidden="true"></div>
+					<div
+						class="session-complete__stat-sep"
+						aria-hidden="true"
+					></div>
 					<div class="session-complete__stat">
-						<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
+						<span class="session-complete__stat-value"
+							>{formatDuration(session.durationSeconds ?? 0, true)}</span
+						>
 						<span class="session-complete__stat-label">duration</span>
 					</div>
 				{:else}
@@ -63,18 +94,29 @@
 						<span class="session-complete__stat-value">{totalSets}</span>
 						<span class="session-complete__stat-label">sets</span>
 					</div>
-					<div class="session-complete__stat-sep" aria-hidden="true"></div>
+					<div
+						class="session-complete__stat-sep"
+						aria-hidden="true"
+					></div>
 					<div class="session-complete__stat">
-						<span class="session-complete__stat-value">{formatDuration(session.durationSeconds ?? 0, true)}</span>
+						<span class="session-complete__stat-value"
+							>{formatDuration(session.durationSeconds ?? 0, true)}</span
+						>
 						<span class="session-complete__stat-label">duration</span>
 					</div>
-					<div class="session-complete__stat-sep" aria-hidden="true"></div>
+					<div
+						class="session-complete__stat-sep"
+						aria-hidden="true"
+					></div>
 					<div class="session-complete__stat">
 						<span class="session-complete__stat-value">{itemsCompleted}</span>
 						<span class="session-complete__stat-label">exercises</span>
 					</div>
 					{#if session.totalVolume > 0}
-						<div class="session-complete__stat-sep" aria-hidden="true"></div>
+						<div
+							class="session-complete__stat-sep"
+							aria-hidden="true"
+						></div>
 						<div class="session-complete__stat">
 							<span class="session-complete__stat-value">{formatVolume(session.totalVolume)}</span>
 							<span class="session-complete__stat-label">{prefsStore.weightUnit}</span>
@@ -85,10 +127,16 @@
 		{/if}
 
 		<div class="session-complete__actions">
-			<button class="session-complete__btn session-complete__btn--primary" onclick={handleBackToToday}>
+			<button
+				class="session-complete__btn session-complete__btn--primary"
+				onclick={handleBackToToday}
+			>
 				Back to today
 			</button>
-			<button class="session-complete__btn session-complete__btn--secondary" onclick={handleSeeCalendar}>
+			<button
+				class="session-complete__btn session-complete__btn--secondary"
+				onclick={handleSeeCalendar}
+			>
 				See it in calendar
 			</button>
 		</div>

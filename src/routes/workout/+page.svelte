@@ -4,6 +4,8 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
 	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
 	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
@@ -13,13 +15,18 @@
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration } from '$lib/format';
 	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	const todayStr = todayIso();
 
 	let contextDate = $derived(loggingContext.date);
 
 	let programId = $derived(
-		page.url.searchParams.get('program') ?? programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ?? null,
+		page.url.searchParams.get('program') ??
+			programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ??
+			null,
 	);
 	let viewingProgram = $derived.by(() => {
 		if (programId) return programStore.programById(programId);
@@ -50,7 +57,33 @@
 		return suggestedWorkout;
 	});
 
-	let showSuggestedHint = $derived(selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id);
+	let showSuggestedHint = $derived(
+		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id,
+	);
+
+	// Goal-plan hook: when the viewed program belongs to the active goal plan (and the
+	// feature is on), prescribe this week's wave targets instead of last-used prefill.
+	let goalPlan = $derived.by(() => {
+		if (!prefsStore.liftPlansEnabled || !programId) return null;
+		const plan = goalPlanStore.activePlan;
+		if (plan && plan.programId === programId) return plan;
+		return null;
+	});
+	let prescribedTargets = $derived(
+		goalPlan ? goalPlanStore.prescribedTargets(goalPlan) : undefined,
+	);
+	let goalContext = $derived.by(() => {
+		if (!goalPlan) return null;
+		const block = goalPlanStore.currentBlock(goalPlan);
+		const focus = goalPlanStore.focusTarget(goalPlan);
+		if (!block || !focus) return null;
+		return {
+			blockNumber: block.blockNumber,
+			totalBlocks: goalPlan.blocks.length,
+			blockWeek: goalPlanStore.currentBlockWeek(goalPlan),
+			phase: focus.phase,
+		};
+	});
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
@@ -61,7 +94,10 @@
 		const workout = selectedWorkout;
 		const program = viewingProgram;
 		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.itemMap, { date: contextDate });
+		await sessionStore.start(workout, program, programStore.itemMap, {
+			date: contextDate,
+			prescribed: prescribedTargets,
+		});
 	}
 
 	async function startSession() {
@@ -91,31 +127,75 @@
 </svelte:head>
 
 <div class="page page--wide workout-page">
-	<PageHeader title="Workout" showBack>
+	<PageHeader
+		title="Workout"
+		showBack
+	>
 		{#snippet trailing()}
-			<a href={resolve('/program')} class="workout-page__programs-link">Programs</a>
+			<span class="workout-page__header-links">
+				{#if prefsStore.liftPlansEnabled}
+					<a
+						href={resolve('/goals')}
+						class="workout-page__programs-link">Goals</a
+					>
+				{/if}
+				<a
+					href={resolve('/program')}
+					class="workout-page__programs-link">Programs</a
+				>
+			</span>
 		{/snippet}
 	</PageHeader>
 
 	{#if !programStore.loaded}
-		<div class="workout-page__loading" aria-busy="true" aria-label="Loading workout">
+		<div
+			class="workout-page__loading"
+			aria-busy="true"
+			aria-label="Loading workout"
+		>
 			<div class="workout-page__spinner"></div>
 		</div>
 	{:else if isProgramComplete}
 		<div class="workout-complete">
-			<div class="workout-complete__icon" aria-hidden="true">🎉</div>
-			<h2 class="workout-complete__title">{viewingProgram?.name ?? 'Program'} complete!</h2>
+			<div
+				class="workout-complete__icon"
+				aria-hidden="true"
+			>
+				🎉
+			</div>
+			<h2 class="workout-complete__title">
+				{viewingProgram?.name ?? 'Program'} complete!
+			</h2>
 			<p class="workout-complete__body">You finished every session. Time for something new.</p>
-			<button class="workout-complete__cta" onclick={() => (showProgramSelect = true)}> Choose a new program </button>
+			<button
+				class="workout-complete__cta"
+				onclick={() => (showProgramSelect = true)}
+			>
+				Choose a new program
+			</button>
 		</div>
 	{:else if !viewingProgram}
 		<div class="workout-page__no-program">
 			<p>No plan selected.</p>
-			<a href={resolve('/practice/workout')} class="workout-page__choose-btn"> Choose a plan </a>
+			<a
+				href={resolve('/practice/workout')}
+				class="workout-page__choose-btn"
+			>
+				Choose a plan
+			</a>
+			{#if prefsStore.liftPlansEnabled}
+				<a
+					href={resolve('/goals/new')}
+					class="workout-page__goal-link">Or start a goal plan</a
+				>
+			{/if}
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<div class="session-done">
-			<div class="session-done__icon" aria-hidden="true">
+			<div
+				class="session-done__icon"
+				aria-hidden="true"
+			>
 				<svg
 					viewBox="0 0 48 48"
 					fill="none"
@@ -133,10 +213,16 @@
 				</p>
 				<p class="session-done__meta">
 					{formatDuration(sessionForDate.durationSeconds ?? 0)}
-					· {sessionForDate.items.length} exercises · {sessionForDate.totalVolume} lb
+					· {sessionForDate.items.length} exercises · {sessionForDate.totalVolume}
+					lb
 				</p>
 			</div>
-			<button class="session-done__edit" onclick={editSession}> Edit </button>
+			<button
+				class="session-done__edit"
+				onclick={editSession}
+			>
+				Edit
+			</button>
 		</div>
 	{:else if weekWorkouts.length > 0 && selectedWorkout}
 		<div class="workout-page__body">
@@ -151,12 +237,21 @@
 				onSelect={(id) => loggingContext.setWorkoutId(id)}
 			/>
 
-			<TodayWorkout workout={selectedWorkout} exerciseMap={programStore.itemMap} onStart={startSession} />
+			<TodayWorkout
+				workout={selectedWorkout}
+				exerciseMap={programStore.itemMap}
+				onStart={startSession}
+				prescribed={prescribedTargets}
+				{goalContext}
+			/>
 		</div>
 	{:else}
 		<div class="workout-page__no-program">
 			<p>No workout scheduled for this week.</p>
-			<a href={resolve('/program')} class="workout-page__program-link">View program</a>
+			<a
+				href={resolve('/program')}
+				class="workout-page__program-link">View program</a
+			>
 		</div>
 	{/if}
 </div>
@@ -209,6 +304,12 @@
 <style>
 	.workout-page {
 		inline-size: 100%;
+	}
+
+	.workout-page__header-links {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
 	}
 
 	.workout-page__programs-link {
@@ -301,6 +402,9 @@
 	}
 
 	.workout-page__choose-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		padding-inline: var(--space-5);
 		block-size: 48px;
 		background: var(--color-accent);
@@ -308,6 +412,18 @@
 		border-radius: var(--radius-full);
 		font-size: 0.9375rem;
 		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.workout-page__goal-link {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		text-decoration: none;
+
+		&:hover {
+			color: var(--color-accent);
+		}
 	}
 
 	.workout-page__program-link {

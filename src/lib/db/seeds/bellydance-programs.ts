@@ -100,7 +100,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'bd-beginner-103',
 		name: 'Beginner 103',
-		description: 'Shimmies and undulations — hip shimmy, camel, belly pop, and your first horizontal figure eight.',
+		description:
+			'Shimmies and undulations — hip shimmy, camel, belly pop, and your first horizontal figure eight.',
 		durationWeeks: 4,
 		routines: [
 			{
@@ -171,7 +172,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'bd-intermediate-102',
 		name: 'Intermediate 102',
-		description: 'Turns and travelling lines — corkscrew and barrel turns, arabesque, and the hip jewel.',
+		description:
+			'Turns and travelling lines — corkscrew and barrel turns, arabesque, and the hip jewel.',
 		durationWeeks: 4,
 		routines: [
 			{
@@ -206,7 +208,8 @@ const COURSES: CourseConfig[] = [
 	{
 		id: 'bd-intermediate-103',
 		name: 'Intermediate 103',
-		description: 'Flow and performance — floorwork, layering, belly flutters, and travelling combinations.',
+		description:
+			'Flow and performance — floorwork, layering, belly flutters, and travelling combinations.',
 		durationWeeks: 4,
 		routines: [
 			{

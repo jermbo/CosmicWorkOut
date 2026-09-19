@@ -5,6 +5,7 @@
 	import { resolveHref } from '$lib/navigation';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { formatWeekdayShortDate, todayIso } from '$lib/date';
 	import WeekStrip from '$lib/components/WeekStrip.svelte';
 
@@ -34,7 +35,13 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let displayDate = $derived(formatWeekdayShortDate(contextDate, ' · '));
-	let activeSessions = $derived(programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id));
+	// Feeds the week strip's "done" pips — empty while Practice is off so other pages
+	// don't show session marks for a hidden feature.
+	let activeSessions = $derived(
+		prefsStore.practiceEnabled
+			? programStore.sessions.filter((s) => s.programId === programStore.activeProgram?.id)
+			: [],
+	);
 
 	function openDatePicker() {
 		dateInputEl?.showPicker?.();
@@ -55,7 +62,11 @@
 		<div class="page-header__text">
 			<div class="page-header__eyebrow-row">
 				{#if showBack}
-					<button class="page-header__back" onclick={() => goto(resolveHref(backHref))} aria-label="Back">
+					<button
+						class="page-header__back"
+						onclick={() => goto(resolveHref(backHref))}
+						aria-label="Back"
+					>
 						<svg
 							viewBox="0 0 24 24"
 							fill="none"
@@ -68,9 +79,19 @@
 						</svg>
 					</button>
 				{/if}
-				<button class="page-header__date-btn" onclick={openDatePicker} aria-label="Change logging date">
+				<button
+					class="page-header__date-btn"
+					onclick={openDatePicker}
+					aria-label="Change logging date"
+				>
 					{displayDate}
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						aria-hidden="true"
+					>
 						<polyline points="6 9 12 15 18 9" />
 					</svg>
 				</button>
@@ -96,7 +117,12 @@
 </header>
 
 {#if programStore.loaded}
-	<WeekStrip sessions={activeSessions} stayOnPage={showBack} {showMoodDots} {dayIndicators} />
+	<WeekStrip
+		sessions={activeSessions}
+		stayOnPage={showBack}
+		{showMoodDots}
+		{dayIndicators}
+	/>
 {/if}
 
 <style>

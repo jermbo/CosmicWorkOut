@@ -13,6 +13,10 @@
 	import { todayIso, formatWeekdayShortDate } from '$lib/date';
 	import { formatDuration, formatMinutes, formatCountWithWord } from '$lib/format';
 	import { toastStore } from '$lib/stores/toast.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
 	const disciplineId = BELLYDANCE_DISCIPLINE_ID;
 	const todayStr = todayIso();
@@ -46,7 +50,9 @@
 		return suggestedRoutine;
 	});
 
-	let showSuggestedHint = $derived(selectedRoutine && suggestedRoutine && selectedRoutine.id !== suggestedRoutine.id);
+	let showSuggestedHint = $derived(
+		selectedRoutine && suggestedRoutine && selectedRoutine.id !== suggestedRoutine.id,
+	);
 
 	let showProgramSelect = $state(false);
 	let showCreateProgram = $state(false);
@@ -61,11 +67,15 @@
 
 		const itemCount = effectiveSections(program, routine).reduce((n, s) => n + s.items.length, 0);
 		if (itemCount === 0) {
-			toastStore.error('This routine has no moves yet. Activate “Belly Dance Foundations” or add items in Programs.');
+			toastStore.error(
+				'This routine has no moves yet. Activate “Belly Dance Foundations” or add items in Programs.',
+			);
 			return;
 		}
 
-		await sessionStore.start(routine, program, programStore.itemMap, { date: contextDate });
+		await sessionStore.start(routine, program, programStore.itemMap, {
+			date: contextDate,
+		});
 	}
 
 	async function startSession() {
@@ -107,32 +117,64 @@
 </svelte:head>
 
 <div class="page page--wide dance-page">
-	<PageHeader title="Belly Dance" showBack backHref="/practice">
+	<PageHeader
+		title="Belly Dance"
+		showBack
+		backHref="/practice"
+	>
 		{#snippet trailing()}
-			<a href={resolve('/program?discipline=bellydance')} class="dance-page__programs-link">Program</a>
+			<a
+				href={resolve('/program?discipline=bellydance')}
+				class="dance-page__programs-link">Program</a
+			>
 		{/snippet}
 	</PageHeader>
 
 	{#if !programStore.loaded}
-		<div class="dance-page__loading" aria-busy="true">
+		<div
+			class="dance-page__loading"
+			aria-busy="true"
+		>
 			<div class="dance-page__spinner"></div>
 		</div>
 	{:else if programStore.isProgramCompleteFor(disciplineId)}
 		<div class="dance-complete">
-			<div class="dance-complete__icon" aria-hidden="true">✨</div>
-			<h2 class="dance-complete__title">{activeProgram?.name ?? 'Program'} complete!</h2>
+			<div
+				class="dance-complete__icon"
+				aria-hidden="true"
+			>
+				✨
+			</div>
+			<h2 class="dance-complete__title">
+				{activeProgram?.name ?? 'Program'} complete!
+			</h2>
 			<p class="dance-complete__body">You finished every practice. Time for something new.</p>
-			<button class="dance-complete__cta" onclick={() => (showProgramSelect = true)}>Choose a new program</button>
+			<button
+				class="dance-complete__cta"
+				onclick={() => (showProgramSelect = true)}>Choose a new program</button
+			>
 		</div>
 	{:else if !activeProgram}
 		<div class="dance-page__no-program">
 			<p>No program active.</p>
-			<button class="dance-page__choose-btn" onclick={() => (showProgramSelect = true)}>Choose a program</button>
+			<button
+				class="dance-page__choose-btn"
+				onclick={() => (showProgramSelect = true)}>Choose a program</button
+			>
 		</div>
 	{:else if sessionForDate && !sessionStore.isActive}
 		<div class="session-done">
-			<div class="session-done__icon" aria-hidden="true">
-				<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+			<div
+				class="session-done__icon"
+				aria-hidden="true"
+			>
+				<svg
+					viewBox="0 0 48 48"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+					stroke-linecap="round"
+				>
 					<polyline points="10 24 20 34 38 14" />
 				</svg>
 			</div>
@@ -145,7 +187,10 @@
 					· {formatCountWithWord(sessionForDate.items.length, 'item')}
 				</p>
 			</div>
-			<button class="session-done__edit" onclick={editSession}>Edit</button>
+			<button
+				class="session-done__edit"
+				onclick={editSession}>Edit</button
+			>
 		</div>
 	{:else if weekRoutines.length > 0 && selectedRoutine}
 		<div class="dance-page__body">
@@ -174,9 +219,16 @@
 					{/each}
 				</ul>
 				{#if selectedRoutine.estMin}
-					<p class="routine-preview__time">~{formatMinutes(selectedRoutine.estMin)}</p>
+					<p class="routine-preview__time">
+						~{formatMinutes(selectedRoutine.estMin)}
+					</p>
 				{/if}
-				<button class="routine-preview__start" onclick={startSession} disabled={starting} aria-busy={starting}>
+				<button
+					class="routine-preview__start"
+					onclick={startSession}
+					disabled={starting}
+					aria-busy={starting}
+				>
 					{#if starting}Starting…{:else}Start practice{/if}
 				</button>
 			</article>
@@ -184,7 +236,10 @@
 	{:else}
 		<div class="dance-page__no-program">
 			<p>No routine scheduled for this week.</p>
-			<a href={resolve('/program?discipline=bellydance')} class="dance-page__program-link">View program</a>
+			<a
+				href={resolve('/program?discipline=bellydance')}
+				class="dance-page__program-link">View program</a
+			>
 		</div>
 	{/if}
 </div>
@@ -201,7 +256,10 @@
 {/if}
 
 {#if showCreateProgram}
-	<CreateProgramSheet {disciplineId} onClose={() => (showCreateProgram = false)} />
+	<CreateProgramSheet
+		{disciplineId}
+		onClose={() => (showCreateProgram = false)}
+	/>
 {/if}
 
 {#if showStartConfirm}

@@ -28,10 +28,15 @@
 
 	let activeItems = $derived(sessionStore.activeItems);
 
-	let totalSets = $derived(activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.length, 0));
+	let totalSets = $derived(
+		activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.length, 0),
+	);
 
 	let doneSets = $derived(
-		activeItems.reduce((sum: number, ex: ActiveItem) => sum + ex.sets.filter((s: ActiveSet) => s.completed).length, 0),
+		activeItems.reduce(
+			(sum: number, ex: ActiveItem) => sum + ex.sets.filter((s: ActiveSet) => s.completed).length,
+			0,
+		),
 	);
 
 	let progressPct = $derived.by(() => {
@@ -109,11 +114,24 @@
 	});
 </script>
 
-<BottomSheet onclose={handleAbandonRequest} maxHeight="100dvh" hideHandle fixedHeight>
-	<div class="session-overlay__inner" aria-labelledby="session-title" aria-modal="true">
+<BottomSheet
+	onclose={handleAbandonRequest}
+	maxHeight="100dvh"
+	hideHandle
+	fixedHeight
+>
+	<div
+		class="session-overlay__inner"
+		aria-labelledby="session-title"
+		aria-modal="true"
+	>
 		<header class="session-overlay__header">
 			<div class="session-overlay__top-row">
-				<button class="session-overlay__back-btn" onclick={handleAbandonRequest} aria-label="End session">
+				<button
+					class="session-overlay__back-btn"
+					onclick={handleAbandonRequest}
+					aria-label="End session"
+				>
 					<svg
 						viewBox="0 0 24 24"
 						fill="none"
@@ -128,7 +146,10 @@
 				</button>
 
 				<div class="session-overlay__titles">
-					<p class="session-overlay__workout-name" id="session-title">
+					<p
+						class="session-overlay__workout-name"
+						id="session-title"
+					>
 						{sessionStore.activeRoutineName}
 					</p>
 					<p class="session-overlay__context">
@@ -140,7 +161,11 @@
 					</p>
 				</div>
 
-				<div class="session-overlay__timer" aria-live="off" aria-label="Elapsed time {elapsedFormatted}">
+				<div
+					class="session-overlay__timer"
+					aria-live="off"
+					aria-label="Elapsed time {elapsedFormatted}"
+				>
 					<span class="session-overlay__timer-label">Elapsed</span>
 					<span class="session-overlay__timer-value">{elapsedFormatted}</span>
 				</div>
@@ -154,7 +179,10 @@
 				aria-valuemax={totalSets}
 				aria-label="Session progress"
 			>
-				<div class="session-overlay__progress-fill" style:inline-size="{progressPct}%"></div>
+				<div
+					class="session-overlay__progress-fill"
+					style:inline-size="{progressPct}%"
+				></div>
 			</div>
 		</header>
 
@@ -163,14 +191,23 @@
 				{#each activeItems as activeExercise, exerciseIndex (activeExercise.itemId)}
 					{@const exercise = programStore.getItemById(activeExercise.itemId)}
 					{#if exercise}
-						<ExerciseCard {activeExercise} {exercise} {exerciseIndex} onSetTap={handleSetTap} />
+						<ExerciseCard
+							{activeExercise}
+							{exercise}
+							{exerciseIndex}
+							onSetTap={handleSetTap}
+						/>
 					{/if}
 				{/each}
 			{/if}
 		</div>
 
 		<div class="session-overlay__footer">
-			<button class="session-overlay__finish" class:session-overlay__finish--all-done={allDone} onclick={handleFinish}>
+			<button
+				class="session-overlay__finish"
+				class:session-overlay__finish--all-done={allDone}
+				onclick={handleFinish}
+			>
 				{#if isEditing}
 					Save changes
 				{:else if allDone}

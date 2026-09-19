@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.8.0](README.md) › US-032
+
 # US-032 — Granular Data Clearing
 
 As a **user**, I want to clear each data section independently — custom exercises, custom programs, workout sessions, activity log, habits, and health readings —

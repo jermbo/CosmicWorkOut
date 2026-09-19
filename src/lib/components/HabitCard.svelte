@@ -18,7 +18,18 @@
 		oneditexact: () => void;
 	};
 
-	let { habit, value, pct, done, step, readOnly = false, onadd, onsubtract, ontoggle, oneditexact }: Props = $props();
+	let {
+		habit,
+		value,
+		pct,
+		done,
+		step,
+		readOnly = false,
+		onadd,
+		onsubtract,
+		ontoggle,
+		oneditexact,
+	}: Props = $props();
 
 	let unitLabel = $derived.by(() => {
 		if (habit.type === 'minutes') return minuteUnitLabel();
@@ -34,11 +45,24 @@
 	});
 </script>
 
-<div class="habit-card" class:habit-card--done={done}>
+<div
+	class="habit-card"
+	class:habit-card--done={done}
+>
 	<div class="habit-card__ring">
-		<ProgressRing done={pct} total={100} complete={done} size={120} strokeWidth={7} dimUntilComplete>
+		<ProgressRing
+			done={pct}
+			total={100}
+			complete={done}
+			size={120}
+			strokeWidth={7}
+			dimUntilComplete
+		>
 			{#if habit.type === 'boolean'}
-				<span class="habit-card__value habit-card__value--bool" class:habit-card__value--done={done}>
+				<span
+					class="habit-card__value habit-card__value--bool"
+					class:habit-card__value--done={done}
+				>
 					{boolLabel}
 				</span>
 			{:else}
@@ -49,7 +73,10 @@
 					aria-label="Enter exact value for {habit.name}"
 					title="Tap to enter exact value"
 				>
-					<span class="habit-card__value" class:habit-card__value--done={done}>{value}</span>
+					<span
+						class="habit-card__value"
+						class:habit-card__value--done={done}>{value}</span
+					>
 					{#if !done && habit.dailyGoal}
 						<span class="habit-card__goal">/ {habit.dailyGoal}</span>
 					{/if}
@@ -65,7 +92,10 @@
 
 	<div class="habit-card__actions">
 		{#if habit.type === 'boolean'}
-			<label class="toggle-label" class:toggle-label--on={done}>
+			<label
+				class="toggle-label"
+				class:toggle-label--on={done}
+			>
 				<input
 					class="sr-only"
 					type="checkbox"
@@ -84,7 +114,11 @@
 					disabled={readOnly || value < step}
 					aria-label="Subtract {step} from {habit.name}"
 				>
-					<Icon name="minus" size={18} stroke={2.5} />
+					<Icon
+						name="minus"
+						size={18}
+						stroke={2.5}
+					/>
 				</button>
 				<button
 					class="stepper__step-label"
@@ -95,8 +129,17 @@
 				>
 					{stepLabel}
 				</button>
-				<button class="stepper__btn" onclick={onadd} disabled={readOnly} aria-label="Add {step} to {habit.name}">
-					<Icon name="plus" size={18} stroke={2.5} />
+				<button
+					class="stepper__btn"
+					onclick={onadd}
+					disabled={readOnly}
+					aria-label="Add {step} to {habit.name}"
+				>
+					<Icon
+						name="plus"
+						size={18}
+						stroke={2.5}
+					/>
 				</button>
 			</div>
 		{/if}

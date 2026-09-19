@@ -9,6 +9,10 @@
 	import HabitCard from '$lib/components/HabitCard.svelte';
 	import ValueDialog from '$lib/components/ValueDialog.svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+
+	redirectWhenDisabled(() => prefsStore.habitsEnabled);
 
 	const NICE_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
 
@@ -93,12 +97,19 @@
 </svelte:head>
 
 <div class="page page--wide habits-page">
-	<PageHeader title="Daily check-in" showBack showMoodDots />
+	<PageHeader
+		title="Daily check-in"
+		showBack
+		showMoodDots
+	/>
 
 	{#if moodHabit}
 		<section class="mood-section">
 			<div class="mood-section__header">
-				<span class="mood-section__title" id="mood-label">Mood</span>
+				<span
+					class="mood-section__title"
+					id="mood-label">Mood</span
+				>
 				{#if currentMoodValue !== null}
 					<span
 						class="mood-section__result"
@@ -107,13 +118,20 @@
 						aria-live="polite"
 					>
 						{getMoodLabel(currentMoodValue)}
-						<span class="mood-section__score">{signPrefix(currentMoodValue)}{currentMoodValue}</span>
+						<span class="mood-section__score">{signPrefix(currentMoodValue)}{currentMoodValue}</span
+						>
 					</span>
 				{:else}
-					<span class="mood-section__empty" aria-live="polite">Select below</span>
+					<span
+						class="mood-section__empty"
+						aria-live="polite">Select below</span
+					>
 				{/if}
 			</div>
-			<fieldset class="mood-scale" aria-labelledby="mood-label">
+			<fieldset
+				class="mood-scale"
+				aria-labelledby="mood-label"
+			>
 				<legend class="sr-only">How are you feeling? (use arrow keys to navigate)</legend>
 				{#each MOOD_SCALE_ASC as item (item.value)}
 					<label

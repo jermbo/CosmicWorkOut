@@ -6,7 +6,11 @@
 </script>
 
 <header class="settings-sub-header">
-	<button class="settings-sub-header__back" onclick={() => goto(resolve('/settings'))} aria-label="Back to Settings">
+	<button
+		class="settings-sub-header__back"
+		onclick={() => goto(resolve('/settings'))}
+		aria-label="Back to Settings"
+	>
 		<svg
 			viewBox="0 0 24 24"
 			fill="none"

@@ -6,6 +6,7 @@
 	import HabitCard from './HabitCard.svelte';
 	import ValueDialog from './ValueDialog.svelte';
 	import { minuteUnitLabel } from '$lib/format';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		date: string;
@@ -63,7 +64,7 @@
 
 <BottomSheet onclose={onClose}>
 	<div class="hh-sheet">
-		<p class="hh-sheet__date">{formatLongDate(date)}</p>
+		<DialogTitle>{formatLongDate(date)}</DialogTitle>
 		<p class="hh-sheet__heading">Habits</p>
 
 		{#if gridHabits.length === 0}
@@ -102,13 +103,6 @@
 	.hh-sheet {
 		padding-inline: var(--space-5);
 		padding-block: var(--space-2) var(--space-6);
-	}
-
-	.hh-sheet__date {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
 	}
 
 	.hh-sheet__heading {

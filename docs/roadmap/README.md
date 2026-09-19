@@ -1,6 +1,8 @@
+[Wiki](../README.md) › Roadmap
+
 # Roadmap
 
-> **Current phase:** Use the app, gather feedback. Versions v1.1–v1.7 are shipped; new work waits on what we learn from real usage.
+> **Current phase:** Use the app, gather feedback. Versions v1.1–v1.9 are shipped; new work waits on what we learn from real usage.
 
 Ideas that were deferred, cut, or only partially built live here — not scattered as "Out of Scope" tables in shipped feature folders. When something ships, move it back to a feature story and mark it Built in [Implementation Status](../implementation/status.md).
 
@@ -10,39 +12,46 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Data & portability
 
-| Item | Notes | Spec |
-| ---- | ----- | ---- |
-| Device-to-device sync | QR pairing + LAN/WebRTC transfer + merge engine | [device-sync.md](device-sync.md) |
-| Include preferences in backup | Optional toggle on export — prefs in `localStorage` today | [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md) |
-| Web Share on export | `navigator.share({ files })` after building backup blob | [device-sync.md](device-sync.md#optional-web-share-api) |
-| Merge-on-import | File restore stays replace-only; merge belongs with device sync | [device-sync.md](device-sync.md) |
-| CSV export | Analytics-only; cannot round-trip | — |
-| Automatic background backup | File System Access API or scheduled export | — |
-| Per-date workout log clearing | Delete a single day's logged session, not the whole store. Activities and habit logs already support per-entry removal; workout sessions don't | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md) |
+| Item                          | Notes                                                                                                                                          | Spec                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Device-to-device sync         | QR pairing + LAN/WebRTC transfer + merge engine                                                                                                | [device-sync.md](device-sync.md)                                  |
+| Include preferences in backup | Optional toggle on export — prefs in `localStorage` today                                                                                      | [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md) |
+| Merge-on-import               | File restore stays replace-only; merge belongs with device sync                                                                                | [device-sync.md](device-sync.md)                                  |
+| CSV export                    | Analytics-only; cannot round-trip                                                                                                              | —                                                                 |
+| Automatic background backup   | File System Access API or scheduled export                                                                                                     | —                                                                 |
+| Per-date workout log clearing | Delete a single day's logged session, not the whole store. Activities and habit logs already support per-entry removal; workout sessions don't | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md)     |
 
-**Shipped:** JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md).
+**Shipped:** JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md). Web Share on export (Save to Files / Mail / AirDrop when `canShare({ files })`) — [device-sync.md](device-sync.md#web-share-api-shipped).
+
+---
+
+### Habits, baselines & tracking
+
+| Item      | Notes                                                                   | Spec                                                                  |
+| --------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Baselines | Specced as **v1.9.0** (US-034–036). Separate from Habits and Lift plans | [baselines.md](baselines.md) · [v1.9.0](../features/v1.9.0/README.md) |
 
 ---
 
 ### UX polish
 
-| Item | Origin |
-| ---- | ------ |
-| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only |
-| Habit icons | v1.2/v1.3 — text-first habits ship today |
-| Per-item session notes | v1.4.0 deferred |
-| Health metrics extended history view | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred |
+| Item                                            | Origin                                                                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only      |
+| Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                         |
+| Per-item session notes                          | v1.4.0 deferred                                                                                                  |
+| Health metrics extended history view            | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred |
 
 ---
 
 ### Activity & insights
 
-| Item | Notes |
-| ---- | ----- |
-| Activity distance / pace fields | Cardio stays on Activity path, not Discipline |
-| Chart drill-down / interactivity | Tap bar, zoom, filter series |
-| Per-discipline chart filtering | Insights shows all sessions today |
-| Nutrition tracking | Out of product identity |
+| Item                             | Notes                                         |
+| -------------------------------- | --------------------------------------------- |
+| Activity distance / pace fields  | Cardio stays on Activity path, not Discipline |
+| Chart drill-down / interactivity | Tap bar, zoom, filter series                  |
+| Per-discipline chart filtering   | Insights shows all sessions today             |
+| Nutrition tracking               | Out of product identity                       |
 
 **Shipped:** Insights hub with date-range chips (45d, week, MTD, YTD, custom) — beyond original v1.5.0 read-only scope.
 
@@ -50,20 +59,41 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Training intelligence
 
-| Item | Notes |
-| ---- | ----- |
-| Load periodization engine | No auto light → heavy → deload; weight uses last-used prefill + manual bump |
-| Additional Disciplines | Engine supports more; only strength + belly dance ship |
-| Day-of-week scheduling | Progression stays count-driven (`completedSessionCount % routineCount`) |
+| Item                                                      | Notes                                                                                                                                                                                           | Spec                                                                                               |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Lift plans (goal progression)                             | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below                                                                     | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
+| Plan comparison visualizations                            | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                                                                                                  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
+| Plan-switching handoff                                    | UX when starting a new lift plan while another exists                                                                                                                                           | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
+| <span id="lift-plan-ui-rename"></span>Lift plan UI rename | Shipped UI still reads "Goal plans" in Settings, Clear data, Add Practice and the plan card. Docs already say **Lift plan**; the strings were never changed. Code identifiers may keep lagging. | [Glossary](../glossary.md#lift-plan)                                                               |
+| Pro-authored goal templates                               | Scaffold choices in v1.9.0; professional templates later                                                                                                                                        | [v1.9.0](../features/v1.9.0/README.md)                                                             |
+| Additional Disciplines                                    | Engine supports more; only strength + belly dance ship                                                                                                                                          | —                                                                                                  |
+| Day-of-week scheduling                                    | Progression stays count-driven (`completedSessionCount % routineCount`)                                                                                                                         | —                                                                                                  |
+
+**Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a lift plan.
+
+---
+
+### Exercise catalog depth
+
+Discussed July 2026: enriching the catalog with muscle diagrams, video links, and a per-body-type view. [MuscleWiki](https://musclewiki.com/) and [Muscle & Strength](https://www.muscleandstrength.com/workout-routines) are useful references for _coverage_ — which exercises and program shapes are worth having. Their diagrams and written content are copyrighted and are not to be reproduced; any diagram here is drawn in-house.
+
+| Item                          | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Structured muscle data        | `Item.muscles` is a display string today (`'Chest · Triceps · Anterior delts'`). Splitting to `primaryMuscles[]` / `secondaryMuscles[]` is the prerequisite for diagrams and muscle-based filtering                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Muscle diagram                | If built: one shared front/back body SVG with muscle regions as targetable IDs, tinted from the structured data. Not per-exercise images — hundreds of assets bloat the precache and weaken the offline story                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Body-type diagram toggle      | Only ever a preference for which body SVG renders. The exercise list does not vary by sex — do not encode that                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| More built-in programs        | Pure seed data in the existing `strength-programs.ts` shape; no maintenance tail. Cheapest item here if the catalog is ever revisited                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Exercise video links          | **Not planned** — an outbound link is the first thing in the app that fails with the network pulled (violates [Offline First](../vision/principles.md#2-offline-first-always)), and links rot silently across the long gaps between updates                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| SQLite (wasm) for the catalog | **Not planned** — the catalog is ~121 rows of static seed data compiled into the bundle, not mutable user data. A `.filter()` beats opening a connection; a ~1MB WASM blob plus an OPFS VFS violates [Small Surface Area](../vision/principles.md#5-small-surface-area) and [Web Tech, Web Idioms](../vision/principles.md#6-web-tech-web-idioms). It would also force hand-written schema migrations and break the JSON round-trip in `backup.ts`. IndexedDB (version **9**, upsert-on-boot) covers the mutable data at this volume. Revisit only with tens of thousands of rows, full-text search, or user-authored queries — none of which this app's identity allows |
 
 ---
 
 ### Infrastructure (if needed later)
 
-| Item | Notes |
-| ---- | ----- |
-| Cloud sync / user accounts | Violates client-only constraint — not planned |
-| Journal | Shipped in v1.3, **removed** in `0af33ff`; not on roadmap unless feedback demands it |
+| Item                       | Notes                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| Cloud sync / user accounts | Violates client-only constraint — not planned                                        |
+| Journal                    | Shipped in v1.3, **removed** in `0af33ff`; not on roadmap unless feedback demands it |
 
 ---
 
@@ -80,3 +110,4 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 - [Implementation Status](../implementation/status.md) — What's built today
 - [North Star](../vision/north-star.md) — What we're not building
 - [June 2026 Audit](../maintenance/audit-2026-06.md) — Pre–user-testing doc/code review
+- [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md) — Perf / security / correctness concerns (mostly deferred)

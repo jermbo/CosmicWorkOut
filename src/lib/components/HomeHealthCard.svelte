@@ -12,10 +12,17 @@
 
 	let hasAny = $derived(weight !== undefined || latestBp !== undefined);
 
-	let ariaLabel = $derived(hasAny ? 'Health metrics logged for this day' : 'Health metrics: nothing logged');
+	let ariaLabel = $derived(
+		hasAny ? 'Health metrics logged for this day' : 'Health metrics: nothing logged',
+	);
 </script>
 
-<HomeCard href="/health" title="Health" {ariaLabel} variant="log">
+<HomeCard
+	href="/health"
+	title="Health"
+	{ariaLabel}
+	variant="log"
+>
 	{#if !hasAny}
 		<p class="home-health-card__empty">Not logged</p>
 	{:else}
@@ -23,14 +30,17 @@
 			{#if weight}
 				<span class="home-health-card__stat">
 					<span class="home-health-card__num"
-						>{weight.values.value}<span class="home-health-card__unit">{prefsStore.weightUnit}</span></span
+						>{weight.values.value}<span class="home-health-card__unit">{prefsStore.weightUnit}</span
+						></span
 					>
 					<span class="home-health-card__label">Weight</span>
 				</span>
 			{/if}
 			{#if latestBp}
 				<span class="home-health-card__stat">
-					<span class="home-health-card__num">{latestBp.values.systolic}/{latestBp.values.diastolic}</span>
+					<span class="home-health-card__num"
+						>{latestBp.values.systolic}/{latestBp.values.diastolic}</span
+					>
 					<span class="home-health-card__label">Blood pressure</span>
 				</span>
 			{/if}

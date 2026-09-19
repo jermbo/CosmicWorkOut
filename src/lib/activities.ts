@@ -12,6 +12,8 @@ export function formatActivitySummary(
 	return `${activityDisplayName(activity)} · ${formatMinutes(activity.durationMinutes)} · ${activity.intensity}`;
 }
 
-export function formatActivityChip(activity: Pick<ActivityLog, 'type' | 'customType' | 'durationMinutes'>): string {
+export function formatActivityChip(
+	activity: Pick<ActivityLog, 'type' | 'customType' | 'durationMinutes'>,
+): string {
 	return `${activityDisplayName(activity)} · ${formatMinutes(activity.durationMinutes)}`;
 }

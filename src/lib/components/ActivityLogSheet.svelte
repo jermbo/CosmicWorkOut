@@ -5,6 +5,8 @@
 	import { todayIso } from '$lib/date';
 	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
+	import SheetHeader from './SheetHeader.svelte';
+	import SheetBody from './SheetBody.svelte';
 
 	const ACTIVITY_TYPES: ActivityType[] = [
 		'Run',
@@ -34,7 +36,9 @@
 
 	const todayStr = todayIso();
 
-	let selectedType = $state<ActivityType>(untrack(() => editing?.type ?? activityStore.lastUsedType));
+	let selectedType = $state<ActivityType>(
+		untrack(() => editing?.type ?? activityStore.lastUsedType),
+	);
 	let customType = $state(untrack(() => editing?.customType ?? ''));
 	let durationMinutes = $state(untrack(() => editing?.durationMinutes ?? 30));
 	let intensity = $state<ActivityIntensity>(untrack(() => editing?.intensity ?? 'Moderate'));
@@ -100,31 +104,24 @@
 	}
 </script>
 
-<BottomSheet onclose={onClose} maxHeight="80dvh">
-	<div class="act-sheet">
-		<div class="act-sheet__header">
-			<h2 class="act-sheet__title">
-				{#if editing}Edit Activity{:else}Log Activity{/if}
-			</h2>
-			<button class="act-sheet__close" onclick={onClose} aria-label="Close">
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					aria-hidden="true"
-				>
-					<line x1="18" y1="6" x2="6" y2="18" />
-					<line x1="6" y1="6" x2="18" y2="18" />
-				</svg>
-			</button>
-		</div>
+<BottomSheet
+	onclose={onClose}
+	maxHeight="80dvh"
+>
+	<SheetBody>
+		<SheetHeader
+			title={editing ? 'Edit Activity' : 'Log Activity'}
+			{onClose}
+		/>
 
 		<div class="act-sheet__body">
 			<div class="act-field">
 				<span class="act-field__label">Activity</span>
-				<div class="act-type-grid" role="radiogroup" aria-label="Activity type">
+				<div
+					class="act-type-grid"
+					role="radiogroup"
+					aria-label="Activity type"
+				>
 					{#each ACTIVITY_TYPES as type (type)}
 						<button
 							class="act-type-btn"
@@ -151,16 +148,29 @@
 
 			<div class="act-field">
 				<span class="act-field__label">Duration</span>
-				<div class="act-stepper" aria-label="Duration in minutes">
-					<button onclick={() => adjustDuration(-5)} aria-label="Decrease 5 minutes">−</button>
+				<div
+					class="act-stepper"
+					aria-label="Duration in minutes"
+				>
+					<button
+						onclick={() => adjustDuration(-5)}
+						aria-label="Decrease 5 minutes">−</button
+					>
 					<span class="act-stepper__val">{formatMinutes(durationMinutes)}</span>
-					<button onclick={() => adjustDuration(5)} aria-label="Increase 5 minutes">+</button>
+					<button
+						onclick={() => adjustDuration(5)}
+						aria-label="Increase 5 minutes">+</button
+					>
 				</div>
 			</div>
 
 			<div class="act-field">
 				<span class="act-field__label">Intensity</span>
-				<div class="act-intensity" role="radiogroup" aria-label="Intensity">
+				<div
+					class="act-intensity"
+					role="radiogroup"
+					aria-label="Intensity"
+				>
 					{#each INTENSITIES as lvl (lvl)}
 						<button
 							class="act-intensity-btn"
@@ -175,7 +185,12 @@
 		</div>
 
 		<div class="act-sheet__footer">
-			<button class="act-sheet__save-btn" onclick={handleSave} disabled={saving} aria-busy={saving}>
+			<button
+				class="act-sheet__save-btn"
+				onclick={handleSave}
+				disabled={saving}
+				aria-busy={saving}
+			>
 				{#if saving}Saving…{:else if editing}Save changes{:else}Log activity{/if}
 			</button>
 			{#if editing}
@@ -189,47 +204,10 @@
 				</button>
 			{/if}
 		</div>
-	</div>
+	</SheetBody>
 </BottomSheet>
 
 <style>
-	.act-sheet {
-		display: flex;
-		flex-direction: column;
-		padding-block-start: var(--space-2);
-	}
-
-	.act-sheet__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding-inline: var(--space-5);
-		padding-block-end: var(--space-4);
-	}
-
-	.act-sheet__title {
-		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
-	}
-
-	.act-sheet__close {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-
-		svg {
-			inline-size: 16px;
-			block-size: 16px;
-		}
-	}
-
 	.act-sheet__body {
 		overflow-y: auto;
 		padding-inline: var(--space-5);

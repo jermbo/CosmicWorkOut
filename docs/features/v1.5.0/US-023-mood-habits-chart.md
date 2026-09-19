@@ -1,3 +1,5 @@
+[Wiki](../../README.md) › [Features](../README.md) › [v1.5.0](README.md) › US-023
+
 # US-023 — Mood vs Coffee & Water Chart
 
 > **Status: Done — v1.5.0**

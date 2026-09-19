@@ -3,16 +3,25 @@
 function TodayView({ workout: w, weekStrip, weekDone, weekTotal, streak, showEmoji, onStart }) {
 	return (
 		<div className="scroll fade-in">
-			<div className="scr-pad top-pad" style={{ paddingTop: 'max(22px, env(safe-area-inset-top))' }}>
+			<div
+				className="scr-pad top-pad"
+				style={{ paddingTop: 'max(22px, env(safe-area-inset-top))' }}
+			>
 				<div className="today-head">
 					<div>
 						<div className="eyebrow">Tue · Jun 9</div>
-						<div className="screen-title" style={{ marginTop: 6 }}>
+						<div
+							className="screen-title"
+							style={{ marginTop: 6 }}
+						>
 							Today
 						</div>
 					</div>
 					<div className="streak-pill">
-						<Icon name="flame" style={{ width: 15, height: 15, color: 'var(--accent)' }} />
+						<Icon
+							name="flame"
+							style={{ width: 15, height: 15, color: 'var(--accent)' }}
+						/>
 						<span>
 							<b>5</b> wk streak
 						</span>
@@ -44,19 +53,29 @@ function TodayView({ workout: w, weekStrip, weekDone, weekTotal, streak, showEmo
 
 				<div className="pkt-meta">
 					{w.focus.split(' · ').map((f, i) => (
-						<span className="focus-chip" key={i}>
+						<span
+							className="focus-chip"
+							key={i}
+						>
 							<span className="dot" />
 							{f}
 						</span>
 					))}
 					<span className="focus-chip">
-						<Icon name="timer" style={{ width: 13, height: 13 }} />~{w.estMin} min
+						<Icon
+							name="timer"
+							style={{ width: 13, height: 13 }}
+						/>
+						~{w.estMin} min
 					</span>
 				</div>
 
 				<div className="pkt-exlist">
 					{w.exercises.map((ex, i) => (
-						<div className="pkt-exrow" key={ex.id}>
+						<div
+							className="pkt-exrow"
+							key={ex.id}
+						>
 							<span className="ix">{i + 1}</span>
 							{showEmoji && <span className="em">{ex.icon}</span>}
 							<span className="nm">{ex.name}</span>
@@ -67,7 +86,10 @@ function TodayView({ workout: w, weekStrip, weekDone, weekTotal, streak, showEmo
 					))}
 				</div>
 
-				<button className="start-btn" onClick={onStart}>
+				<button
+					className="start-btn"
+					onClick={onStart}
+				>
 					<Icon name="play" /> Start session
 				</button>
 			</div>
@@ -82,7 +104,10 @@ function TodayView({ workout: w, weekStrip, weekDone, weekTotal, streak, showEmo
 				</div>
 				<div className="week-strip">
 					{weekStrip.map((d, i) => (
-						<div className={`wday ${d.status}`} key={i}>
+						<div
+							className={`wday ${d.status}`}
+							key={i}
+						>
 							<span className="dow">{d.dow}</span>
 							<span className="dn">{d.date}</span>
 							<span className="ind" />

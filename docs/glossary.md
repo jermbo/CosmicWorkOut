@@ -1,3 +1,5 @@
+[Wiki](README.md) › Glossary
+
 # Glossary
 
 > The shared vocabulary for CosmicWorkOut. When a term here and the code disagree, fix one of them — don't let them drift. Every term below is in the code today.
@@ -28,9 +30,13 @@ Pickleball is already an Activity type — it cost zero architecture. That's the
 ---
 
 ## Structured archetype terms
+
 These generalize the original strength model so belly dance (and anything after it) reuses one engine. The model shipped in v1.4.0; the strength-only names below were renamed at that point.
 
 ### Discipline
+
+<span id="discipline"></span>
+
 A first-class, data-driven definition of a structured movement practice. A Discipline declares everything that makes it _specific_ while the engine stays _generic_:
 
 - its **sections** and the order they run in,
@@ -43,6 +49,9 @@ Strength and Belly Dance are both Disciplines (seeded, read-only config in `src/
 > **Discipline vs. Practice — don't conflate them.** _Discipline_ is the **data-model** term (config in code). _Practice_ (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
 
 ### Practice
+
+<span id="practice"></span>
+
 The **Practice destination** and page shell for guided sessions (`/practice`). Organized as:
 
 - **Practice groups** — broad buckets like Workout and Dance (UI config, not stored in IndexedDB).
@@ -51,7 +60,12 @@ The **Practice destination** and page shell for guided sessions (`/practice`). O
 
 Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
 
+**Opt-in:** gated by `practiceEnabled` in Settings (default off). Practice is the session engine rather than a single screen, so the flag also hides `/workout`, `/program`, the session overlays, and the session marks on History and Insights — programs and session history stay in IndexedDB. [Lift plans](#lift-plan) are nested inside it. See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
+
 ### Section
+
+<span id="section"></span>
+
 An ordered division of a routine. A Discipline defines its own sections.
 
 - **Strength:** a single implicit section — the exercise list.
@@ -60,6 +74,9 @@ An ordered division of a routine. A Discipline defines its own sections.
 Each section is tied to a **metric**, which decides how its items are logged.
 
 ### Metric
+
+<span id="metric"></span>
+
 The rule for how one item is recorded during a session. This is the core flexibility lever — a new Discipline picks from existing metrics or adds one.
 
 | Metric     | Logs                                         | Used by             |
@@ -70,23 +87,77 @@ The rule for how one item is recorded during a session. This is the core flexibi
 
 ### Item _(renamed from **Exercise**)_
 
+<span id="item"></span>
+
 The atomic unit of any routine — one movement. Belongs to a Discipline, carries a **section** key, **focus** tag(s), an optional cue, and a logging metric. Ships built-in (seeded, read-only) or custom (user-created). Built-in items are **derived from catalog seeds** — see [Data Model](architecture/data-model.md#catalog--item-derivation).
 
 ### Focus
+
+<span id="focus"></span>
+
 A descriptive tag on an item for filtering — _hips · core · arms · legs · …_. Independent of section/metric. Multiple per item (see `FOCUS_TAGS`).
 
 ### Program
+
+<span id="program"></span>
+
 A multi-week plan within **one** Discipline: name, duration in weeks, days per week, and its routines. Ships built-in (read-only; edit = copy-first) or custom. Every Program belongs to a Discipline.
 
+Two program **flavors** exist for Strength today:
+
+| Flavor                   | Purpose                                         | Progression                                                |
+| ------------------------ | ----------------------------------------------- | ---------------------------------------------------------- |
+| **Course program**       | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump |
+| **Lift plan** _(v1.9.0)_ | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Lift plan](#lift-plan)       |
+
+### Lift plan _(v1.9.0)_
+
+<span id="lift-plan"></span>
+<span id="goal-progression-plan"></span>
+
+**Preferred name in docs:** Lift plan. Use it in all prose.
+**Older name:** Goal progression plan. Still present in three places, by design or by lag:
+
+| Where              | State                                                                                                                                                                                   |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Docs prose         | **Renamed.** Any doc still saying "goal plan" is wrong.                                                                                                                                 |
+| Code identifiers   | **Lagging, allowed** — `goalPlans` store, `goalPlanStore`, `GoalPlan`, `goalProgressionPlansEnabled`, `/goals` routes, `src/lib/goalPlans/`.                                            |
+| Shipped UI strings | **Lagging, not yet allowed for** — Settings and Clear-data still read "Goal plans". The UI rename is outstanding work, tracked on the [Roadmap](roadmap/README.md#lift-plan-ui-rename). |
+
+Quote a UI string as it actually appears, and say that it is the old name.
+
+A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics — and **nested under [Practice](#practice)**, since a plan can only be trained through `/workout`. Code reads the derived `prefsStore.liftPlansEnabled`. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+
+Do **not** confuse with [Baseline](#baseline) — that is daily floor/ceiling tracking across any topic, not a Strength wave plan.
+
+### Progression block
+
+<span id="progression-block"></span>
+
+One **4-week wave** within a lift plan. Focus exercise pattern: build → build → peak → deload (e.g. 150×10 → 160×8 → 170×6 → 150×10), then the next block starts at a higher starting weight. The user may **repeat** the current block without rewinding to earlier blocks.
+
+### Focus exercise
+
+<span id="focus-exercise"></span>
+
+The single lift a lift plan is built around. It follows the full wave block schedule. All other exercises in the plan are **supporting** — weekly `weightIncrement` bumps, no deload wave.
+
 ### Routine _(renamed from **Workout**)_
+
+<span id="routine"></span>
 
 A single training day within a program — optionally lettered **A / B / C**, an ordered set of sections of items. The app suggests the next one by linear progression: `completedSessions % routineCount`.
 
 ### Session _(renamed from **SessionLog**)_
 
+<span id="session"></span>
+
 A completed, recorded instance of a routine on a given date. Written on finish. What gets stored per item depends on that item's metric.
 
 ### Bookends
+
+<span id="bookends"></span>
+
 The shared warm-up and cool-down sections. Routine **A** defines the canonical lists; other routines inherit until they set `overridesBookends`. A Discipline-level pattern generalizing template inheritance.
 
 ---
@@ -95,9 +166,16 @@ The shared warm-up and cool-down sections. Routine **A** defines the canonical l
 
 ### Activity _(`ActivityLog`)_
 
+<span id="activity"></span>
+
 A lightweight record of a non-structured physical activity: a **type** (Run · Bike · Pickleball · Swim · Hike · Yoga · …), a **duration**, and an **intensity** (Easy · Moderate · Hard). No program, no routine, no session flow. This is where cardio and sports live — and where most "next things" will land.
 
+**Opt-in:** the activity log is gated by `activityLogEnabled` in Settings (default off); logged activities are kept when off.
+
 ### Activity type
+
+<span id="activity-type"></span>
+
 One value in the Activity type list. Adding one (e.g. Kayaking) is a config change, not architecture.
 
 ---
@@ -105,10 +183,36 @@ One value in the Activity type list. Adding one (e.g. Kayaking) is a config chan
 ## Habit archetype terms
 
 ### Habit
+
+<span id="habit"></span>
+
 A daily trackable behavior with a **type** (`times · minutes · count · boolean · mood`), optional daily goal, and unit label.
 
+**Opt-in:** gated by `habitsEnabled` in Settings (default off); habits and their logs are kept when off. **Mood has no separate flag** — see [Habit log](#habit-log).
+
 ### Habit log
-One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)).
+
+<span id="habit-log"></span>
+
+One day's value for one habit. Exactly one record per (habit, date); upserted on every tap. Mood uses a **−5…+5** scale. The built-in **Mood** habit is always active and not user-managed ([US-031](features/v1.7.0/US-031-default-habits-tweak.md)) — "always active" means it can't be deactivated _within_ Habits, not that it survives the `habitsEnabled` flag. Turning Habits off hides the mood strip, week-strip mood pips, History mood dot, and the Mood vs Habits chart too.
+
+---
+
+## Baselines _(v1.9.0)_
+
+> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Built and opt-in (`baselinesEnabled`, default off). Spec: [US-034](features/v1.9.0/US-034-baselines-setup.md) · [US-035](features/v1.9.0/US-035-baselines-logging.md) · [US-036](features/v1.9.0/US-036-baselines-charts.md). Origin: [Roadmap — Baselines](roadmap/baselines.md).
+
+### Baseline
+
+<span id="baseline"></span>
+
+A user-defined daily **floor** (go up / hit-or-exceed) or **ceiling** (stay under), with one or two metrics, logged as many times per day as needed (entries sum). Unit labels are user-typed in Settings. Entries (including past dates) are editable/deletable. Examples: walk 30 min + 1.25 miles, write 250 words, 10 pushups, phone time under 30 min. The target stays embarrassingly low until the user raises it. Distinct from [Habits](#habit) (simple daily check-ins) and from [Lift plans](#lift-plan) (Strength wave-loading).
+
+### Baseline log
+
+<span id="baseline-log"></span>
+
+One entry toward a Baseline on a given day. Many per day; the day’s total(s) are the sum. Stored in IndexedDB (`baselineLogs`, DB version 10); deleting a Baseline retains its logs.
 
 ---
 
@@ -118,9 +222,13 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 ### Health metric
 
+<span id="health-metric"></span>
+
 An app-defined measurement type in the catalog (`weight`, `bloodPressure`, …). Definitions live in code (`src/lib/health/metrics.ts`), not IndexedDB. New types ship with app updates — users do not create custom metrics.
 
 ### Health reading
+
+<span id="health-reading"></span>
 
 One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight: at most one per date. Blood pressure: many per date, each with `recordedAt`. Gated by `UserPrefs.healthMetricsEnabled`.
 
@@ -140,21 +248,25 @@ One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight:
 
 ## Naming map (original → current)
 
-The v1.4.0 generalization renamed the strength-only entities. These old names no longer appear in the code.
+The v1.4.0 generalization renamed the strength-only **data entities**. The old names no longer exist as stored types or interfaces, though "Exercise" and "Workout" still appear as UI copy and component/route identifiers (e.g. `ExerciseCard`, `WorkoutPicker`, `/workout`).
 
-| Original             | Current                            | Why                                              |
-| -------------------- | ---------------------------------- | ------------------------------------------------ |
-| Exercise             | Item                               | Items exist in any Discipline, not just strength |
-| Workout              | Routine                            | "Workout" reads as strength-only                 |
-| SessionLog           | Session                            | One concept across all Disciplines               |
-| Program _(strength)_ | Program _(Discipline-scoped)_      | Now belongs to a Discipline                      |
-| —                    | Discipline, Section, Metric, Focus | New in the generalized model                     |
+| Original                          | Current                             | Why                                                                        |
+| --------------------------------- | ----------------------------------- | -------------------------------------------------------------------------- |
+| Exercise                          | Item                                | Items exist in any Discipline, not just strength                           |
+| Workout                           | Routine                             | "Workout" reads as strength-only                                           |
+| SessionLog                        | Session                             | One concept across all Disciplines                                         |
+| Program _(strength)_              | Program _(Discipline-scoped)_       | Now belongs to a Discipline                                                |
+| —                                 | Discipline, Section, Metric, Focus  | New in the generalized model                                               |
+| Goal progression plan _(docs/UI)_ | **Lift plan** _(preferred UI name)_ | Avoid clash with [Baseline](#baseline); code ids may still say `goalPlan*` |
 
 ---
 
 ## Related
 
 - [North Star](vision/north-star.md) — product identity
+- [How It Works](implementation/behavior.md) — these terms in everyday app behavior
 - [Data Model](architecture/data-model.md) — the entities behind these terms
+- [US-033 — Goal Progression Plans](features/v1.9.0/US-033-goal-progression-plans.md) — Lift plans (wave-loading Strength stints)
+- [US-034 — Baselines Setup](features/v1.9.0/US-034-baselines-setup.md) — daily floor/ceiling growth tracking
 - [US-029 — Health Metrics](features/v1.7.0/US-029-health-metrics.md) — optional body measurements
 - [v1.4.0 — Belly Dance](features/v1.4.0/README.md) — first Discipline beyond strength

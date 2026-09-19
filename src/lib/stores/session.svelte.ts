@@ -18,6 +18,12 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
+/**
+ * Optional per-item weekly targets a plan engine (e.g. goal progression plans)
+ * can pass into start(); they take precedence over the last-used prefill.
+ */
+export type PrescribedTargets = Map<string, { weight: number; reps?: number }>;
+
 function metricForLoggedItem(logged: LoggedItem): Metric {
 	if (logged.checked !== undefined) return 'check';
 	if (logged.value !== undefined || logged.skipped) return 'measure';
@@ -29,7 +35,11 @@ function valueForMeasure(logged: { skipped?: boolean; value?: number | null }): 
 	return logged.value ?? null;
 }
 
-function resolveFinishedAt(isEditing: boolean, originalFinishedAt: string | undefined, now: string): string {
+function resolveFinishedAt(
+	isEditing: boolean,
+	originalFinishedAt: string | undefined,
+	now: string,
+): string {
 	if (isEditing) return originalFinishedAt ?? now;
 	return now;
 }
@@ -86,13 +96,20 @@ class SessionStore {
 		}
 	}
 
-	private async buildStrengthItem(ri: RoutineItem, item: Item): Promise<ActiveItem> {
+	private async buildStrengthItem(
+		ri: RoutineItem,
+		item: Item,
+		prescribed?: { weight: number; reps?: number },
+	): Promise<ActiveItem> {
 		const lastUsed = await db.itemLastUsed.get(ri.itemId);
-		const defaultWeight: number | string = lastUsed?.weight ?? 0;
+		const defaultWeight: number | string = prescribed?.weight ?? lastUsed?.weight ?? 0;
 
-		const targetReps = ri.reps ?? item.defaultReps ?? '8';
+		const targetReps =
+			prescribed?.reps != null ? String(prescribed.reps) : (ri.reps ?? item.defaultReps ?? '8');
 		let defaultReps = parseInt(targetReps.split('-')[0], 10) || 8;
-		if (lastUsed?.reps) {
+		if (prescribed?.reps != null) {
+			defaultReps = prescribed.reps;
+		} else if (lastUsed?.reps) {
 			defaultReps = lastUsed.reps;
 		}
 
@@ -146,6 +163,7 @@ class SessionStore {
 		routine: Routine,
 		program: Program,
 		itemMap: Map<string, Item>,
+		prescribed?: PrescribedTargets,
 	): Promise<ActiveItem[]> {
 		const activeItems: ActiveItem[] = [];
 		const sections = effectiveSections(program, routine);
@@ -156,7 +174,7 @@ class SessionStore {
 				if (!item) continue;
 
 				if (section.metric === 'setsReps') {
-					activeItems.push(await this.buildStrengthItem(ri, item));
+					activeItems.push(await this.buildStrengthItem(ri, item, prescribed?.get(ri.itemId)));
 				} else if (section.metric === 'check') {
 					activeItems.push(this.buildCheckItem(item, section.key));
 				} else {
@@ -172,7 +190,13 @@ class SessionStore {
 		routine: Routine,
 		program: Program,
 		log: Session,
-	): Array<{ itemId: string; template?: RoutineItem; logged: LoggedItem; metric: Metric; section: string }> {
+	): Array<{
+		itemId: string;
+		template?: RoutineItem;
+		logged: LoggedItem;
+		metric: Metric;
+		section: string;
+	}> {
 		const loggedById = new SvelteMap(log.items.map((e) => [e.itemId, e]));
 		const seen = new SvelteSet<string>();
 		const result: Array<{
@@ -200,14 +224,23 @@ class SessionStore {
 			if (!seen.has(logged.itemId)) {
 				const item = { itemId: logged.itemId, sets: logged.sets ?? [] };
 				const metric = metricForLoggedItem(logged);
-				result.push({ itemId: logged.itemId, logged: item, metric, section: '' });
+				result.push({
+					itemId: logged.itemId,
+					logged: item,
+					metric,
+					section: '',
+				});
 			}
 		}
 
 		return result;
 	}
 
-	private hydrateSetFromLog(loggedSet: LoggedItem['sets'][number], setNumber: number, targetReps: string): ActiveSet {
+	private hydrateSetFromLog(
+		loggedSet: LoggedItem['sets'][number],
+		setNumber: number,
+		targetReps: string,
+	): ActiveSet {
 		return {
 			setNumber,
 			targetReps,
@@ -222,11 +255,11 @@ class SessionStore {
 		routine: Routine,
 		program: Program,
 		itemMap: Map<string, Item>,
-		options?: { date?: string },
+		options?: { date?: string; prescribed?: PrescribedTargets },
 	): Promise<void> {
 		const date = options?.date ?? todayIso();
 		const now = new Date().toISOString();
-		const items = await this.buildActiveItems(routine, program, itemMap);
+		const items = await this.buildActiveItems(routine, program, itemMap, options?.prescribed);
 
 		this.active = {
 			id: generateId(),
@@ -243,7 +276,12 @@ class SessionStore {
 		this.persist();
 	}
 
-	async editSession(log: Session, routine: Routine, program: Program, itemMap: Map<string, Item>): Promise<void> {
+	async editSession(
+		log: Session,
+		routine: Routine,
+		program: Program,
+		itemMap: Map<string, Item>,
+	): Promise<void> {
 		const snapshot = snapshotLog(log);
 		const items: ActiveItem[] = [];
 		const editList = this.buildEditItemList(routine, program, snapshot);
@@ -336,7 +374,12 @@ class SessionStore {
 		await this.logSet(itemIndex, setIndex, set.weight, set.reps);
 	}
 
-	async logSet(itemIndex: number, setIndex: number, weight: number | string, reps: number): Promise<void> {
+	async logSet(
+		itemIndex: number,
+		setIndex: number,
+		weight: number | string,
+		reps: number,
+	): Promise<void> {
 		if (!this.active) return;
 
 		const item = this.active.items[itemIndex];
@@ -454,7 +497,8 @@ class SessionStore {
 		const elapsed = isEditing
 			? (this.active.originalDurationSeconds ??
 				Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000))
-			: (durationSeconds ?? Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000));
+			: (durationSeconds ??
+				Math.round((Date.now() - new Date(this.active.startedAt).getTime()) / 1000));
 
 		const session: Session = {
 			id: this.active.id,

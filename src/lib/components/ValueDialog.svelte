@@ -42,7 +42,10 @@
 		if (e.target === dialog) dialog.close();
 	}}
 >
-	<label class="value-dialog__title" for="value-dialog-input">{title}</label>
+	<label
+		class="value-dialog__title"
+		for="value-dialog-input">{title}</label
+	>
 	<div class="value-dialog__field">
 		<input
 			id="value-dialog-input"
@@ -54,12 +57,21 @@
 			onkeydown={(e) => e.key === 'Enter' && save()}
 		/>
 		{#if unit}
-			<span class="value-dialog__unit" aria-hidden="true">{unit}</span>
+			<span
+				class="value-dialog__unit"
+				aria-hidden="true">{unit}</span
+			>
 		{/if}
 	</div>
 	<div class="value-dialog__actions">
-		<button class="value-dialog__save" onclick={save}>Save</button>
-		<button class="value-dialog__cancel" onclick={() => dialog.close()}>Cancel</button>
+		<button
+			class="value-dialog__save"
+			onclick={save}>Save</button
+		>
+		<button
+			class="value-dialog__cancel"
+			onclick={() => dialog.close()}>Cancel</button
+		>
 	</div>
 </dialog>
 

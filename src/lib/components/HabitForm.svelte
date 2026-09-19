@@ -3,6 +3,9 @@
 	import type { Habit, HabitType } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '$lib/habits';
+	import Button from './Button.svelte';
+	import FieldLabel from './FieldLabel.svelte';
+	import DialogTitle from './DialogTitle.svelte';
 
 	type Props = {
 		editing?: Habit | null;
@@ -55,7 +58,12 @@
 					dailyGoal,
 				});
 			} else {
-				await habitStore.addHabit({ name: name.trim(), unit: unit.trim(), type, dailyGoal });
+				await habitStore.addHabit({
+					name: name.trim(),
+					unit: unit.trim(),
+					type,
+					dailyGoal,
+				});
 			}
 			onclose();
 		} finally {
@@ -64,36 +72,63 @@
 	}
 </script>
 
-<div class="modal-backdrop" role="presentation" onclick={() => !saving && onclose()}></div>
-<div class="modal" role="dialog" aria-labelledby={titleId} aria-modal="true">
-	<p class="modal__title" id={titleId}>
+<div
+	class="modal-backdrop"
+	role="presentation"
+	onclick={() => !saving && onclose()}
+></div>
+<div
+	class="modal"
+	role="dialog"
+	aria-labelledby={titleId}
+	aria-modal="true"
+>
+	<DialogTitle id={titleId}>
 		{#if editing}Edit Habit{:else}New Habit{/if}
-	</p>
+	</DialogTitle>
 
 	{#if showPresets && !editing}
 		<div class="hf-presets">
 			<p class="hf-presets__label">Start from a preset</p>
 			<div class="hf-presets__grid">
 				{#each HABIT_PRESETS as preset (preset.name)}
-					<button class="hf-preset-btn" onclick={() => applyPreset(preset)}>{preset.name}</button>
+					<button
+						class="hf-preset-btn"
+						onclick={() => applyPreset(preset)}>{preset.name}</button
+					>
 				{/each}
 			</div>
-			<button class="hf-presets__skip" onclick={() => (showPresets = false)}> Start from scratch </button>
+			<button
+				class="hf-presets__skip"
+				onclick={() => (showPresets = false)}
+			>
+				Start from scratch
+			</button>
 		</div>
 	{:else}
 		<div class="hf-field">
-			<label class="hf-label" for="habit-name">Name <span class="hf-hint">max 40 chars</span></label>
-			<input id="habit-name" class="hf-input" type="text" bind:value={name} placeholder="e.g. Water" maxlength={40} />
+			<FieldLabel
+				for="habit-name"
+				hint="max 40 chars">Name</FieldLabel
+			>
+			<input
+				id="habit-name"
+				class="hf-input"
+				type="text"
+				bind:value={name}
+				placeholder="e.g. Water"
+				maxlength={40}
+			/>
 		</div>
 
 		{#if editing}
 			<div class="hf-field">
-				<span class="hf-label">Type <span class="hf-hint">locked after creation</span></span>
+				<FieldLabel hint="locked after creation">Type</FieldLabel>
 				<div class="hf-type-locked">{habitTypeLabel(type)}</div>
 			</div>
 		{:else}
 			<div class="hf-field">
-				<span class="hf-label">Type</span>
+				<FieldLabel>Type</FieldLabel>
 				<div class="hf-types">
 					{#each CREATABLE_HABIT_TYPES as ht (ht)}
 						<button
@@ -112,7 +147,10 @@
 
 		{#if type === 'count'}
 			<div class="hf-field">
-				<label class="hf-label" for="habit-unit">Unit label <span class="hf-hint">required · max 20 chars</span></label>
+				<FieldLabel
+					for="habit-unit"
+					hint="required · max 20 chars">Unit label</FieldLabel
+				>
 				<input
 					id="habit-unit"
 					class="hf-input"
@@ -126,20 +164,35 @@
 
 		{#if typeHasGoal}
 			<div class="hf-field">
-				<label class="hf-label" for="habit-goal">Daily goal <span class="hf-hint">optional</span></label>
-				<input id="habit-goal" class="hf-input" type="number" bind:value={goal} placeholder="e.g. 8" min="1" />
+				<FieldLabel
+					for="habit-goal"
+					hint="optional">Daily goal</FieldLabel
+				>
+				<input
+					id="habit-goal"
+					class="hf-input"
+					type="number"
+					bind:value={goal}
+					placeholder="e.g. 8"
+					min="1"
+				/>
 			</div>
 		{/if}
 
 		<div class="modal__actions">
-			<button class="modal__btn modal__btn--ghost" onclick={onclose} disabled={saving}>Cancel</button>
-			<button
-				class="modal__btn modal__btn--primary"
+			<Button
+				variant="ghost"
+				grow
+				onclick={onclose}
+				disabled={saving}>Cancel</Button
+			>
+			<Button
+				grow
 				onclick={save}
 				disabled={!name.trim() || saving || (typeRequiresUnit && !unit.trim())}
 			>
 				{#if saving}Saving…{:else}Save{/if}
-			</button>
+			</Button>
 		</div>
 	{/if}
 </div>
@@ -169,41 +222,10 @@
 		box-shadow: var(--shadow-lg);
 	}
 
-	.modal__title {
-		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-4);
-	}
-
 	.modal__actions {
 		display: flex;
 		gap: var(--space-2);
 		margin-block-start: var(--space-4);
-	}
-
-	.modal__btn {
-		flex: 1;
-		min-block-size: 48px;
-		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-	}
-
-	.modal__btn--ghost {
-		background: var(--color-surface-3);
-		color: var(--color-text-primary);
-	}
-
-	.modal__btn--primary {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.hf-field {
@@ -211,21 +233,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-2);
-	}
-
-	.hf-label {
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-secondary);
-	}
-
-	.hf-hint {
-		font-weight: 400;
-		text-transform: none;
-		letter-spacing: 0;
-		color: var(--color-text-muted);
 	}
 
 	.hf-input {

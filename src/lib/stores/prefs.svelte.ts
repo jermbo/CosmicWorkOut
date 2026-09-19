@@ -1,4 +1,5 @@
 import type { UserPrefs, Density, Roundness } from '$lib/db/types';
+import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 
@@ -7,7 +8,13 @@ const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
+	homeCardOrder: [...DEFAULT_HOME_CARD_ORDER],
+	habitsEnabled: false,
+	activityLogEnabled: false,
+	practiceEnabled: false,
 	healthMetricsEnabled: false,
+	goalProgressionPlansEnabled: false,
+	baselinesEnabled: false,
 };
 
 class PrefsStore {
@@ -15,17 +22,54 @@ class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	homeCardOrder = $state<HomeCardId[]>([...DEFAULT_HOME_CARD_ORDER]);
+	habitsEnabled = $state(DEFAULTS.habitsEnabled);
+	activityLogEnabled = $state(DEFAULTS.activityLogEnabled);
+	practiceEnabled = $state(DEFAULTS.practiceEnabled);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
+	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
+	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
+
+	/**
+	 * Lift plans generate backing programs and can only be trained through `/workout`,
+	 * which Practice owns — so they are only ever live when Practice is on. Every
+	 * consumer reads this instead of and-ing the two flags itself.
+	 */
+	liftPlansEnabled = $derived(this.practiceEnabled && this.goalProgressionPlansEnabled);
+
+	/**
+	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
+	 * Overview uses this to offer a way into Settings instead of rendering blank.
+	 */
+	anyTrackingEnabled = $derived(
+		this.habitsEnabled ||
+			this.activityLogEnabled ||
+			this.practiceEnabled ||
+			this.healthMetricsEnabled ||
+			this.baselinesEnabled,
+	);
 
 	load(): void {
-		const stored = localStorage.getItem(PREFS_KEY);
-		if (stored) {
-			const parsed = JSON.parse(stored) as UserPrefs;
-			this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
-			this.density = parsed.density ?? DEFAULTS.density;
-			this.roundness = parsed.roundness ?? DEFAULTS.roundness;
-			this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
-			this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
+		try {
+			const stored = localStorage.getItem(PREFS_KEY);
+			if (stored) {
+				const parsed = JSON.parse(stored) as Partial<UserPrefs>;
+				this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
+				this.density = parsed.density ?? DEFAULTS.density;
+				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
+				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.homeCardOrder = resolveHomeCardOrder(parsed.homeCardOrder);
+				this.habitsEnabled = parsed.habitsEnabled ?? DEFAULTS.habitsEnabled;
+				this.activityLogEnabled = parsed.activityLogEnabled ?? DEFAULTS.activityLogEnabled;
+				this.practiceEnabled = parsed.practiceEnabled ?? DEFAULTS.practiceEnabled;
+				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
+				this.goalProgressionPlansEnabled =
+					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
+				this.baselinesEnabled = parsed.baselinesEnabled ?? DEFAULTS.baselinesEnabled;
+			}
+		} catch (e) {
+			// Corrupt prefs must never block app startup — fall back to defaults.
+			console.error('Failed to load preferences, using defaults:', e);
 		}
 
 		this.applyAccentColor();
@@ -39,13 +83,53 @@ class PrefsStore {
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
+			homeCardOrder: this.homeCardOrder,
+			habitsEnabled: this.habitsEnabled,
+			activityLogEnabled: this.activityLogEnabled,
+			practiceEnabled: this.practiceEnabled,
 			healthMetricsEnabled: this.healthMetricsEnabled,
+			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
+			baselinesEnabled: this.baselinesEnabled,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
 
+	setHomeCardOrder(order: HomeCardId[]): void {
+		this.homeCardOrder = resolveHomeCardOrder(order);
+		this.save();
+	}
+
+	resetHomeCardOrder(): void {
+		this.setHomeCardOrder([...DEFAULT_HOME_CARD_ORDER]);
+	}
+
+	setHabitsEnabled(enabled: boolean): void {
+		this.habitsEnabled = enabled;
+		this.save();
+	}
+
+	setActivityLogEnabled(enabled: boolean): void {
+		this.activityLogEnabled = enabled;
+		this.save();
+	}
+
+	setPracticeEnabled(enabled: boolean): void {
+		this.practiceEnabled = enabled;
+		this.save();
+	}
+
 	setHealthMetricsEnabled(enabled: boolean): void {
 		this.healthMetricsEnabled = enabled;
+		this.save();
+	}
+
+	setGoalProgressionPlansEnabled(enabled: boolean): void {
+		this.goalProgressionPlansEnabled = enabled;
+		this.save();
+	}
+
+	setBaselinesEnabled(enabled: boolean): void {
+		this.baselinesEnabled = enabled;
 		this.save();
 	}
 

@@ -10,7 +10,13 @@
 		fixedHeight?: boolean;
 	};
 
-	let { children, onclose, maxHeight = '90dvh', hideHandle = false, fixedHeight = false }: Props = $props();
+	let {
+		children,
+		onclose,
+		maxHeight = '90dvh',
+		hideHandle = false,
+		fixedHeight = false,
+	}: Props = $props();
 
 	let dialog: HTMLDialogElement;
 
@@ -50,7 +56,10 @@
 		style:block-size={panelBlockSize}
 	>
 		{#if !hideHandle}
-			<div class="bottom-sheet__grab" aria-hidden="true"></div>
+			<div
+				class="bottom-sheet__grab"
+				aria-hidden="true"
+			></div>
 		{/if}
 		{@render children()}
 	</div>
