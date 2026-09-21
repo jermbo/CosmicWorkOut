@@ -24,6 +24,7 @@
 	let { dates }: { dates: string[] } = $props();
 
 	const ROW_HEIGHT = 26;
+	/** Both views use the same small square cells, so a month fits on a laptop screen. */
 	const GRID_COLUMN = 32;
 	const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -229,6 +230,7 @@
 {:else if habits.length > 0}
 	<ScrollChart
 		columns={dates.length}
+		columnWidth={GRID_COLUMN}
 		height={Math.max(2, habits.length) * ROW_HEIGHT + PLOT_MARGIN.top + PLOT_MARGIN.bottom}
 		definition={buildStrips}
 		ariaLabel="Heat chart: every habit by day"

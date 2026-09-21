@@ -40,6 +40,7 @@
 	--radius-xl: 16px;
 	--radius-2xl: 20px;
 	--radius-tile: 14px;
+	--radius-sheet: 26px;
 	--radius-full: 9999px;
 
 	--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -77,34 +78,65 @@
 	--tile-h: 68px;
 	--card-gap: 12px;
 
-	/* Roundness defaults */
+	/* Older roundness names — aliases so every corner follows the setting. */
 	--r-tile: var(--radius-tile);
 	--r-xl: var(--radius-xl);
 	--r-2xl: var(--radius-2xl);
 }
 
-/* ── Density variants ─────────────────────────────────────── */
+/*
+ * ── Density & roundness (Settings → Personalization, US-046) ──
+ * These override the base tokens themselves, so every component that uses
+ * --space-* or --radius-* follows the setting. (Before v1.10.0 they only changed
+ * a handful of --r-* / --tile-h tokens, which is why the old page seemed to do
+ * nothing.) --radius-full stays: pills and circles are round at any setting.
+ */
 [data-density='compact'] {
+	--space-1: 3px;
+	--space-2: 6px;
+	--space-3: 9px;
+	--space-4: 12px;
+	--space-5: 15px;
+	--space-6: 18px;
+	--space-8: 24px;
+	--space-10: 30px;
+	--space-12: 36px;
 	--tile-h: 60px;
 	--card-gap: 9px;
 }
 
 [data-density='spacious'] {
+	--space-1: 5px;
+	--space-2: 10px;
+	--space-3: 15px;
+	--space-4: 20px;
+	--space-5: 25px;
+	--space-6: 30px;
+	--space-8: 40px;
+	--space-10: 50px;
+	--space-12: 60px;
 	--tile-h: 78px;
 	--card-gap: 16px;
 }
 
-/* ── Roundness variants ───────────────────────────────────── */
 [data-roundness='sharp'] {
-	--r-tile: 6px;
-	--r-xl: 10px;
-	--r-2xl: 12px;
+	--radius-sm: 2px;
+	--radius-md: 4px;
+	--radius-lg: 5px;
+	--radius-xl: 6px;
+	--radius-2xl: 8px;
+	--radius-tile: 5px;
+	--radius-sheet: 10px;
 }
 
 [data-roundness='soft'] {
-	--r-tile: 20px;
-	--r-xl: 20px;
-	--r-2xl: 24px;
+	--radius-sm: 9px;
+	--radius-md: 14px;
+	--radius-lg: 18px;
+	--radius-xl: 22px;
+	--radius-2xl: 26px;
+	--radius-tile: 20px;
+	--radius-sheet: 32px;
 }
 
 /* ============================================================

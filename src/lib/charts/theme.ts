@@ -48,8 +48,8 @@ export interface TooltipRowSpec<TDatum> {
 }
 
 /**
- * Tooltip config: portalled so it escapes the horizontal scroller, titled by a
- * date, with one row per focused point.
+ * Tooltip config: portalled so it escapes the horizontal scroller, placed beside
+ * the pointer, titled by a date, with one row per focused point.
  */
 export function chartTooltip<TDatum>(
 	title: (datum: TDatum) => string,
@@ -58,6 +58,9 @@ export function chartTooltip<TDatum>(
 	return {
 		use: tooltip,
 		portal,
+		// Beside the pointer, not the point: in a scrolled chart the nearest point can
+		// sit just past the visible edge, which put the tooltip outside the chart.
+		anchor: 'pointer' as const,
 		className: 'cw-chart-tooltip',
 		content: (points: readonly ChartPoint<TDatum>[]): ChartTooltipContent => {
 			const first = points[0];

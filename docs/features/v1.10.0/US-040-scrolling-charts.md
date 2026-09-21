@@ -2,7 +2,7 @@
 
 # US-040 — Scrolling Charts on Mobile
 
-> **As built:** `src/lib/charts/ScrollChart.svelte`. Each column is a fixed **48 px** (`COLUMN_WIDTH`, ~7 on a phone). The plot is as wide as `columns × 48` (or the viewport, if wider) inside a native `overflow-x: auto` scroller, so touch, trackpad, and keyboard panning are the browser's own and vertical page scroll is never trapped. Value labels are HTML **rails** outside the scroller (left, and right for dual-axis Mood & Habits), positioned from the same `niceAxis` the plot uses with fixed `PLOT_MARGIN`. It opens scrolled to the newest column and re-snaps there when the range or width changes. Edge fades with ‹ › show there is more history. Tooltips are portalled so the scroller can't clip them. The Baselines page chart scrolls the same way.
+> **As built:** `src/lib/charts/ScrollChart.svelte`. Each column is a fixed **48 px** (`COLUMN_WIDTH`, ~7 on a phone). The plot is as wide as `columns × 48` (or the viewport, if wider) inside a native `overflow-x: auto` scroller, so touch, trackpad, and keyboard panning are the browser's own and vertical page scroll is never trapped. Value labels are HTML **rails** outside the scroller (left, and right for dual-axis Mood & Habits), positioned from the same `niceAxis` the plot uses with fixed `PLOT_MARGIN`. It opens scrolled to the newest column and re-snaps there when the range or width changes. Edge fades with ‹ › show there is more history. Tooltips are portalled so the scroller can't clip them, sit **beside the pointer** (not the point), and **close when the chart scrolls** — otherwise a tooltip followed its point out of the chart (user feedback, v1.10.0 testing). The Baselines page chart scrolls the same way.
 >
 > Depends on
 

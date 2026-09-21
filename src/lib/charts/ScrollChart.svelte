@@ -71,6 +71,18 @@
 		maxScroll = viewport.scrollWidth - viewport.clientWidth;
 	}
 
+	/**
+	 * The tooltip is portalled (so the scroller can't clip it) and tracks its point,
+	 * so scrolling would carry it outside the chart. Close it instead: the chart
+	 * clears pointer focus on `mouseleave` of its surface.
+	 */
+	function onUserScroll() {
+		syncScroll();
+		for (const surface of viewport?.querySelectorAll('.ts-chart-surface') ?? []) {
+			surface.dispatchEvent(new MouseEvent('mouseleave'));
+		}
+	}
+
 	function railTicks(rail: AxisRail): { key: string; label: string; top: number }[] {
 		if (rail.categories) {
 			const step = plotHeight / Math.max(1, rail.categories.length);
@@ -119,7 +131,7 @@
 			class="scroll-chart__viewport"
 			bind:this={viewport}
 			bind:clientWidth={viewportWidth}
-			onscroll={syncScroll}
+			onscroll={onUserScroll}
 			role="region"
 			aria-label={scrollable ? `${ariaLabel}. Scroll sideways for earlier dates.` : ariaLabel}
 			tabindex={scrollable ? 0 : -1}
