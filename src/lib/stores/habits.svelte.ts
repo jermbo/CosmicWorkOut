@@ -53,12 +53,6 @@ class HabitStore {
 		return this.trackableHabits.filter((h) => this.isComplete(h, date)).length;
 	}
 
-	completionRatioForDate(date: string): number {
-		const total = this.trackableHabits.length;
-		if (total === 0) return 0;
-		return this.loggedCountForDate(date) / total;
-	}
-
 	async load(): Promise<void> {
 		const [habits, logs] = await Promise.all([db.habits.getAll(), db.habitLogs.getAll()]);
 		const normalized = habits.map((h) => {

@@ -33,10 +33,6 @@ class HealthStore {
 			.sort((a, b) => a.recordedAt.localeCompare(b.recordedAt));
 	}
 
-	hasReadingOnDate(date: string): boolean {
-		return this.readings.some((r) => r.date === date);
-	}
-
 	latestWeight(): (HealthReading & { values: WeightValues }) | undefined {
 		let latest: (HealthReading & { values: WeightValues }) | undefined;
 		for (const r of this.readings) {

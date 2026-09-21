@@ -23,18 +23,17 @@ flowchart TB
     Practice --> Session[Session overlay]
     Session -->|Finish| Done[Completion screen]
     Done --> Overview
-    Overview --> History[History calendar]
     Overview --> Insights[Insights]
 
     classDef entry fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef screen fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef session fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     class Boot entry;
-    class Overview,Practice,History,Insights screen;
+    class Overview,Practice,Insights screen;
     class Session,Done session;
 ```
 
-Five tabs are always visible in the bottom nav: **Overview**, **Practice**, **History**, **Insights**, **Settings**. Active sessions and completion screens appear as overlays — you never navigate away mid-session.
+The bottom nav has four tabs: **Overview**, **Practice** (only while Practice is on), **Insights**, **Settings**. Active sessions and completion screens appear as overlays — you never navigate away mid-session.
 
 ---
 
@@ -139,14 +138,12 @@ The **Activity log** records non-structured movement: a **type** (Run, Walk, Bik
 
 ---
 
-## History Calendar
+## Reviewing and Fixing Past Days
 
-A monthly grid showing what you did each day. Days carry small dots for the kinds of things logged (strength, dance, activity, health, mood), and a habit-fill background shows how much of the day's habits you hit.
+There is no separate History screen (removed in v1.10.0 — [US-047](../features/v1.10.0/US-047-retire-history.md)). The two jobs it did are split:
 
-- Month stats summarize the period.
-- Tapping a day opens an actions sheet: review session summaries, edit habits, and add/edit/delete activities or sessions for that day.
-
-Only actual logged data is shown — there are no "scheduled" or "rest" day styles.
+- **Seeing the past** — Insights. Gaps and streaks show in the charts (All Habits heat chart, Showing Up, Weekly Volume).
+- **Changing the past** — pick the date in a tracker's page header, then log or edit there. A logged session shows **Edit** and **Delete** on `/workout` and `/practice/dance`.
 
 ---
 

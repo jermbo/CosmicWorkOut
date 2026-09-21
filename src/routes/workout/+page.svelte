@@ -89,6 +89,7 @@
 	let showCreateProgram = $state(false);
 	let showStartConfirm = $state(false);
 	let showConflictConfirm = $state(false);
+	let showDeleteConfirm = $state(false);
 
 	async function doStartSession() {
 		const workout = selectedWorkout;
@@ -119,6 +120,13 @@
 		const program = programStore.programs.find((p) => p.id === session.programId);
 		if (!workout || !program) return;
 		await sessionStore.editSession(session, workout, program, programStore.itemMap);
+	}
+
+	async function deleteSession() {
+		showDeleteConfirm = false;
+		const session = sessionForDate;
+		if (!session) return;
+		await programStore.deleteSession(session.id);
 	}
 </script>
 
@@ -217,12 +225,20 @@
 					lb
 				</p>
 			</div>
-			<button
-				class="session-done__edit"
-				onclick={editSession}
-			>
-				Edit
-			</button>
+			<div class="session-done__actions">
+				<button
+					class="session-done__edit"
+					onclick={editSession}
+				>
+					Edit
+				</button>
+				<button
+					class="session-done__delete"
+					onclick={() => (showDeleteConfirm = true)}
+				>
+					Delete
+				</button>
+			</div>
 		</div>
 	{:else if weekWorkouts.length > 0 && selectedWorkout}
 		<div class="workout-page__body">
@@ -298,6 +314,18 @@
 		oncancel={() => (showConflictConfirm = false)}
 	>
 		You have an unfinished session in another discipline. Starting this workout will discard it.
+	</ConfirmDialog>
+{/if}
+
+{#if showDeleteConfirm}
+	<ConfirmDialog
+		title="Delete this workout?"
+		confirmLabel="Delete"
+		danger
+		onconfirm={deleteSession}
+		oncancel={() => (showDeleteConfirm = false)}
+	>
+		This cannot be undone.
 	</ConfirmDialog>
 {/if}
 
@@ -499,5 +527,22 @@
 		font-size: 0.875rem;
 		font-weight: 600;
 		color: var(--color-text-primary);
+	}
+	.session-done__actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		flex-shrink: 0;
+	}
+
+	.session-done__delete {
+		padding-inline: var(--space-4);
+		block-size: 40px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-red);
 	}
 </style>

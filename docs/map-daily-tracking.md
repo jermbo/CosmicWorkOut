@@ -52,7 +52,7 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 ## 5k — Detail
 
 - [Settings & Preferences](requirements/settings-preferences.md) — the feature flags and their contract
-- [History & Calendar](requirements/history-calendar.md) — how a tracked day is read back
+- [History & Past Days](requirements/history-calendar.md) — how a past day is read back and fixed
 
 ## Ground — Stories by release
 

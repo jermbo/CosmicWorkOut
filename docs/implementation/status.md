@@ -10,30 +10,30 @@ Verified against the codebase (July 2026).
 
 ## v1.1.0 — Core Workout Flows
 
-| Feature                                                   | Status | Notes                                                                                 |
-| --------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- |
-| Today view + start session                                | Built  | Home practice card navigates to `/practice`; workout page handles start/edit          |
-| Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry                      |
-| Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                              |
-| Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                            |
-| Per-item weight increment (2.5 / 5 / 10)                  | Built  | Configured on item form; weights round to nearest increment                           |
-| Finish / abandon session                                  | Built  | Finish saves completed sets only; abandon has confirm dialog                          |
-| Crash recovery                                            | Built  | Resume/discard banner on boot                                                         |
-| Session complete overlay                                  | Built  | Stats + confetti                                                                      |
-| Program view + week progress                              | Built  | Routine cards from the current week's templates                                       |
-| Workout/routine editor                                    | Built  | Edit items, add new routines                                                          |
-| Item library browser                                      | Built  | Category-filtered sheet in editor                                                     |
-| Calendar + day summary                                    | Built  | Month grid, tap completed days                                                        |
-| IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                            |
-| Preferences store                                         | Built  | Accent, density, roundness, weight unit — editable again on Personalization (v1.10.0) |
-| Settings UI                                               | Built  | `/settings` hub — one row per feature since v1.10.0 (US-045)                          |
-| Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating                          |
-| Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks             |
-| Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program                      |
-| Custom item CRUD                                          | Built  | Create/edit/delete in the item library; built-in items are read-only                  |
-| Browse all program weeks                                  | Built  | Week picker chevrons on program page                                                  |
-| Weekly consistency streak                                 | Built  | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar              |
-| Scheduled/skipped day status                              | Built  | Calendar infers training days-of-week from session history                            |
+| Feature                                                   | Status  | Notes                                                                                 |
+| --------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
+| Today view + start session                                | Built   | Home practice card navigates to `/practice`; workout page handles start/edit          |
+| Session logging — smart tap (instant or first-time entry) | Built   | Instant if weight known; opens sheet for first-time weight entry                      |
+| Session logging — adjust completed set                    | Built   | Tap any completed tile to reopen sheet; cascades forward                              |
+| Weight remembered across sessions (`itemLastUsed`)        | Built   | Pre-fills on session start                                                            |
+| Per-item weight increment (2.5 / 5 / 10)                  | Built   | Configured on item form; weights round to nearest increment                           |
+| Finish / abandon session                                  | Built   | Finish saves completed sets only; abandon has confirm dialog                          |
+| Crash recovery                                            | Built   | Resume/discard banner on boot                                                         |
+| Session complete overlay                                  | Built   | Stats + confetti                                                                      |
+| Program view + week progress                              | Built   | Routine cards from the current week's templates                                       |
+| Workout/routine editor                                    | Built   | Edit items, add new routines                                                          |
+| Item library browser                                      | Built   | Category-filtered sheet in editor                                                     |
+| Calendar + day summary                                    | Removed | v1.10.0 — [US-047](../features/v1.10.0/US-047-retire-history.md)                      |
+| IndexedDB persistence                                     | Built   | Raw API wrapper, seed data                                                            |
+| Preferences store                                         | Built   | Accent, density, roundness, weight unit — editable again on Personalization (v1.10.0) |
+| Settings UI                                               | Built   | `/settings` hub — one row per feature since v1.10.0 (US-045)                          |
+| Program selection screen                                  | Built   | Bottom sheet; built-in programs deep-clone before activating                          |
+| Create new program                                        | Built   | 2-step full-screen flow — details then routine names; scaffolds all weeks             |
+| Copy built-in before editing                              | Built   | Guard dialog prompts copy+switch when editing a built-in program                      |
+| Custom item CRUD                                          | Built   | Create/edit/delete in the item library; built-in items are read-only                  |
+| Browse all program weeks                                  | Built   | Week picker chevrons on program page                                                  |
+| Weekly consistency streak                                 | Built   | Consecutive weeks where sessions ≥ daysPerWeek; shown on home                         |
+| Scheduled/skipped day status                              | Removed | Went with the calendar (v1.10.0)                                                      |
 
 ---
 
@@ -59,8 +59,8 @@ Verified against the codebase (July 2026).
 | Feature                           | Status  | Doc reference                                                                                                                             |
 | --------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | Custom habit CRUD in Settings     | Built   | US-009                                                                                                                                    |
-| Habit history heatmap on Calendar | Built   | US-010                                                                                                                                    |
-| Activity edit from calendar       | Built   | US-013                                                                                                                                    |
+| Habit history heatmap on Calendar | Removed | US-010; calendar retired in v1.10.0 ([US-047](../features/v1.10.0/US-047-retire-history.md))                                              |
+| Activity edit from calendar       | Removed | US-013; edit from `/log` instead                                                                                                          |
 | Journal page                      | Removed | Shipped in v1.3 (US-012/US-014), then **removed** in commit `0af33ff`. Not on [roadmap](../roadmap/README.md) unless feedback demands it. |
 | Journal speech input & auto-save  | Removed | Removed with the Journal page (US-014).                                                                                                   |
 
@@ -114,7 +114,7 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 | Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                                                    |
 | Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                                                |
 | Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON export (share sheet or download) + staged restore on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
-| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights + calendar; DB v8                                                                                |
+| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights; DB v8                                                                                           |
 | Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults)                     |
 | Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                                               |
 
@@ -132,22 +132,22 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 
 ## v1.9.0 — Lift Plans & Baselines
 
-| Feature                                          | Status | Notes                                                                                                                                                                                               |
-| ------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Goal progression plan type (Lift plans)          | Built  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9                                                                                                |
-| Settings toggle (`goalProgressionPlansEnabled`)  | Built  | Default off; hides UI, data persists — same pattern as health metrics                                                                                                                               |
-| Modular implementation                           | Built  | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                                                                                                           |
-| Plan generator (goal + start → blocks)           | Built  | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                                                                                                              |
-| Starter scaffolds                                | Built  | Priority week / Focus only / From scratch                                                                                                                                                           |
-| Focus wave (4-week block)                        | Built  | Build → build → peak → deload                                                                                                                                                                       |
-| Supporting weekly increment                      | Built  | Uses frozen `weightIncrement`; reps stay flat                                                                                                                                                       |
-| Block repeat                                     | Built  | Re-run current block from week 1 via `countOffset`                                                                                                                                                  |
-| Plan lifecycle (complete / pause)                | Built  | One active lift plan; sole active Strength program; backing programs hidden from generic pickers                                                                                                    |
-| Baselines feature flag + Settings CRUD           | Built  | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — `baselines` / `baselineLogs` in DB v10                                                                                                     |
-| Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context                                                                                                        |
-| Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`                                                                                                    |
-| Practice feature flag (`practiceEnabled`)        | Built  | Default off. Hides nav tab, `/practice*`, `/workout`, `/program`, session overlays, and session marks on History/Insights; data persists. Lift plans nest inside it via derived `liftPlansEnabled`. |
-| Habits + Activity log feature flags              | Built  | `habitsEnabled` (incl. mood) and `activityLogEnabled`, both default off. Every tracking feature is now opt-in, so Overview shows a "choose what to track" empty state on a fresh install.           |
+| Feature                                          | Status | Notes                                                                                                                                                                                       |
+| ------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Goal progression plan type (Lift plans)          | Built  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) — isolated stint per focus lift; DB v9                                                                                        |
+| Settings toggle (`goalProgressionPlansEnabled`)  | Built  | Default off; hides UI, data persists — same pattern as health metrics                                                                                                                       |
+| Modular implementation                           | Built  | `src/lib/goalPlans/` + `goalPlanStore`; thin hooks at workout/practice UI                                                                                                                   |
+| Plan generator (goal + start → blocks)           | Built  | Wave blocks; final peak snaps to goal weight × reps; duration estimate                                                                                                                      |
+| Starter scaffolds                                | Built  | Priority week / Focus only / From scratch                                                                                                                                                   |
+| Focus wave (4-week block)                        | Built  | Build → build → peak → deload                                                                                                                                                               |
+| Supporting weekly increment                      | Built  | Uses frozen `weightIncrement`; reps stay flat                                                                                                                                               |
+| Block repeat                                     | Built  | Re-run current block from week 1 via `countOffset`                                                                                                                                          |
+| Plan lifecycle (complete / pause)                | Built  | One active lift plan; sole active Strength program; backing programs hidden from generic pickers                                                                                            |
+| Baselines feature flag + Settings CRUD           | Built  | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — `baselines` / `baselineLogs` in DB v10                                                                                             |
+| Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context                                                                                                |
+| Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`                                                                                            |
+| Practice feature flag (`practiceEnabled`)        | Built  | Default off. Hides nav tab, `/practice*`, `/workout`, `/program`, session overlays, and session marks on Insights; data persists. Lift plans nest inside it via derived `liftPlansEnabled`. |
+| Habits + Activity log feature flags              | Built  | `habitsEnabled` (incl. mood) and `activityLogEnabled`, both default off. Every tracking feature is now opt-in, so Overview shows a "choose what to track" empty state on a fresh install.   |
 
 See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Baselines](../roadmap/baselines.md).
 
@@ -155,18 +155,19 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 
 ## v1.10.0 — Baselines & Insights Refresh
 
-| Feature                               | Status | Notes                                                                                                                                                           |
-| ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Flexible baseline metrics             | Built  | [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — 1 to n Duration / Distance / Count metrics, no direction; DB v11 drops v1.9.0 baseline data |
-| Baseline logging & neutral comparison | Built  | [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md) — logging = done; signed difference vs baseline                                             |
-| TanStack Charts                       | Built  | [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md) — every chart; `src/lib/charts/`. `chart.js` still installed until the user removes it        |
-| Scrolling charts                      | Built  | [US-040](../features/v1.10.0/US-040-scrolling-charts.md) — `ScrollChart.svelte`, 48 px columns, pinned value rails                                              |
-| All-habits heat chart (experimental)  | Built  | [US-041](../features/v1.10.0/US-041-all-habits-heat-chart.md) — strips + calendar grid                                                                          |
-| Habit colors                          | Built  | [US-042](../features/v1.10.0/US-042-habit-colors.md) — `Habit.color` / `negativeColor`, defaults on load                                                        |
-| Show / hide Insights charts           | Built  | [US-043](../features/v1.10.0/US-043-insights-chart-visibility.md) — `prefs.hiddenCharts`; `/settings/insights`                                                  |
-| Experimental Insights charts          | Built  | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
-| Settings feature hub                  | Built  | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
-| Personalization                       | Built  | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
+| Feature                               | Status  | Notes                                                                                                                                                           |
+| ------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flexible baseline metrics             | Built   | [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — 1 to n Duration / Distance / Count metrics, no direction; DB v11 drops v1.9.0 baseline data |
+| Baseline logging & neutral comparison | Built   | [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md) — logging = done; signed difference vs baseline                                             |
+| TanStack Charts                       | Built   | [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md) — every chart; `src/lib/charts/`. `chart.js` still installed until the user removes it        |
+| Scrolling charts                      | Built   | [US-040](../features/v1.10.0/US-040-scrolling-charts.md) — `ScrollChart.svelte`, 48 px columns, pinned value rails                                              |
+| All-habits heat chart (experimental)  | Built   | [US-041](../features/v1.10.0/US-041-all-habits-heat-chart.md) — strips + calendar grid                                                                          |
+| Habit colors                          | Built   | [US-042](../features/v1.10.0/US-042-habit-colors.md) — `Habit.color` / `negativeColor`, defaults on load                                                        |
+| Show / hide Insights charts           | Built   | [US-043](../features/v1.10.0/US-043-insights-chart-visibility.md) — `prefs.hiddenCharts`; `/settings/insights`                                                  |
+| Experimental Insights charts          | Built   | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
+| Settings feature hub                  | Built   | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
+| Personalization                       | Built   | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
+| Retire History (`/calendar`)          | Removed | [US-047](../features/v1.10.0/US-047-retire-history.md) — History tab gone; session Delete moved to `/workout` and `/practice/dance`                             |
 
 Not yet verified in a browser — built and checked with type check, lint, unit tests, and a production build only.
 

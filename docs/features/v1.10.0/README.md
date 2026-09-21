@@ -2,7 +2,7 @@
 
 # v1.10.0 — Baselines & Insights Refresh
 
-> **Status:** Built — US-037 – US-046 implemented. Checked with type check, lint, unit tests (102), and a production build; **not yet verified in a browser** (awaiting user testing).
+> **Status:** Built — US-037 – US-047 implemented. Checked with type check, lint, unit tests (102), and a production build; **not yet verified in a browser** (awaiting user testing).
 
 Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub.
 
@@ -22,8 +22,9 @@ Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub.
 | [US-044](./US-044-experimental-insights-charts.md) | Experimental Insights Charts       | 5     | Built  |
 | [US-045](./US-045-settings-feature-hub.md)         | Settings Feature Hub               | 6     | Built  |
 | [US-046](./US-046-personalization.md)              | Personalization                    | 6     | Built  |
+| [US-047](./US-047-retire-history.md)               | Retire History                     | 7     | Built  |
 
-**Suggested build order:** US-039 (chart foundation) → US-040 → US-037 → US-038 → US-042 → US-041 → US-043 → US-044 → US-045 → US-046.
+**Suggested build order:** US-039 (chart foundation) → US-040 → US-037 → US-038 → US-042 → US-041 → US-043 → US-044 → US-045 → US-046 → US-047.
 
 ---
 
@@ -37,6 +38,7 @@ Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub.
 | 4   | Heat charts — habits                           | Decided |
 | 5   | Other useful chart insights                    | Decided |
 | 6   | Settings page — is it useful and intuitive?    | Decided |
+| 7   | Is History still needed?                       | Decided |
 
 ---
 
@@ -206,6 +208,18 @@ Insights              ›
 Personalization       ›   (accent, weight unit, density, roundness, Overview layout)
 Data & backup         ›
 ```
+
+---
+
+## Topic 7 — Is History still needed?
+
+**Problem:** After the Insights refresh, the History calendar showed the same things Insights does (consistency, mood, volume). Its only other job — opening a past day to change it — is already handled by each tracker's date picker. The user doesn't use the page.
+
+| Topic                   | Decision                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Remove History**      | Drop the History tab and `/calendar`. Insights is where you look back; the tracker pages are where you change the past.                               |
+| **Keep session delete** | Deleting a session only existed in the calendar's day sheet. Move it next to **Edit** on the logged-session card on `/workout` and `/practice/dance`. |
+| **Data**                | Untouched. Nothing is migrated or cleared.                                                                                                            |
 
 ---
 

@@ -58,6 +58,7 @@
 	let showCreateProgram = $state(false);
 	let showStartConfirm = $state(false);
 	let showConflictConfirm = $state(false);
+	let showDeleteConfirm = $state(false);
 	let starting = $state(false);
 
 	async function doStartSession() {
@@ -102,6 +103,13 @@
 		const program = programStore.programs.find((p) => p.id === session.programId);
 		if (!routine || !program) return;
 		await sessionStore.editSession(session, routine, program, programStore.itemMap);
+	}
+
+	async function deleteSession() {
+		showDeleteConfirm = false;
+		const session = sessionForDate;
+		if (!session) return;
+		await programStore.deleteSession(session.id);
 	}
 
 	let sectionPreview = $derived.by(() => {
@@ -187,10 +195,20 @@
 					· {formatCountWithWord(sessionForDate.items.length, 'item')}
 				</p>
 			</div>
-			<button
-				class="session-done__edit"
-				onclick={editSession}>Edit</button
-			>
+			<div class="session-done__actions">
+				<button
+					class="session-done__edit"
+					onclick={editSession}
+				>
+					Edit
+				</button>
+				<button
+					class="session-done__delete"
+					onclick={() => (showDeleteConfirm = true)}
+				>
+					Delete
+				</button>
+			</div>
 		</div>
 	{:else if weekRoutines.length > 0 && selectedRoutine}
 		<div class="dance-page__body">
@@ -294,6 +312,18 @@
 		oncancel={() => (showConflictConfirm = false)}
 	>
 		You have an unfinished session in another discipline. Starting this practice will discard it.
+	</ConfirmDialog>
+{/if}
+
+{#if showDeleteConfirm}
+	<ConfirmDialog
+		title="Delete this practice?"
+		confirmLabel="Delete"
+		danger
+		onconfirm={deleteSession}
+		oncancel={() => (showDeleteConfirm = false)}
+	>
+		This cannot be undone.
 	</ConfirmDialog>
 {/if}
 
@@ -510,5 +540,22 @@
 		background: var(--color-surface-3);
 		border: 1px solid var(--color-border);
 		font-weight: 600;
+	}
+	.session-done__actions {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		flex-shrink: 0;
+	}
+
+	.session-done__delete {
+		padding-inline: var(--space-4);
+		block-size: 40px;
+		border-radius: var(--radius-full);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-red);
 	}
 </style>

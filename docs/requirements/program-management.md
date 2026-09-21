@@ -161,4 +161,4 @@ sequenceDiagram
 
 - [Data Model](../architecture/data-model.md) — Program, Week, Routine, Item types
 - [Session Logging](session-logging.md) — How programs drive the logging flow
-- [History & Calendar](history-calendar.md) — How program completion is visualized
+- [History & Past Days](history-calendar.md) — Streaks and past sessions

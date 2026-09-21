@@ -82,12 +82,12 @@ Every feature toggle defaults **off** and hides UI only — data always persists
 | ----------------------------- | ----------------------------------------------------------------------- |
 | `habitsEnabled`               | Habits **and mood** — daily check-in, CRUD, dots, charts                |
 | `activityLogEnabled`          | The activity log — runs, walks, yoga, and other one-off activities      |
-| `practiceEnabled`             | The whole Practice / session engine, plus its History & Insights marks  |
+| `practiceEnabled`             | The whole Practice / session engine, plus its Insights marks            |
 | `goalProgressionPlansEnabled` | Lift plans — **nested under Practice**; only shown while Practice is on |
 | `healthMetricsEnabled`        | Weight and blood pressure                                               |
 | `baselinesEnabled`            | Daily baselines (1 to n metrics each)                                   |
 
-**Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page, and History day cells are not tappable until at least one feature is on.
+**Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page.
 
 Lift plans are nested because a plan can only be trained through `/workout`, which Practice owns. Code reads the derived `prefsStore.liftPlansEnabled` rather than and-ing the two flags.
 

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { formatDuration, formatVolume } from '$lib/format';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -9,11 +7,6 @@
 
 	function handleBackToToday() {
 		sessionStore.dismissComplete();
-	}
-
-	async function handleSeeCalendar() {
-		sessionStore.dismissComplete();
-		await goto(resolve('/calendar'));
 	}
 
 	let session = $derived(sessionStore.completedSession);
@@ -132,12 +125,6 @@
 				onclick={handleBackToToday}
 			>
 				Back to today
-			</button>
-			<button
-				class="session-complete__btn session-complete__btn--secondary"
-				onclick={handleSeeCalendar}
-			>
-				See it in calendar
 			</button>
 		</div>
 	</div>
@@ -302,11 +289,5 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		box-shadow: var(--shadow-lime);
-	}
-
-	.session-complete__btn--secondary {
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-primary);
 	}
 </style>

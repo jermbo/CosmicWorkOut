@@ -67,12 +67,11 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Habits (`/habits`)
 
-| Component           | Purpose                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `HabitCard`         | A single habit with progress ring, +/− stepper, boolean toggle.                                             |
-| `HabitRow`          | Compact habit row variant.                                                                                  |
-| `HabitForm`         | Create / edit a custom habit (Settings).                                                                    |
-| `HabitHistorySheet` | Editable habit sheet for a past calendar day (add/subtract/toggle/exact-value, same controls as `/habits`). |
+| Component   | Purpose                                                         |
+| ----------- | --------------------------------------------------------------- |
+| `HabitCard` | A single habit with progress ring, +/− stepper, boolean toggle. |
+| `HabitRow`  | Compact habit row variant.                                      |
+| `HabitForm` | Create / edit a custom habit (Settings).                        |
 
 ---
 
@@ -156,24 +155,12 @@ Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.t
 
 ---
 
-## Calendar & day detail (`/calendar`)
-
-| Component                  | Purpose                                                        |
-| -------------------------- | -------------------------------------------------------------- |
-| `DaySummarySheet`          | Read-only session detail for a completed day.                  |
-| `DayActionsSheet`          | Actions for a tapped day (view/edit/add across disciplines).   |
-| `DayActionItem`            | A single action row inside `DayActionsSheet`.                  |
-| `DayActionsActivityList`   | Activity entries for the day, inside `DayActionsSheet`.        |
-| `DayActionsWorkoutSummary` | Workout/session summary for the day, inside `DayActionsSheet`. |
-
----
-
 ## Streaks
 
 | Component         | Purpose                                                                |
 | ----------------- | ---------------------------------------------------------------------- |
 | `WeekStrip`       | 7-day mini calendar of this week's session activity (in `PageHeader`). |
-| `WeekStreakBadge` | Consecutive-weeks consistency badge (home + calendar).                 |
+| `WeekStreakBadge` | Consecutive-weeks consistency badge (home).                            |
 
 ---
 
@@ -264,12 +251,6 @@ flowchart TB
         WRI[WeightRepsInputs]
     end
 
-    subgraph dayactions ["Calendar day"]
-        DAS[DayActionsSheet]
-        DAI[DayActionItem]
-        DAAL[DayActionsActivityList]
-        DAWS[DayActionsWorkoutSummary]
-    end
 
     SO --> EC --> PR & ST
     SO --> LS
@@ -277,9 +258,8 @@ flowchart TB
     DRE --> LIB --> IFS
     AGPC --> GBT
     GFS --> WRI
-    DAS --> DAI & DAAL & DAWS
     PH --> WeekStrip
-    LS & EFS & ILS & IFS & ELS & DAS --> BS
+    LS & EFS & ILS & IFS & ELS --> BS
 
     classDef layout fill:#465569,stroke:#28313e,color:#ffffff;
     classDef shared fill:#3b3f8c,stroke:#23264f,color:#ffffff;
@@ -287,14 +267,12 @@ flowchart TB
     classDef editor fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     classDef dance fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
     classDef goals fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
-    classDef day fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class BN,SO,DSO,SC,TO layout;
     class BS,IC,CD,PH shared;
     class EC,ST,LS,PR strength;
     class WE,ELS,EFS editor;
     class DRE,ILS,IFS dance;
     class AGPC,GBT,GFS,WRI goals;
-    class DAS,DAI,DAAL,DAWS day;
 ```
 
 ---

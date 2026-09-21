@@ -42,7 +42,7 @@ flowchart LR
     Today --> Start[Start session]
     Start --> Log[Log items — one tap each]
     Log --> Finish[Finish session]
-    Finish --> History[Review in calendar + insights]
+    Finish --> History[Review in insights]
     History --> Open
 
     classDef entry fill:#3b3f8c,stroke:#23264f,color:#ffffff;

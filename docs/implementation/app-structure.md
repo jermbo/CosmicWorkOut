@@ -18,7 +18,6 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/workout`                  | `routes/workout/+page.svelte`                  | Strength workout — full session start/edit UI                                                                                                        |
 | `/program`                  | `routes/program/+page.svelte`                  | Programs — activate, create, edit routines (`?discipline=`)                                                                                          |
 | `/log`                      | `routes/log/+page.svelte`                      | Activity log — list and log non-workout activities                                                                                                   |
-| `/calendar`                 | `routes/calendar/+page.svelte`                 | History — month grid, stats, day summary                                                                                                             |
 | `/insights`                 | `routes/insights/+page.svelte`                 | Insights — TanStack charts from the `INSIGHT_CHARTS` list, each hideable ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))         |
 | `/health`                   | `routes/health/+page.svelte`                   | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))                                                         |
 | `/goals`                    | `routes/goals/+page.svelte`                    | Lift plans (Goal progression plans) — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md))                    |
@@ -35,7 +34,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. lift plans and Baselines), debug seed                                                                              |
 
-Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, Health, and Baselines are reached from their summary cards and the Practice hub.
+Navigation via `BottomNav` (Overview · Practice · Insights · Settings). The History tab and `/calendar` were removed in v1.10.0 ([US-047](../features/v1.10.0/US-047-retire-history.md)). Workout, Program, Log, Habits, Health, and Baselines are reached from their summary cards and the Practice hub.
 
 **Every tracking feature is opt-in and defaults off**, so most of these routes are gated. `habitsEnabled` guards `/habits`; `activityLogEnabled` guards `/log`; `practiceEnabled` hides the Practice tab and guards `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, and `/program`; `/goals*` additionally needs Lift plans on; `/health` needs `healthMetricsEnabled`; `/baselines` needs `baselinesEnabled`. Settings feature pages (`/settings/habits`, `/settings/baselines`, …) are **not** gated — they hold the switch that turns the feature on (v1.10.0). Guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts` — see [state.md](state.md#feature-flags-hide-ui-data-always-persists).
 
@@ -62,7 +61,6 @@ flowchart TB
     Main --> Workout["/workout"]
     Main --> Program["/program"]
     Main --> Log["/log"]
-    Main --> Calendar["/calendar"]
     Main --> Insights["/insights"]
     Main --> Health["/health"]
     Main --> Goals["/goals (+ /new) — Lift plans"]
@@ -77,7 +75,7 @@ flowchart TB
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     class Layout,Main,Nav,Toast shell;
     class Overlay,Dance,Complete,Recovery overlay;
-    class Today,Habits,Practice,Workout,Program,Log,Calendar,Insights,Health,Goals,Baselines,Settings,SettingsHab,SettingsBaselines,SettingsData route;
+    class Today,Habits,Practice,Workout,Program,Log,Insights,Health,Goals,Baselines,Settings,SettingsHab,SettingsBaselines,SettingsData route;
 ```
 
 `routes/+layout.ts` sets `ssr = false` — fully client-rendered.
@@ -143,7 +141,6 @@ src/
 │   │   ├── +page.svelte
 │   │   └── new/+page.svelte
 │   ├── log/+page.svelte
-│   ├── calendar/+page.svelte
 │   ├── insights/+page.svelte
 │   ├── health/+page.svelte
 │   └── settings/

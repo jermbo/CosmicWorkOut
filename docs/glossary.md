@@ -60,7 +60,7 @@ The **Practice destination** and page shell for guided sessions (`/practice`). O
 
 Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
 
-**Opt-in:** gated by `practiceEnabled` in Settings (default off). Practice is the session engine rather than a single screen, so the flag also hides `/workout`, `/program`, the session overlays, and the session marks on History and Insights — programs and session history stay in IndexedDB. [Lift plans](#lift-plan) are nested inside it. See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
+**Opt-in:** gated by `practiceEnabled` in Settings (default off). Practice is the session engine rather than a single screen, so the flag also hides `/workout`, `/program`, the session overlays, and the session marks on Insights — programs and session history stay in IndexedDB. [Lift plans](#lift-plan) are nested inside it. See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
 
 ### Section
 

@@ -7,7 +7,6 @@
 	const ALL_NAV_ITEMS = [
 		{ href: '/', label: 'Overview', exact: true },
 		{ href: '/practice', label: 'Practice', exact: false },
-		{ href: '/calendar', label: 'History', exact: false },
 		{ href: '/insights', label: 'Insights', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
 	] as const;
@@ -73,44 +72,6 @@
 							stroke-linejoin="round"
 						>
 							<path d="M6 4v6M18 4v6M3 7h4M17 7h4M6 14v6M18 14v6M3 17h4M17 17h4M8 10h8v4H8z" />
-						</svg>
-					{:else if item.label === 'History'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<rect
-								x="3"
-								y="4"
-								width="18"
-								height="18"
-								rx="2"
-								ry="2"
-							/>
-							<line
-								x1="16"
-								y1="2"
-								x2="16"
-								y2="6"
-							/>
-							<line
-								x1="8"
-								y1="2"
-								x2="8"
-								y2="6"
-							/>
-							<line
-								x1="3"
-								y1="10"
-								x2="21"
-								y2="10"
-							/>
 						</svg>
 					{:else if item.label === 'Insights'}
 						<svg

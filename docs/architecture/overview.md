@@ -41,7 +41,7 @@ After the first page load the app runs entirely in the browser. A service worker
 
 ### UI Layer — Svelte 5 + SvelteKit
 
-The shipped routes: **Overview** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Calendar** (`/calendar`), **Insights** (`/insights`), **Health** (`/health`), **Lift plans** (`/goals`, `/goals/new` — UI name; code may still say “goals”), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout. **Planned (v1.9.0):** **Baselines** (`/baselines`, `/settings/baselines`). There is no `/settings/appearance` route; appearance prefs stay at fixed defaults.
+The shipped routes: **Overview** (`/`), **Habits** (`/habits`), **Workout** (`/workout`), **Activity Log** (`/log`), **Program** (`/program`), **Insights** (`/insights`), **Health** (`/health`), **Lift plans** (`/goals`, `/goals/new` — UI name; code may still say “goals”), **Practice hub** (`/practice`), **Practice group** (`/practice/[groupId]`), **Dance session** (`/practice/dance`), and **Settings** (`/settings`) with `habits` / `data` sub-routes — plus global overlays (active session, completion screen, crash recovery) in the root layout. **Planned (v1.9.0):** **Baselines** (`/baselines`, `/settings/baselines`). There is no `/settings/appearance` route; appearance prefs stay at fixed defaults.
 
 The UI reads and writes through the Svelte stores — no REST, no server state.
 
