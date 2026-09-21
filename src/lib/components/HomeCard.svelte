@@ -139,7 +139,7 @@
 
 	.home-card__badge--done {
 		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.home-card__badge--live {

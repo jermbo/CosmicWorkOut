@@ -173,6 +173,19 @@ Not yet verified in a browser — built and checked with type check, lint, unit 
 
 ---
 
+## v1.11.0 — Finish the Threads, Then Sharpen Insights
+
+| Feature                                  | Status | Doc reference                                                                                                    |
+| ---------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------- |
+| Light mode (Dark / Light / Match device) | Built  | [US-048](../features/v1.11.0/US-048-light-mode.md) — default Dark; `data-theme` on `<html>`; charts follow theme |
+| Lift plan wording in the UI              | Built  | [US-049](../features/v1.11.0/US-049-lift-plan-rename.md)                                                         |
+| Cheap hardening (audit Phase A)          | Built  | [US-050](../features/v1.11.0/US-050-cheap-hardening.md) — backup size cap, save-error resets, streak tests       |
+| Insights improvements                    | Open   | [v1.11.0 Topics 4 – 7](../features/v1.11.0/README.md#topics-4--7--insights-open) — not decided yet               |
+
+Checked with type check, lint, unit tests (109), a production build, and a light-mode browser pass at phone width.
+
+---
+
 ## Built-In Content
 
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
@@ -191,6 +204,7 @@ Not yet verified in a browser — built and checked with type check, lint, unit 
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
+- [v1.11.0 Features](../features/v1.11.0/README.md) — Light mode, Lift plan wording, hardening; Insights next
 - [v1.10.0 Features](../features/v1.10.0/README.md) — Baselines & Insights refresh, Settings
 - [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans + Baselines
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)

@@ -46,9 +46,20 @@
 	let allDone = $derived(totalSets > 0 && doneSets === totalSets);
 	let isEditing = $derived(sessionStore.active?.isEditing === true);
 
+	let finishing = $state(false);
+
+	// A failed save leaves the session active (the DB layer already toasts), so Finish can be retried.
 	async function handleFinish() {
-		await sessionStore.finish(elapsed);
-		await programStore.refreshSessions();
+		if (finishing) return;
+		finishing = true;
+		try {
+			await sessionStore.finish(elapsed);
+			await programStore.refreshSessions();
+		} catch (e) {
+			console.error('[session] finish failed', e);
+		} finally {
+			finishing = false;
+		}
 	}
 
 	function handleAbandonRequest() {
@@ -207,6 +218,7 @@
 				class="session-overlay__finish"
 				class:session-overlay__finish--all-done={allDone}
 				onclick={handleFinish}
+				disabled={finishing}
 			>
 				{#if isEditing}
 					Save changes

@@ -8,7 +8,7 @@
 	import { isWeightReading } from '$lib/health/metrics';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { CHART_GRID, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
+	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -35,7 +35,7 @@
 		const [lo, hi] = axis.domain;
 		return defineChart({
 			marks: [
-				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				ruleY(axis.ticks, { stroke: chartGrid() }),
 				lineY(rows, {
 					x: 'date',
 					y: 'value',

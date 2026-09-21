@@ -1,4 +1,4 @@
-// Goal progression plans (US-033) — self-contained module types.
+// Lift plans (US-033) — self-contained module types.
 // Runtime imports inside this module stay relative so the pure parts run under `node --test`.
 
 export type GoalPlanStatus = 'active' | 'paused' | 'completed';
@@ -80,7 +80,7 @@ export interface GoalPlan {
 	pausedAt?: string;
 }
 
-/** An exercise slot inside a goal plan template routine. */
+/** An exercise slot inside a lift plan template routine. */
 export interface GoalTemplateSlot {
 	itemId: string;
 	sets: number;

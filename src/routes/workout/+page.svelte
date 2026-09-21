@@ -61,7 +61,7 @@
 		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id,
 	);
 
-	// Goal-plan hook: when the viewed program belongs to the active goal plan (and the
+	// Goal-plan hook: when the viewed program belongs to the active lift plan (and the
 	// feature is on), prescribe this week's wave targets instead of last-used prefill.
 	let goalPlan = $derived.by(() => {
 		if (!prefsStore.liftPlansEnabled || !programId) return null;
@@ -144,7 +144,7 @@
 				{#if prefsStore.liftPlansEnabled}
 					<a
 						href={resolve('/goals')}
-						class="workout-page__programs-link">Goals</a
+						class="workout-page__programs-link">Lift plans</a
 					>
 				{/if}
 				<a
@@ -194,7 +194,7 @@
 			{#if prefsStore.liftPlansEnabled}
 				<a
 					href={resolve('/goals/new')}
-					class="workout-page__goal-link">Or start a goal plan</a
+					class="workout-page__goal-link">Or start a lift plan</a
 				>
 			{/if}
 		</div>
@@ -355,7 +355,7 @@
 		transition: color var(--duration-fast) var(--ease-out);
 
 		&:hover {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -398,7 +398,7 @@
 		font-family: var(--font-display);
 		font-size: 1.5rem;
 		font-weight: 700;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.workout-complete__body {
@@ -450,12 +450,12 @@
 		text-decoration: none;
 
 		&:hover {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
 	.workout-page__program-link {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		font-weight: 600;
 	}
 
@@ -492,7 +492,7 @@
 		block-size: 52px;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		svg {
 			inline-size: 28px;

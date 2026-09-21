@@ -18,12 +18,20 @@
 
 	--color-accent: #b2f042;
 	--color-accent-ink: #101010;
+	/* Accent used as text or a thin line. Same as the accent in dark; darkened in light. */
+	--color-accent-text: var(--color-accent);
 
 	--color-lime: #b2f042;
 	--color-lavender: #b286fd;
 	--color-sky: #60c6ff;
 	--color-red: #e55733;
 	--color-success: #4ade80;
+
+	/* Mood good / bad. Fills stay bright; the -text pair darkens in light mode. */
+	--color-mood-good: #4ade80;
+	--color-mood-bad: #f87171;
+	--color-mood-good-text: var(--color-mood-good);
+	--color-mood-bad-text: var(--color-mood-bad);
 
 	--color-text-primary: #ffffff;
 	--color-text-secondary: #888888;
@@ -82,6 +90,46 @@
 	--r-tile: var(--radius-tile);
 	--r-xl: var(--radius-xl);
 	--r-2xl: var(--radius-2xl);
+}
+
+/*
+ * ── Light theme (Settings → Personalization, v1.11.0) ──
+ * Set on <html> by the inline script in app.html and prefsStore.applyTheme().
+ * Cards are white on a warm light-gray page; surface-3 is the recessed layer
+ * (inputs, secondary buttons). The accent itself stays as chosen — it is a fill
+ * with --color-accent-ink on top — but accent *text* is darkened to stay readable.
+ * The named hues are darker so they hold up as text on white.
+ */
+[data-theme='light'] {
+	color-scheme: light;
+
+	--color-bg: #f1f1ee;
+	--color-surface-1: #fafaf8;
+	--color-surface-2: #ffffff;
+	--color-surface-3: #ecece8;
+	--color-border: #dcdcd7;
+	--color-border-strong: #c6c6c0;
+
+	--color-accent-text: color-mix(in srgb, var(--color-accent) 50%, #000000);
+
+	--color-lime: #5f9a0c;
+	--color-lavender: #7c4ddb;
+	--color-sky: #0a7fc2;
+	--color-red: #d2431c;
+	--color-success: #16a34a;
+	--color-mood-good-text: #15803d;
+	--color-mood-bad-text: #c62828;
+
+	--color-text-primary: #141414;
+	--color-text-secondary: #5c5c58;
+	--color-text-muted: #8c8c86;
+	--color-text-tertiary: #8c8c86;
+
+	--shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+	--shadow-lime: 0 6px 18px color-mix(in srgb, var(--color-accent) 35%, transparent);
+	--shadow-lavender: 0 6px 18px rgba(124, 77, 219, 0.25);
 }
 
 /*

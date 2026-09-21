@@ -124,7 +124,7 @@
 		block-size: 26px;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		font-size: 0.8125rem;
 	}
 
@@ -146,7 +146,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 

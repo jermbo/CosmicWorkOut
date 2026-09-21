@@ -220,7 +220,7 @@
 	}
 
 	.bottom-nav__link--active {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		&:focus-visible {
 			outline-offset: -3px;

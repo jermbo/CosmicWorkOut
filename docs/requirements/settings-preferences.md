@@ -24,7 +24,7 @@ User-configurable behavior and appearance.
 | Accent / density / roundness applied on boot | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25); roundness sets every `--radius-*` token except `--radius-full` (v1.10.0 fix — before, both only reached a few tokens)  |
 | Personalization page                         | Built     | `/settings/personalization` — accent, weight unit, density, roundness, card order ([US-046](../features/v1.10.0/US-046-personalization.md)). Restores the Appearance page dropped after US-030 |
 | Insights chart visibility (`hiddenCharts`)   | Built     | `/settings/insights` + ⋯ → Hide on each chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                                              |
-| Light mode                                   | Deferred  | Next version — [Roadmap](../roadmap/README.md)                                                                                                                                                 |
+| Light mode (`theme`)                         | Built     | Dark / Light / Match device on Personalization; default Dark ([US-048](../features/v1.11.0/US-048-light-mode.md))                                                                              |
 | Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                                                                 |
 | Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                                                                      |
 | Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                                                           |
@@ -47,7 +47,7 @@ Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.
 | `/settings/activity`        | Activity log switch                                                                                                    |
 | `/settings/health`          | Health metrics switch                                                                                                  |
 | `/settings/insights`        | Show / hide each Insights chart                                                                                        |
-| `/settings/personalization` | Accent, weight unit, density, roundness, Overview card order                                                           |
+| `/settings/personalization` | Appearance (theme), accent, weight unit, density, roundness, Overview card order                                       |
 | `/settings/overview`        | Overview card order (kept for old links)                                                                               |
 | `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                   |
 
@@ -109,10 +109,10 @@ flowchart LR
     Store --> LS[("localStorage<br/>cwout:prefs")]
     Store --> Apply{Apply immediately}
     Apply --> CSS["--color-accent on :root"]
-    Apply --> Data["data-density / data-roundness"]
+    Apply --> Data["data-theme / data-density / data-roundness"]
     Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight]
     Apply --> Health[healthMetricsEnabled → home / health / insights]
-    Apply --> Practice[practiceEnabled → nav / practice / workout / history / insights]
+    Apply --> Practice[practiceEnabled → nav / practice / workout / insights]
 
     classDef trigger fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
@@ -192,7 +192,7 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 
 ## Out of Scope for v1
 
-Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications, light mode (dark-only by design — see [Design Principles](../vision/principles.md)).
+Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications. Light mode shipped in v1.11.0 ([US-048](../features/v1.11.0/US-048-light-mode.md)); dark stays the default — see [Design Principles](../vision/principles.md#4-tactile-and-satisfying--dark-first).
 
 ---
 
@@ -200,5 +200,5 @@ Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, noti
 
 - [Data Model — UserPrefs](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — Where weight increment and completion feel are applied
-- [Design Principles](../vision/principles.md) — Why dark-only and small surface area
+- [Design Principles](../vision/principles.md) — Why dark-first and small surface area
 - [US-030 — Settings Hub Restructure](../features/v1.7.0/US-030-settings-restructure.md)

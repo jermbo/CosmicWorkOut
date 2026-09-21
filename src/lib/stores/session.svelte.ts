@@ -19,7 +19,7 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';
 
 /**
- * Optional per-item weekly targets a plan engine (e.g. goal progression plans)
+ * Optional per-item weekly targets a plan engine (e.g. lift plans)
  * can pass into start(); they take precedence over the last-used prefill.
  */
 export type PrescribedTargets = Map<string, { weight: number; reps?: number }>;

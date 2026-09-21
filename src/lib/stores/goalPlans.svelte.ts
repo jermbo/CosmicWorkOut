@@ -149,7 +149,7 @@ class GoalPlanStore {
 
 	// ── Lifecycle ─────────────────────────────────────────────────────
 
-	/** One goal plan may be active at a time; returns false when another already is. */
+	/** One lift plan may be active at a time; returns false when another already is. */
 	async activatePlan(id: string): Promise<boolean> {
 		const plan = this.planById(id);
 		if (!plan || plan.status === 'active') return plan?.status === 'active';
@@ -158,7 +158,7 @@ class GoalPlanStore {
 		plan.status = 'active';
 		plan.pausedAt = undefined;
 		await this.persist(plan);
-		// Goal plan is the sole active Strength program while running.
+		// Lift plan is the sole active Strength program while running.
 		programStore.setSoleActiveProgram(plan.programId);
 		return true;
 	}

@@ -1,10 +1,14 @@
-import type { UserPrefs, Density, Roundness } from '$lib/db/types';
+import type { UserPrefs, Density, Roundness, Theme } from '$lib/db/types';
 import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 
+/** Browser chrome color per resolved theme — matches `--color-bg` in app.css. */
+const THEME_BG = { dark: '#101010', light: '#f1f1ee' } as const;
+
 const DEFAULTS: UserPrefs = {
 	accentColor: '#b2f042',
+	theme: 'dark',
 	density: 'comfortable',
 	roundness: 'default',
 	weightUnit: 'lb',
@@ -20,6 +24,9 @@ const DEFAULTS: UserPrefs = {
 
 class PrefsStore {
 	accentColor = $state(DEFAULTS.accentColor);
+	theme = $state<Theme>(DEFAULTS.theme);
+	/** Tracks the device setting so `system` can follow it live. */
+	private systemPrefersLight = $state(false);
 	density = $state<Density>(DEFAULTS.density);
 	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
@@ -37,6 +44,11 @@ class PrefsStore {
 	 * which Practice owns — so they are only ever live when Practice is on. Every
 	 * consumer reads this instead of and-ing the two flags itself.
 	 */
+	/** The theme actually on screen — `system` resolved against the device. */
+	resolvedTheme = $derived<'dark' | 'light'>(
+		this.theme === 'system' ? (this.systemPrefersLight ? 'light' : 'dark') : this.theme,
+	);
+
 	liftPlansEnabled = $derived(this.practiceEnabled && this.goalProgressionPlansEnabled);
 
 	/**
@@ -57,6 +69,7 @@ class PrefsStore {
 			if (stored) {
 				const parsed = JSON.parse(stored) as Partial<UserPrefs>;
 				this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
+				this.theme = isTheme(parsed.theme) ? parsed.theme : DEFAULTS.theme;
 				this.density = parsed.density ?? DEFAULTS.density;
 				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
@@ -77,6 +90,8 @@ class PrefsStore {
 			console.error('Failed to load preferences, using defaults:', e);
 		}
 
+		this.watchSystemTheme();
+		this.applyTheme();
 		this.applyAccentColor();
 		this.applyDensity();
 		this.applyRoundness();
@@ -85,6 +100,7 @@ class PrefsStore {
 	private save(): void {
 		const prefs: UserPrefs = {
 			accentColor: this.accentColor,
+			theme: this.theme,
 			density: this.density,
 			roundness: this.roundness,
 			weightUnit: this.weightUnit,
@@ -150,6 +166,28 @@ class PrefsStore {
 		this.save();
 	}
 
+	private watchSystemTheme(): void {
+		const query = window.matchMedia('(prefers-color-scheme: light)');
+		this.systemPrefersLight = query.matches;
+		query.addEventListener('change', (e) => {
+			this.systemPrefersLight = e.matches;
+			this.applyTheme();
+		});
+	}
+
+	/** Also set before first paint by the inline script in app.html, so there's no dark flash. */
+	private applyTheme(): void {
+		const theme = this.resolvedTheme;
+		document.documentElement.dataset.theme = theme;
+		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_BG[theme]);
+	}
+
+	setTheme(theme: Theme): void {
+		this.theme = theme;
+		this.applyTheme();
+		this.save();
+	}
+
 	private applyDensity(): void {
 		document.documentElement.dataset.density = this.density;
 	}
@@ -200,14 +238,20 @@ class PrefsStore {
 
 	resetToDefaults(): void {
 		this.accentColor = DEFAULTS.accentColor;
+		this.theme = DEFAULTS.theme;
 		this.density = DEFAULTS.density;
 		this.roundness = DEFAULTS.roundness;
 		this.weightUnit = DEFAULTS.weightUnit;
+		this.applyTheme();
 		this.applyAccentColor();
 		this.applyDensity();
 		this.applyRoundness();
 		this.save();
 	}
+}
+
+function isTheme(value: unknown): value is Theme {
+	return value === 'dark' || value === 'light' || value === 'system';
 }
 
 export const prefsStore = new PrefsStore();

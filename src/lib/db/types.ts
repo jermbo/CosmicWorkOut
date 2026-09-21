@@ -2,6 +2,8 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
+/** `system` follows the device's light / dark setting (v1.11.0). */
+export type Theme = 'dark' | 'light' | 'system';
 export const STRENGTH_CATS = [
 	'Chest',
 	'Back',
@@ -182,6 +184,7 @@ export interface ItemLastUsed {
 
 export interface UserPrefs {
 	accentColor: string;
+	theme: Theme;
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';

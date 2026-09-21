@@ -202,7 +202,7 @@
 		color: var(--color-text-secondary);
 
 		a {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 			font-weight: 600;
 		}
 	}
@@ -246,10 +246,10 @@
 	}
 
 	.mood-result--pos {
-		color: #4ade80;
+		color: var(--color-mood-good-text);
 	}
 	.mood-result--neg {
-		color: #f87171;
+		color: var(--color-mood-bad-text);
 	}
 
 	.mood-section__score {
@@ -296,13 +296,13 @@
 			transform var(--duration-fast) var(--ease-out);
 
 		&.mood-scale__item--pos {
-			color: color-mix(in srgb, #4ade80 80%, var(--color-text-muted));
-			border-color: color-mix(in srgb, #4ade80 20%, var(--color-border));
+			color: color-mix(in srgb, var(--color-mood-good-text) 80%, var(--color-text-muted));
+			border-color: color-mix(in srgb, var(--color-mood-good) 20%, var(--color-border));
 		}
 
 		&.mood-scale__item--neg {
-			color: color-mix(in srgb, #f87171 80%, var(--color-text-muted));
-			border-color: color-mix(in srgb, #f87171 20%, var(--color-border));
+			color: color-mix(in srgb, var(--color-mood-bad-text) 80%, var(--color-text-muted));
+			border-color: color-mix(in srgb, var(--color-mood-bad) 20%, var(--color-border));
 		}
 
 		&.mood-scale__item--selected {
@@ -313,13 +313,13 @@
 		}
 
 		&.mood-scale__item--pos.mood-scale__item--selected {
-			background: #4ade80;
+			background: var(--color-mood-good);
 		}
 		&:not(.mood-scale__item--pos):not(.mood-scale__item--neg).mood-scale__item--selected {
 			background: var(--color-text-muted);
 		}
 		&.mood-scale__item--neg.mood-scale__item--selected {
-			background: #f87171;
+			background: var(--color-mood-bad);
 		}
 
 		&:has(input:focus-visible) {

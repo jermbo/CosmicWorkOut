@@ -28,7 +28,7 @@
 	async function handleResume(plan: GoalPlan) {
 		const ok = await goalPlanStore.activatePlan(plan.id);
 		if (!ok) {
-			toastStore.error('Another goal plan is active. Pause or complete it first.');
+			toastStore.error('Another lift plan is active. Pause or complete it first.');
 		}
 	}
 
@@ -60,12 +60,12 @@
 </script>
 
 <svelte:head>
-	<title>Goal plans — CosmicWorkOut</title>
+	<title>Lift plans — CosmicWorkOut</title>
 </svelte:head>
 
 <div class="page page--wide goals-page">
 	<PageHeader
-		title="Goal plans"
+		title="Lift plans"
 		showBack
 		backHref={prefsStore.practiceEnabled ? '/practice/workout' : '/'}
 	/>
@@ -74,11 +74,11 @@
 		<section class="goals-disabled">
 			{#if !prefsStore.practiceEnabled}
 				<p>
-					Goal plans are part of Practice, which is turned off. Your plan data is kept either way.
+					Lift plans are part of Practice, which is turned off. Your plan data is kept either way.
 				</p>
 				<a href={resolve('/settings/practice')}>Turn on Practice in Settings</a>
 			{:else}
-				<p>Goal progression plans are turned off. Your plan data is kept either way.</p>
+				<p>Lift plans are turned off. Your plan data is kept either way.</p>
 				<a href={resolve('/settings/practice')}>Enable them in Settings</a>
 			{/if}
 		</section>
@@ -86,7 +86,7 @@
 		<div class="goals-page__toolbar">
 			<a
 				class="goals-page__new"
-				href={resolve('/goals/new')}>New goal plan</a
+				href={resolve('/goals/new')}>New lift plan</a
 			>
 		</div>
 
@@ -113,14 +113,14 @@
 			/>
 		{:else}
 			<section class="goals-empty">
-				<p class="goals-empty__title">No active goal plan</p>
+				<p class="goals-empty__title">No active lift plan</p>
 				<p class="goals-empty__body">
 					Set a goal — like bench 250×5 — and get a generated multi-month wave plan that builds
 					toward it.
 				</p>
 				<a
 					class="goals-empty__cta"
-					href={resolve('/goals/new')}>Create your first goal plan</a
+					href={resolve('/goals/new')}>Create your first lift plan</a
 				>
 			</section>
 		{/if}
@@ -206,7 +206,7 @@
 		a {
 			display: inline-block;
 			margin-block-start: var(--space-4);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 			font-weight: 700;
 		}
 	}

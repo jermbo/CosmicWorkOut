@@ -80,7 +80,7 @@
 				{#if goalsEnabled}
 					<a
 						class="practice-empty__goal"
-						href={resolve('/goals/new')}>Start a goal plan</a
+						href={resolve('/goals/new')}>Start a lift plan</a
 					>
 					<p class="practice-empty__goal-hint">
 						Build toward a specific lift (e.g. bench 250×5) with an auto-generated wave.
@@ -93,7 +93,7 @@
 			{#if goalsEnabled}
 				<a
 					class="practice-page__goals"
-					href={resolve('/goals')}>Goal plans</a
+					href={resolve('/goals')}>Lift plans</a
 				>
 			{/if}
 			<button
@@ -181,7 +181,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -215,7 +215,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -231,7 +231,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 

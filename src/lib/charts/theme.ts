@@ -1,6 +1,7 @@
 import { tooltip } from '@tanstack/charts/tooltip';
 import { portal } from '@tanstack/charts/tooltip/portal';
 import type { ChartPoint, ChartTooltipContent } from '@tanstack/charts';
+import { prefsStore } from '$lib/stores/prefs.svelte';
 
 export { withAlpha } from './color';
 
@@ -10,10 +11,23 @@ export const COLUMN_WIDTH = 48;
 /** Plot margins shared by the scrolling plot and its pinned value rails. */
 export const PLOT_MARGIN = { top: 12, bottom: 28, left: 0, right: 0 } as const;
 
-/** Dark-only tokens (see app.css); read once so charts don't touch the DOM per build. */
-export const CHART_GRID = '#2a2a2a';
-export const CHART_MUTED = '#888888';
-export const CHART_TEXT = '#ffffff';
+/**
+ * Chart colors that can't be CSS variables — SVG presentation attributes don't resolve
+ * `var()`. Reading `prefsStore.resolvedTheme` inside a chart's definition makes it
+ * rebuild when the theme changes. Axis text uses `currentColor`, so it needs nothing here.
+ */
+const PALETTES = {
+	dark: { grid: '#2a2a2a', outline: '#3a3a3a', heatEmpty: '#232323', heatNeutral: '#3a3a3a' },
+	light: { grid: '#e4e4df', outline: '#cfcfc9', heatEmpty: '#ebebe6', heatNeutral: '#c9c9c3' },
+} as const;
+
+export function chartPalette() {
+	return PALETTES[prefsStore.resolvedTheme];
+}
+
+export function chartGrid(): string {
+	return chartPalette().grid;
+}
 
 /** Series colors used across Insights when nothing more specific applies. */
 export const SERIES_COLORS = [

@@ -172,7 +172,7 @@
 		border: 1px solid var(--color-border);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.order-hint {

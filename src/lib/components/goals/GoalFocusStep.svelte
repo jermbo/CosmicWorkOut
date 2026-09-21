@@ -150,7 +150,7 @@
 		margin-block-start: var(--space-3);
 		font-size: 0.875rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.focus-list {

@@ -475,7 +475,7 @@ class ProgramStore {
 		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
 	}
 
-	/** Write a fully-built program record (used by generators like goal plans). */
+	/** Write a fully-built program record (used by generators like lift plans). */
 	async upsertProgram(program: Program): Promise<void> {
 		try {
 			await db.programs.put($state.snapshot(program) as Program);
@@ -511,7 +511,7 @@ class ProgramStore {
 
 	/**
 	 * Activate `programId` and deactivate every other active program in the same
-	 * discipline — used when a goal plan must be the sole Strength plan.
+	 * discipline — used when a lift plan must be the sole Strength plan.
 	 */
 	setSoleActiveProgram(programId: string): void {
 		const program = this.programById(programId);

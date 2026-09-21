@@ -334,7 +334,7 @@
 	.week-strip__offset {
 		font-size: 0.6875rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 	}
@@ -388,7 +388,7 @@
 		}
 
 		.week-day--actual-today:not(.week-day--selected) & {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -526,10 +526,10 @@
 	}
 
 	.week-day__indicator--mood-pos {
-		background: #4ade80;
+		background: var(--color-mood-good);
 	}
 	.week-day__indicator--mood-neg {
-		background: #f87171;
+		background: var(--color-mood-bad);
 	}
 	.week-day__indicator--mood-neutral {
 		background: var(--color-text-muted);
@@ -543,7 +543,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		white-space: nowrap;
 	}
 </style>

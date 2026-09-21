@@ -186,7 +186,7 @@
 
 	.exercise-card__ring-check {
 		font-size: 0.75rem;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.exercise-card__meta {

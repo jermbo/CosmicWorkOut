@@ -9,7 +9,7 @@ flowchart TB
     NS[North Star] --> P1[Speed Over Completeness]
     NS --> P2[Offline First]
     NS --> P3[Flexibility Without Complexity]
-    NS --> P4[Dark, Tactile, Satisfying]
+    NS --> P4[Tactile, Satisfying — dark first]
     NS --> P5[Small Surface Area]
     NS --> P6[Web Tech, Web Idioms]
     P1 --> SL[Session Logging]
@@ -57,9 +57,9 @@ See [Program Management](../requirements/program-management.md) for requirements
 
 ---
 
-## 4. Dark, Tactile, Satisfying
+## 4. Tactile and Satisfying — Dark First
 
-The UI is dark mode only. Interactions have physical weight — tapping a set tile should feel like checking something off a list. Animations use spring curves, not linear transitions. Completion moments (exercise done, session done) should feel earned.
+Dark is the default and the reference look; a light theme exists for daylight reading (v1.11.0, [US-048](../features/v1.11.0/US-048-light-mode.md)), and every screen must work in both. Interactions have physical weight — tapping a set tile should feel like checking something off a list. Animations use spring curves, not linear transitions. Completion moments (exercise done, session done) should feel earned.
 
 This is not decoration. Satisfying feedback is what makes people actually log their workouts consistently.
 

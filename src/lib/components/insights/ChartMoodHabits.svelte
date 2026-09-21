@@ -6,7 +6,7 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { CHART_GRID, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
+	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -56,7 +56,7 @@
 	function build() {
 		return defineChart({
 			marks: [
-				ruleY(moodAxis.ticks, { stroke: CHART_GRID }),
+				ruleY(moodAxis.ticks, { stroke: chartGrid() }),
 				lineY(coffee, {
 					id: 'coffee',
 					x: 'date',

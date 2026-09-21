@@ -11,7 +11,13 @@
 		clearEverything,
 		loadDebugSeedData,
 	} from '$lib/db/database';
-	import { downloadBackup, parseBackup, importBackup, BackupValidationError } from '$lib/db/backup';
+	import {
+		downloadBackup,
+		parseBackup,
+		importBackup,
+		assertBackupSize,
+		BackupValidationError,
+	} from '$lib/db/backup';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -88,6 +94,7 @@
 		if (!file) return;
 
 		try {
+			assertBackupSize(file.size);
 			const text = await file.text();
 			const parsed = parseBackup(text);
 			pendingBackupText = text;

@@ -38,7 +38,7 @@
 	}
 
 	.week-streak :global(.icon) {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.week-streak strong {

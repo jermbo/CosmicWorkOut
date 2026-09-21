@@ -17,7 +17,7 @@
 		splitByCondition,
 	} from '$lib/insights/logic';
 	import { niceAxis } from '$lib/charts/scale';
-	import { CHART_GRID, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, chartTooltip, withAlpha } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -123,7 +123,7 @@
 		const color = outcome?.color ?? '#888888';
 		return defineChart({
 			marks: [
-				ruleX(axis.ticks, { stroke: CHART_GRID }),
+				ruleX(axis.ticks, { stroke: chartGrid() }),
 				barX(bars, {
 					x: 'average',
 					y: 'group',

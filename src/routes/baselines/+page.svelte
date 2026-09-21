@@ -267,7 +267,7 @@
 		color: var(--color-text-secondary);
 
 		a {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 			font-weight: 600;
 		}
 	}

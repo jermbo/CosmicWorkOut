@@ -8,7 +8,7 @@
 	import { hourHistogram, hourLabel } from '$lib/insights/logic';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { CHART_GRID, PLOT_MARGIN, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, PLOT_MARGIN, chartTooltip, withAlpha } from '$lib/charts/theme';
 	import ChipPicker from './ChipPicker.svelte';
 
 	let { dates }: { dates: string[] } = $props();
@@ -44,7 +44,7 @@
 		const accent = prefsStore.accentColor;
 		return defineChart({
 			marks: [
-				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				ruleY(axis.ticks, { stroke: chartGrid() }),
 				barY(hours, {
 					x: 'hour',
 					y: 'entries',

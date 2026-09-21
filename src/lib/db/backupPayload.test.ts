@@ -12,7 +12,9 @@ import {
 	BACKUP_VERSION,
 	BackupValidationError,
 	DB_STORES,
+	MAX_BACKUP_BYTES,
 	STORE_KEY_PATH,
+	assertBackupSize,
 	assertCountsMatch,
 	assertStoresAreArrays,
 	dropLegacyBaselines,
@@ -325,4 +327,10 @@ test('export → file → restore preserves every row', () => {
 	assertCountsMatch(expectedCounts(exported), expectedCounts(plain), 'live');
 	assert.deepEqual(plain.db, exported.db);
 	assert.deepEqual(localEntriesOf(plain), exported.localStorage);
+});
+
+test('assertBackupSize accepts files up to the cap and rejects anything larger', () => {
+	assert.doesNotThrow(() => assertBackupSize(0));
+	assert.doesNotThrow(() => assertBackupSize(MAX_BACKUP_BYTES));
+	assert.throws(() => assertBackupSize(MAX_BACKUP_BYTES + 1), BackupValidationError);
 });

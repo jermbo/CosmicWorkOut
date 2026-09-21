@@ -79,6 +79,6 @@
 		background: var(--color-surface-2);
 		font-size: 0.875rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 </style>

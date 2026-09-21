@@ -208,7 +208,7 @@ export class GoalWizard {
 			const activated = await goalPlanStore.activatePlan(plan.id);
 			return { name: plan.name, activated };
 		} catch (e) {
-			console.error('Failed to create goal plan:', e);
+			console.error('Failed to create lift plan:', e);
 			this.creating = false;
 			throw e;
 		}

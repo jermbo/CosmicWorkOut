@@ -45,19 +45,21 @@
 	async function handleCreate() {
 		if (saving) return;
 		saving = true;
+		try {
+			const program = await programStore.createProgram({
+				name: name.trim(),
+				description: description.trim(),
+				durationWeeks,
+				daysPerWeek,
+				routineTemplates: templates,
+				disciplineId,
+			});
 
-		const program = await programStore.createProgram({
-			name: name.trim(),
-			description: description.trim(),
-			durationWeeks,
-			daysPerWeek,
-			routineTemplates: templates,
-			disciplineId,
-		});
-
-		programStore.setActiveProgram(program.id);
-		saving = false;
-		onClose();
+			programStore.setActiveProgram(program.id);
+			onClose();
+		} finally {
+			saving = false;
+		}
 	}
 
 	function updateTemplate(i: number, field: 'name' | 'focus', value: string) {
@@ -532,7 +534,7 @@
 		block-size: 44px;
 		border-radius: var(--radius-md);
 		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		font-family: var(--font-display);
 		font-size: 1rem;
 		font-weight: 700;

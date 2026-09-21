@@ -372,7 +372,7 @@
 		border: 1px solid var(--color-border);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		svg {
 			inline-size: 14px;
@@ -499,7 +499,7 @@
 		block-size: 16px;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		display: inline-flex;
 		align-items: center;
 	}

@@ -12,16 +12,15 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Data & portability
 
-| Item                          | Notes                                                                                                                                          | Spec                                                              |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Device-to-device sync         | QR pairing + LAN/WebRTC transfer + merge engine                                                                                                | [device-sync.md](device-sync.md)                                  |
-| Include preferences in backup | Optional toggle on export — prefs in `localStorage` today                                                                                      | [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md) |
-| Merge-on-import               | File restore stays replace-only; merge belongs with device sync                                                                                | [device-sync.md](device-sync.md)                                  |
-| CSV export                    | Analytics-only; cannot round-trip                                                                                                              | —                                                                 |
-| Automatic background backup   | File System Access API or scheduled export                                                                                                     | —                                                                 |
-| Per-date workout log clearing | Delete a single day's logged session, not the whole store. Activities and habit logs already support per-entry removal; workout sessions don't | [US-032](../features/v1.8.0/US-032-granular-data-clearing.md)     |
+| Item                          | Notes                                                           | Spec                                                              |
+| ----------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Device-to-device sync         | QR pairing + LAN/WebRTC transfer + merge engine                 | [device-sync.md](device-sync.md)                                  |
+| Include preferences in backup | Optional toggle on export — prefs in `localStorage` today       | [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md) |
+| Merge-on-import               | File restore stays replace-only; merge belongs with device sync | [device-sync.md](device-sync.md)                                  |
+| CSV export                    | Analytics-only; cannot round-trip                               | —                                                                 |
+| Automatic background backup   | File System Access API or scheduled export                      | —                                                                 |
 
-**Shipped:** JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md). Web Share on export (Save to Files / Mail / AirDrop when `canShare({ files })`) — [device-sync.md](device-sync.md#web-share-api-shipped).
+**Shipped:** per-session delete on `/workout` and `/practice/dance` ([US-047](../features/v1.10.0/US-047-retire-history.md)). JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md). Web Share on export (Save to Files / Mail / AirDrop when `canShare({ files })`) — [device-sync.md](device-sync.md#web-share-api-shipped).
 
 ---
 
@@ -35,25 +34,24 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### UX polish
 
-| Item                                            | Origin                                                                                                                                                                                                                       |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Remove `chart.js` from `package.json`           | [v1.10.0](../features/v1.10.0/US-039-tanstack-charts-migration.md) — nothing imports it; user removes it after testing TanStack Charts                                                                                       |
-| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only                                                                                                                  |
-| Light mode (light / dark / match device)        | [v1.10.0 Topic 6](../features/v1.10.0/README.md#topic-6--settings-page) — app is dark-only today; revisit **next version** after v1.10.0. Needs a light palette for the whole app, then a choice on the Personalization page |
-| Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                                                                                                                                     |
-| Per-item session notes                          | v1.4.0 deferred                                                                                                                                                                                                              |
-| Health metrics extended history view            | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred                                                                                                             |
+| Item                                            | Origin                                                                                                                                 |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Remove `chart.js` from `package.json`           | [v1.10.0](../features/v1.10.0/US-039-tanstack-charts-migration.md) — nothing imports it; user removes it after testing TanStack Charts |
+| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only                            |
+| Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                                               |
+| Per-item session notes                          | v1.4.0 deferred                                                                                                                        |
+| Health metrics extended history view            | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred                       |
 
 ---
 
 ### Activity & insights
 
-| Item                             | Notes                                         |
-| -------------------------------- | --------------------------------------------- |
-| Activity distance / pace fields  | Cardio stays on Activity path, not Discipline |
-| Chart drill-down / interactivity | Tap bar, zoom, filter series                  |
-| Per-discipline chart filtering   | Insights shows all sessions today             |
-| Nutrition tracking               | Out of product identity                       |
+| Item                             | Notes                                                                                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Activity distance / pace fields  | Cardio stays on Activity path, not Discipline                                                                                        |
+| Chart drill-down / interactivity | Tap bar, zoom, filter series — **being decided in [v1.11.0 Topic 5](../features/v1.11.0/README.md#topics-4--7--insights-open)**      |
+| Per-discipline chart filtering   | Insights shows all sessions today — **being decided in [v1.11.0 Topic 6](../features/v1.11.0/README.md#topics-4--7--insights-open)** |
+| Nutrition tracking               | Out of product identity                                                                                                              |
 
 **Shipped:** Insights hub with date-range chips (45d, week, MTD, YTD, custom) — beyond original v1.5.0 read-only scope.
 
@@ -61,15 +59,14 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Training intelligence
 
-| Item                                                      | Notes                                                                                                                                                                                           | Spec                                                                                               |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Lift plans (goal progression)                             | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below                                                                     | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
-| Plan comparison visualizations                            | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                                                                                                  | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
-| Plan-switching handoff                                    | UX when starting a new lift plan while another exists                                                                                                                                           | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
-| <span id="lift-plan-ui-rename"></span>Lift plan UI rename | Shipped UI still reads "Goal plans" in Settings, Clear data, Add Practice and the plan card. Docs already say **Lift plan**; the strings were never changed. Code identifiers may keep lagging. | [Glossary](../glossary.md#lift-plan)                                                               |
-| Pro-authored goal templates                               | Scaffold choices in v1.9.0; professional templates later                                                                                                                                        | [v1.9.0](../features/v1.9.0/README.md)                                                             |
-| Additional Disciplines                                    | Engine supports more; only strength + belly dance ship                                                                                                                                          | —                                                                                                  |
-| Day-of-week scheduling                                    | Progression stays count-driven (`completedSessionCount % routineCount`)                                                                                                                         | —                                                                                                  |
+| Item                           | Notes                                                                                                                       | Spec                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Lift plans (goal progression)  | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
+| Plan comparison visualizations | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                              | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
+| Plan-switching handoff         | UX when starting a new lift plan while another exists                                                                       | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
+| Pro-authored goal templates    | Scaffold choices in v1.9.0; professional templates later                                                                    | [v1.9.0](../features/v1.9.0/README.md)                                                             |
+| Additional Disciplines         | Engine supports more; only strength + belly dance ship                                                                      | —                                                                                                  |
+| Day-of-week scheduling         | Progression stays count-driven (`completedSessionCount % routineCount`)                                                     | —                                                                                                  |
 
 **Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a lift plan.
 

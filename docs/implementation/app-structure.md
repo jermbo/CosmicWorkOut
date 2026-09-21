@@ -30,7 +30,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/activity`        | `routes/settings/activity/+page.svelte`        | Activity log toggle                                                                                                                                  |
 | `/settings/health`          | `routes/settings/health/+page.svelte`          | Health metrics toggle                                                                                                                                |
 | `/settings/insights`        | `routes/settings/insights/+page.svelte`        | Show / hide each Insights chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                  |
-| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Accent, weight unit, density, roundness, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md))                               |
+| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Appearance (theme), accent, weight unit, density, roundness, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md))           |
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. lift plans and Baselines), debug seed                                                                              |
 

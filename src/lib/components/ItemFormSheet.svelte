@@ -60,34 +60,36 @@
 	async function handleSave() {
 		if (!validate() || saving) return;
 		saving = true;
+		try {
+			const metric = sectionMetric(disciplineId, section);
+			let saved: Item;
+			if (item) {
+				const updated: Item = {
+					...item,
+					name: name.trim(),
+					cue: cue.trim(),
+					section,
+					metric,
+					focus: [...focus],
+				};
+				await programStore.updateItem(updated);
+				saved = updated;
+			} else {
+				saved = await programStore.addItem({
+					disciplineId,
+					name: name.trim(),
+					cue: cue.trim(),
+					section,
+					metric,
+					focus: [...focus],
+				});
+			}
 
-		const metric = sectionMetric(disciplineId, section);
-		let saved: Item;
-		if (item) {
-			const updated: Item = {
-				...item,
-				name: name.trim(),
-				cue: cue.trim(),
-				section,
-				metric,
-				focus: [...focus],
-			};
-			await programStore.updateItem(updated);
-			saved = updated;
-		} else {
-			saved = await programStore.addItem({
-				disciplineId,
-				name: name.trim(),
-				cue: cue.trim(),
-				section,
-				metric,
-				focus: [...focus],
-			});
+			onSave?.(saved);
+			onClose();
+		} finally {
+			saving = false;
 		}
-
-		saving = false;
-		onSave?.(saved);
-		onClose();
 	}
 </script>
 

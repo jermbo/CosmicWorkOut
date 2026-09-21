@@ -23,7 +23,7 @@
 			if (result.activated) {
 				toastStore.show(`${result.name} is live. Follow the wave!`, 'info');
 			} else {
-				toastStore.show('Plan created as paused — another goal plan is already active.', 'info');
+				toastStore.show('Plan created as paused — another lift plan is already active.', 'info');
 			}
 			goto(resolve('/goals'));
 		} catch {
@@ -33,12 +33,12 @@
 </script>
 
 <svelte:head>
-	<title>New goal plan — CosmicWorkOut</title>
+	<title>New lift plan — CosmicWorkOut</title>
 </svelte:head>
 
 <div class="page page--wide goal-new">
 	<PageHeader
-		title="New goal plan"
+		title="New lift plan"
 		showBack
 		backHref="/goals"
 	/>
@@ -46,10 +46,10 @@
 	{#if !prefsStore.liftPlansEnabled}
 		<section class="goal-new__disabled">
 			{#if !prefsStore.practiceEnabled}
-				<p>Goal plans are part of Practice, which is turned off.</p>
+				<p>Lift plans are part of Practice, which is turned off.</p>
 				<a href={resolve('/settings/practice')}>Turn on Practice in Settings</a>
 			{:else}
-				<p>Goal progression plans are turned off.</p>
+				<p>Lift plans are turned off.</p>
 				<a href={resolve('/settings/practice')}>Enable them in Settings</a>
 			{/if}
 		</section>
@@ -196,7 +196,7 @@
 		a {
 			display: inline-block;
 			margin-block-start: var(--space-3);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 			font-weight: 700;
 		}
 	}

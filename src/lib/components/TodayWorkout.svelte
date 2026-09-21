@@ -9,9 +9,9 @@
 		workout: Routine;
 		exerciseMap: Map<string, Item>;
 		onStart: () => Promise<void>;
-		/** Weekly targets from an active goal plan; shown next to each exercise. */
+		/** Weekly targets from an active lift plan; shown next to each exercise. */
 		prescribed?: Map<string, { weight: number; reps?: number }>;
-		/** Wave position from an active goal plan; shown as a header chip. */
+		/** Wave position from an active lift plan; shown as a header chip. */
 		goalContext?: {
 			blockNumber: number;
 			totalBlocks: number;
@@ -80,7 +80,7 @@
 			<a
 				class="packet-card__tab packet-card__tab--wave"
 				href={resolve('/goals')}
-				aria-label="View goal plan"
+				aria-label="View lift plan"
 			>
 				B{goalContext.blockNumber} · {goalContext.phase}
 			</a>

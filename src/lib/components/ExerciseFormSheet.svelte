@@ -60,39 +60,41 @@
 	async function handleSave() {
 		if (!validate() || saving) return;
 		saving = true;
+		try {
+			let saved: Item;
+			const inc = incrementForUnit();
+			if (exercise) {
+				const updated: Item = {
+					...exercise,
+					name: name.trim(),
+					cue: cue.trim(),
+					muscles: muscles.trim(),
+					cat,
+					unit,
+					defaultSets,
+					defaultReps,
+					weightIncrement: inc,
+				};
+				await programStore.updateItem(updated);
+				saved = updated;
+			} else {
+				saved = await programStore.addItem({
+					name: name.trim(),
+					cue: cue.trim(),
+					muscles: muscles.trim(),
+					cat,
+					unit,
+					defaultSets,
+					defaultReps,
+					weightIncrement: inc,
+				});
+			}
 
-		let saved: Item;
-		const inc = incrementForUnit();
-		if (exercise) {
-			const updated: Item = {
-				...exercise,
-				name: name.trim(),
-				cue: cue.trim(),
-				muscles: muscles.trim(),
-				cat,
-				unit,
-				defaultSets,
-				defaultReps,
-				weightIncrement: inc,
-			};
-			await programStore.updateItem(updated);
-			saved = updated;
-		} else {
-			saved = await programStore.addItem({
-				name: name.trim(),
-				cue: cue.trim(),
-				muscles: muscles.trim(),
-				cat,
-				unit,
-				defaultSets,
-				defaultReps,
-				weightIncrement: inc,
-			});
+			onSave?.(saved);
+			onClose();
+		} finally {
+			saving = false;
 		}
-
-		saving = false;
-		onSave?.(saved);
-		onClose();
 	}
 </script>
 

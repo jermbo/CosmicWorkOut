@@ -14,7 +14,7 @@
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
 	import {
-		CHART_GRID,
+		chartGrid,
 		PLOT_MARGIN,
 		SERIES_COLORS,
 		chartTooltip,
@@ -65,7 +65,7 @@
 	function build() {
 		return defineChart({
 			marks: [
-				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				ruleY(axis.ticks, { stroke: chartGrid() }),
 				...series.map((s) =>
 					ruleY([s.metric.baseline], {
 						stroke: s.color,

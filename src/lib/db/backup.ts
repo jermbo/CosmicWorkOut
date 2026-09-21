@@ -15,7 +15,7 @@ import {
 } from './backupPayload';
 import type { BackupEnvelope, StoreCounts } from './backupPayload';
 
-export { BackupValidationError, parseBackup } from './backupPayload';
+export { BackupValidationError, assertBackupSize, parseBackup } from './backupPayload';
 export type { BackupEnvelope } from './backupPayload';
 
 /** Temporary IndexedDB used to prove a backup is writable before touching live data. */

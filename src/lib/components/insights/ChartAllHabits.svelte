@@ -19,7 +19,14 @@
 		type HeatCell,
 	} from '$lib/insights/heat';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { PLOT_MARGIN, chartTooltip, longDate, shortDate, withAlpha } from '$lib/charts/theme';
+	import {
+		PLOT_MARGIN,
+		chartPalette,
+		chartTooltip,
+		longDate,
+		shortDate,
+		withAlpha,
+	} from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -37,6 +44,14 @@
 	}
 
 	let habitsById = $derived(new Map(habits.map((h) => [h.id, h])));
+
+	/** heat.ts paints empty / neutral days in dark grays; swap in the current theme's. */
+	function themed<T extends HeatCell>(c: T): T {
+		const palette = chartPalette();
+		if (c.fill === HEAT_EMPTY) return { ...c, fill: palette.heatEmpty };
+		if (c.fill === HEAT_NEUTRAL) return { ...c, fill: palette.heatNeutral };
+		return c;
+	}
 
 	/** Stable identity-mapped color scale: each cell's fill is its own color key. */
 	function colorScale(fills: readonly string[]) {
@@ -58,7 +73,9 @@
 	}
 
 	// ── All: stacked strips ──────────────────────────────────
-	let stripCells = $derived(habits.flatMap((h) => habitHeatRow(h, habitStore.logs, dates)));
+	let stripCells = $derived(
+		habits.flatMap((h) => habitHeatRow(h, habitStore.logs, dates)).map(themed),
+	);
 
 	function buildStrips() {
 		return defineChart({
@@ -97,7 +114,9 @@
 		if (!focused)
 			return { weeks: [] as string[], cells: [] as GridCell[], outside: [] as GridCell[] };
 		const { weeks, slots } = calendarSlots(dates);
-		const byDate = new Map(habitHeatRow(focused, habitStore.logs, dates).map((c) => [c.date, c]));
+		const byDate = new Map(
+			habitHeatRow(focused, habitStore.logs, dates).map((c) => [c.date, themed(c)]),
+		);
 		const cells: GridCell[] = [];
 		const outside: GridCell[] = [];
 		for (const slot of slots) {
@@ -128,7 +147,7 @@
 					y: 'weekday',
 					key: (c) => `out:${c.date}`,
 					fill: 'transparent',
-					stroke: '#3a3a3a',
+					stroke: chartPalette().outline,
 					strokeWidth: 1,
 					inset: 2.5,
 					radius: 3,
@@ -179,7 +198,7 @@
 		if (habit.type === 'mood') {
 			return {
 				low: [...ramp(moodBadColor(habit))].reverse(),
-				mid: HEAT_NEUTRAL,
+				mid: chartPalette().heatNeutral,
 				high: ramp(habitColor(habit)),
 			};
 		}
@@ -254,7 +273,7 @@
 			></span>{/if}
 		{#if !legend.mid}<span
 				class="heat-legend__cell"
-				style:background={HEAT_EMPTY}
+				style:background={chartPalette().heatEmpty}
 			></span>{/if}
 		{#each legend.high as c, i (i)}<span
 				class="heat-legend__cell"
@@ -330,7 +349,7 @@
 	}
 
 	.heat-legend__cell--out {
-		border: 1px solid #3a3a3a;
+		border: 1px solid var(--color-border-strong);
 		vertical-align: middle;
 	}
 

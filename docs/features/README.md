@@ -21,7 +21,8 @@ New stories follow the [User Story Standards](../standards/user-story-standards.
 | [v1.7.0](v1.7.0/README.md)   | Full strength catalog, PWA, health & backup | US-028 – US-031                 |
 | [v1.8.0](v1.8.0/README.md)   | Granular data clearing                      | US-032                          |
 | [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                      | US-033 – US-036                 |
-| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings      | US-037 – US-046                 |
+| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings      | US-037 – US-047                 |
+| [v1.11.0](v1.11.0/README.md) | Finish the threads, then sharpen Insights   | US-048 – US-050 (Insights open) |
 
 ---
 

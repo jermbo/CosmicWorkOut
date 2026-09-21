@@ -47,7 +47,7 @@
 		font-family: var(--font-display);
 		font-size: 2rem;
 		font-weight: 700;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		line-height: 1;
 	}
 
@@ -72,7 +72,7 @@
 	.home-baselines-card__done-note {
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		margin-block-start: var(--space-1);
 	}
 

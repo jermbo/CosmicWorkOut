@@ -127,7 +127,7 @@
 				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
 					<a
 						class="group-page__goals"
-						href={resolveHref('/goals')}>Goal plans</a
+						href={resolveHref('/goals')}>Lift plans</a
 					>
 				{/if}
 				<a
@@ -149,7 +149,7 @@
 				{#if group.id === WORKOUT_GROUP_ID && prefsStore.liftPlansEnabled}
 					<a
 						class="group-empty__goals"
-						href={resolveHref('/goals')}>Or start a goal plan</a
+						href={resolveHref('/goals')}>Or start a lift plan</a
 					>
 				{/if}
 			</section>
@@ -247,7 +247,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -258,7 +258,7 @@
 		text-decoration: none;
 
 		&:hover {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -306,7 +306,7 @@
 
 		button {
 			margin-block-start: var(--space-4);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 			font-weight: 700;
 		}
 	}
@@ -320,7 +320,7 @@
 		text-decoration: none;
 
 		&:hover {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 

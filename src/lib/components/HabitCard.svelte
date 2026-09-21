@@ -201,7 +201,7 @@
 	}
 
 	.habit-card__value--done {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.habit-card__value--bool {
@@ -296,7 +296,7 @@
 		border-radius: var(--radius-full);
 		border: 1.5px solid var(--color-border);
 		background: var(--color-surface-3);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		transition: background var(--duration-fast) var(--ease-out);
 
 		&:not(:disabled):active {
@@ -316,7 +316,7 @@
 		border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
 		font-size: 0.75rem;
 		font-weight: 700;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		letter-spacing: 0.02em;
 		line-height: 1.2;
 		white-space: nowrap;

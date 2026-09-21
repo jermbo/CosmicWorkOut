@@ -16,7 +16,7 @@ export interface BuildGoalProgramInput {
 	makeRoutineId: (weekNumber: number, routineIndex: number) => string;
 }
 
-/** Build the backing Program (A/B/C x weeks) a goal plan drives. */
+/** Build the backing Program (A/B/C x weeks) a lift plan drives. */
 export function buildGoalProgram(input: BuildGoalProgramInput): Program {
 	const weeks: Week[] = Array.from({ length: input.durationWeeks }, (_, wi) => {
 		const weekNumber = wi + 1;
@@ -50,7 +50,7 @@ export function buildGoalProgram(input: BuildGoalProgramInput): Program {
 		id: input.programId,
 		disciplineId: STRENGTH_DISCIPLINE_ID,
 		name: input.name,
-		description: `Goal progression plan — ${input.goal.weight} x ${input.goal.reps}`,
+		description: `Lift plan — ${input.goal.weight} x ${input.goal.reps}`,
 		durationWeeks: input.durationWeeks,
 		daysPerWeek: input.daysPerWeek,
 		weeks,

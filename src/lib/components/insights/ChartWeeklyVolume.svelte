@@ -9,7 +9,7 @@
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
 	import {
-		CHART_GRID,
+		chartGrid,
 		PLOT_MARGIN,
 		chartTooltip,
 		longDate,
@@ -49,7 +49,7 @@
 		const accent = prefsStore.accentColor;
 		return defineChart({
 			marks: [
-				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				ruleY(axis.ticks, { stroke: chartGrid() }),
 				barY(weeks, {
 					x: 'monday',
 					y: 'volume',

@@ -17,7 +17,7 @@
 		type WeekdayAverage,
 	} from '$lib/insights/logic';
 	import { niceAxis } from '$lib/charts/scale';
-	import { CHART_GRID, SERIES_COLORS, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, SERIES_COLORS, chartTooltip, withAlpha } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -78,7 +78,7 @@
 		const format = source?.format ?? String;
 		return defineChart({
 			marks: [
-				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				ruleY(axis.ticks, { stroke: chartGrid() }),
 				barY(bars, {
 					x: 'weekday',
 					y: 'average',

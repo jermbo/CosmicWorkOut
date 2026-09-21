@@ -224,7 +224,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 </style>

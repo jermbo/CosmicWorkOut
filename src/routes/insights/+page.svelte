@@ -311,7 +311,7 @@
 	}
 
 	.empty-state__msg a {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		font-weight: 600;
 	}
 

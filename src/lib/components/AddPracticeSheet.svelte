@@ -40,7 +40,7 @@
 	let programs = $derived.by(() => {
 		if (!group) return [] as Program[];
 		let list = programStore.programs.filter((p) => group.disciplineIds.includes(p.disciplineId));
-		// Backing programs for goal plans are managed on /goals — hide them here.
+		// Backing programs for lift plans are managed on /goals — hide them here.
 		list = list.filter((p) => !goalPlanStore.planForProgram(p.id));
 		if (filter === 'mine') list = list.filter((p) => !p.isBuiltIn);
 		if (filter === 'builtin') list = list.filter((p) => p.isBuiltIn);
@@ -53,7 +53,7 @@
 	}
 
 	async function activate(program: Program) {
-		// Switching to a course/custom plan pauses any running goal plan.
+		// Switching to a course/custom plan pauses any running lift plan.
 		const activeGoal = goalPlanStore.activePlan;
 		if (activeGoal) await goalPlanStore.pausePlan(activeGoal.id);
 		programStore.setActiveProgram(program.id);
@@ -110,7 +110,7 @@
 							goto(resolve('/goals/new'));
 						}}
 					>
-						<span class="add-practice__goal-card-label">Start a goal plan</span>
+						<span class="add-practice__goal-card-label">Start a lift plan</span>
 						<span class="add-practice__goal-card-desc">
 							Wave-loading plan toward one lift target — generated from a template.
 						</span>
@@ -286,7 +286,7 @@
 		padding-inline: var(--space-5);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		margin-block-end: var(--space-2);
 	}
 
@@ -353,7 +353,7 @@
 
 	.add-practice__tag--mine {
 		background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.add-practice__row-meta {
@@ -415,7 +415,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 </style>

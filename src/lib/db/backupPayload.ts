@@ -89,6 +89,19 @@ export type StoreCounts = Record<keyof BackupDb, number>;
 
 export class BackupValidationError extends Error {}
 
+/**
+ * Largest file restore will read. Real backups are well under 1 MB even with years of logs;
+ * the cap stops a wrong or huge file from freezing the tab in `file.text()`.
+ */
+export const MAX_BACKUP_BYTES = 50 * 1024 * 1024;
+
+/** Throws BackupValidationError when a file is too large to be a backup. Call before reading it. */
+export function assertBackupSize(bytes: number): void {
+	if (bytes > MAX_BACKUP_BYTES) {
+		throw new BackupValidationError('This file is too large to be a CosmicWorkOut backup.');
+	}
+}
+
 /** Parse and validate a backup file's contents. Throws BackupValidationError on bad input. */
 export function parseBackup(text: string): BackupEnvelope {
 	let parsed: unknown;

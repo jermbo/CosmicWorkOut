@@ -571,7 +571,7 @@
 
 	.prog-badge--active {
 		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.prog-badge--builtin {
@@ -792,7 +792,7 @@
 		block-size: 20px;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		display: inline-flex;
 		align-items: center;
 	}
@@ -971,7 +971,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 </style>

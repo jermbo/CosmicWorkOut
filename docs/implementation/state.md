@@ -74,19 +74,20 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref                          | Default       | Applied via                           |
-| ----------------------------- | ------------- | ------------------------------------- |
-| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color  |
-| `density`                     | `comfortable` | `data-density` on `<html>`            |
-| `roundness`                   | `default`     | `data-roundness` on `<html>`          |
-| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet       |
-| `homeCardOrder`               | see below     | Order of the Overview summary cards   |
-| `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI |
-| `activityLogEnabled`          | `false`       | Gates `/log` and related UI           |
-| `practiceEnabled`             | `false`       | Gates the Practice engine (below)     |
-| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI        |
-| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI         |
-| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI     |
+| Pref                          | Default       | Applied via                                                                                        |
+| ----------------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
+| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color                                                               |
+| `theme`                       | `dark`        | `data-theme` on `<html>` (resolved: `system` follows the device; also set pre-paint in `app.html`) |
+| `density`                     | `comfortable` | `data-density` on `<html>`                                                                         |
+| `roundness`                   | `default`     | `data-roundness` on `<html>`                                                                       |
+| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet                                                                    |
+| `homeCardOrder`               | see below     | Order of the Overview summary cards                                                                |
+| `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI                                                              |
+| `activityLogEnabled`          | `false`       | Gates `/log` and related UI                                                                        |
+| `practiceEnabled`             | `false`       | Gates the Practice engine (below)                                                                  |
+| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI                                                                     |
+| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI                                                                      |
+| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI                                                                  |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 

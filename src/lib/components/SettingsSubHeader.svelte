@@ -37,7 +37,7 @@
 		gap: 2px;
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		margin-block-end: var(--space-1);

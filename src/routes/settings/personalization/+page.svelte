@@ -1,9 +1,9 @@
 <!--
-	Settings → Personalization (US-046): accent color, weight unit, density, roundness,
-	and Overview card order. Light mode is deferred to the next version (Roadmap).
+	Settings → Personalization (US-046): appearance (light / dark / match device, v1.11.0),
+	accent color, weight unit, density, roundness, and Overview card order.
 -->
 <script lang="ts">
-	import type { Density, Roundness } from '$lib/db/types';
+	import type { Density, Roundness, Theme } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import ColorSwatches from '$lib/components/ColorSwatches.svelte';
 	import OverviewLayoutEditor from '$lib/components/OverviewLayoutEditor.svelte';
@@ -21,6 +21,12 @@
 		{ name: 'Yellow', value: '#facc15' },
 	];
 	const ACCENT_NAMES = Object.fromEntries(ACCENTS.map((a) => [a.value, a.name]));
+
+	const THEMES: { value: Theme; label: string }[] = [
+		{ value: 'dark', label: 'Dark' },
+		{ value: 'light', label: 'Light' },
+		{ value: 'system', label: 'Match device' },
+	];
 
 	const WEIGHT_UNITS = [
 		{ value: 'lb', label: 'lb' },
@@ -46,6 +52,24 @@
 
 <div class="page page--wide personalization">
 	<SettingsSubHeader title="Personalization" />
+
+	<section
+		class="p-section"
+		aria-labelledby="p-theme"
+	>
+		<h2
+			class="p-section__title"
+			id="p-theme"
+		>
+			Appearance
+		</h2>
+		<SegmentedControl
+			options={THEMES}
+			value={prefsStore.theme}
+			label="Appearance"
+			onchange={(t) => prefsStore.setTheme(t)}
+		/>
+	</section>
 
 	<section
 		class="p-section"

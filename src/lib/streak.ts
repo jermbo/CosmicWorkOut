@@ -1,4 +1,4 @@
-import { fromIso } from '$lib/date';
+import { fromIso } from './date.ts';
 
 export function isoWeekKey(date: Date): string {
 	const utc = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));

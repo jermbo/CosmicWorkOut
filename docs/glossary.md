@@ -118,11 +118,11 @@ Two program **flavors** exist for Strength today:
 **Preferred name in docs:** Lift plan. Use it in all prose.
 **Older name:** Goal progression plan. Still present in three places, by design or by lag:
 
-| Where              | State                                                                                                                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Docs prose         | **Renamed.** Any doc still saying "goal plan" is wrong.                                                                                                                                 |
-| Code identifiers   | **Lagging, allowed** — `goalPlans` store, `goalPlanStore`, `GoalPlan`, `goalProgressionPlansEnabled`, `/goals` routes, `src/lib/goalPlans/`.                                            |
-| Shipped UI strings | **Lagging, not yet allowed for** — Settings and Clear-data still read "Goal plans". The UI rename is outstanding work, tracked on the [Roadmap](roadmap/README.md#lift-plan-ui-rename). |
+| Where              | State                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Docs prose         | **Renamed.** Any doc still saying "goal plan" is wrong.                                                                                                                   |
+| Code identifiers   | **Lagging, allowed** — `goalPlans` store, `goalPlanStore`, `GoalPlan`, `goalProgressionPlansEnabled`, `/goals` routes, `src/lib/goalPlans/`.                              |
+| Shipped UI strings | **Renamed** in v1.11.0 ([US-049](features/v1.11.0/US-049-lift-plan-rename.md)). Programs created before that may still carry the old "Goal progression plan" description. |
 
 Quote a UI string as it actually appears, and say that it is the old name.
 

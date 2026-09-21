@@ -97,36 +97,38 @@
 	async function handleSave() {
 		if (saving) return;
 		saving = true;
+		try {
+			const cleanSections: RoutineSection[] = sections.map((s) => {
+				const overrides = s.isBookend && !isRoutineA && !s.inherits;
+				const inheritsBookend = s.inherits && s.isBookend && !isRoutineA;
+				const section: RoutineSection = {
+					key: s.key,
+					items: [],
+				};
+				if (!inheritsBookend) {
+					section.items = s.items.map((item) => {
+						const { _key: _itemKey, ...rest } = item;
+						void _itemKey;
+						return rest;
+					});
+				}
+				if (overrides) {
+					section.overridesBookends = true;
+				}
+				return section;
+			});
 
-		const cleanSections: RoutineSection[] = sections.map((s) => {
-			const overrides = s.isBookend && !isRoutineA && !s.inherits;
-			const inheritsBookend = s.inherits && s.isBookend && !isRoutineA;
-			const section: RoutineSection = {
-				key: s.key,
-				items: [],
-			};
-			if (!inheritsBookend) {
-				section.items = s.items.map((item) => {
-					const { _key: _itemKey, ...rest } = item;
-					void _itemKey;
-					return rest;
-				});
-			}
-			if (overrides) {
-				section.overridesBookends = true;
-			}
-			return section;
-		});
+			await programStore.saveRoutineSections(program.id, routine.name, {
+				name: name.trim() || routine.name,
+				focus: focus.trim(),
+				color: routine.color,
+				sections: cleanSections,
+			});
 
-		await programStore.saveRoutineSections(program.id, routine.name, {
-			name: name.trim() || routine.name,
-			focus: focus.trim(),
-			color: routine.color,
-			sections: cleanSections,
-		});
-
-		saving = false;
-		onBack();
+			onBack();
+		} finally {
+			saving = false;
+		}
 	}
 
 	let dialog: HTMLDialogElement;
@@ -475,7 +477,7 @@
 
 	.sec__badge--custom {
 		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.sec__list {
@@ -552,7 +554,7 @@
 		border: 1px solid var(--color-border);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.sec__bookend-btn {

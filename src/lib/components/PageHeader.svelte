@@ -145,7 +145,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 2px;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.page-header__back {

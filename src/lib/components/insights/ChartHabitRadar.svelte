@@ -6,7 +6,7 @@
 	import { Chart } from '@tanstack/charts/svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { CHART_GRID, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, chartTooltip, withAlpha } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -45,8 +45,8 @@
 						radius: { scale: scaleLinear().domain([0, 1]) },
 					},
 					guides: [
-						radialGrid({ values: [0.25, 0.5, 0.75, 1], shape: 'polygon', stroke: CHART_GRID }),
-						angleGrid({ stroke: CHART_GRID }),
+						radialGrid({ values: [0.25, 0.5, 0.75, 1], shape: 'polygon', stroke: chartGrid() }),
+						angleGrid({ stroke: chartGrid() }),
 					],
 					marks: [
 						radialArea(ring, {
