@@ -1,10 +1,29 @@
 [Wiki](../../README.md) › [Features](../README.md) › v1.10.0
 
-# v1.10.0 — Baselines & Insights Refresh (in discussion)
+# v1.10.0 — Baselines & Insights Refresh
 
-> **Status:** Discovery. Decisions are recorded here as they are locked. User stories come after.
+> **Status:** Planned — decisions locked, stories written (US-037 – US-046). Not built.
 
 Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub.
+
+---
+
+## What's Shipping
+
+| Story                                              | Title                              | Topic | Status  |
+| -------------------------------------------------- | ---------------------------------- | ----- | ------- |
+| [US-037](./US-037-flexible-baseline-metrics.md)    | Flexible Baseline Metrics          | 1     | Planned |
+| [US-038](./US-038-baseline-logging-comparison.md)  | Baseline Logging & Comparison      | 1     | Planned |
+| [US-039](./US-039-tanstack-charts-migration.md)    | Move All Charts to TanStack Charts | 3     | Planned |
+| [US-040](./US-040-scrolling-charts.md)             | Scrolling Charts on Mobile         | 2     | Planned |
+| [US-041](./US-041-all-habits-heat-chart.md)        | All-Habits Heat Chart              | 4     | Planned |
+| [US-042](./US-042-habit-colors.md)                 | Habit Colors                       | 4     | Planned |
+| [US-043](./US-043-insights-chart-visibility.md)    | Show / Hide Insights Charts        | 5     | Planned |
+| [US-044](./US-044-experimental-insights-charts.md) | Experimental Insights Charts       | 5     | Planned |
+| [US-045](./US-045-settings-feature-hub.md)         | Settings Feature Hub               | 6     | Planned |
+| [US-046](./US-046-personalization.md)              | Personalization                    | 6     | Planned |
+
+**Suggested build order:** US-039 (chart foundation) → US-040 → US-037 → US-038 → US-042 → US-041 → US-043 → US-044 → US-045 → US-046.
 
 ---
 

@@ -206,6 +206,8 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 <span id="baseline"></span>
 
+> **Changing in v1.10.0 (planned):** 1 to n metrics typed as Duration / Distance / Count; no up / under direction; logging = done; neutral comparison against the baseline. See [US-037](features/v1.10.0/US-037-flexible-baseline-metrics.md) · [US-038](features/v1.10.0/US-038-baseline-logging-comparison.md).
+
 A user-defined daily **floor** (go up / hit-or-exceed) or **ceiling** (stay under), with one or two metrics, logged as many times per day as needed (entries sum). Unit labels are user-typed in Settings. Entries (including past dates) are editable/deletable. Examples: walk 30 min + 1.25 miles, write 250 words, 10 pushups, phone time under 30 min. The target stays embarrassingly low until the user raises it. Distinct from [Habits](#habit) (simple daily check-ins) and from [Lift plans](#lift-plan) (Strength wave-loading).
 
 ### Baseline log

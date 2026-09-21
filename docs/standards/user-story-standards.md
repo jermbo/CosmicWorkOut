@@ -16,11 +16,12 @@ A user story captures a feature from the perspective of the person who will use 
 
 Stories are written from the perspective of a named persona. Use the personas defined below. If a new persona is needed, add it here first.
 
-| Persona                   | Description                                                                                                                              |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fitness User**          | Someone actively following a structured workout program. Goal-oriented, wants to track progress and stay on plan.                        |
-| **Active User**           | Someone who exercises regularly but not always at the gym — runs, plays sports, does yoga. Values tracking all movement, not just lifts. |
-| **Health-Conscious User** | Someone tracking daily wellness habits alongside fitness — water, sleep, nutrition, mindfulness.                                         |
+| Persona                   | Description                                                                                                                                                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fitness User**          | Someone actively following a structured workout program. Goal-oriented, wants to track progress and stay on plan.                                                                                                           |
+| **Active User**           | Someone who exercises regularly but not always at the gym — runs, plays sports, does yoga. Values tracking all movement, not just lifts.                                                                                    |
+| **Health-Conscious User** | Someone tracking daily wellness habits alongside fitness — water, sleep, nutrition, mindfulness.                                                                                                                            |
+| **Growth-Minded User**    | Someone building small daily practices in any pursuit — physical, creative, or mental (writing, reading, drawing, meditation, walking). Wants to show up when motivation is low and see growth over time. Added in v1.10.0. |
 
 A single story may span multiple personas if the core need is shared. Lead with the most relevant one.
 
