@@ -35,12 +35,13 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### UX polish
 
-| Item                                            | Origin                                                                                                           |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only      |
-| Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                         |
-| Per-item session notes                          | v1.4.0 deferred                                                                                                  |
-| Health metrics extended history view            | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred |
+| Item                                            | Origin                                                                                                                                                                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only                                                                                                                  |
+| Light mode (light / dark / match device)        | [v1.10.0 Topic 6](../features/v1.10.0/README.md#topic-6--settings-page) — app is dark-only today; revisit **next version** after v1.10.0. Needs a light palette for the whole app, then a choice on the Personalization page |
+| Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                                                                                                                                     |
+| Per-item session notes                          | v1.4.0 deferred                                                                                                                                                                                                              |
+| Health metrics extended history view            | [US-029](../features/v1.7.0/US-029-health-metrics.md) — context-date view ships; dedicated history link deferred                                                                                                             |
 
 ---
 
