@@ -56,7 +56,7 @@
 	let dateLatestBp = $derived(healthStore.bloodPressureForDate(contextDate).at(-1));
 
 	let baselinesTotal = $derived(baselineStore.activeBaselines.length);
-	let baselinesCleared = $derived(baselineStore.clearedCountForDate(contextDate));
+	let baselinesDone = $derived(baselineStore.loggedCountForDate(contextDate));
 
 	let liveDiscipline = $derived.by(() => {
 		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
@@ -166,7 +166,7 @@
 				<HomeActivityCard activities={dateActivities} />
 			{:else if cardId === 'baselines'}
 				<HomeBaselinesCard
-					cleared={baselinesCleared}
+					done={baselinesDone}
 					total={baselinesTotal}
 				/>
 			{:else if cardId === 'health'}

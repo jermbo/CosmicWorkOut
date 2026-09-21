@@ -2,6 +2,8 @@
 
 # US-043 — Show / Hide Insights Charts
 
+> **As built:** `src/lib/insights/charts.ts` lists every Insights chart (id, title, desc, features, experimental, wide); the page renders from it. `prefs.hiddenCharts` stores hidden ids (unknown ids ignored, new charts visible). `InsightCard.svelte` gives each card ⋯ → Hide chart. `/settings/insights` lists every chart with a switch; charts whose feature is off say which feature ("Habits is off — turn it on to see this chart"). When everything is hidden, Insights links to Settings → Insights. Also offers **Show all charts**.
+>
 > Makes the Insights page a testing ground: many charts, each hideable. Settings home lives in [US-045](./US-045-settings-feature-hub.md). Decisions: [v1.10.0 — Topic 5](./README.md#topic-5--more-insights-experiments).
 
 As a **health-conscious user**, I want to hide the Insights charts that feel like noise and bring them back later

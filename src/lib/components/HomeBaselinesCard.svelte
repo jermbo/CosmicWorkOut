@@ -2,15 +2,16 @@
 	import HomeCard from './HomeCard.svelte';
 
 	type Props = {
-		cleared: number;
+		/** Baselines logged on the date — logging is showing up (US-038). */
+		done: number;
 		total: number;
 	};
 
-	let { cleared, total }: Props = $props();
+	let { done, total }: Props = $props();
 
 	let ariaLabel = $derived.by(() => {
 		if (total === 0) return 'Baselines: Add baselines';
-		return `Baselines: ${cleared} of ${total} cleared`;
+		return `Baselines: ${done} of ${total} done`;
 	});
 </script>
 
@@ -21,16 +22,16 @@
 	variant="log"
 >
 	{#if total === 0}
-		<p class="home-baselines-card__empty">Set your first daily floor in Settings.</p>
+		<p class="home-baselines-card__empty">Set your first baseline in Settings.</p>
 	{:else}
 		<div class="home-baselines-card__summary">
-			<span class="home-baselines-card__count">{cleared}</span>
+			<span class="home-baselines-card__count">{done}</span>
 			<span class="home-baselines-card__sep">/</span>
 			<span class="home-baselines-card__total">{total}</span>
-			<span class="home-baselines-card__label">baselines cleared</span>
+			<span class="home-baselines-card__label">done</span>
 		</div>
-		{#if cleared === total}
-			<p class="home-baselines-card__done-note">Bar cleared today.</p>
+		{#if done === total}
+			<p class="home-baselines-card__done-note">You showed up for all of them.</p>
 		{/if}
 	{/if}
 </HomeCard>

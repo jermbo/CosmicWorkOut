@@ -8,6 +8,7 @@ import {
 	BackupValidationError,
 	assertCountsMatch,
 	assertStoresAreArrays,
+	dropLegacyBaselines,
 	expectedCounts,
 	localEntriesOf,
 	toPlainEnvelope,
@@ -296,6 +297,9 @@ async function commitLiveFromPlain(plain: BackupEnvelope, expected: StoreCounts)
  */
 export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 	const plain = toPlainEnvelope(envelope);
+	if (dropLegacyBaselines(plain)) {
+		console.info('[backup-restore] dropped pre-v1.10.0 baselines from the backup');
+	}
 	const expected = expectedCounts(plain);
 
 	console.info('[backup-restore] starting', {

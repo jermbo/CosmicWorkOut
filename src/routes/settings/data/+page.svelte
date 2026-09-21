@@ -234,8 +234,8 @@
 		/>
 		{#if prefsStore.liftPlansEnabled}
 			<SettingsActionRow
-				label="Goal plans"
-				description="Goal progression plan records. Their generated programs and sessions stay in place."
+				label="Lift plans"
+				description="Lift plan records. Their generated programs and sessions stay in place."
 				onclick={() => openClearDialog('goalPlans')}
 			/>
 		{/if}
@@ -269,9 +269,9 @@
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
 				Load ~6 months of realistic debug data — workout sessions, activities, habit logs, health
-				readings, and two sample goal plans (one completed, one mid-plan; visible when goal
-				progression plans are enabled) — for testing graphs and visualizations. Existing data is
-				kept. Remove with "Workout sessions", "Activity log", and "Goal plans" above.
+				readings, two sample lift plans (one completed, one mid-plan; visible when lift plans are
+				on), and two sample baselines — for testing graphs and visualizations. Existing data is
+				kept. Remove with "Workout sessions", "Activity log", and "Lift plans" above.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--ghost"
@@ -391,8 +391,8 @@
 	</ConfirmDialog>
 {:else if activeDialog === 'goalPlans'}
 	<ConfirmDialog
-		title="Clear goal plans?"
-		confirmLabel="Clear goal plans"
+		title="Clear lift plans?"
+		confirmLabel="Clear lift plans"
 		confirmBusyLabel="Clearing…"
 		danger
 		busy={clearingData}
@@ -400,9 +400,9 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes all goal progression plan records — active, paused, and completed. The programs and
-		sessions they generated stay and can be cleared with "Custom programs" and "Workout sessions".
-		This cannot be undone.
+		This removes all lift plan records — active, paused, and completed. The programs and sessions
+		they generated stay and can be cleared with "Custom programs" and "Workout sessions". This
+		cannot be undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'baselines'}
 	<ConfirmDialog

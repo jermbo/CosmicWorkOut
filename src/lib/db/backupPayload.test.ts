@@ -15,6 +15,7 @@ import {
 	STORE_KEY_PATH,
 	assertCountsMatch,
 	assertStoresAreArrays,
+	dropLegacyBaselines,
 	expectedCounts,
 	localEntriesOf,
 	parseBackup,
@@ -179,6 +180,46 @@ test('accepts a pre-v1.9.0 backup with no goal plans or baselines', () => {
 	assert.equal(counts.baselines, 0);
 	assert.equal(counts.baselineLogs, 0);
 	assert.equal(counts.sessions, 1);
+});
+
+test('drops v1.9.0-shaped baselines and their logs, keeps everything else', () => {
+	const old = envelope();
+	old.db.baselines = [
+		{
+			id: 'b1',
+			name: 'Walking',
+			direction: 'up',
+			metrics: [{ id: 'm1', label: 'minutes', target: 30 }],
+			sortOrder: 0,
+			active: true,
+			createdAt: '2026-01-01T00:00:00.000Z',
+		},
+	] as unknown as typeof old.db.baselines;
+	old.db.baselineLogs = [
+		{ id: 'l1', baselineId: 'b1', date: '2026-01-02', recordedAt: '', values: { m1: 30 } },
+	];
+
+	assert.equal(dropLegacyBaselines(old), true);
+	const counts = expectedCounts(old);
+	assert.equal(counts.baselines, 0);
+	assert.equal(counts.baselineLogs, 0);
+	assert.equal(counts.sessions, 1);
+});
+
+test('keeps v1.10.0-shaped baselines', () => {
+	const current = envelope();
+	current.db.baselines = [
+		{
+			id: 'b1',
+			name: 'Daily 10',
+			metrics: [{ id: 'm1', name: 'Pushups', measure: 'count', baseline: 10, label: 'reps' }],
+			sortOrder: 0,
+			active: true,
+			createdAt: '2026-01-01T00:00:00.000Z',
+		},
+	];
+	assert.equal(dropLegacyBaselines(current), false);
+	assert.equal(expectedCounts(current).baselines, 1);
 });
 
 // ── Counts ────────────────────────────────────────────────────────────

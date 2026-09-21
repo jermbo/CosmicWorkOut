@@ -2,6 +2,8 @@
 
 # US-042 — Habit Colors
 
+> **As built:** `Habit.color` and, for Mood, `Habit.negativeColor`. Pure helpers in `src/lib/habitColors.ts` (tested): a 12-swatch palette with spoken names, `nextDefaultColor` hands out unused colors first, `withDefaultColors` fills missing colors on `habitStore.load()` and saves them once. `ColorSwatches.svelte` is the picker, used in `HabitForm`. Mood (protected) now has an edit button that opens a colors-only form. Habit rows show a color dot. Backups carry colors automatically (they live on the habit record).
+>
 > Used by [US-041](./US-041-all-habits-heat-chart.md). Decisions: [v1.10.0 — Topic 4](./README.md#topic-4--heat-charts-for-habits).
 
 As a **health-conscious user**, I want to choose the color for each of my habits

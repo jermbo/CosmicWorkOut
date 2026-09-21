@@ -11,6 +11,7 @@ import type {
 	BaselineLog,
 } from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
+import { isLegacyBaseline } from '../baselines/logic.ts';
 
 /**
  * The pure half of backup/restore: the envelope shape, its validation, and the
@@ -166,4 +167,18 @@ export function localEntriesOf(plain: BackupEnvelope): Record<string, unknown> {
 	const entries = plain.localStorage;
 	if (!entries || typeof entries !== 'object' || Array.isArray(entries)) return {};
 	return entries;
+}
+
+/**
+ * Baselines were reshaped in v1.10.0 and v1.9.0 baseline data was test-only, so a
+ * backup carrying the old shape restores without its baselines rather than writing
+ * records the app can no longer read. Everything else in the backup is untouched.
+ * Returns true when baselines were dropped.
+ */
+export function dropLegacyBaselines(plain: BackupEnvelope): boolean {
+	const defs = plain.db.baselines;
+	if (!Array.isArray(defs) || !defs.some(isLegacyBaseline)) return false;
+	plain.db.baselines = [];
+	plain.db.baselineLogs = [];
+	return true;
 }

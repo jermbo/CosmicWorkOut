@@ -2,7 +2,11 @@
 
 # US-039 — Move All Charts to TanStack Charts
 
-> Foundation for [US-040](./US-040-scrolling-charts.md), [US-041](./US-041-all-habits-heat-chart.md), and [US-044](./US-044-experimental-insights-charts.md). Decisions: [v1.10.0 — Topic 3](./README.md#topic-3--tanstack-charts).
+> **As built:** Every chart renders through `@tanstack/charts` 0.18.0 (Svelte adapter, SVG). Shared pieces live in `src/lib/charts/`: `scale.ts` (pure nice-axis math, tested in `src/lib/charts.test.ts`), `theme.ts` (column width, plot margins, colors, portalled tooltip helper), and `ScrollChart.svelte` (US-040). Donut uses `pie` + `radialArc`; radar uses `polar` + `radialArea`/`radialLine`, closed by repeating the first spoke (avoids importing `d3-shape`, which is not a direct dependency). Grid lines are `ruleY` marks at the same tick values the pinned rails print, so labels and lines always align. `src/lib/chart-utils.ts` no longer imports Chart.js.
+>
+> **Deviation:** `chart.js` is **still installed** — per the user, `package.json` is not touched; they remove it after testing (requirement 4a is theirs to close). Health lines **connect across missing days**, matching the old `spanGaps: true` behaviour (the story text below said "gaps", which never matched the shipped chart).
+>
+> Foundation for
 
 As a **health-conscious user**, I want every chart in the app to look and behave the same way
 so that Insights and Baselines feel like one product, and new views (scrolling, heat charts) can be added without fighting the chart library.
@@ -31,7 +35,7 @@ so that Insights and Baselines feel like one product, and new views (scrolling, 
 
 1. Parity
    a. Each existing chart shall be rebuilt showing the same data series, axes meaning, and date range behavior as before.
-   b. Charts with gaps for missing days (health) shall keep gaps; charts that plot missing days as zero (baselines) shall keep zeros.
+   b. Health lines shall connect across days with no reading (as before); charts that plot missing days as zero (baselines) shall keep zeros.
    c. The Mood & Habits combined chart shall remain (Mood, Water, Coffee together).
    d. Tooltips shall show the exact value and date for a point or bar.
 2. Look
@@ -50,7 +54,7 @@ so that Insights and Baselines feel like one product, and new views (scrolling, 
 
 1. Parity
    a. Given 7 days of mood, water, and coffee logs, when the user opens Insights, then the Mood & Habits chart shows all three series for those days.
-   b. Given weight readings on 3 of 7 days, when the user views the Weight chart, then the line has gaps on the 4 missing days.
+   b. Given weight readings on 3 of 7 days, when the user views the Weight chart, then 3 points show, joined by one line.
    c. Given a baseline with no log on one day, when the user views its chart, then that day plots at zero.
    d. Given the user hovers or taps a point, when the tooltip opens, then it shows the date and exact value.
 2. Look

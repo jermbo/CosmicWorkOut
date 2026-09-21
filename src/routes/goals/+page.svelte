@@ -76,10 +76,10 @@
 				<p>
 					Goal plans are part of Practice, which is turned off. Your plan data is kept either way.
 				</p>
-				<a href={resolve('/settings')}>Turn on Practice in Settings</a>
+				<a href={resolve('/settings/practice')}>Turn on Practice in Settings</a>
 			{:else}
 				<p>Goal progression plans are turned off. Your plan data is kept either way.</p>
-				<a href={resolve('/settings')}>Enable them in Settings</a>
+				<a href={resolve('/settings/practice')}>Enable them in Settings</a>
 			{/if}
 		</section>
 	{:else}

@@ -5,10 +5,9 @@
 	import HabitRow from '$lib/components/HabitRow.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
+	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
-
-	redirectWhenDisabled(() => prefsStore.habitsEnabled);
 
 	let showHabitForm = $state(false);
 	let editingHabit = $state<Habit | null>(null);
@@ -95,56 +94,67 @@
 <div class="page page--wide">
 	<SettingsSubHeader title="Habits" />
 
-	<section
-		class="settings-section"
-		aria-labelledby="section-habits"
-	>
-		<div class="settings-section__title-row">
-			<h2
-				class="settings-section__title"
-				id="section-habits"
-			>
-				Habits
-			</h2>
-			<button
-				class="habits-add-btn"
-				onclick={openNewHabit}
-				aria-label="Add habit"
-			>
-				<Icon
-					name="plus"
-					size={13}
-					stroke={2.5}
-				/>
-				Add
-			</button>
-		</div>
+	<SettingsGroup title="Habits">
+		<SettingsToggleRow
+			label="Habits"
+			description="Daily check-in for mood, water, meditation, and more. Your habits and logs are kept when off."
+			checked={prefsStore.habitsEnabled}
+			onchange={(v) => prefsStore.setHabitsEnabled(v)}
+		/>
+	</SettingsGroup>
 
-		{#if habitStore.habits.length === 0}
-			<p class="habits-empty">No habits yet. Tap Add to create your first.</p>
-		{:else}
-			<p class="habits-drag-hint">Drag to reorder</p>
-			<div class="habits-list">
-				{#each sortedHabits as habit (habit.id)}
-					<HabitRow
-						{habit}
-						dragging={draggingId === habit.id}
-						dragover={dragOverId === habit.id}
-						confirmingDelete={confirmDeleteHabitId === habit.id}
-						ondragstart={(e) => onDragStart(e, habit.id)}
-						ondragover={(e) => onDragOver(e, habit.id)}
-						ondragleave={onDragLeave}
-						ondrop={(e) => onDrop(e, habit.id)}
-						ondragend={onDragEnd}
-						ontoggle={() => habitStore.toggleActive(habit.id)}
-						onedit={() => openEditHabit(habit)}
-						ondelete={() => deleteHabit(habit.id)}
-						oncanceldelete={() => (confirmDeleteHabitId = null)}
+	{#if prefsStore.habitsEnabled}
+		<section
+			class="settings-section"
+			aria-labelledby="section-habits"
+		>
+			<div class="settings-section__title-row">
+				<h2
+					class="settings-section__title"
+					id="section-habits"
+				>
+					Habits
+				</h2>
+				<button
+					class="habits-add-btn"
+					onclick={openNewHabit}
+					aria-label="Add habit"
+				>
+					<Icon
+						name="plus"
+						size={13}
+						stroke={2.5}
 					/>
-				{/each}
+					Add
+				</button>
 			</div>
-		{/if}
-	</section>
+
+			{#if habitStore.habits.length === 0}
+				<p class="habits-empty">No habits yet. Tap Add to create your first.</p>
+			{:else}
+				<p class="habits-drag-hint">Drag to reorder</p>
+				<div class="habits-list">
+					{#each sortedHabits as habit (habit.id)}
+						<HabitRow
+							{habit}
+							dragging={draggingId === habit.id}
+							dragover={dragOverId === habit.id}
+							confirmingDelete={confirmDeleteHabitId === habit.id}
+							ondragstart={(e) => onDragStart(e, habit.id)}
+							ondragover={(e) => onDragOver(e, habit.id)}
+							ondragleave={onDragLeave}
+							ondrop={(e) => onDrop(e, habit.id)}
+							ondragend={onDragEnd}
+							ontoggle={() => habitStore.toggleActive(habit.id)}
+							onedit={() => openEditHabit(habit)}
+							ondelete={() => deleteHabit(habit.id)}
+							oncanceldelete={() => (confirmDeleteHabitId = null)}
+						/>
+					{/each}
+				</div>
+			{/if}
+		</section>
+	{/if}
 </div>
 
 {#if showHabitForm}

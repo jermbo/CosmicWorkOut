@@ -15,6 +15,7 @@ const DEFAULTS: UserPrefs = {
 	healthMetricsEnabled: false,
 	goalProgressionPlansEnabled: false,
 	baselinesEnabled: false,
+	hiddenCharts: [],
 };
 
 class PrefsStore {
@@ -29,6 +30,7 @@ class PrefsStore {
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
+	hiddenCharts = $state<string[]>([]);
 
 	/**
 	 * Lift plans generate backing programs and can only be trained through `/workout`,
@@ -66,6 +68,9 @@ class PrefsStore {
 				this.goalProgressionPlansEnabled =
 					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
 				this.baselinesEnabled = parsed.baselinesEnabled ?? DEFAULTS.baselinesEnabled;
+				this.hiddenCharts = Array.isArray(parsed.hiddenCharts)
+					? parsed.hiddenCharts.filter((id): id is string => typeof id === 'string')
+					: [];
 			}
 		} catch (e) {
 			// Corrupt prefs must never block app startup — fall back to defaults.
@@ -90,6 +95,7 @@ class PrefsStore {
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
 			baselinesEnabled: this.baselinesEnabled,
+			hiddenCharts: this.hiddenCharts,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
@@ -130,6 +136,17 @@ class PrefsStore {
 
 	setBaselinesEnabled(enabled: boolean): void {
 		this.baselinesEnabled = enabled;
+		this.save();
+	}
+
+	isChartHidden(id: string): boolean {
+		return this.hiddenCharts.includes(id);
+	}
+
+	/** Show or hide one Insights chart (US-043). New charts are visible by default. */
+	setChartHidden(id: string, hidden: boolean): void {
+		const rest = this.hiddenCharts.filter((c) => c !== id);
+		this.hiddenCharts = hidden ? [...rest, id] : rest;
 		this.save();
 	}
 

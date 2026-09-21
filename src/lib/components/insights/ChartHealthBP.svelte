@@ -1,86 +1,83 @@
 <script lang="ts">
+	import { defineChart, lineY, ruleY } from '@tanstack/charts';
+	import { scaleLinear } from '@tanstack/charts/scales/linear';
+	import { scalePoint } from '@tanstack/charts/scales/point';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { bloodPressureDailyAverages } from '$lib/health/metrics';
-	import { Chart, chartTheme } from '$lib/chart-utils';
+	import ScrollChart from '$lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '$lib/charts/scale';
+	import { CHART_GRID, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
 
-	let { dates, xLabels }: { dates: string[]; xLabels: string[] } = $props();
+	let { dates }: { dates: string[] } = $props();
 
-	let canvas: HTMLCanvasElement = $state()!;
+	type Row = { date: string; value: number };
 
-	const SYSTOLIC_COLOR = '#e55733';
-	const DIASTOLIC_COLOR = '#60c6ff';
-	const PULSE_COLOR = '#b286fd';
+	const SERIES = [
+		{ id: 'systolic', label: 'Systolic', color: '#e55733' },
+		{ id: 'diastolic', label: 'Diastolic', color: '#60c6ff' },
+		{ id: 'pulse', label: 'Pulse', color: '#b286fd' },
+	] as const;
 
-	$effect(() => {
-		if (!canvas || dates.length === 0) return;
-
-		const { gridOpts, tickOpts, legendOpts } = chartTheme();
-
-		const dailies = bloodPressureDailyAverages(healthStore.readings);
-		const byDate = new Map(dailies.map((d) => [d.date, d]));
-
-		const systolic = dates.map((d) => byDate.get(d)?.systolic ?? null);
-		const diastolic = dates.map((d) => byDate.get(d)?.diastolic ?? null);
-		const pulse = dates.map((d) => byDate.get(d)?.pulse ?? null);
-		const hasPulse = pulse.some((p) => p !== null);
-
-		const datasets = [
-			{
-				label: 'Systolic',
-				data: systolic,
-				borderColor: SYSTOLIC_COLOR,
-				backgroundColor: SYSTOLIC_COLOR,
-				borderWidth: 2,
-				pointRadius: 2,
-				tension: 0.3,
-				spanGaps: true,
-			},
-			{
-				label: 'Diastolic',
-				data: diastolic,
-				borderColor: DIASTOLIC_COLOR,
-				backgroundColor: DIASTOLIC_COLOR,
-				borderWidth: 2,
-				pointRadius: 2,
-				tension: 0.3,
-				spanGaps: true,
-			},
-		];
-
-		if (hasPulse) {
-			datasets.push({
-				label: 'Pulse',
-				data: pulse,
-				borderColor: PULSE_COLOR,
-				backgroundColor: PULSE_COLOR,
-				borderWidth: 2,
-				pointRadius: 2,
-				tension: 0.3,
-				spanGaps: true,
-			});
-		}
-
-		const chart = new Chart(canvas, {
-			type: 'line',
-			data: { labels: xLabels, datasets },
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				plugins: {
-					legend: { display: true, position: 'bottom', labels: legendOpts },
-				},
-				scales: {
-					x: { grid: { display: false }, ticks: tickOpts },
-					y: { grid: gridOpts, ticks: tickOpts },
-				},
-			},
-		});
-
-		return () => chart.destroy();
+	let series = $derived.by(() => {
+		const dateSet = new Set(dates);
+		const dailies = bloodPressureDailyAverages(healthStore.readings).filter((d) =>
+			dateSet.has(d.date),
+		);
+		const pick = (key: 'systolic' | 'diastolic' | 'pulse'): Row[] =>
+			dailies.flatMap((d) => (d[key] === null ? [] : [{ date: d.date, value: d[key] as number }]));
+		return { systolic: pick('systolic'), diastolic: pick('diastolic'), pulse: pick('pulse') };
 	});
+
+	let visible = $derived(SERIES.filter((s) => series[s.id].length > 0));
+
+	let axis = $derived(niceAxis(visible.flatMap((s) => series[s.id].map((r) => r.value))));
+
+	let labels: Record<string, string> = Object.fromEntries(SERIES.map((s) => [s.id, s.label]));
+
+	function build() {
+		return defineChart({
+			marks: [
+				ruleY(axis.ticks, { stroke: CHART_GRID }),
+				...visible.map((s) =>
+					lineY(series[s.id], {
+						id: s.id,
+						x: 'date',
+						y: 'value',
+						stroke: s.color,
+						strokeWidth: 2,
+						points: true,
+					}),
+				),
+			],
+			scales: {
+				x: {
+					scale: scalePoint<string>().domain(dates).padding(0.5),
+					axis: { ticks: { format: shortDate, size: 0 } },
+				},
+				y: { scale: scaleLinear().domain(axis.domain), axis: false },
+			},
+			margin: PLOT_MARGIN,
+			focus: 'group-x',
+			tooltip: chartTooltip<Row>(
+				(d) => longDate(d.date),
+				(p) => ({ label: labels[p.markId] ?? p.markId, value: String(p.datum.value) }),
+			),
+		});
+	}
 </script>
 
-<canvas
-	bind:this={canvas}
-	aria-label="Line chart: daily average systolic and diastolic blood pressure over the selected period"
-></canvas>
+<ScrollChart
+	columns={dates.length}
+	definition={build}
+	ariaLabel="Line chart: daily average systolic and diastolic blood pressure over the selected period"
+	left={{ axis, unit: 'mmHg' }}
+/>
+
+<ul
+	class="chart-legend"
+	aria-hidden="true"
+>
+	{#each visible as s (s.id)}
+		<li><span style:background={s.color}></span>{s.label}</li>
+	{/each}
+</ul>

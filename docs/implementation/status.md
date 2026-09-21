@@ -10,30 +10,30 @@ Verified against the codebase (July 2026).
 
 ## v1.1.0 — Core Workout Flows
 
-| Feature                                                   | Status | Notes                                                                        |
-| --------------------------------------------------------- | ------ | ---------------------------------------------------------------------------- |
-| Today view + start session                                | Built  | Home practice card navigates to `/practice`; workout page handles start/edit |
-| Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry             |
-| Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                     |
-| Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                   |
-| Per-item weight increment (2.5 / 5 / 10)                  | Built  | Configured on item form; weights round to nearest increment                  |
-| Finish / abandon session                                  | Built  | Finish saves completed sets only; abandon has confirm dialog                 |
-| Crash recovery                                            | Built  | Resume/discard banner on boot                                                |
-| Session complete overlay                                  | Built  | Stats + confetti                                                             |
-| Program view + week progress                              | Built  | Routine cards from the current week's templates                              |
-| Workout/routine editor                                    | Built  | Edit items, add new routines                                                 |
-| Item library browser                                      | Built  | Category-filtered sheet in editor                                            |
-| Calendar + day summary                                    | Built  | Month grid, tap completed days                                               |
-| IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                   |
-| Preferences store                                         | Built  | Accent, density, roundness, weight unit                                      |
-| Settings UI                                               | Built  | `/settings` hub + `habits`/`data` sub-routes (US-030)                        |
-| Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating                 |
-| Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks    |
-| Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program             |
-| Custom item CRUD                                          | Built  | Create/edit/delete in the item library; built-in items are read-only         |
-| Browse all program weeks                                  | Built  | Week picker chevrons on program page                                         |
-| Weekly consistency streak                                 | Built  | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar     |
-| Scheduled/skipped day status                              | Built  | Calendar infers training days-of-week from session history                   |
+| Feature                                                   | Status | Notes                                                                                 |
+| --------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------- |
+| Today view + start session                                | Built  | Home practice card navigates to `/practice`; workout page handles start/edit          |
+| Session logging — smart tap (instant or first-time entry) | Built  | Instant if weight known; opens sheet for first-time weight entry                      |
+| Session logging — adjust completed set                    | Built  | Tap any completed tile to reopen sheet; cascades forward                              |
+| Weight remembered across sessions (`itemLastUsed`)        | Built  | Pre-fills on session start                                                            |
+| Per-item weight increment (2.5 / 5 / 10)                  | Built  | Configured on item form; weights round to nearest increment                           |
+| Finish / abandon session                                  | Built  | Finish saves completed sets only; abandon has confirm dialog                          |
+| Crash recovery                                            | Built  | Resume/discard banner on boot                                                         |
+| Session complete overlay                                  | Built  | Stats + confetti                                                                      |
+| Program view + week progress                              | Built  | Routine cards from the current week's templates                                       |
+| Workout/routine editor                                    | Built  | Edit items, add new routines                                                          |
+| Item library browser                                      | Built  | Category-filtered sheet in editor                                                     |
+| Calendar + day summary                                    | Built  | Month grid, tap completed days                                                        |
+| IndexedDB persistence                                     | Built  | Raw API wrapper, seed data                                                            |
+| Preferences store                                         | Built  | Accent, density, roundness, weight unit — editable again on Personalization (v1.10.0) |
+| Settings UI                                               | Built  | `/settings` hub — one row per feature since v1.10.0 (US-045)                          |
+| Program selection screen                                  | Built  | Bottom sheet; built-in programs deep-clone before activating                          |
+| Create new program                                        | Built  | 2-step full-screen flow — details then routine names; scaffolds all weeks             |
+| Copy built-in before editing                              | Built  | Guard dialog prompts copy+switch when editing a built-in program                      |
+| Custom item CRUD                                          | Built  | Create/edit/delete in the item library; built-in items are read-only                  |
+| Browse all program weeks                                  | Built  | Week picker chevrons on program page                                                  |
+| Weekly consistency streak                                 | Built  | Consecutive weeks where sessions ≥ daysPerWeek; shown on home + calendar              |
+| Scheduled/skipped day status                              | Built  | Calendar infers training days-of-week from session history                            |
 
 ---
 
@@ -82,16 +82,16 @@ Verified against the codebase (July 2026).
 
 ## v1.5.0 — Insights Hub
 
-| Feature                    | Status | Doc reference |
-| -------------------------- | ------ | ------------- |
-| Insights hub (`/insights`) | Built  | US-022        |
-| Mood × habits chart        | Built  | US-023        |
-| Weekly volume chart        | Built  | US-024        |
-| Activity breakdown chart   | Built  | US-025        |
-| Habit radar chart          | Built  | US-026        |
-| Exercise progress chart    | Built  | US-027        |
+| Feature                    | Status  | Doc reference                                                                                                  |
+| -------------------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| Insights hub (`/insights`) | Built   | US-022                                                                                                         |
+| Mood × habits chart        | Built   | US-023                                                                                                         |
+| Weekly volume chart        | Built   | US-024                                                                                                         |
+| Activity breakdown chart   | Built   | US-025                                                                                                         |
+| Habit radar chart          | Built   | US-026                                                                                                         |
+| Exercise progress chart    | Removed | US-027 — `ChartStrengthProgress` was removed in commit `9798644`; not in the code today (found during v1.10.0) |
 
-Charts render with **Chart.js** (`src/lib/components/insights/`, helpers in `src/lib/chart-utils.ts`). Date-range chips shipped beyond original v1.5.0 scope.
+Charts originally rendered with Chart.js; since **v1.10.0** they render with **TanStack Charts** (see below). Date-range chips shipped beyond original v1.5.0 scope.
 
 ---
 
@@ -153,6 +153,25 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 
 ---
 
+## v1.10.0 — Baselines & Insights Refresh
+
+| Feature                               | Status | Notes                                                                                                                                                           |
+| ------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flexible baseline metrics             | Built  | [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — 1 to n Duration / Distance / Count metrics, no direction; DB v11 drops v1.9.0 baseline data |
+| Baseline logging & neutral comparison | Built  | [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md) — logging = done; signed difference vs baseline                                             |
+| TanStack Charts                       | Built  | [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md) — every chart; `src/lib/charts/`. `chart.js` still installed until the user removes it        |
+| Scrolling charts                      | Built  | [US-040](../features/v1.10.0/US-040-scrolling-charts.md) — `ScrollChart.svelte`, 48 px columns, pinned value rails                                              |
+| All-habits heat chart (experimental)  | Built  | [US-041](../features/v1.10.0/US-041-all-habits-heat-chart.md) — strips + calendar grid                                                                          |
+| Habit colors                          | Built  | [US-042](../features/v1.10.0/US-042-habit-colors.md) — `Habit.color` / `negativeColor`, defaults on load                                                        |
+| Show / hide Insights charts           | Built  | [US-043](../features/v1.10.0/US-043-insights-chart-visibility.md) — `prefs.hiddenCharts`; `/settings/insights`                                                  |
+| Experimental Insights charts          | Built  | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
+| Settings feature hub                  | Built  | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
+| Personalization                       | Built  | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
+
+Not yet verified in a browser — built and checked with type check, lint, unit tests, and a production build only.
+
+---
+
 ## Built-In Content
 
 - **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
@@ -171,7 +190,8 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans (shipped) + Baselines (planned)
+- [v1.10.0 Features](../features/v1.10.0/README.md) — Baselines & Insights refresh, Settings
+- [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans + Baselines
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)
 - [v1.4.0 Features](../features/v1.4.0/README.md) — Discipline model (shipped)
 - [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md) — Known deferred concerns

@@ -3,6 +3,7 @@ import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { isHabitComplete, habitProgressPct } from '$lib/habits';
+import { nextDefaultColor, withDefaultColors } from '$lib/habitColors';
 
 const TODAY_KEY = 'cwout:habitDay';
 
@@ -73,6 +74,11 @@ class HabitStore {
 			await this.updateHabit({ ...mood, active: true });
 		}
 
+		// v1.10.0: every habit gets a chart color; existing habits receive defaults once.
+		for (const habit of withDefaultColors(this.habits)) {
+			await this.updateHabit(habit);
+		}
+
 		localStorage.setItem(TODAY_KEY, this.todayStr());
 	}
 
@@ -81,8 +87,15 @@ class HabitStore {
 		unit: string;
 		type: HabitType;
 		dailyGoal?: number;
+		color?: string;
 	}): Promise<Habit> {
 		const maxOrder = this.habits.reduce((m, h) => Math.max(m, h.sortOrder), -1);
+		const color =
+			data.color ??
+			nextDefaultColor(
+				this.habits.map((h) => h.color),
+				maxOrder + 1,
+			);
 		const habit: Habit = {
 			id: generateId(),
 			name: data.name,
@@ -92,6 +105,7 @@ class HabitStore {
 			active: true,
 			sortOrder: maxOrder + 1,
 			createdAt: new Date().toISOString(),
+			color,
 		};
 		await db.habits.put(habit);
 		this.habits = [...this.habits, habit];

@@ -2,6 +2,8 @@
 
 # US-044 — Experimental Insights Charts
 
+> **As built:** components in `src/lib/components/insights/`: `ChartBaselineGrowth` (wraps `BaselineChart` with baseline / metric chips; **personal bests** are rings on the best day per metric — #7 lives here, not as its own card), `ChartShowUpRate`, `ChartWeekVsWeek` (a table — clearer than a chart for totals + ↑↓=; always the current week, so it ignores the range picker), `ChartDayOfWeek`, `ChartOnDaysWhen` (outcome = mood or a number habit; conditions = workout / activity / any baseline / each baseline / each other habit; needs ≥ 3 days each side), `ChartTimeOfDay` (hour bars, opens at midnight, notes that backdated entries count at save time). Pure aggregation + tests: `src/lib/insights/logic.ts`, `src/lib/insights.test.ts`. A chart shows when its feature is on; with no data it shows its own empty state. Arrows and differences stay neutral (US-038).
+>
 > **Experimental.** Seven new charts added to learn what is useful. Each can be hidden ([US-043](./US-043-insights-chart-visibility.md)); real use and feedback decide what stays. Depends on [US-039](./US-039-tanstack-charts-migration.md), [US-040](./US-040-scrolling-charts.md), and [US-038](./US-038-baseline-logging-comparison.md). Decisions: [v1.10.0 — Topic 5](./README.md#topic-5--more-insights-experiments).
 
 As a **growth-minded user**, I want a range of different views of my data

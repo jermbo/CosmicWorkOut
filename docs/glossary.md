@@ -186,7 +186,7 @@ One value in the Activity type list. Adding one (e.g. Kayaking) is a config chan
 
 <span id="habit"></span>
 
-A daily trackable behavior with a **type** (`times · minutes · count · boolean · mood`), optional daily goal, and unit label.
+A daily trackable behavior with a **type** (`times · minutes · count · boolean · mood`), optional daily goal, unit label, and a **chart color** (v1.10.0; Mood has a good-day and a bad-day color).
 
 **Opt-in:** gated by `habitsEnabled` in Settings (default off); habits and their logs are kept when off. **Mood has no separate flag** — see [Habit log](#habit-log).
 
@@ -200,21 +200,19 @@ One day's value for one habit. Exactly one record per (habit, date); upserted on
 
 ## Baselines _(v1.9.0)_
 
-> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Built and opt-in (`baselinesEnabled`, default off). Spec: [US-034](features/v1.9.0/US-034-baselines-setup.md) · [US-035](features/v1.9.0/US-035-baselines-logging.md) · [US-036](features/v1.9.0/US-036-baselines-charts.md). Origin: [Roadmap — Baselines](roadmap/baselines.md).
+> **Not a fourth movement archetype** and **not** a Habit. Separate daily tracking for growth over time. Built and opt-in (`baselinesEnabled`, default off). Spec: [US-034](features/v1.9.0/US-034-baselines-setup.md) · [US-035](features/v1.9.0/US-035-baselines-logging.md) · [US-036](features/v1.9.0/US-036-baselines-charts.md), reworked in [US-037](features/v1.10.0/US-037-flexible-baseline-metrics.md) · [US-038](features/v1.10.0/US-038-baseline-logging-comparison.md). Origin: [Roadmap — Baselines](roadmap/baselines.md).
 
 ### Baseline
 
 <span id="baseline"></span>
 
-> **Changing in v1.10.0 (planned):** 1 to n metrics typed as Duration / Distance / Count; no up / under direction; logging = done; neutral comparison against the baseline. See [US-037](features/v1.10.0/US-037-flexible-baseline-metrics.md) · [US-038](features/v1.10.0/US-038-baseline-logging-comparison.md).
-
-A user-defined daily **floor** (go up / hit-or-exceed) or **ceiling** (stay under), with one or two metrics, logged as many times per day as needed (entries sum). Unit labels are user-typed in Settings. Entries (including past dates) are editable/deletable. Examples: walk 30 min + 1.25 miles, write 250 words, 10 pushups, phone time under 30 min. The target stays embarrassingly low until the user raises it. Distinct from [Habits](#habit) (simple daily check-ins) and from [Lift plans](#lift-plan) (Strength wave-loading).
+A user-defined daily **floor** with **1 to n metrics**, each a **Duration** (time), **Distance** (mi / km / m / yd), or **Count** (user-labelled — reps, words, pages). Logged as many times per day as needed (entries sum). **Logging anything marks the day done**; each metric is then compared to its baseline as a plain signed difference (+20, −2 min) — the app never decides what "better" means. The baseline is set embarrassingly low and stays put. Works for any pursuit — Daily 10, bike ride, reading, meditation, writing, "phone locked away". Distinct from [Habits](#habit) (simple daily check-ins) and from [Lift plans](#lift-plan) (Strength wave-loading). Shape since [v1.10.0](features/v1.10.0/US-037-flexible-baseline-metrics.md).
 
 ### Baseline log
 
 <span id="baseline-log"></span>
 
-One entry toward a Baseline on a given day. Many per day; the day’s total(s) are the sum. Stored in IndexedDB (`baselineLogs`, DB version 10); deleting a Baseline retains its logs.
+One entry toward a Baseline on a given day. Many per day; the day’s total(s) are the sum. Stored in IndexedDB (`baselineLogs`, DB version 11); deleting a Baseline retains its logs.
 
 ---
 

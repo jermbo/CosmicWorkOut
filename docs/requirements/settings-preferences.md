@@ -10,62 +10,69 @@ User-configurable behavior and appearance.
 
 ## Implementation Status
 
-| Story                                        | Status    | Notes                                                                                                                                                 |
-| -------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                                                                          |
-| Settings hub + sub-routes (`/settings`)      | Shipped   | Hub + `/settings/habits`, `/settings/overview`, `/settings/baselines`, `/settings/data` ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| Health metrics master toggle                 | Shipped   | On the Settings hub ([US-029](../features/v1.7.0/US-029-health-metrics.md))                                                                           |
-| Lift plans master toggle                     | Shipped   | On the Settings hub ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)); UI name **Lift plans**                                           |
-| Baselines master toggle + Settings CRUD      | Built     | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                                                                |
-| Habits / Activity log master toggles         | Built     | Both default off; every tracking feature is opt-in                                                                                                    |
-| Practice master toggle                       | Built     | Default off; Lift plans nest inside it                                                                                                                |
-| Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on `/settings/overview`; `src/lib/homeCards.ts`                                                                                        |
-| Weight unit applied in display/input         | Built     | Default `lb`; applied throughout                                                                                                                      |
-| Accent / density / roundness applied on boot | Built     | Read from stored prefs and applied; see appearance-UI note below                                                                                      |
-| Appearance settings page                     | Removed   | `/settings/appearance` UI dropped in US-030; prefs keep applying their stored/default values                                                          |
-| Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                        |
-| Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                             |
-| Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                  |
-| Reset preferences to defaults                | Built     | `prefsStore.resetToDefaults()`                                                                                                                        |
+| Story                                        | Status    | Notes                                                                                                                                                                                          |
+| -------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                                                                                                                   |
+| Settings hub + sub-routes (`/settings`)      | Built     | One row per feature since v1.10.0 ([US-045](../features/v1.10.0/US-045-settings-feature-hub.md)); originally [US-030](../features/v1.7.0/US-030-settings-restructure.md)                       |
+| Health metrics master toggle                 | Built     | On `/settings/health` ([US-029](../features/v1.7.0/US-029-health-metrics.md), moved by US-045)                                                                                                 |
+| Lift plans master toggle                     | Built     | On `/settings/practice` ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)); UI name **Lift plans**                                                                                |
+| Baselines master toggle + Settings CRUD      | Built     | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                                                                                                         |
+| Habits / Activity log master toggles         | Built     | Both default off; every tracking feature is opt-in                                                                                                                                             |
+| Practice master toggle                       | Built     | Default off; Lift plans nest inside it                                                                                                                                                         |
+| Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on Personalization (and `/settings/overview`); `src/lib/homeCards.ts`                                                                                                           |
+| Weight unit applied in display/input         | Built     | Default `lb`; a **label only** — switching does not convert stored readings                                                                                                                    |
+| Accent / density / roundness applied on boot | Built     | Read from stored prefs and applied; see appearance-UI note below                                                                                                                               |
+| Personalization page                         | Built     | `/settings/personalization` — accent, weight unit, density, roundness, card order ([US-046](../features/v1.10.0/US-046-personalization.md)). Restores the Appearance page dropped after US-030 |
+| Insights chart visibility (`hiddenCharts`)   | Built     | `/settings/insights` + ⋯ → Hide on each chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                                              |
+| Light mode                                   | Deferred  | Next version — [Roadmap](../roadmap/README.md)                                                                                                                                                 |
+| Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                                                                 |
+| Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                                                                      |
+| Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                                                           |
+| Reset preferences to defaults                | Built     | `prefsStore.resetToDefaults()`                                                                                                                                                                 |
 
-> **Appearance UI note:** `accentColor`, `density`, `roundness`, and `weightUnit` all exist in `prefsStore` and apply on boot, but the dedicated appearance page was removed in US-030 — there is currently no in-app UI to change them, so they use their stored/default values. The accent-color and completion-feel user stories below describe the **target** UX, not what is currently surfaced.
+> **Appearance UI note:** since v1.10.0, `accentColor`, `density`, `roundness`, and `weightUnit` are editable again on **Settings → Personalization** ([US-046](../features/v1.10.0/US-046-personalization.md)). The completion-feel story below still describes target UX only.
 
 ---
 
 ## Settings Information Architecture
 
-Shipped in [US-030](../features/v1.7.0/US-030-settings-restructure.md) — a short hub with sub-routes instead of one long scroll.
+Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.0): **one row per feature**, iPhone-Settings style. Each row shows On / Off and opens that feature's page, which holds its switch, its manage list, and its own options. (Originally [US-030](../features/v1.7.0/US-030-settings-restructure.md).)
 
-| Route                 | Contents                                                                                             |
-| --------------------- | ---------------------------------------------------------------------------------------------------- |
-| `/settings`           | **Hub** — one toggle per tracking feature + navigation rows for their sub-pages                      |
-| `/settings/overview`  | Overview card order — drag or arrows; shows position of turned-off cards too                         |
-| `/settings/habits`    | Habit CRUD, reorder, active toggle ([US-009](../features/v1.3.0/US-009-habit-creation.md))           |
-| `/settings/baselines` | Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                               |
-| `/settings/data`      | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed |
+| Route                       | Contents                                                                                                               |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `/settings`                 | **Hub** — Features: Habits · Baselines · Practice · Activity · Health. App: Insights · Personalization · Data & backup |
+| `/settings/habits`          | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                 |
+| `/settings/baselines`       | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                    |
+| `/settings/practice`        | Practice switch; Lift plans switch; link to `/goals`                                                                   |
+| `/settings/activity`        | Activity log switch                                                                                                    |
+| `/settings/health`          | Health metrics switch                                                                                                  |
+| `/settings/insights`        | Show / hide each Insights chart                                                                                        |
+| `/settings/personalization` | Accent, weight unit, density, roundness, Overview card order                                                           |
+| `/settings/overview`        | Overview card order (kept for old links)                                                                               |
+| `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                   |
 
 ```mermaid
 flowchart LR
     Hub["/settings"]
+    Hub --> Hab["/settings/habits"]
     Hub --> Base["/settings/baselines"]
+    Hub --> Prac["/settings/practice"]
+    Hub --> Act["/settings/activity"]
+    Hub --> Hea["/settings/health"]
+    Hub --> Ins["/settings/insights"]
+    Hub --> Per["/settings/personalization"]
     Hub --> Data["/settings/data"]
-    Hub -->|toggle| Habits[habitsEnabled]
-    Habits -->|nested| Hab["/settings/habits"]
-    Hub -->|toggle| Activity[activityLogEnabled]
-    Hub -->|toggle| Practice[practiceEnabled]
-    Practice -->|toggle, nested| Lift[goalProgressionPlansEnabled]
-    Hub -->|toggle| Health[healthMetricsEnabled]
-    Hub -->|toggle| Baselines[baselinesEnabled]
+    Prac -->|nested toggle| Lift[Lift plans]
 
     classDef hub fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef toggle fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class Hub hub;
-    class Hab,Base,Data route;
-    class Habits,Activity,Practice,Lift,Health,Baselines toggle;
+    class Hab,Base,Prac,Act,Hea,Ins,Per,Data route;
+    class Lift toggle;
 ```
 
-The hub stays short; destructive and infrequent actions live on **Data & backup**. There is no appearance page — see the Appearance UI note above.
+Settings feature pages are never gated by their own flag — they hold the switch that turns the feature on. Destructive and infrequent actions live on **Data & backup**.
 
 ### Feature toggles
 
@@ -78,7 +85,7 @@ Every feature toggle defaults **off** and hides UI only — data always persists
 | `practiceEnabled`             | The whole Practice / session engine, plus its History & Insights marks  |
 | `goalProgressionPlansEnabled` | Lift plans — **nested under Practice**; only shown while Practice is on |
 | `healthMetricsEnabled`        | Weight and blood pressure                                               |
-| `baselinesEnabled`            | Daily floors and ceilings                                               |
+| `baselinesEnabled`            | Daily baselines (1 to n metrics each)                                   |
 
 **Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page, and History day cells are not tappable until at least one feature is on.
 
@@ -88,7 +95,7 @@ Mood has no toggle of its own — it is a protected habit, locked _inside_ Habit
 
 ### Overview card order
 
-Which feature sits at the top of Overview is the user's call, not a hardcoded default — some people lead with Habits, others with the Activity log. `homeCardOrder` holds the order, edited on **Overview layout** by drag or arrow buttons. Details and the stale-value repair rule: [state.md](../implementation/state.md#overview-card-order).
+Which feature sits at the top of Overview is the user's call, not a hardcoded default — some people lead with Habits, others with the Activity log. `homeCardOrder` holds the order, edited on **Personalization** (also `/settings/overview`) by drag or arrow buttons. Details and the stale-value repair rule: [state.md](../implementation/state.md#overview-card-order).
 
 ---
 

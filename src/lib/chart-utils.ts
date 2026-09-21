@@ -1,38 +1,8 @@
-import {
-	Chart,
-	CategoryScale,
-	LinearScale,
-	RadialLinearScale,
-	BarController,
-	BarElement,
-	LineController,
-	LineElement,
-	PointElement,
-	DoughnutController,
-	ArcElement,
-	RadarController,
-	Legend,
-	Tooltip,
-} from 'chart.js';
+/*
+ * Date-range helpers shared by Insights and Baselines. Chart rendering lives in
+ * src/lib/charts/ (TanStack Charts); nothing here imports a chart library.
+ */
 import { toLocalIso } from '$lib/date';
-
-export { Chart };
-
-Chart.register(
-	CategoryScale,
-	LinearScale,
-	RadialLinearScale,
-	BarController,
-	BarElement,
-	LineController,
-	LineElement,
-	PointElement,
-	DoughnutController,
-	ArcElement,
-	RadarController,
-	Legend,
-	Tooltip,
-);
 
 export const ACTIVITY_PALETTE = [
 	'#60c6ff',
@@ -83,20 +53,6 @@ export function buildDatesBetween(start: string, end: string): string[] {
 	return dates;
 }
 
-function labelStepFor(count: number): number {
-	if (count <= 14) return 1;
-	if (count <= 90) return 7;
-	return 30;
-}
-
-export function xLabelsFor(dates: string[]): string[] {
-	const step = labelStepFor(dates.length);
-	return dates.map((d, i) => {
-		if (i % step === 0) return d.slice(5).replace('-', '/');
-		return '';
-	});
-}
-
 export function computeRange(
 	key: RangeKey,
 	cs: string,
@@ -125,39 +81,4 @@ export function computeRange(
 		case 'custom':
 			return { start: cs, end: ce };
 	}
-}
-
-export function cssVar(name: string): string {
-	return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-export function chartTheme() {
-	const accent = cssVar('--color-accent');
-	const textPrimary = cssVar('--color-text-primary');
-	const textSecondary = cssVar('--color-text-secondary');
-	const borderColor = cssVar('--color-border');
-	const fontBody = cssVar('--font-body');
-
-	const gridOpts = { color: borderColor };
-	const tickOpts = {
-		color: textSecondary,
-		font: { family: fontBody, size: 11 },
-		autoSkip: true,
-		maxRotation: 0,
-	};
-	const legendOpts = {
-		color: textPrimary,
-		font: { family: fontBody, size: 12 },
-	};
-
-	return {
-		accent,
-		textPrimary,
-		textSecondary,
-		borderColor,
-		fontBody,
-		gridOpts,
-		tickOpts,
-		legendOpts,
-	};
 }

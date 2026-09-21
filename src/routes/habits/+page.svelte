@@ -160,7 +160,7 @@
 	{#if gridHabits.length === 0}
 		<div class="empty-state">
 			<p>No habits configured.</p>
-			<a href={resolve('/settings')}>Go to Settings to add habits</a>
+			<a href={resolve('/settings/habits')}>Go to Settings to add habits</a>
 		</div>
 	{:else}
 		<div class="habit-grid">

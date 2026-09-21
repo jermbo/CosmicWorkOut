@@ -245,6 +245,8 @@ type Habit = {
 	active: boolean;
 	sortOrder: number;
 	createdAt: string;
+	color?: string; // chart color (v1.10.0, US-042); a default is saved on load when missing
+	negativeColor?: string; // mood only — bad-day color; `color` is the good-day color
 };
 
 type HabitLog = {
@@ -382,22 +384,26 @@ type GoalPlan = {
 
 ### Baseline
 
-> **[US-034](../features/v1.9.0/US-034-baselines-setup.md).** Opt-in daily floor/ceiling tracking with growth charts. Not a Habit; not a Lift plan. Discovery: [Roadmap — Baselines](../roadmap/baselines.md).
+> **[US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) / [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md)** (v1.10.0, replacing the v1.9.0 shape from [US-034](../features/v1.9.0/US-034-baselines-setup.md)). Opt-in daily baselines with growth charts. Not a Habit; not a Lift plan.
 
 ```typescript
-type BaselineDirection = 'up' | 'under';
+type BaselineMeasure = 'duration' | 'distance' | 'count';
+type DistanceUnit = 'mi' | 'km' | 'm' | 'yd';
 
 type BaselineMetric = {
 	id: string;
-	label: string; // user-typed unit label
-	target: number;
+	name: string; // e.g. "Pushups", "Walk"
+	measure: BaselineMeasure; // fixed at creation
+	baseline: number; // the floor; duration is stored in minutes
+	unit?: DistanceUnit; // distance only
+	label?: string; // count only — user-typed, e.g. "reps", "words"
+	removed?: boolean; // hidden from the baseline; its logs are kept
 };
 
 type Baseline = {
 	id: string;
 	name: string;
-	direction: BaselineDirection;
-	metrics: BaselineMetric[]; // length 1 or 2
+	metrics: BaselineMetric[]; // 1 to n, display order
 	sortOrder: number;
 	active: boolean;
 	createdAt: string;
@@ -412,13 +418,16 @@ type BaselineLog = {
 };
 ```
 
-- **Aggregation:** many `BaselineLog` rows per `(baselineId, date)`; day total per metric = sum of `values[metricId]`. Sums are rounded to 4 decimal places so user-typed decimals (`0.6 + 0.7`) don't render as `1.2999999999999998`.
+- **Done = logged:** any entry on a date marks the baseline done for that date. Values never fail a day.
+- **Comparison:** each metric shows `total − baseline` as a neutral signed difference. The app does not decide what "better" means.
+- **Aggregation:** many `BaselineLog` rows per `(baselineId, date)`; day total per metric = sum of `values[metricId]`, rounded to 4 decimal places.
+- **Entry values:** an entry stores only the metrics the user filled in. A metric blank in every entry that day shows as "not logged".
+- **Metric identity:** metric `id`s are generated once and never reassigned, because `BaselineLog.values` is keyed by them. Edits match by id; new metrics are appended; removed metrics are soft-deleted (`removed: true`).
 - **Feature gate:** `UserPrefs.baselinesEnabled` (default `false`). When off, UI is hidden; data remains in IndexedDB.
-- **Routes:** `/baselines` (logging + charts), `/settings/baselines` (CRUD).
-- **Metric identity:** metric `id`s are generated once at creation and never reassigned, because `BaselineLog.values` is keyed by them. Edits carry ids over by position; the metric **count** is fixed after creation (same spirit as habit type immutability).
-- **Entry values:** an entry stores only the metrics the user filled in, so a partial log (minutes but no miles) is valid and a missing metric counts as `0`.
+- **Routes:** `/baselines` (logging + charts), `/settings/baselines` (toggle + CRUD).
 - **Delete:** deleting a `Baseline` retains its `BaselineLog` rows, matching habits.
 - **Clear data:** "Clear baselines" clears both `baselines` and `baselineLogs`.
+- **Backups:** restoring a backup with v1.9.0-shaped baselines drops its baselines and baseline logs and restores everything else.
 
 ### UserPrefs
 
@@ -437,6 +446,7 @@ type UserPrefs = {
 	healthMetricsEnabled: boolean; // default false — US-029
 	goalProgressionPlansEnabled: boolean; // default false — US-033 (Lift plans); only live when practiceEnabled
 	baselinesEnabled: boolean; // default false — US-034
+	hiddenCharts: string[]; // Insights chart ids hidden by the user — US-043
 };
 ```
 
@@ -472,39 +482,40 @@ erDiagram
 
 **Lift plans** (`GoalPlan`) pair with a generated `Program` for session rotation; prescribed loads come from the plan's blocks, not `itemLastUsed`.
 
-**Baselines** (`Baseline` + `BaselineLog`) are standalone daily growth tracking — see [US-034](../features/v1.9.0/US-034-baselines-setup.md).
+**Baselines** (`Baseline` + `BaselineLog`) are standalone daily growth tracking — see [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md).
 
 ---
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **9**. The upgrade path is **non-destructive**: `onupgradeneeded` creates only the stores and indexes that don't already exist (via idempotent `ensureStore` / `ensureIndex` helpers) and never drops user data. Future schema changes append new store/index creation plus, where needed, data transforms keyed on `event.oldVersion`. See the [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16) for why this replaced the earlier wipe-on-bump behavior.
+DB name `cosmic-workout`, version **11**. The upgrade path is **non-destructive**: `onupgradeneeded` creates only the stores and indexes that don't already exist (via idempotent `ensureStore` / `ensureIndex` helpers) and never drops user data. Future schema changes append new store/index creation plus, where needed, data transforms keyed on `event.oldVersion`. See the [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16) for why this replaced the earlier wipe-on-bump behavior.
 
 **Version history** (bumps up to v9 predate the non-destructive upgrade and ran under the old wipe-and-reseed path; from now on bumps preserve data):
 
-| Version      | Change                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v4 (v1.4.0)  | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                                                                                    |
-| v5 (v1.4.0)  | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                                                                                           |
-| v6 (v1.6.0)  | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                                                                                    |
-| v7 (v1.7.0)  | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                                                                               |
-| v8 (v1.7.0)  | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                                                                                         |
-| v9 (v1.9.0)  | `goalPlans` — Lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).                                                                                                                                                                                                                                                                                               |
-| v10 (v1.9.0) | `baselines` + `baselineLogs` — Baselines ([US-034](../features/v1.9.0/US-034-baselines-setup.md)). Originally planned to fold into the v9 bump, but `onupgradeneeded` only runs when the version **increases**, so any DB already opened at v9 would silently lack the two stores. A separate bump upgrades existing installs cleanly; the migration is idempotent and non-destructive. |
+| Version       | Change                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v4 (v1.4.0)   | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                                                                                    |
+| v5 (v1.4.0)   | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                                                                                           |
+| v6 (v1.6.0)   | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                                                                                    |
+| v7 (v1.7.0)   | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                                                                               |
+| v8 (v1.7.0)   | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                                                                                         |
+| v9 (v1.9.0)   | `goalPlans` — Lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).                                                                                                                                                                                                                                                                                               |
+| v10 (v1.9.0)  | `baselines` + `baselineLogs` — Baselines ([US-034](../features/v1.9.0/US-034-baselines-setup.md)). Originally planned to fold into the v9 bump, but `onupgradeneeded` only runs when the version **increases**, so any DB already opened at v9 would silently lack the two stores. A separate bump upgrades existing installs cleanly; the migration is idempotent and non-destructive. |
+| v11 (v1.10.0) | Baselines reshaped ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md)). Upgrading from v10 **clears** `baselines` + `baselineLogs` — v1.9.0 baseline data was test-only, so it is dropped rather than converted. No other store is touched.                                                                                                                             |
 
-| Store            | Key      | Indexes                  | Contents                              |
-| ---------------- | -------- | ------------------------ | ------------------------------------- |
-| `items`          | `id`     | —                        | Item library (built-in + custom)      |
-| `programs`       | `id`     | —                        | All programs                          |
-| `sessions`       | `id`     | `by_date`                | Completed sessions                    |
-| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item             |
-| `activities`     | `id`     | `by_date`                | Activity log entries                  |
-| `habits`         | `id`     | —                        | Habit definitions                     |
-| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                |
-| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)       |
-| `goalPlans`      | `id`     | `by_status`              | Lift plans (US-033)                   |
-| `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10) |
-| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10) |
+| Store            | Key      | Indexes                  | Contents                                            |
+| ---------------- | -------- | ------------------------ | --------------------------------------------------- |
+| `items`          | `id`     | —                        | Item library (built-in + custom)                    |
+| `programs`       | `id`     | —                        | All programs                                        |
+| `sessions`       | `id`     | `by_date`                | Completed sessions                                  |
+| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item                           |
+| `activities`     | `id`     | `by_date`                | Activity log entries                                |
+| `habits`         | `id`     | —                        | Habit definitions                                   |
+| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                              |
+| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)                     |
+| `goalPlans`      | `id`     | `by_status`              | Lift plans (US-033)                                 |
+| `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10; reshaped v11) |
+| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10)               |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
@@ -530,4 +541,5 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 - [Program Progression](../implementation/program-progression.md) — How sessions advance the schedule
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health readings store
 - [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plan store
-- [US-034 — Baselines Setup](../features/v1.9.0/US-034-baselines-setup.md) — Baselines stores (planned)
+- [US-034 — Baselines Setup](../features/v1.9.0/US-034-baselines-setup.md) — Baselines stores
+- [US-037 — Flexible Baseline Metrics](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — current baseline shape

@@ -2,6 +2,8 @@
 
 # US-046 — Personalization
 
+> **As built:** `/settings/personalization` — accent swatches (8 presets via `ColorSwatches`), weight unit / density / roundness via a new `SegmentedControl`, and the Overview card-order editor (extracted to `OverviewLayoutEditor.svelte`, also rendered at `/settings/overview`). Everything writes through the existing `prefsStore` setters, so it applies immediately and persists. Charts read `prefsStore.accentColor`, so they recolor live. **Weight unit is a label only** — past readings are not converted; the page says so. The Health page links here for the unit.
+>
 > Restores the look-and-feel page removed after [US-030](../v1.7.0/US-030-settings-restructure.md) (removed as "single-user app" — no longer true). Light mode is **deferred** to the next version ([Roadmap](../../roadmap/README.md)). Decisions: [v1.10.0 — Topic 6](./README.md#topic-6--settings-page).
 
 As a **health-conscious user**, I want one place to make the app look and feel like mine

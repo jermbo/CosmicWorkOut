@@ -112,7 +112,7 @@ built in [`$lib/itemLibrary.ts`](../../src/lib/itemLibrary.ts):
 | `danceLibrary(disciplineId, section?)` | `DanceRoutineEditor`          |
 
 The config supplies the copy, which items belong in the list, how free-text search
-matches, the chip filter rows, and how one row renders (dot colour, subtitle, tag,
+matches, the chip filter rows, and how one row renders (dot color, subtitle, tag,
 optional right-hand readout). `kind` picks which form sheet the New/Edit buttons open.
 **A new movement type needs a builder here, not another copy of the sheet.**
 
@@ -179,12 +179,15 @@ Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.t
 
 ## Settings (`/settings`)
 
-| Component           | Purpose                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `AccentColorPicker` | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
-| `SettingsRow`       | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| `SettingsToggleRow` | Hub row with inline switch (e.g. health metrics)                                                            |
-| `SettingsGroup`     | Section header + grouped rows on hub                                                                        |
+| Component              | Purpose                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
+| `SettingsRow`          | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `SettingsToggleRow`    | Hub row with inline switch (e.g. health metrics)                                                            |
+| `SettingsGroup`        | Section header + grouped rows on hub                                                                        |
+| `ColorSwatches`        | Preset color swatches (habit colors, accent color) — v1.10.0                                                |
+| `SegmentedControl`     | Single-choice button row (Personalization) — v1.10.0                                                        |
+| `OverviewLayoutEditor` | Overview card order; on Personalization and `/settings/overview` — v1.10.0                                  |
 
 Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits` with US-030.
 
@@ -192,17 +195,28 @@ Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits
 
 ## Insights (`/insights`)
 
-Chart.js wrappers + a shared range control. See [v1.5.0 features](../features/v1.5.0/README.md).
+TanStack Charts components + a shared range control. The page renders from `INSIGHT_CHARTS` (`src/lib/insights/charts.ts`). See [v1.10.0](../features/v1.10.0/README.md).
 
-| Component           | Purpose                                   |
-| ------------------- | ----------------------------------------- |
-| `ChartMoodHabits`   | Mood vs. coffee/water multi-axis line.    |
-| `ChartWeeklyVolume` | Weekly training-volume bar chart.         |
-| `ChartActivityMix`  | Activity-type breakdown doughnut.         |
-| `ChartHabitRadar`   | Habit-balance radar.                      |
-| `RangeBar`          | Date-range chip bar shared by the charts. |
+| Component             | Purpose                                                             |
+| --------------------- | ------------------------------------------------------------------- |
+| `InsightCard`         | Card chrome: title, "Experimental" badge, ⋯ → Hide.                 |
+| `ChartMoodHabits`     | Mood vs coffee/water, two value rails.                              |
+| `ChartAllHabits`      | Heat chart: strips (all) / calendar grid (one habit). Experimental. |
+| `ChartBaselineGrowth` | Baseline metrics vs baseline lines, best-day rings. Experimental.   |
+| `ChartShowUpRate`     | % of days logged per week. Experimental.                            |
+| `ChartWeekVsWeek`     | This week vs same days last week (table). Experimental.             |
+| `ChartDayOfWeek`      | Average per weekday. Experimental.                                  |
+| `ChartOnDaysWhen`     | Outcome average on condition days vs other days. Experimental.      |
+| `ChartTimeOfDay`      | Baseline entries by hour. Experimental.                             |
+| `ChartWeeklyVolume`   | Weekly training-volume bars.                                        |
+| `ChartActivityMix`    | Activity-type donut with HTML legend.                               |
+| `ChartHabitRadar`     | Habit-balance radar.                                                |
+| `ChartHealthWeight`   | Weight line.                                                        |
+| `ChartHealthBP`       | Blood-pressure lines.                                               |
+| `ChipPicker`          | Single-choice chips for picking a baseline / metric / habit.        |
+| `RangeBar`            | Date-range chip bar shared by the charts.                           |
 
-> The exercise-progress chart (US-027) is rendered inline on the `/insights` route rather than as a standalone component.
+Shared chart plumbing lives in `src/lib/charts/` — `ScrollChart` (fixed-spacing sideways scroll, pinned rails), `scale.ts`, `theme.ts`, `color.ts`.
 
 ---
 

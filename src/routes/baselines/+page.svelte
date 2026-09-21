@@ -4,8 +4,14 @@
 	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { isMetricCleared, metricProgressPct, targetLabel } from '$lib/baselines/logic';
-	import { buildDatesBetween, computeRange, xLabelsFor, type RangeKey } from '$lib/chart-utils';
+	import {
+		differenceFromBaseline,
+		formatDifference,
+		formatValue,
+		isMetricLogged,
+		visibleMetrics,
+	} from '$lib/baselines/logic';
+	import { buildDatesBetween, computeRange, type RangeKey } from '$lib/chart-utils';
 	import { formatTime } from '$lib/date';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import RangeBar from '$lib/components/insights/RangeBar.svelte';
@@ -29,7 +35,6 @@
 	let chartDates = $derived(
 		range.start && range.end ? buildDatesBetween(range.start, range.end) : [],
 	);
-	let chartLabels = $derived(xLabelsFor(chartDates));
 
 	function toggleExpanded(id: string) {
 		if (expandedId === id) expandedId = null;
@@ -62,7 +67,7 @@
 	function entrySummary(baseline: Baseline, entry: BaselineLog): string {
 		return baseline.metrics
 			.filter((m) => typeof entry.values[m.id] === 'number')
-			.map((m) => `${entry.values[m.id]} ${m.label}`)
+			.map((m) => `${m.name} ${formatValue(m, entry.values[m.id])}`)
 			.join(' · ');
 	}
 </script>
@@ -80,7 +85,7 @@
 	{#if !prefsStore.baselinesEnabled}
 		<section class="baselines-disabled">
 			<p>Baselines are turned off. Your baseline data is kept either way.</p>
-			<a href={resolve('/settings')}>Enable them in Settings</a>
+			<a href={resolve('/settings/baselines')}>Enable them in Settings</a>
 		</section>
 	{:else if baselines.length === 0}
 		<div class="empty-state">
@@ -91,20 +96,22 @@
 		<div class="baselines-list">
 			{#each baselines as baseline (baseline.id)}
 				{@const totals = baselineStore.totalsForDate(baseline, contextDate)}
-				{@const cleared = baselineStore.isClearedOn(baseline, contextDate)}
 				{@const entries = baselineStore.entriesFor(baseline.id, contextDate)}
+				{@const done = entries.length > 0}
 				{@const expanded = expandedId === baseline.id}
 				<section
 					class="bl-card"
-					class:bl-card--cleared={cleared}
+					class:bl-card--done={done}
 				>
 					<div class="bl-card__head">
 						<div class="bl-card__title-col">
 							<h2 class="bl-card__name">{baseline.name}</h2>
-							<p class="bl-card__direction">
-								{#if baseline.direction === 'up'}Floor{:else}Ceiling{/if}
-								{#if cleared}
-									<span class="bl-card__badge">Cleared</span>
+							<p class="bl-card__status">
+								{#if done}
+									<span class="bl-card__badge">Done</span>
+									You showed up.
+								{:else}
+									Not logged yet
 								{/if}
 							</p>
 						</div>
@@ -122,36 +129,30 @@
 						</button>
 					</div>
 
-					<div class="bl-metrics">
-						{#each baseline.metrics as metric (metric.id)}
+					<ul class="bl-metrics">
+						{#each visibleMetrics(baseline) as metric (metric.id)}
+							{@const logged = isMetricLogged(entries, metric.id)}
 							{@const total = totals[metric.id] ?? 0}
-							{@const metricCleared = isMetricCleared(baseline.direction, metric, total)}
-							<div class="bl-metric">
-								<div class="bl-metric__row">
-									<span class="bl-metric__value">
-										<strong>{total}</strong>
-										<span class="bl-metric__unit">{metric.label}</span>
-									</span>
-									<span class="bl-metric__target">{targetLabel(baseline.direction, metric)}</span>
-								</div>
-								<div
-									class="bl-metric__bar"
-									role="progressbar"
-									aria-valuenow={total}
-									aria-valuemin={0}
-									aria-valuemax={metric.target}
-									aria-label="{baseline.name} {metric.label}"
-								>
-									<span
-										class="bl-metric__fill"
-										class:bl-metric__fill--cleared={metricCleared}
-										class:bl-metric__fill--over={!metricCleared && baseline.direction === 'under'}
-										style="inline-size: {metricProgressPct(baseline.direction, metric, total)}%"
-									></span>
-								</div>
-							</div>
+							<li class="bl-metric">
+								<span class="bl-metric__name">{metric.name}</span>
+								<span class="bl-metric__value">
+									{#if logged}
+										<strong>{formatValue(metric, total)}</strong>
+									{:else}
+										<span class="bl-metric__none">not logged</span>
+									{/if}
+								</span>
+								<span class="bl-metric__base">
+									{#if logged}
+										<span class="bl-metric__diff"
+											>{formatDifference(metric, differenceFromBaseline(metric, total))}</span
+										>
+									{/if}
+									<span class="bl-metric__vs">base {formatValue(metric, metric.baseline)}</span>
+								</span>
+							</li>
 						{/each}
-					</div>
+					</ul>
 
 					<button
 						class="bl-card__expand"
@@ -224,7 +225,6 @@
 								<BaselineChart
 									{baseline}
 									dates={chartDates}
-									xLabels={chartLabels}
 								/>
 							</div>
 						</div>
@@ -286,7 +286,7 @@
 		transition: border-color var(--duration-fast) var(--ease-out);
 	}
 
-	.bl-card--cleared {
+	.bl-card--done {
 		border-color: color-mix(in srgb, var(--color-accent) 50%, var(--color-border));
 	}
 
@@ -309,15 +309,12 @@
 		letter-spacing: -0.01em;
 	}
 
-	.bl-card__direction {
+	.bl-card__status {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
 		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.07em;
-		font-weight: 700;
-		color: var(--color-text-muted);
+		color: var(--color-text-secondary);
 		margin-block-start: 2px;
 	}
 
@@ -345,64 +342,70 @@
 	}
 
 	.bl-metrics {
+		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
-	}
-
-	.bl-metric__row {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
 		gap: var(--space-2);
-		margin-block-end: var(--space-2);
 	}
 
-	.bl-metric__value {
-		display: flex;
-		align-items: baseline;
-		gap: 4px;
+	.bl-metric {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		grid-template-areas:
+			'name value'
+			'base base';
+		gap: 2px var(--space-2);
+		padding-block: var(--space-2);
+		border-block-end: 1px solid var(--color-border);
 
-		strong {
-			font-family: var(--font-mono);
-			font-size: 1.375rem;
-			font-weight: 700;
-			line-height: 1;
+		&:last-child {
+			border-block-end: none;
 		}
 	}
 
-	.bl-metric__unit {
+	.bl-metric__name {
+		grid-area: name;
+		font-size: 0.9375rem;
+		font-weight: 600;
+	}
+
+	.bl-metric__value {
+		grid-area: value;
+		text-align: end;
+
+		strong {
+			font-family: var(--font-mono);
+			font-size: 1.125rem;
+			font-weight: 700;
+		}
+	}
+
+	.bl-metric__none {
 		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+	}
+
+	.bl-metric__base {
+		grid-area: base;
+		display: flex;
+		justify-content: space-between;
+		gap: var(--space-2);
+		font-size: 0.75rem;
 		color: var(--color-text-secondary);
 	}
 
-	.bl-metric__target {
-		font-size: 0.75rem;
-		color: var(--color-text-muted);
-		text-align: end;
-	}
-
-	.bl-metric__bar {
-		block-size: 6px;
+	/* Neutral on purpose (US-038): +20 and −2 look the same; the user decides what's better. */
+	.bl-metric__diff {
+		font-family: var(--font-mono);
+		font-weight: 600;
+		color: var(--color-text-primary);
+		padding: 0 var(--space-2);
 		border-radius: var(--radius-full);
 		background: var(--color-surface-3);
-		overflow: hidden;
 	}
 
-	.bl-metric__fill {
-		display: block;
-		block-size: 100%;
-		border-radius: var(--radius-full);
-		background: var(--color-text-muted);
-		transition: inline-size var(--duration-base) var(--ease-out);
-	}
-
-	.bl-metric__fill--cleared {
-		background: var(--color-accent);
-	}
-
-	.bl-metric__fill--over {
-		background: var(--color-red);
+	.bl-metric__vs {
+		margin-inline-start: auto;
 	}
 
 	.bl-card__expand {

@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Baseline, BaselineDirection } from '$lib/db/types';
+	import type { Baseline, BaselineMeasure, DistanceUnit } from '$lib/db/types';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { BASELINE_DIRECTIONS, BASELINE_PRESETS } from '$lib/baselines/logic';
+	import {
+		BASELINE_MEASURES,
+		BASELINE_PRESETS,
+		DISTANCE_UNITS,
+		durationInputText,
+		parseDuration,
+		visibleMetrics,
+		type BaselineMetricDraft,
+	} from '$lib/baselines/logic';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';
 	import DialogTitle from './DialogTitle.svelte';
@@ -14,14 +22,41 @@
 
 	let { editing = null, onclose }: Props = $props();
 
-	type MetricDraft = { label: string; target: number | undefined };
+	/** Form row. `amount` is text so durations can be typed as m:ss. */
+	type MetricRow = {
+		key: number;
+		id?: string;
+		name: string;
+		measure: BaselineMeasure;
+		amount: string;
+		unit: DistanceUnit;
+		label: string;
+	};
+
+	let nextKey = 0;
+
+	function rowFrom(draft: BaselineMetricDraft): MetricRow {
+		return {
+			key: nextKey++,
+			id: draft.id,
+			name: draft.name,
+			measure: draft.measure,
+			amount:
+				draft.measure === 'duration' ? durationInputText(draft.baseline) : String(draft.baseline),
+			unit: draft.unit ?? 'mi',
+			label: draft.label ?? '',
+		};
+	}
+
+	function blankRow(): MetricRow {
+		return { key: nextKey++, name: '', measure: 'count', amount: '', unit: 'mi', label: '' };
+	}
 
 	let name = $state(untrack(() => editing?.name ?? ''));
-	let direction = $state<BaselineDirection>(untrack(() => editing?.direction ?? 'up'));
-	let metrics = $state<MetricDraft[]>(
+	let rows = $state<MetricRow[]>(
 		untrack(() => {
-			if (editing) return editing.metrics.map((m) => ({ label: m.label, target: m.target }));
-			return [{ label: '', target: undefined }];
+			if (editing) return visibleMetrics(editing).map((m) => rowFrom(m));
+			return [blankRow()];
 		}),
 	);
 	let saving = $state(false);
@@ -29,42 +64,65 @@
 
 	const titleId = $props.id();
 
-	/** Metric count is fixed at creation so existing logs keep matching their metric. */
-	let metricCountLocked = $derived(editing !== null);
+	function amountOf(row: MetricRow): number | null {
+		if (row.measure === 'duration') return parseDuration(row.amount);
+		const n = Number(row.amount);
+		return row.amount.trim() !== '' && Number.isFinite(n) ? n : null;
+	}
 
-	let valid = $derived(
-		name.trim().length > 0 &&
-			metrics.every((m) => m.label.trim().length > 0 && m.target !== undefined && m.target > 0),
-	);
+	function rowValid(row: MetricRow): boolean {
+		const amount = amountOf(row);
+		if (row.name.trim().length === 0 || amount === null || amount <= 0) return false;
+		if (row.measure === 'count' && row.label.trim().length === 0) return false;
+		return true;
+	}
+
+	let valid = $derived(name.trim().length > 0 && rows.length > 0 && rows.every(rowValid));
 
 	function applyPreset(preset: (typeof BASELINE_PRESETS)[number]) {
 		name = preset.name;
-		direction = preset.direction;
-		metrics = preset.metrics.map((m) => ({ label: m.label, target: m.target }));
+		rows = preset.metrics.map((m) => rowFrom(m));
 		showPresets = false;
 	}
 
 	function addMetric() {
-		metrics = [...metrics, { label: '', target: undefined }];
+		rows = [...rows, blankRow()];
 	}
 
-	function removeMetric(index: number) {
-		metrics = metrics.filter((_, i) => i !== index);
+	function removeMetric(key: number) {
+		rows = rows.filter((r) => r.key !== key);
+	}
+
+	function move(index: number, delta: -1 | 1) {
+		const target = index + delta;
+		if (target < 0 || target >= rows.length) return;
+		const next = [...rows];
+		[next[index], next[target]] = [next[target], next[index]];
+		rows = next;
+	}
+
+	function amountPlaceholder(measure: BaselineMeasure): string {
+		if (measure === 'duration') return 'min or m:ss';
+		if (measure === 'distance') return '0.5';
+		return '10';
 	}
 
 	async function save() {
 		if (!valid || saving) return;
 		saving = true;
 		try {
-			const drafts = metrics.map((m) => ({ label: m.label.trim(), target: m.target as number }));
+			const drafts: BaselineMetricDraft[] = rows.map((r) => ({
+				id: r.id,
+				name: r.name.trim(),
+				measure: r.measure,
+				baseline: amountOf(r) as number,
+				unit: r.measure === 'distance' ? r.unit : undefined,
+				label: r.measure === 'count' ? r.label.trim() : undefined,
+			}));
 			if (editing) {
-				await baselineStore.updateBaseline(editing.id, {
-					name: name.trim(),
-					direction,
-					metrics: drafts,
-				});
+				await baselineStore.updateBaseline(editing.id, { name: name.trim(), metrics: drafts });
 			} else {
-				await baselineStore.addBaseline({ name: name.trim(), direction, metrics: drafts });
+				await baselineStore.addBaseline({ name: name.trim(), metrics: drafts });
 			}
 			onclose();
 		} finally {
@@ -90,7 +148,7 @@
 
 	{#if showPresets && !editing}
 		<div class="bf-presets">
-			<FieldLabel>Start from a preset</FieldLabel>
+			<FieldLabel>Start from an example</FieldLabel>
 			<div class="bf-presets__grid">
 				{#each BASELINE_PRESETS as preset (preset.name)}
 					<button
@@ -117,71 +175,114 @@
 				class="bf-input"
 				type="text"
 				bind:value={name}
-				placeholder="e.g. Walking"
+				placeholder="e.g. Daily 10, Reading, Bike ride"
 				maxlength={40}
 			/>
+			<p class="bf-tip">
+				Tip: word it so doing more is the win — "Phone locked away", not "Phone time under 30".
+			</p>
 		</div>
 
 		<div class="bf-field">
-			<FieldLabel>Direction</FieldLabel>
-			<div class="bf-directions">
-				{#each BASELINE_DIRECTIONS as option (option.value)}
-					<button
-						class="bf-direction-btn"
-						class:bf-direction-btn--active={direction === option.value}
-						onclick={() => (direction = option.value)}
-						aria-pressed={direction === option.value}
+			<FieldLabel hint="set it embarrassingly low">Your baseline</FieldLabel>
+
+			{#each rows as row, i (row.key)}
+				<fieldset class="bf-metric">
+					<legend class="sr-only">Metric {i + 1}</legend>
+					<div class="bf-metric__head">
+						<input
+							class="bf-input bf-metric__name"
+							type="text"
+							bind:value={row.name}
+							placeholder="What, e.g. Pushups"
+							maxlength={30}
+							aria-label="Metric {i + 1} name"
+						/>
+						<div class="bf-metric__order">
+							<button
+								class="bf-icon-btn"
+								onclick={() => move(i, -1)}
+								disabled={i === 0}
+								aria-label="Move metric {i + 1} up">↑</button
+							>
+							<button
+								class="bf-icon-btn"
+								onclick={() => move(i, 1)}
+								disabled={i === rows.length - 1}
+								aria-label="Move metric {i + 1} down">↓</button
+							>
+							{#if rows.length > 1}
+								<button
+									class="bf-icon-btn bf-icon-btn--remove"
+									onclick={() => removeMetric(row.key)}
+									aria-label="Remove metric {i + 1}">&times;</button
+								>
+							{/if}
+						</div>
+					</div>
+
+					<div
+						class="bf-measures"
+						role="radiogroup"
+						aria-label="Metric {i + 1} type"
 					>
-						<span class="bf-direction-btn__label">{option.label}</span>
-						<span class="bf-direction-btn__desc">{option.desc}</span>
-					</button>
-				{/each}
-			</div>
-		</div>
+						{#each BASELINE_MEASURES as option (option.value)}
+							<button
+								class="bf-measure-btn"
+								class:bf-measure-btn--active={row.measure === option.value}
+								role="radio"
+								aria-checked={row.measure === option.value}
+								disabled={row.id !== undefined && row.measure !== option.value}
+								title={option.desc}
+								onclick={() => (row.measure = option.value)}>{option.label}</button
+							>
+						{/each}
+					</div>
 
-		<div class="bf-field">
-			<FieldLabel
-				hint={metricCountLocked ? 'metric count locked after creation' : 'one or two metrics'}
-				>Daily target</FieldLabel
-			>
-
-			{#each metrics as metric, i (i)}
-				<div class="bf-metric">
-					<input
-						class="bf-input bf-input--target"
-						type="number"
-						bind:value={metric.target}
-						placeholder="30"
-						min="0"
-						step="any"
-						aria-label="Target for metric {i + 1}"
-					/>
-					<input
-						class="bf-input"
-						type="text"
-						bind:value={metric.label}
-						placeholder="unit, e.g. minutes"
-						maxlength={20}
-						aria-label="Unit label for metric {i + 1}"
-					/>
-					{#if !metricCountLocked && metrics.length > 1}
-						<button
-							class="bf-metric__remove"
-							onclick={() => removeMetric(i)}
-							aria-label="Remove metric {i + 1}">&times;</button
-						>
+					<div class="bf-metric__amount">
+						<input
+							class="bf-input bf-input--amount"
+							type="text"
+							inputmode={row.measure === 'duration' ? 'text' : 'decimal'}
+							bind:value={row.amount}
+							placeholder={amountPlaceholder(row.measure)}
+							aria-label="Metric {i + 1} baseline"
+						/>
+						{#if row.measure === 'duration'}
+							<span class="bf-unit">minutes</span>
+						{:else if row.measure === 'distance'}
+							<select
+								class="bf-input bf-input--unit"
+								bind:value={row.unit}
+								aria-label="Metric {i + 1} distance unit"
+							>
+								{#each DISTANCE_UNITS as unit (unit.value)}
+									<option value={unit.value}>{unit.label}</option>
+								{/each}
+							</select>
+						{:else}
+							<input
+								class="bf-input bf-input--unit"
+								type="text"
+								bind:value={row.label}
+								placeholder="reps, words…"
+								maxlength={20}
+								aria-label="Metric {i + 1} count label"
+							/>
+						{/if}
+					</div>
+					{#if row.id !== undefined}
+						<p class="bf-tip">Type is fixed once saved, so your history keeps its meaning.</p>
 					{/if}
-				</div>
+				</fieldset>
 			{/each}
 
-			{#if !metricCountLocked && metrics.length < 2}
-				<button
-					class="bf-add-metric"
-					onclick={addMetric}
-				>
-					Add a second metric
-				</button>
-			{/if}
+			<button
+				class="bf-add-metric"
+				onclick={addMetric}
+			>
+				+ Add a metric
+			</button>
 		</div>
 
 		<div class="modal__actions">
@@ -261,69 +362,105 @@
 		}
 	}
 
-	.bf-directions {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-	}
-
-	.bf-direction-btn {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		text-align: start;
-		transition: border-color var(--duration-fast) var(--ease-out);
-	}
-
-	.bf-direction-btn--active {
-		border-color: var(--color-accent);
-	}
-
-	.bf-direction-btn__label {
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
-	}
-
-	.bf-direction-btn__desc {
+	.bf-tip {
 		font-size: 0.75rem;
 		color: var(--color-text-secondary);
-		margin-block-start: 2px;
+		line-height: 1.4;
 	}
 
 	.bf-metric {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-3);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		background: var(--color-surface-1);
+	}
+
+	.bf-metric__head,
+	.bf-metric__amount {
 		display: flex;
 		gap: var(--space-2);
 		align-items: center;
 	}
 
-	.bf-input--target {
-		flex: 0 0 90px;
-		text-align: center;
-	}
-
-	.bf-metric .bf-input:not(.bf-input--target) {
+	.bf-metric__name {
 		flex: 1;
 	}
 
-	.bf-metric__remove {
+	.bf-metric__order {
+		display: flex;
+		gap: 4px;
+	}
+
+	.bf-icon-btn {
 		flex-shrink: 0;
 		inline-size: 32px;
 		block-size: 32px;
 		border-radius: var(--radius-md);
 		background: var(--color-surface-3);
 		border: 1px solid var(--color-border);
-		color: var(--color-text-muted);
-		font-size: 1.125rem;
+		color: var(--color-text-secondary);
+		font-size: 0.9375rem;
 		line-height: 1;
 
-		&:hover {
-			color: var(--color-red);
+		&:disabled {
+			opacity: 0.35;
 		}
+	}
+
+	.bf-icon-btn--remove:hover {
+		color: var(--color-red);
+	}
+
+	.bf-measures {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 4px;
+	}
+
+	.bf-measure-btn {
+		block-size: 34px;
+		border-radius: var(--radius-md);
+		background: var(--color-surface-3);
+		border: 1px solid var(--color-border);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		transition: border-color var(--duration-fast) var(--ease-out);
+
+		&:disabled {
+			opacity: 0.35;
+		}
+	}
+
+	.bf-measure-btn--active {
+		border-color: var(--color-accent);
+		color: var(--color-text-primary);
+	}
+
+	.bf-input--amount {
+		flex: 0 0 110px;
+		text-align: center;
+	}
+
+	.bf-input--unit {
+		flex: 1;
+	}
+
+	.bf-unit {
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
 	}
 
 	.bf-add-metric {

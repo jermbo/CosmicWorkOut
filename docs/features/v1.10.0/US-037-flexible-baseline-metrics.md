@@ -2,7 +2,9 @@
 
 # US-037 — Flexible Baseline Metrics
 
-> Replaces the metric rules of [US-034](../v1.9.0/US-034-baselines-setup.md): **1 to n** metrics instead of 1 or 2, three generic **measurement types** instead of free-typed units, and **no direction** (go up / stay under). Logging and comparison: [US-038](./US-038-baseline-logging-comparison.md). Decisions: [v1.10.0 — Topic 1](./README.md#topic-1--baselines-1-to-n-metrics).
+> **As built:** `BaselineMetric` is now `{ id, name, measure: 'duration' | 'distance' | 'count', baseline, unit?, label?, removed? }`; `Baseline` has no `direction`. Duration is stored in **minutes** and typed as minutes, `m:ss`, or `h:mm:ss` (`parseDuration` / `formatDuration` in `src/lib/baselines/logic.ts`). Edits go through `mergeMetrics`: matched by id, new drafts appended, missing ones soft-removed (`removed: true`, logs kept), measure locked once saved. The form (`BaselineForm.svelte`) lists metric cards with type buttons, reorder ↑↓, remove, and "+ Add a metric"; examples include Daily 10, Bike ride, Reading, Meditation, Writing, Phone locked away. **IndexedDB v11** clears `baselines` + `baselineLogs` when upgrading from v10. Backup restore drops v1.9.0-shaped baselines (`dropLegacyBaselines`) and restores everything else. Tests: `src/lib/baselines/logic.test.ts`, `src/lib/db/backupPayload.test.ts`.
+>
+> Replaces the metric rules
 
 As a **growth-minded user**, I want to build a baseline from as many metrics as my practice needs — each measured as a duration, a distance, or a count
 so that one baseline can hold my whole "Daily 10" (or a reading session, a bike ride, a meditation) without being squeezed into one or two free-typed units.

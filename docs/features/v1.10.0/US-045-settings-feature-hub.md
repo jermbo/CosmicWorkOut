@@ -2,6 +2,8 @@
 
 # US-045 — Settings Feature Hub
 
+> **As built:** `/settings` has two groups — **Features** (Habits, Baselines, Practice, Activity, Health — each shows On / Off, plus active counts) and **App** (Insights, Personalization, Data & backup). New pages `/settings/practice`, `/settings/activity`, `/settings/health`; `/settings/habits` and `/settings/baselines` gained their switch at the top and no longer redirect when the feature is off. Settings copy says **Lift plans** (incl. Data & backup). "Enable in Settings" links on `/goals`, `/habits`, `/baselines` now go to the feature's own page. `/settings/overview` still works. **Not changed:** the `/goals` screens themselves still say "Goal plans" — outside this story's Settings-only scope.
+>
 > Reshapes the Settings home from [US-030](../v1.7.0/US-030-settings-restructure.md). Personalization: [US-046](./US-046-personalization.md). Decisions: [v1.10.0 — Topic 6](./README.md#topic-6--settings-page).
 
 As a **health-conscious user**, I want Settings to list each feature once, with everything about that feature on its own page

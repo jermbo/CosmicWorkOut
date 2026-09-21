@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Habit } from '$lib/db/types';
 	import { habitTypeLabel, isProtectedHabit } from '$lib/habits';
+	import { habitColor } from '$lib/habitColors';
 	import Icon from './Icon.svelte';
 
 	type Props = {
@@ -84,7 +85,23 @@
 		<span class="habit-row__meta">{meta}</span>
 	</div>
 	<div class="habit-row__actions">
-		{#if !locked}
+		<span
+			class="habit-row__color"
+			style:background={habitColor(habit)}
+			aria-hidden="true"
+		></span>
+		{#if locked}
+			<button
+				class="habit-row__btn"
+				onclick={onedit}
+				aria-label="Edit {habit.name} colors"
+			>
+				<Icon
+					name="edit"
+					size={14}
+				/>
+			</button>
+		{:else}
 			<button
 				class="habit-row__toggle"
 				class:habit-row__toggle--active={habit.active}
@@ -137,6 +154,14 @@
 </div>
 
 <style>
+	.habit-row__color {
+		inline-size: 12px;
+		block-size: 12px;
+		border-radius: var(--radius-full);
+		flex: none;
+		align-self: center;
+	}
+
 	.habit-row {
 		display: flex;
 		align-items: center;

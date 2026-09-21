@@ -2,7 +2,7 @@
 
 # Roadmap
 
-> **Current phase:** Use the app, gather feedback. Versions v1.1–v1.9 are shipped; new work waits on what we learn from real usage.
+> **Current phase:** Use the app, gather feedback. Versions v1.1–v1.10 are built; new work waits on what we learn from real usage.
 
 Ideas that were deferred, cut, or only partially built live here — not scattered as "Out of Scope" tables in shipped feature folders. When something ships, move it back to a feature story and mark it Built in [Implementation Status](../implementation/status.md).
 
@@ -27,9 +27,9 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Habits, baselines & tracking
 
-| Item      | Notes                                                                   | Spec                                                                  |
-| --------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Baselines | Specced as **v1.9.0** (US-034–036). Separate from Habits and Lift plans | [baselines.md](baselines.md) · [v1.9.0](../features/v1.9.0/README.md) |
+| Item      | Notes                                                                                  | Spec                                                                    |
+| --------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Baselines | **Shipped** v1.9.0, reshaped v1.10.0 (US-037–038). Separate from Habits and Lift plans | [baselines.md](baselines.md) · [v1.10.0](../features/v1.10.0/README.md) |
 
 ---
 
@@ -37,6 +37,7 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 | Item                                            | Origin                                                                                                                                                                                                                       |
 | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Remove `chart.js` from `package.json`           | [v1.10.0](../features/v1.10.0/US-039-tanstack-charts-migration.md) — nothing imports it; user removes it after testing TanStack Charts                                                                                       |
 | Program week-by-week schedule preview in picker | [US-001](../features/v1.1.0/US-001-program-library.md) req 1c — picker shows name, duration, frequency only                                                                                                                  |
 | Light mode (light / dark / match device)        | [v1.10.0 Topic 6](../features/v1.10.0/README.md#topic-6--settings-page) — app is dark-only today; revisit **next version** after v1.10.0. Needs a light palette for the whole app, then a choice on the Personalization page |
 | Habit icons                                     | v1.2/v1.3 — text-first habits ship today                                                                                                                                                                                     |

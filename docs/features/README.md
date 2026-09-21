@@ -10,18 +10,18 @@ New stories follow the [User Story Standards](../standards/user-story-standards.
 
 ## Releases
 
-| Version                      | Theme                                        | Stories                         |
-| ---------------------------- | -------------------------------------------- | ------------------------------- |
-| [v1.1.0](v1.1.0/README.md)   | Core workout flows                           | US-001 – US-006                 |
-| [v1.2.0](v1.2.0/README.md)   | Daily dashboard & habits                     | US-007, 008, 011                |
-| [v1.3.0](v1.3.0/README.md)   | Habit management & calendar history          | US-009, 010, 013                |
-| [v1.4.0](v1.4.0/README.md)   | Belly dance & the Discipline model           | US-015 – US-021                 |
-| [v1.5.0](v1.5.0/README.md)   | Insights hub                                 | US-022 – US-027                 |
-| [v1.6.0](v1.6.0/README.md)   | Belly dance catalog & course programs        | Backfilled (no per-story files) |
-| [v1.7.0](v1.7.0/README.md)   | Full strength catalog, PWA, health & backup  | US-028 – US-031                 |
-| [v1.8.0](v1.8.0/README.md)   | Granular data clearing                       | US-032                          |
-| [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                       | US-033 – US-036                 |
-| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh (in discussion) | Stories not yet written         |
+| Version                      | Theme                                       | Stories                         |
+| ---------------------------- | ------------------------------------------- | ------------------------------- |
+| [v1.1.0](v1.1.0/README.md)   | Core workout flows                          | US-001 – US-006                 |
+| [v1.2.0](v1.2.0/README.md)   | Daily dashboard & habits                    | US-007, 008, 011                |
+| [v1.3.0](v1.3.0/README.md)   | Habit management & calendar history         | US-009, 010, 013                |
+| [v1.4.0](v1.4.0/README.md)   | Belly dance & the Discipline model          | US-015 – US-021                 |
+| [v1.5.0](v1.5.0/README.md)   | Insights hub                                | US-022 – US-027                 |
+| [v1.6.0](v1.6.0/README.md)   | Belly dance catalog & course programs       | Backfilled (no per-story files) |
+| [v1.7.0](v1.7.0/README.md)   | Full strength catalog, PWA, health & backup | US-028 – US-031                 |
+| [v1.8.0](v1.8.0/README.md)   | Granular data clearing                      | US-032                          |
+| [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                      | US-033 – US-036                 |
+| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings      | US-037 – US-046                 |
 
 ---
 

@@ -8,31 +8,36 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 
 ## Routes
 
-| Route                 | File                                     | Purpose                                                                                                                                              |
-| --------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`                   | `routes/+page.svelte`                    | Overview — dashboard with habit, practice, activity, and health summary cards                                                                        |
-| `/habits`             | `routes/habits/+page.svelte`             | Habit log — progress rings, mood strip, date picker                                                                                                  |
-| `/practice`           | `routes/practice/+page.svelte`           | Practice hub — active practice groups (Workout, Dance)                                                                                               |
-| `/practice/dance`     | `routes/practice/dance/+page.svelte`     | Belly Dance — pick routine, preview, start session                                                                                                   |
-| `/practice/[groupId]` | `routes/practice/[groupId]/+page.svelte` | Practice group detail (e.g. Workout) — active plans, manage                                                                                          |
-| `/workout`            | `routes/workout/+page.svelte`            | Strength workout — full session start/edit UI                                                                                                        |
-| `/program`            | `routes/program/+page.svelte`            | Programs — activate, create, edit routines (`?discipline=`)                                                                                          |
-| `/log`                | `routes/log/+page.svelte`                | Activity log — list and log non-workout activities                                                                                                   |
-| `/calendar`           | `routes/calendar/+page.svelte`           | History — month grid, stats, day summary                                                                                                             |
-| `/insights`           | `routes/insights/+page.svelte`           | Insights — Chart.js charts with date-range picker                                                                                                    |
-| `/health`             | `routes/health/+page.svelte`             | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))                                                         |
-| `/goals`              | `routes/goals/+page.svelte`              | Lift plans (Goal progression plans) — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md))                    |
-| `/goals/new`          | `routes/goals/new/+page.svelte`          | Create lift plan wizard                                                                                                                              |
-| `/baselines`          | `routes/baselines/+page.svelte`          | Baselines daily logging + charts ([US-035](../features/v1.9.0/US-035-baselines-logging.md), [US-036](../features/v1.9.0/US-036-baselines-charts.md)) |
-| `/settings`           | `routes/settings/+page.svelte`           | Settings **hub** — navigation to sub-pages ([US-030](../features/v1.7.0/US-030-settings-restructure.md))                                             |
-| `/settings/overview`  | `routes/settings/overview/+page.svelte`  | Overview card order — drag or arrow buttons                                                                                                          |
-| `/settings/habits`    | `routes/settings/habits/+page.svelte`    | Habit CRUD and reorder                                                                                                                               |
-| `/settings/baselines` | `routes/settings/baselines/+page.svelte` | Baseline CRUD ([US-034](../features/v1.9.0/US-034-baselines-setup.md))                                                                               |
-| `/settings/data`      | `routes/settings/data/+page.svelte`      | Backup/restore, clear data (incl. lift plans and Baselines), debug seed                                                                              |
+| Route                       | File                                           | Purpose                                                                                                                                              |
+| --------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                         | `routes/+page.svelte`                          | Overview — dashboard with habit, practice, activity, and health summary cards                                                                        |
+| `/habits`                   | `routes/habits/+page.svelte`                   | Habit log — progress rings, mood strip, date picker                                                                                                  |
+| `/practice`                 | `routes/practice/+page.svelte`                 | Practice hub — active practice groups (Workout, Dance)                                                                                               |
+| `/practice/dance`           | `routes/practice/dance/+page.svelte`           | Belly Dance — pick routine, preview, start session                                                                                                   |
+| `/practice/[groupId]`       | `routes/practice/[groupId]/+page.svelte`       | Practice group detail (e.g. Workout) — active plans, manage                                                                                          |
+| `/workout`                  | `routes/workout/+page.svelte`                  | Strength workout — full session start/edit UI                                                                                                        |
+| `/program`                  | `routes/program/+page.svelte`                  | Programs — activate, create, edit routines (`?discipline=`)                                                                                          |
+| `/log`                      | `routes/log/+page.svelte`                      | Activity log — list and log non-workout activities                                                                                                   |
+| `/calendar`                 | `routes/calendar/+page.svelte`                 | History — month grid, stats, day summary                                                                                                             |
+| `/insights`                 | `routes/insights/+page.svelte`                 | Insights — TanStack charts from the `INSIGHT_CHARTS` list, each hideable ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))         |
+| `/health`                   | `routes/health/+page.svelte`                   | Health metrics — weight + BP logging ([US-029](../features/v1.7.0/US-029-health-metrics.md))                                                         |
+| `/goals`                    | `routes/goals/+page.svelte`                    | Lift plans (Goal progression plans) — active / paused / completed ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md))                    |
+| `/goals/new`                | `routes/goals/new/+page.svelte`                | Create lift plan wizard                                                                                                                              |
+| `/baselines`                | `routes/baselines/+page.svelte`                | Baselines daily logging + charts ([US-035](../features/v1.9.0/US-035-baselines-logging.md), [US-036](../features/v1.9.0/US-036-baselines-charts.md)) |
+| `/settings`                 | `routes/settings/+page.svelte`                 | Settings **hub** — one row per feature ([US-045](../features/v1.10.0/US-045-settings-feature-hub.md))                                                |
+| `/settings/habits`          | `routes/settings/habits/+page.svelte`          | Habits toggle, habit CRUD / reorder / colors, Mood colors                                                                                            |
+| `/settings/baselines`       | `routes/settings/baselines/+page.svelte`       | Baselines toggle + CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                                                          |
+| `/settings/practice`        | `routes/settings/practice/+page.svelte`        | Practice toggle, Lift plans toggle, link to `/goals`                                                                                                 |
+| `/settings/activity`        | `routes/settings/activity/+page.svelte`        | Activity log toggle                                                                                                                                  |
+| `/settings/health`          | `routes/settings/health/+page.svelte`          | Health metrics toggle                                                                                                                                |
+| `/settings/insights`        | `routes/settings/insights/+page.svelte`        | Show / hide each Insights chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                  |
+| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Accent, weight unit, density, roundness, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md))                               |
+| `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
+| `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. lift plans and Baselines), debug seed                                                                              |
 
 Navigation via `BottomNav` (Overview · Practice · History · Insights · Settings). Workout, Program, Log, Habits, Health, and Baselines are reached from their summary cards and the Practice hub.
 
-**Every tracking feature is opt-in and defaults off**, so most of these routes are gated. `habitsEnabled` guards `/habits` and `/settings/habits`; `activityLogEnabled` guards `/log`; `practiceEnabled` hides the Practice tab and guards `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, and `/program`; `/goals*` additionally needs Lift plans on; `/health` needs `healthMetricsEnabled`; `/baselines` and `/settings/baselines` need `baselinesEnabled`. Guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts` — see [state.md](state.md#feature-flags-hide-ui-data-always-persists).
+**Every tracking feature is opt-in and defaults off**, so most of these routes are gated. `habitsEnabled` guards `/habits`; `activityLogEnabled` guards `/log`; `practiceEnabled` hides the Practice tab and guards `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, and `/program`; `/goals*` additionally needs Lift plans on; `/health` needs `healthMetricsEnabled`; `/baselines` needs `baselinesEnabled`. Settings feature pages (`/settings/habits`, `/settings/baselines`, …) are **not** gated — they hold the switch that turns the feature on (v1.10.0). Guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts` — see [state.md](state.md#feature-flags-hide-ui-data-always-persists).
 
 ---
 
@@ -61,10 +66,10 @@ flowchart TB
     Main --> Insights["/insights"]
     Main --> Health["/health"]
     Main --> Goals["/goals (+ /new) — Lift plans"]
-    Main --> Baselines["/baselines (planned)"]
+    Main --> Baselines["/baselines"]
     Main --> Settings["/settings"]
-    Settings --> SettingsHab["/settings/habits"]
-    Settings --> SettingsBaselines["/settings/baselines (planned)"]
+    Settings --> SettingsHab["/settings/habits · baselines · practice · activity · health"]
+    Settings --> SettingsBaselines["/settings/insights · personalization"]
     Settings --> SettingsData["/settings/data"]
 
     classDef shell fill:#465569,stroke:#28313e,color:#ffffff;
@@ -142,8 +147,9 @@ src/
 │   ├── insights/+page.svelte
 │   ├── health/+page.svelte
 │   └── settings/
-│       ├── +page.svelte           (hub)
-│       ├── habits/+page.svelte
+│       ├── +page.svelte           (hub — one row per feature)
+│       ├── habits/ baselines/ practice/ activity/ health/
+│       ├── insights/ personalization/ overview/
 │       └── data/+page.svelte
 ├── service-worker.ts
 └── lib/
@@ -167,6 +173,10 @@ src/
     │   ├── goalPlans.svelte.ts
     │   ├── loggingContext.svelte.ts
     │   └── toast.svelte.ts
+    ├── charts/                    (v1.10.0 — TanStack Charts: ScrollChart, scale, theme, color)
+    ├── insights/                  (v1.10.0 — chart list, pure aggregation, heat shading)
+    ├── baselines/logic.ts
+    ├── habitColors.ts
     ├── components/
     │   ├── insights/*.svelte
     │   ├── goals/*.svelte

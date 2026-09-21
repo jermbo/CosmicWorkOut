@@ -2,7 +2,9 @@
 
 # US-038 — Baseline Logging & Comparison
 
-> Replaces "cleared" in [US-035](../v1.9.0/US-035-baselines-logging.md): **logging = done**, and every metric shows a **neutral comparison** against its baseline. Depends on [US-037](./US-037-flexible-baseline-metrics.md). Decisions: [v1.10.0 — Topic 1](./README.md#topic-1--baselines-1-to-n-metrics).
+> **As built:** `/baselines` cards show a **Done** badge ("You showed up.") once any entry exists for the date. Each visible metric shows its day total, a neutral signed difference chip (`formatDifference`: `+20`, `−2 min`, `0`, same styling either way), and `base …`. A metric blank in every entry shows **not logged**. The progress bars were removed — a filling bar reads as pass / fail. The Overview card counts baselines **done** (logged). The entry dialog takes text per metric (durations as `m:ss`), skips blanks, and shows each metric's unit and baseline.
+>
+> Replaces "cleared"
 
 As a **growth-minded user**, I want logging a baseline to count as showing up, and to see plainly how each metric compared to my baseline
 so that low-motivation days still count, and on high-motivation days I can see exactly where I went above and beyond.

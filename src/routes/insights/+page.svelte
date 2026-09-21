@@ -6,7 +6,7 @@
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { todayIso } from '$lib/date';
 	import { rollingBpAverage } from '$lib/health/metrics';
-	import { type RangeKey, computeRange, buildDatesBetween, xLabelsFor } from '$lib/chart-utils';
+	import { type RangeKey, computeRange, buildDatesBetween } from '$lib/chart-utils';
 	import RangeBar from '$lib/components/insights/RangeBar.svelte';
 	import ChartMoodHabits from '$lib/components/insights/ChartMoodHabits.svelte';
 	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
@@ -14,6 +14,17 @@
 	import ChartHabitRadar from '$lib/components/insights/ChartHabitRadar.svelte';
 	import ChartHealthWeight from '$lib/components/insights/ChartHealthWeight.svelte';
 	import ChartHealthBP from '$lib/components/insights/ChartHealthBP.svelte';
+	import ChartAllHabits from '$lib/components/insights/ChartAllHabits.svelte';
+	import ChartBaselineGrowth from '$lib/components/insights/ChartBaselineGrowth.svelte';
+	import ChartShowUpRate from '$lib/components/insights/ChartShowUpRate.svelte';
+	import ChartWeekVsWeek from '$lib/components/insights/ChartWeekVsWeek.svelte';
+	import ChartDayOfWeek from '$lib/components/insights/ChartDayOfWeek.svelte';
+	import ChartOnDaysWhen from '$lib/components/insights/ChartOnDaysWhen.svelte';
+	import ChartTimeOfDay from '$lib/components/insights/ChartTimeOfDay.svelte';
+	import InsightCard from '$lib/components/insights/InsightCard.svelte';
+	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import { INSIGHT_CHARTS, chartAvailable, type InsightFeature } from '$lib/insights/charts';
+	import { resolve } from '$app/paths';
 
 	let rangeKey = $state<RangeKey>('last-7');
 	let customStart = $state('');
@@ -62,8 +73,6 @@
 		return buildDatesBetween(start, end);
 	});
 
-	let xLabels = $derived(xLabelsFor(dates));
-
 	let practiceEnabled = $derived(prefsStore.practiceEnabled);
 	let hasSessions = $derived(practiceEnabled && programStore.sessions.length > 0);
 	let activityLogEnabled = $derived(prefsStore.activityLogEnabled);
@@ -82,7 +91,35 @@
 	let latestWeight = $derived(healthStore.latestWeight());
 	let bp7day = $derived(rollingBpAverage(healthStore.readings, 7, todayIso()));
 
-	let hasAnyData = $derived(hasSessions || hasActivities || hasHabitLogs || hasWeight || hasBp);
+	let baselinesEnabled = $derived(prefsStore.baselinesEnabled);
+	let hasBaselineLogs = $derived(baselinesEnabled && baselineStore.logs.length > 0);
+
+	let hasAnyData = $derived(
+		hasSessions || hasActivities || hasHabitLogs || hasWeight || hasBp || hasBaselineLogs,
+	);
+
+	let enabledFeatures = $derived<Record<InsightFeature, boolean>>({
+		habits: habitsEnabled,
+		practice: practiceEnabled,
+		activity: activityLogEnabled,
+		health: healthEnabled,
+		baselines: baselinesEnabled,
+	});
+
+	/** Charts whose feature is on, in page order (US-043). */
+	let availableCharts = $derived(INSIGHT_CHARTS.filter((c) => chartAvailable(c, enabledFeatures)));
+	let visibleCharts = $derived(availableCharts.filter((c) => !prefsStore.isChartHidden(c.id)));
+
+	/** Existing charts need their own data; experimental ones explain their own empty state. */
+	let hasData = $derived<Record<string, boolean>>({
+		'mood-habits': hasHabitLogs,
+		'habit-radar': hasHabits && hasHabitLogs,
+		'weekly-volume': hasSessions,
+		'activity-mix': hasActivities,
+		'health-summary': hasWeight || hasBp,
+		weight: hasWeight,
+		'blood-pressure': hasBp,
+	});
 
 	/** Only name the things the user has actually turned on. */
 	let trackableNames = $derived.by(() => {
@@ -91,6 +128,7 @@
 		if (activityLogEnabled) names.push('activities');
 		if (habitsEnabled) names.push('habits');
 		if (healthEnabled) names.push('health metrics');
+		if (baselinesEnabled) names.push('baselines');
 		return names;
 	});
 
@@ -120,103 +158,70 @@
 		<div class="empty-state">
 			<p class="empty-state__msg">{emptyMessage}</p>
 		</div>
+	{:else if visibleCharts.length === 0}
+		<div class="empty-state">
+			<p class="empty-state__msg">
+				Every chart is hidden. <a href={resolve('/settings/insights')}>Choose charts to show</a> in Settings
+				→ Insights.
+			</p>
+		</div>
 	{:else}
 		<div class="charts">
-			{#if hasHabitLogs}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Mood vs Habits</h2>
-					<p class="chart-section__desc">Mood compared to daily coffee and water intake.</p>
-					<div class="chart-wrap">
-						<ChartMoodHabits
-							{dates}
-							{xLabels}
-						/>
-					</div>
-				</section>
-			{/if}
-
-			{#if hasSessions}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Weekly Volume</h2>
-					<p class="chart-section__desc">Total pounds lifted per week.</p>
-					<div class="chart-wrap">
+			{#each visibleCharts as chart (chart.id)}
+				<InsightCard {chart}>
+					{#if hasData[chart.id] === false}
+						<p class="insight-empty">Nothing logged in this range yet.</p>
+					{:else if chart.id === 'mood-habits'}
+						<ChartMoodHabits {dates} />
+					{:else if chart.id === 'all-habits'}
+						<ChartAllHabits {dates} />
+					{:else if chart.id === 'baseline-growth'}
+						<ChartBaselineGrowth {dates} />
+					{:else if chart.id === 'show-up-rate'}
+						<ChartShowUpRate {dates} />
+					{:else if chart.id === 'week-vs-week'}
+						<ChartWeekVsWeek />
+					{:else if chart.id === 'day-of-week'}
+						<ChartDayOfWeek {dates} />
+					{:else if chart.id === 'on-days-when'}
+						<ChartOnDaysWhen {dates} />
+					{:else if chart.id === 'time-of-day'}
+						<ChartTimeOfDay {dates} />
+					{:else if chart.id === 'weekly-volume'}
 						<ChartWeeklyVolume {dates} />
-					</div>
-				</section>
-			{/if}
-
-			{#if hasActivities}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Activity Mix</h2>
-					<p class="chart-section__desc">Breakdown of activities logged in the selected period.</p>
-					<div class="chart-wrap chart-wrap--doughnut">
+					{:else if chart.id === 'activity-mix'}
 						<ChartActivityMix
 							{dates}
 							{rangeLabel}
 						/>
-					</div>
-				</section>
-			{/if}
-
-			{#if hasHabits && hasHabitLogs}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Habit Balance</h2>
-					<p class="chart-section__desc">Average habit consistency over the selected period.</p>
-					<div class="chart-wrap chart-wrap--radar">
+					{:else if chart.id === 'habit-radar'}
 						<ChartHabitRadar {dates} />
-					</div>
-				</section>
-			{/if}
-
-			{#if healthEnabled && (hasWeight || hasBp)}
-				<section class="chart-section chart-section--full">
-					<h2 class="chart-section__title">Health Summary</h2>
-					<div class="health-summary">
-						{#if latestWeight}
-							<div class="health-summary__stat">
-								<span class="health-summary__num"
-									>{latestWeight.values.value}<span class="health-summary__unit"
-										>{prefsStore.weightUnit}</span
-									></span
-								>
-								<span class="health-summary__label">Latest weight</span>
-							</div>
-						{/if}
-						{#if bp7day}
-							<div class="health-summary__stat">
-								<span class="health-summary__num">{bp7day.systolic}/{bp7day.diastolic}</span>
-								<span class="health-summary__label">7-day avg BP</span>
-							</div>
-						{/if}
-					</div>
-				</section>
-			{/if}
-
-			{#if hasWeight}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Weight Trend</h2>
-					<p class="chart-section__desc">Body weight over the selected period.</p>
-					<div class="chart-wrap">
-						<ChartHealthWeight
-							{dates}
-							{xLabels}
-						/>
-					</div>
-				</section>
-			{/if}
-
-			{#if hasBp}
-				<section class="chart-section">
-					<h2 class="chart-section__title">Blood Pressure</h2>
-					<p class="chart-section__desc">Daily average systolic and diastolic.</p>
-					<div class="chart-wrap">
-						<ChartHealthBP
-							{dates}
-							{xLabels}
-						/>
-					</div>
-				</section>
-			{/if}
+					{:else if chart.id === 'health-summary'}
+						<div class="health-summary">
+							{#if latestWeight}
+								<div class="health-summary__stat">
+									<span class="health-summary__num"
+										>{latestWeight.values.value}<span class="health-summary__unit"
+											>{prefsStore.weightUnit}</span
+										></span
+									>
+									<span class="health-summary__label">Latest weight</span>
+								</div>
+							{/if}
+							{#if bp7day}
+								<div class="health-summary__stat">
+									<span class="health-summary__num">{bp7day.systolic}/{bp7day.diastolic}</span>
+									<span class="health-summary__label">7-day avg BP</span>
+								</div>
+							{/if}
+						</div>
+					{:else if chart.id === 'weight'}
+						<ChartHealthWeight {dates} />
+					{:else if chart.id === 'blood-pressure'}
+						<ChartHealthBP {dates} />
+					{/if}
+				</InsightCard>
+			{/each}
 		</div>
 	{/if}
 </div>
@@ -265,38 +270,11 @@
 		.charts {
 			grid-template-columns: 1fr 1fr;
 		}
-
-		.chart-section:last-child:nth-child(odd) {
-			grid-column: 1 / -1;
-		}
-
-		.chart-wrap {
-			height: 300px;
-		}
-
-		.chart-wrap--doughnut,
-		.chart-wrap--radar {
-			height: 340px;
-		}
-	}
-
-	.chart-section {
-		background: var(--color-surface-1);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-5);
-	}
-
-	@container app (inline-size >= 720px) {
-		.chart-section--full {
-			grid-column: 1 / -1;
-		}
 	}
 
 	.health-summary {
 		display: flex;
 		gap: var(--space-8);
-		margin-block-start: var(--space-3);
 	}
 
 	.health-summary__stat {
@@ -324,40 +302,17 @@
 		color: var(--color-text-secondary);
 	}
 
-	.chart-section__title {
-		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		color: var(--color-text-primary);
-		margin: 0;
-	}
-
-	.chart-section__desc {
-		margin: var(--space-1) 0 var(--space-4);
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-	}
-
-	.chart-wrap {
-		position: relative;
-		height: 260px;
-	}
-
-	.chart-wrap--doughnut {
-		height: 300px;
-	}
-
-	.chart-wrap--radar {
-		height: 300px;
-	}
-
 	.empty-state {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		min-height: 60vh;
 		padding: var(--page-gutter);
+	}
+
+	.empty-state__msg a {
+		color: var(--color-accent);
+		font-weight: 600;
 	}
 
 	.empty-state__msg {

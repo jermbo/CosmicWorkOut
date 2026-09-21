@@ -370,26 +370,35 @@ function buildBpReadings(date: Date): HealthReading[] {
 
 /**
  * Baselines have no built-in seed, so the debug data ships its own definitions:
- * one two-metric floor and one single-metric ceiling.
+ * a four-metric "Daily 10" and a distance + duration bike ride.
  */
 const seedBaselines: Baseline[] = [
 	{
-		id: 'seed-baseline-walking',
-		name: 'Walking',
-		direction: 'up',
+		id: 'seed-baseline-daily10',
+		name: 'Daily 10',
 		metrics: [
-			{ id: 'seed-baseline-walking-min', label: 'minutes', target: 30 },
-			{ id: 'seed-baseline-walking-mi', label: 'miles', target: 1.25 },
+			{ id: 'seed-bl-d10-push', name: 'Pushups', measure: 'count', baseline: 10, label: 'reps' },
+			{
+				id: 'seed-bl-d10-jj',
+				name: 'Jumping jacks',
+				measure: 'count',
+				baseline: 10,
+				label: 'reps',
+			},
+			{ id: 'seed-bl-d10-walk', name: 'Walk', measure: 'duration', baseline: 10 },
+			{ id: 'seed-bl-d10-lunge', name: 'Lunges', measure: 'count', baseline: 10, label: 'reps' },
 		],
 		sortOrder: 0,
 		active: true,
 		createdAt: new Date().toISOString(),
 	},
 	{
-		id: 'seed-baseline-phone',
-		name: 'Phone time',
-		direction: 'under',
-		metrics: [{ id: 'seed-baseline-phone-min', label: 'minutes', target: 30 }],
+		id: 'seed-baseline-bike',
+		name: 'Bike ride',
+		metrics: [
+			{ id: 'seed-bl-bike-dist', name: 'Distance', measure: 'distance', baseline: 5, unit: 'mi' },
+			{ id: 'seed-bl-bike-time', name: 'Time', measure: 'duration', baseline: 30 },
+		],
 		sortOrder: 1,
 		active: true,
 		createdAt: new Date().toISOString(),
@@ -409,7 +418,7 @@ function buildBaselineLogs(baseline: Baseline, date: Date, dayIndex: number): Ba
 			// Drift upward over the seeded window so charts show growth, then split
 			// the day's amount across however many entries this day has.
 			const growth = 1 + (dayIndex / SEED_DAYS) * 0.5;
-			const dayAmount = metric.target * growth * (rInt(70, 130) / 100);
+			const dayAmount = metric.baseline * growth * (rInt(70, 130) / 100);
 			values[metric.id] = Math.round((dayAmount / entryCount) * 100) / 100;
 		}
 		logs.push({

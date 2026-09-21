@@ -152,10 +152,13 @@ Only actual logged data is shown — there are no "scheduled" or "rest" day styl
 
 ## Insights
 
-The **Insights** screen renders charts (Chart.js) with a range picker (7 days, month-to-date, year-to-date, custom):
+The **Insights** screen renders charts (TanStack Charts) with a range picker (this week, 7 days, month-to-date, year-to-date, custom):
 
-- Mood vs habits, weekly training volume, activity-type breakdown, habit-balance radar, top-exercise progress.
+- Mood vs habits, weekly training volume, activity-type breakdown, habit-balance radar.
 - When health metrics are enabled: weight trend, blood-pressure trend, and summary stats.
+- **Experimental (v1.10.0):** All-habits heat chart, baseline growth with best-day rings, showing-up rate, this week vs last week, day-of-week pattern, "on days when…", time of day.
+- **Scrolling:** day charts keep a fixed ~7-days-per-phone spacing; longer ranges scroll sideways and open on the newest day. The value scale covers the whole range.
+- **Show / hide:** each chart has ⋯ → Hide; Settings → Insights brings charts back.
 
 ---
 
