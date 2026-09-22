@@ -149,7 +149,7 @@ class GoalPlanStore {
 
 	// ── Lifecycle ─────────────────────────────────────────────────────
 
-	/** One goal plan may be active at a time; returns false when another already is. */
+	/** One lift plan may be active at a time; returns false when another already is. */
 	async activatePlan(id: string): Promise<boolean> {
 		const plan = this.planById(id);
 		if (!plan || plan.status === 'active') return plan?.status === 'active';
@@ -158,8 +158,8 @@ class GoalPlanStore {
 		plan.status = 'active';
 		plan.pausedAt = undefined;
 		await this.persist(plan);
-		// Goal plan is the sole active Strength program while running.
-		programStore.setSoleActiveProgram(plan.programId);
+		// Exactly one plan is ever active — see programStore.setActiveProgram.
+		programStore.setActiveProgram(plan.programId);
 		return true;
 	}
 
@@ -179,6 +179,23 @@ class GoalPlanStore {
 		plan.completedAt = new Date().toISOString();
 		await this.persist(plan);
 		programStore.deactivateProgram(plan.programId);
+	}
+
+	/**
+	 * Drop the goal (v1.10.0, US-052) — the plan continues as a plain plan to its
+	 * original end. Only the GoalPlan record goes; the backing program, its
+	 * active/paused state, and every logged session are untouched.
+	 */
+	async removeGoal(id: string): Promise<void> {
+		const plan = this.planById(id);
+		if (!plan) return;
+		try {
+			await db.goalPlans.remove(id);
+		} catch (e) {
+			console.error('Failed to remove plan goal:', e);
+			throw e;
+		}
+		this.plans = this.plans.filter((p) => p.id !== id);
 	}
 
 	async renamePlan(id: string, name: string): Promise<void> {

@@ -18,12 +18,20 @@
 
 	--color-accent: #b2f042;
 	--color-accent-ink: #101010;
+	/* Accent used as text or a thin line. Same as the accent in dark; darkened in light. */
+	--color-accent-text: var(--color-accent);
 
 	--color-lime: #b2f042;
 	--color-lavender: #b286fd;
 	--color-sky: #60c6ff;
 	--color-red: #e55733;
 	--color-success: #4ade80;
+
+	/* Mood good / bad. Fills stay bright; the -text pair darkens in light mode. */
+	--color-mood-good: #4ade80;
+	--color-mood-bad: #f87171;
+	--color-mood-good-text: var(--color-mood-good);
+	--color-mood-bad-text: var(--color-mood-bad);
 
 	--color-text-primary: #ffffff;
 	--color-text-secondary: #888888;
@@ -40,6 +48,7 @@
 	--radius-xl: 16px;
 	--radius-2xl: 20px;
 	--radius-tile: 14px;
+	--radius-sheet: 26px;
 	--radius-full: 9999px;
 
 	--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -77,34 +86,105 @@
 	--tile-h: 68px;
 	--card-gap: 12px;
 
-	/* Roundness defaults */
+	/* Older roundness names — aliases so every corner follows the setting. */
 	--r-tile: var(--radius-tile);
 	--r-xl: var(--radius-xl);
 	--r-2xl: var(--radius-2xl);
 }
 
-/* ── Density variants ─────────────────────────────────────── */
+/*
+ * ── Light theme (Settings → Personalization, v1.11.0) ──
+ * Set on <html> by the inline script in app.html and prefsStore.applyTheme().
+ * Cards are white on a warm light-gray page; surface-3 is the recessed layer
+ * (inputs, secondary buttons). The accent itself stays as chosen — it is a fill
+ * with --color-accent-ink on top — but accent *text* is darkened to stay readable.
+ * The named hues are darker so they hold up as text on white.
+ */
+[data-theme='light'] {
+	color-scheme: light;
+
+	--color-bg: #f1f1ee;
+	--color-surface-1: #fafaf8;
+	--color-surface-2: #ffffff;
+	--color-surface-3: #ecece8;
+	--color-border: #dcdcd7;
+	--color-border-strong: #c6c6c0;
+
+	--color-accent-text: color-mix(in srgb, var(--color-accent) 50%, #000000);
+
+	--color-lime: #5f9a0c;
+	--color-lavender: #7c4ddb;
+	--color-sky: #0a7fc2;
+	--color-red: #d2431c;
+	--color-success: #16a34a;
+	--color-mood-good-text: #15803d;
+	--color-mood-bad-text: #c62828;
+
+	--color-text-primary: #141414;
+	--color-text-secondary: #5c5c58;
+	--color-text-muted: #8c8c86;
+	--color-text-tertiary: #8c8c86;
+
+	--shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+	--shadow-lime: 0 6px 18px color-mix(in srgb, var(--color-accent) 35%, transparent);
+	--shadow-lavender: 0 6px 18px rgba(124, 77, 219, 0.25);
+}
+
+/*
+ * ── Density & roundness (Settings → Personalization, US-046) ──
+ * These override the base tokens themselves, so every component that uses
+ * --space-* or --radius-* follows the setting. (Before v1.10.0 they only changed
+ * a handful of --r-* / --tile-h tokens, which is why the old page seemed to do
+ * nothing.) --radius-full stays: pills and circles are round at any setting.
+ */
 [data-density='compact'] {
+	--space-1: 3px;
+	--space-2: 6px;
+	--space-3: 9px;
+	--space-4: 12px;
+	--space-5: 15px;
+	--space-6: 18px;
+	--space-8: 24px;
+	--space-10: 30px;
+	--space-12: 36px;
 	--tile-h: 60px;
 	--card-gap: 9px;
 }
 
 [data-density='spacious'] {
+	--space-1: 5px;
+	--space-2: 10px;
+	--space-3: 15px;
+	--space-4: 20px;
+	--space-5: 25px;
+	--space-6: 30px;
+	--space-8: 40px;
+	--space-10: 50px;
+	--space-12: 60px;
 	--tile-h: 78px;
 	--card-gap: 16px;
 }
 
-/* ── Roundness variants ───────────────────────────────────── */
 [data-roundness='sharp'] {
-	--r-tile: 6px;
-	--r-xl: 10px;
-	--r-2xl: 12px;
+	--radius-sm: 2px;
+	--radius-md: 4px;
+	--radius-lg: 5px;
+	--radius-xl: 6px;
+	--radius-2xl: 8px;
+	--radius-tile: 5px;
+	--radius-sheet: 10px;
 }
 
 [data-roundness='soft'] {
-	--r-tile: 20px;
-	--r-xl: 20px;
-	--r-2xl: 24px;
+	--radius-sm: 9px;
+	--radius-md: 14px;
+	--radius-lg: 18px;
+	--radius-xl: 22px;
+	--radius-2xl: 26px;
+	--radius-tile: 20px;
+	--radius-sheet: 32px;
 }
 
 /* ============================================================
@@ -389,4 +469,75 @@ a {
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
 	}
+}
+
+/* ============================================================
+   Charts (TanStack Charts — see src/lib/charts/)
+   ============================================================ */
+:root {
+	--ts-chart-tooltip-background: var(--color-surface-3);
+	--ts-chart-tooltip-color: var(--color-text-primary);
+	--ts-chart-tooltip-border: 1px solid var(--color-border-strong);
+	--ts-chart-tooltip-border-radius: var(--radius-md);
+	--ts-chart-tooltip-shadow: var(--shadow-md);
+	--ts-chart-tooltip-font: 500 0.8125rem/1.4 var(--font-body);
+}
+
+/* Series key under multi-line charts. Decorative — the tooltip carries the data. */
+.chart-legend {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-2) var(--space-4);
+	margin-block-start: var(--space-3);
+	font-size: 0.75rem;
+	color: var(--color-text-secondary);
+}
+
+.chart-legend li {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.chart-legend span {
+	inline-size: 10px;
+	block-size: 10px;
+	border-radius: 2px;
+}
+
+/* Insights card helpers (empty states, footnotes, pickers). */
+.insight-empty {
+	padding-block: var(--space-6);
+	text-align: center;
+	font-size: 0.875rem;
+	color: var(--color-text-secondary);
+}
+
+.insight-note {
+	margin-block-start: var(--space-3);
+	font-size: 0.75rem;
+	line-height: 1.45;
+	color: var(--color-text-secondary);
+}
+
+.insight-select {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	margin-block-end: var(--space-3);
+	font-size: 0.8125rem;
+	color: var(--color-text-secondary);
+}
+
+.insight-select select {
+	max-inline-size: 220px;
+	block-size: 34px;
+	padding-inline: var(--space-2);
+	border-radius: var(--radius-md);
+	border: 1px solid var(--color-border);
+	background: var(--color-surface-2);
+	color: var(--color-text-primary);
+	font: inherit;
+	font-size: 0.8125rem;
 }

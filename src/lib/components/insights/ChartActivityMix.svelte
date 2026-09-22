@@ -1,15 +1,19 @@
 <script lang="ts">
+	import { SvelteMap } from 'svelte/reactivity';
+	import { defineChart } from '@tanstack/charts';
+	import { pie, polar, radialArc } from '@tanstack/charts/polar';
+	import { Chart } from '@tanstack/charts/svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
-	import { Chart, chartTheme, ACTIVITY_PALETTE } from '$lib/chart-utils';
-	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+	import { ACTIVITY_PALETTE } from '$lib/chart-utils';
+	import { chartTooltip } from '$lib/charts/theme';
 
 	let { dates, rangeLabel }: { dates: string[]; rangeLabel: string } = $props();
 
-	let canvas: HTMLCanvasElement = $state()!;
+	type Slice = { type: string; count: number; color: string };
 
-	let activityBreakdown = $derived.by(() => {
+	let breakdown = $derived.by<Slice[]>(() => {
 		if (dates.length === 0) return [];
-		const dateSet = new SvelteSet(dates);
+		const dateSet = new Set(dates);
 		const counts = new SvelteMap<string, number>();
 		for (const a of activityStore.activities) {
 			if (!dateSet.has(a.date)) continue;
@@ -17,110 +21,118 @@
 		}
 		return [...counts.entries()]
 			.sort((a, b) => b[1] - a[1])
-			.map(([type, count]) => ({ type, count }));
+			.map(([type, count], i) => ({
+				type,
+				count,
+				color: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length],
+			}));
 	});
 
-	let activityTotal = $derived(activityBreakdown.reduce((s, a) => s + a.count, 0));
+	let total = $derived(breakdown.reduce((s, a) => s + a.count, 0));
 
-	$effect(() => {
-		if (!canvas || dates.length === 0) return;
-
-		const { legendOpts } = chartTheme();
-		const { textPrimary } = chartTheme();
-
-		const types = activityBreakdown.map((a) => a.type);
-		const counts = activityBreakdown.map((a) => a.count);
-
-		const chart = new Chart(canvas, {
-			type: 'doughnut',
-			data: {
-				labels: types,
-				datasets: [
-					{
-						data: counts,
-						backgroundColor: types.map(
-							(_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc',
-						),
-						borderColor: types.map((_, i) => ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length]),
-						borderWidth: 1,
-					},
-				],
+	let definition = $derived.by(() => {
+		const slices = pie(breakdown, { value: 'count', gapAngle: 0.02 });
+		return defineChart({
+			marks: [
+				polar({
+					inset: 4,
+					marks: [
+						radialArc(slices, {
+							innerRadius: ({ radius }) => radius * 0.6,
+							cornerRadius: 3,
+							color: 'type',
+							key: 'type',
+						}),
+					],
+					scales: { angle: null, radius: null },
+				}),
+			],
+			scales: { x: null, y: null },
+			color: {
+				domain: breakdown.map((s) => s.type),
+				range: breakdown.map((s) => s.color),
 			},
-			options: {
-				responsive: true,
-				maintainAspectRatio: false,
-				onResize(chart, { width }) {
-					let pos: 'right' | 'bottom' = 'bottom';
-					if (width >= 360) pos = 'right';
-					if (chart.options.plugins?.legend?.position !== pos) {
-						chart.options.plugins!.legend!.position = pos;
-						chart.update('none');
-					}
-				},
-				plugins: {
-					legend: {
-						position: 'right',
-						labels: {
-							...legendOpts,
-							boxWidth: 14,
-							boxHeight: 14,
-							generateLabels: (chart) => {
-								const data = chart.data;
-								return (data.labels as string[]).map((label, i) => ({
-									text: `${label} (${(data.datasets[0].data as number[])[i]})`,
-									fillStyle: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length] + 'cc',
-									strokeStyle: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length],
-									fontColor: textPrimary,
-									lineWidth: 1,
-									index: i,
-									hidden: false,
-								}));
-							},
-						},
-					},
-					tooltip: {
-						callbacks: {
-							label: (ctx) => ` ${ctx.label}: ${ctx.formattedValue}`,
-						},
-					},
-				},
-			},
+			tooltip: chartTooltip<(typeof slices)[number]>(
+				(d) => d.type,
+				(p) => ({
+					label: `${Math.round(p.datum.fraction * 100)}%`,
+					value: String(p.datum.count),
+				}),
+			),
 		});
-
-		return () => chart.destroy();
 	});
 </script>
 
-<div aria-hidden="true">
-	<canvas bind:this={canvas}></canvas>
+<div class="activity-mix">
+	<div class="activity-mix__chart">
+		<Chart
+			{definition}
+			height={200}
+			ariaLabel="Donut chart: activity breakdown — {rangeLabel} ({total} total)"
+		/>
+	</div>
+	<ul class="activity-mix__legend">
+		{#each breakdown as slice (slice.type)}
+			<li>
+				<span
+					class="activity-mix__swatch"
+					style:background={slice.color}
+				></span>
+				<span class="activity-mix__name">{slice.type}</span>
+				<span class="activity-mix__count">{slice.count}</span>
+			</li>
+		{/each}
+	</ul>
 </div>
 
-<table class="sr-only">
-	<caption>Activity breakdown — {rangeLabel} ({activityTotal} total)</caption>
-	<thead>
-		<tr><th scope="col">Activity</th><th scope="col">Count</th><th scope="col">Share</th></tr>
-	</thead>
-	<tbody>
-		{#each activityBreakdown as { type, count } (type)}
-			<tr>
-				<td>{type}</td>
-				<td>{count}</td>
-				<td>{Math.round((count / activityTotal) * 100)}%</td>
-			</tr>
-		{/each}
-	</tbody>
-</table>
-
 <style>
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border-width: 0;
+	.activity-mix {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		color: var(--color-text-secondary);
+	}
+
+	@container app (inline-size >= 420px) {
+		.activity-mix {
+			flex-direction: row;
+			align-items: center;
+		}
+
+		.activity-mix__chart {
+			flex: 1 1 60%;
+		}
+	}
+
+	.activity-mix__legend {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		font-size: 0.8125rem;
+		color: var(--color-text-primary);
+	}
+
+	.activity-mix__legend li {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.activity-mix__swatch {
+		inline-size: 12px;
+		block-size: 12px;
+		border-radius: 3px;
+		flex: none;
+	}
+
+	.activity-mix__name {
+		flex: 1;
+		text-transform: capitalize;
+	}
+
+	.activity-mix__count {
+		font-family: var(--font-mono);
+		color: var(--color-text-secondary);
 	}
 </style>

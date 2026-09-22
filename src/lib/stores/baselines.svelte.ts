@@ -1,9 +1,15 @@
-import type { Baseline, BaselineDirection, BaselineLog, BaselineMetric } from '$lib/db/types';
+import type { Baseline, BaselineLog } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
-import { entriesForDate, isCleared, totalsFor } from '$lib/baselines/logic';
+import {
+	entriesForDate,
+	isDone,
+	mergeMetrics,
+	totalsFor,
+	type BaselineMetricDraft,
+} from '$lib/baselines/logic';
 
-export type BaselineMetricDraft = { label: string; target: number };
+export type { BaselineMetricDraft };
 
 class BaselineStore {
 	baselines = $state<Baseline[]>([]);
@@ -35,8 +41,9 @@ class BaselineStore {
 		return totalsFor(baseline, this.entriesFor(baseline.id, date));
 	}
 
-	isClearedOn(baseline: Baseline, date: string): boolean {
-		return isCleared(baseline, this.totalsForDate(baseline, date));
+	/** Logging anything counts as showing up for the day (US-038). */
+	isDoneOn(baseline: Baseline, date: string): boolean {
+		return isDone(this.entriesFor(baseline.id, date));
 	}
 
 	/** Values from the most recent entry, for prefilling the add form. */
@@ -54,25 +61,17 @@ class BaselineStore {
 		return this.logs.some((l) => l.date === date);
 	}
 
+	/** Active baselines done (logged) on the date. */
 	loggedCountForDate(date: string): number {
-		return this.activeBaselines.filter((b) => this.entriesFor(b.id, date).length > 0).length;
+		return this.activeBaselines.filter((b) => this.isDoneOn(b, date)).length;
 	}
 
-	clearedCountForDate(date: string): number {
-		return this.activeBaselines.filter((b) => this.isClearedOn(b, date)).length;
-	}
-
-	async addBaseline(data: {
-		name: string;
-		direction: BaselineDirection;
-		metrics: BaselineMetricDraft[];
-	}): Promise<Baseline> {
+	async addBaseline(data: { name: string; metrics: BaselineMetricDraft[] }): Promise<Baseline> {
 		const maxOrder = this.baselines.reduce((m, b) => Math.max(m, b.sortOrder), -1);
 		const baseline: Baseline = {
 			id: generateId(),
 			name: data.name,
-			direction: data.direction,
-			metrics: data.metrics.map((m) => ({ id: generateId(), label: m.label, target: m.target })),
+			metrics: mergeMetrics([], data.metrics, generateId),
 			sortOrder: maxOrder + 1,
 			active: true,
 			createdAt: new Date().toISOString(),
@@ -83,22 +82,18 @@ class BaselineStore {
 	}
 
 	/**
-	 * Name, direction, labels and targets are editable. Metric ids are carried over by
-	 * position so existing logs keep pointing at the right metric — the metric count is
-	 * fixed at creation and extra drafts are dropped.
+	 * Metrics are matched by id: edits keep history attached, new drafts are added,
+	 * and metrics left out are marked removed (their logs stay). A metric's measure
+	 * is fixed at creation.
 	 */
 	async updateBaseline(
 		id: string,
-		data: { name: string; direction: BaselineDirection; metrics: BaselineMetricDraft[] },
+		data: { name: string; metrics: BaselineMetricDraft[] },
 	): Promise<void> {
 		const existing = this.getBaseline(id);
 		if (!existing) return;
-		const metrics: BaselineMetric[] = existing.metrics.map((m, i) => ({
-			id: m.id,
-			label: data.metrics[i]?.label ?? m.label,
-			target: data.metrics[i]?.target ?? m.target,
-		}));
-		await this.putBaseline({ ...existing, name: data.name, direction: data.direction, metrics });
+		const metrics = mergeMetrics(existing.metrics, data.metrics, generateId);
+		await this.putBaseline({ ...existing, name: data.name, metrics });
 	}
 
 	private async putBaseline(baseline: Baseline): Promise<void> {

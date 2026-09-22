@@ -11,6 +11,7 @@ import type {
 	BaselineLog,
 } from './types';
 import type { GoalPlan } from '$lib/goalPlans/types';
+import { isLegacyBaseline } from '../baselines/logic.ts';
 
 /**
  * The pure half of backup/restore: the envelope shape, its validation, and the
@@ -87,6 +88,19 @@ export const STORE_KEY_PATH: Record<keyof BackupDb, string> = {
 export type StoreCounts = Record<keyof BackupDb, number>;
 
 export class BackupValidationError extends Error {}
+
+/**
+ * Largest file restore will read. Real backups are well under 1 MB even with years of logs;
+ * the cap stops a wrong or huge file from freezing the tab in `file.text()`.
+ */
+export const MAX_BACKUP_BYTES = 50 * 1024 * 1024;
+
+/** Throws BackupValidationError when a file is too large to be a backup. Call before reading it. */
+export function assertBackupSize(bytes: number): void {
+	if (bytes > MAX_BACKUP_BYTES) {
+		throw new BackupValidationError('This file is too large to be a CosmicWorkOut backup.');
+	}
+}
 
 /** Parse and validate a backup file's contents. Throws BackupValidationError on bad input. */
 export function parseBackup(text: string): BackupEnvelope {
@@ -166,4 +180,18 @@ export function localEntriesOf(plain: BackupEnvelope): Record<string, unknown> {
 	const entries = plain.localStorage;
 	if (!entries || typeof entries !== 'object' || Array.isArray(entries)) return {};
 	return entries;
+}
+
+/**
+ * Baselines were reshaped in v1.10.0 and v1.9.0 baseline data was test-only, so a
+ * backup carrying the old shape restores without its baselines rather than writing
+ * records the app can no longer read. Everything else in the backup is untouched.
+ * Returns true when baselines were dropped.
+ */
+export function dropLegacyBaselines(plain: BackupEnvelope): boolean {
+	const defs = plain.db.baselines;
+	if (!Array.isArray(defs) || !defs.some(isLegacyBaseline)) return false;
+	plain.db.baselines = [];
+	plain.db.baselineLogs = [];
+	return true;
 }

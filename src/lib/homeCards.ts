@@ -5,7 +5,7 @@ export type HomeCardId = (typeof HOME_CARD_IDS)[number];
 
 export const HOME_CARD_LABELS: Record<HomeCardId, string> = {
 	habits: 'Habits',
-	practice: 'Practice',
+	practice: 'Workout',
 	activity: 'Activity log',
 	baselines: 'Baselines',
 	health: 'Health',

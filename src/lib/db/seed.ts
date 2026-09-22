@@ -1,6 +1,4 @@
 import type { Program, Habit } from './types';
-import { bellyDanceItems } from './seeds/bellydance-items';
-import { bellyDancePrograms } from './seeds/bellydance-programs';
 import { strengthItems } from './seeds/strength-items';
 import { strengthPrograms } from './seeds/strength-programs';
 
@@ -68,6 +66,6 @@ export const builtInHabits: Habit[] = [
 	},
 ];
 
-export const builtInItems = [...strengthItems, ...bellyDanceItems];
+export const builtInItems = [...strengthItems];
 
-export const builtInPrograms: Program[] = [...strengthPrograms, ...bellyDancePrograms];
+export const builtInPrograms: Program[] = [...strengthPrograms];

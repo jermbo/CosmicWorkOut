@@ -366,7 +366,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.log-sheet__prev {
@@ -450,7 +450,7 @@
 		border-radius: var(--radius-md);
 		background: var(--color-surface-2);
 		border: 1px solid var(--color-border);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		flex-shrink: 0;
 		transition: background-color var(--duration-fast) var(--ease-out);
 

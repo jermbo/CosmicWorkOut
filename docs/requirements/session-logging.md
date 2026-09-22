@@ -184,4 +184,4 @@ Deferred items on [roadmap](../roadmap/README.md): rest timer, progressive overl
 - [Offline Strategy — Crash Recovery](../architecture/offline-strategy.md)
 - [Program Management](program-management.md) — Where the workout definition comes from
 - [Settings & Preferences](settings-preferences.md) — Completion feel, weight unit
-- [History & Calendar](history-calendar.md) — Where completed sessions go
+- [History & Past Days](history-calendar.md) — Editing and deleting past sessions

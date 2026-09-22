@@ -48,7 +48,7 @@
 
 <section
 	class="plan-card"
-	aria-label="Active goal plan"
+	aria-label="Active lift plan"
 >
 	<header class="plan-card__header">
 		{#if renaming}
@@ -140,7 +140,7 @@
 	<div class="plan-card__actions">
 		<a
 			class="plan-card__cta"
-			href={resolve(`/workout?program=${plan.programId}`)}>Go to workout</a
+			href={resolve(`/workout/today?program=${plan.programId}`)}>Go to workout</a
 		>
 		<button
 			class="plan-card__action"
@@ -192,7 +192,7 @@
 		flex-shrink: 0;
 
 		&:hover {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -221,7 +221,7 @@
 	.plan-card__rename-save {
 		font-size: 0.8125rem;
 		font-weight: 700;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		&:disabled {
 			opacity: 0.5;
@@ -332,7 +332,7 @@
 	}
 
 	.plan-card__action--complete:hover {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
 	}
 </style>

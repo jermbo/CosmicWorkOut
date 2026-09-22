@@ -16,12 +16,12 @@
 		return null;
 	});
 
-	let ariaLabel = $derived(`Practice: ${headline}`);
+	let ariaLabel = $derived(`Workout: ${headline}`);
 </script>
 
 <HomeCard
-	href="/practice"
-	title="Practice"
+	href="/workout"
+	title="Workout"
 	{ariaLabel}
 	variant="workout"
 	done={completedCount > 0}

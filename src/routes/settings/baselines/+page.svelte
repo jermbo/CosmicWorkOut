@@ -6,6 +6,8 @@
 	import BaselineRow from '$lib/components/BaselineRow.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
+	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
 
 	let showForm = $state(false);
 	let editingBaseline = $state<Baseline | null>(null);
@@ -86,12 +88,16 @@
 <div class="page page--wide">
 	<SettingsSubHeader title="Baselines" />
 
-	{#if !prefsStore.baselinesEnabled}
-		<p class="baselines-settings__off">
-			Baselines are turned off. Enable them in Settings to manage your daily floors and ceilings —
-			your existing baselines are kept.
-		</p>
-	{:else}
+	<SettingsGroup title="Baselines">
+		<SettingsToggleRow
+			label="Baselines"
+			description="Embarrassingly low daily baselines for anything you want to keep showing up for. Your baseline data is kept when off."
+			checked={prefsStore.baselinesEnabled}
+			onchange={(v) => prefsStore.setBaselinesEnabled(v)}
+		/>
+	</SettingsGroup>
+
+	{#if prefsStore.baselinesEnabled}
 		<section
 			class="settings-section"
 			aria-labelledby="section-baselines"
@@ -188,15 +194,10 @@
 		border: 1px solid var(--color-border);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 
 	.baselines-empty,
-	.baselines-settings__off {
-		font-size: 0.875rem;
-		color: var(--color-text-muted);
-	}
-
 	.baselines-drag-hint {
 		font-size: 0.75rem;
 		color: var(--color-text-muted);

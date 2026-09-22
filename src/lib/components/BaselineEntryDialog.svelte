@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Baseline } from '$lib/db/types';
+	import type { Baseline, BaselineMetric } from '$lib/db/types';
+	import {
+		durationInputText,
+		formatValue,
+		metricUnit,
+		parseDuration,
+		visibleMetrics,
+	} from '$lib/baselines/logic';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';
 	import DialogTitle from './DialogTitle.svelte';
@@ -16,10 +23,17 @@
 
 	let { baseline, initialValues = {}, mode, onsave, onclose }: Props = $props();
 
-	let values = $state<Record<string, number | undefined>>(
+	let metrics = $derived(visibleMetrics(baseline));
+
+	/** Text per metric so durations can be typed as m:ss. Blank = not logged this entry. */
+	let texts = $state<Record<string, string>>(
 		untrack(() => {
-			const seed: Record<string, number | undefined> = {};
-			for (const metric of baseline.metrics) seed[metric.id] = initialValues[metric.id];
+			const seed: Record<string, string> = {};
+			for (const metric of visibleMetrics(baseline)) {
+				const v = initialValues[metric.id];
+				if (typeof v !== 'number') seed[metric.id] = '';
+				else seed[metric.id] = metric.measure === 'duration' ? durationInputText(v) : String(v);
+			}
 			return seed;
 		}),
 	);
@@ -27,17 +41,31 @@
 
 	const titleId = $props.id();
 
+	function parse(metric: BaselineMetric, text: string): number | null {
+		if (text.trim() === '') return null;
+		if (metric.measure === 'duration') return parseDuration(text);
+		const n = Number(text);
+		return Number.isFinite(n) && n >= 0 ? n : null;
+	}
+
+	/** Blank fields are fine; typed fields must parse. */
+	let invalidIds = $derived(
+		metrics.filter((m) => (texts[m.id] ?? '').trim() !== '' && parse(m, texts[m.id]) === null),
+	);
+
 	/** At least one metric must carry a number, so an entry always means something. */
-	let valid = $derived(baseline.metrics.some((m) => typeof values[m.id] === 'number'));
+	let valid = $derived(
+		invalidIds.length === 0 && metrics.some((m) => parse(m, texts[m.id] ?? '') !== null),
+	);
 
 	async function save() {
 		if (!valid || saving) return;
 		saving = true;
 		try {
 			const payload: Record<string, number> = {};
-			for (const metric of baseline.metrics) {
-				const v = values[metric.id];
-				if (typeof v === 'number') payload[metric.id] = v;
+			for (const metric of metrics) {
+				const v = parse(metric, texts[metric.id] ?? '');
+				if (v !== null) payload[metric.id] = v;
 			}
 			await onsave(payload);
 			onclose();
@@ -62,22 +90,28 @@
 		{#if mode === 'edit'}Edit entry{:else}{baseline.name}{/if}
 	</DialogTitle>
 
-	{#each baseline.metrics as metric (metric.id)}
+	<p class="bed-hint">Log what you did. Leave any field blank to skip it.</p>
+
+	{#each metrics as metric (metric.id)}
+		{@const bad = invalidIds.includes(metric)}
 		<div class="bed-field">
 			<FieldLabel
 				for="bed-{metric.id}"
-				hint="target {metric.target}">{metric.label}</FieldLabel
+				hint="baseline {formatValue(metric, metric.baseline)}">{metric.name}</FieldLabel
 			>
-			<input
-				id="bed-{metric.id}"
-				class="bed-input"
-				type="number"
-				inputmode="decimal"
-				bind:value={values[metric.id]}
-				min="0"
-				step="any"
-				placeholder="0"
-			/>
+			<div class="bed-row">
+				<input
+					id="bed-{metric.id}"
+					class="bed-input"
+					class:bed-input--bad={bad}
+					type="text"
+					inputmode={metric.measure === 'duration' ? 'text' : 'decimal'}
+					bind:value={texts[metric.id]}
+					placeholder={metric.measure === 'duration' ? 'min or m:ss' : '0'}
+					aria-invalid={bad}
+				/>
+				<span class="bed-unit">{metricUnit(metric)}</span>
+			</div>
 		</div>
 	{/each}
 
@@ -99,6 +133,34 @@
 </div>
 
 <style>
+	.bed-hint {
+		font-size: 0.8125rem;
+		color: var(--color-text-secondary);
+		margin-block-end: var(--space-3);
+	}
+
+	.bed-row {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.bed-row .bed-input {
+		flex: 1;
+		min-inline-size: 0;
+	}
+
+	.bed-input--bad {
+		border-color: var(--color-red) !important;
+	}
+
+	.bed-unit {
+		flex: 0 0 auto;
+		min-inline-size: 36px;
+		font-size: 0.875rem;
+		color: var(--color-text-secondary);
+	}
+
 	.modal-backdrop {
 		position: fixed;
 		inset: 0;

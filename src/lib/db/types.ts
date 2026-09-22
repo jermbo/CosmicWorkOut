@@ -2,6 +2,8 @@ export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
 export type Roundness = 'sharp' | 'default' | 'soft';
+/** `system` follows the device's light / dark setting (v1.11.0). */
+export type Theme = 'dark' | 'light' | 'system';
 export const STRENGTH_CATS = [
 	'Chest',
 	'Back',
@@ -70,8 +72,6 @@ export interface Item {
 	section: string;
 	metric: Metric;
 	focus?: string[];
-	danceCat?: string;
-	movementType?: DanceMovementType;
 	difficulty?: CatalogDifficulty;
 	muscles?: string;
 	cat?: ItemCat;
@@ -83,9 +83,6 @@ export interface Item {
 	weightIncrement?: number;
 	isBuiltIn: boolean;
 }
-
-export type DanceMovementType = 'sharp' | 'smooth' | 'variable';
-export type DanceDifficulty = CatalogDifficulty;
 
 export const FOCUS_TAGS = [
 	'hips',
@@ -182,6 +179,7 @@ export interface ItemLastUsed {
 
 export interface UserPrefs {
 	accentColor: string;
+	theme: Theme;
 	density: Density;
 	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
@@ -191,8 +189,9 @@ export interface UserPrefs {
 	activityLogEnabled: boolean;
 	practiceEnabled: boolean;
 	healthMetricsEnabled: boolean;
-	goalProgressionPlansEnabled: boolean;
 	baselinesEnabled: boolean;
+	/** Insights chart ids the user has hidden (v1.10.0, US-043). Unknown ids are ignored. */
+	hiddenCharts: string[];
 }
 
 export interface ActiveSet {
@@ -249,6 +248,10 @@ export interface Habit {
 	active: boolean;
 	sortOrder: number;
 	createdAt: string;
+	/** Base color for charts (v1.10.0, US-042). Filled with a default on load when missing. */
+	color?: string;
+	/** Mood only: color for bad days (−1…−5). `color` is used for good days. */
+	negativeColor?: string;
 }
 
 export interface HabitLog {
@@ -278,20 +281,34 @@ export interface HealthReading {
 	values: WeightValues | BloodPressureValues;
 }
 
-/** 'up' = daily floor to meet or beat; 'under' = daily ceiling to stay at or below. */
-export type BaselineDirection = 'up' | 'under';
+/**
+ * How a baseline metric is measured (v1.10.0, US-037). Duration values are stored in
+ * minutes; Distance values in the metric's own unit; Count values as a plain number.
+ */
+export type BaselineMeasure = 'duration' | 'distance' | 'count';
+
+export type DistanceUnit = 'mi' | 'km' | 'm' | 'yd';
 
 export interface BaselineMetric {
 	id: string;
-	label: string;
-	target: number;
+	/** What is being measured, e.g. "Pushups", "Walk". */
+	name: string;
+	/** Fixed at creation so logged history keeps its meaning. */
+	measure: BaselineMeasure;
+	/** The floor — the embarrassingly low amount the day is compared against. */
+	baseline: number;
+	/** Distance only. */
+	unit?: DistanceUnit;
+	/** Count only — user-typed, e.g. "reps", "words", "pages". */
+	label?: string;
+	/** Removed from the baseline; its logged values are kept but no longer shown. */
+	removed?: boolean;
 }
 
 export interface Baseline {
 	id: string;
 	name: string;
-	direction: BaselineDirection;
-	/** One or two metrics; count is fixed after creation so log history stays readable. */
+	/** One or more metrics, in display order. No upper limit. */
 	metrics: BaselineMetric[];
 	sortOrder: number;
 	active: boolean;

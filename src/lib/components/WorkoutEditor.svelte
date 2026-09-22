@@ -8,11 +8,12 @@
 	import { strengthLibrary } from '$lib/itemLibrary';
 
 	type Props = {
+		programId: string;
 		workout: Routine | null;
 		onBack: () => void;
 	};
 
-	let { workout: initWorkout, onBack }: Props = $props();
+	let { programId, workout: initWorkout, onBack }: Props = $props();
 
 	function initialExercises(): (RoutineItem & { _key: number })[] {
 		if (!initWorkout) return [];
@@ -77,34 +78,37 @@
 			return;
 		}
 		saving = true;
-
-		const clean: RoutineItem[] = exercises.map((item) => {
-			const { _key: _itemKey, ...rest } = item;
-			void _itemKey;
-			return rest;
-		});
-
-		if (isNew) {
-			await programStore.addRoutine({
-				disciplineId: programStore.activeProgram?.disciplineId ?? STRENGTH_DISCIPLINE_ID,
-				name: title,
-				letter,
-				focus,
-				color: 'lime',
-				sections: singleSection(clean),
+		try {
+			const clean: RoutineItem[] = exercises.map((item) => {
+				const { _key: _itemKey, ...rest } = item;
+				void _itemKey;
+				return rest;
 			});
-		} else {
-			await programStore.saveRoutine(initWorkout!.name, {
-				name: title,
-				letter,
-				focus,
-				color: initWorkout!.color ?? 'lime',
-				items: clean,
-			});
+
+			if (isNew) {
+				const program = programStore.programById(programId);
+				await programStore.addRoutine(programId, {
+					disciplineId: program?.disciplineId ?? STRENGTH_DISCIPLINE_ID,
+					name: title,
+					letter,
+					focus,
+					color: 'lime',
+					sections: singleSection(clean),
+				});
+			} else {
+				await programStore.saveRoutine(programId, initWorkout!.name, {
+					name: title,
+					letter,
+					focus,
+					color: initWorkout!.color ?? 'lime',
+					items: clean,
+				});
+			}
+
+			onBack();
+		} finally {
+			saving = false;
 		}
-
-		saving = false;
-		onBack();
 	}
 
 	let dialog: HTMLDialogElement;
@@ -805,7 +809,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 </style>

@@ -5,7 +5,6 @@
 	import { programStore } from '$lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
-	import ItemFormSheet from './ItemFormSheet.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';
 	import Chip from './Chip.svelte';
 	import SheetBody from './SheetBody.svelte';
@@ -47,13 +46,6 @@
 
 	function toggleExpand(id: string) {
 		expandedId = expandedId === id ? null : id;
-	}
-
-	/** New items inherit the section being filtered, falling back to the caller's. */
-	function resolveDefaultSection(fallback: string | undefined): string | undefined {
-		const section = selected[0];
-		if (!section || section === config.filters[0]?.anyValue) return fallback;
-		return section;
 	}
 
 	async function deleteItem(item: Item) {
@@ -345,19 +337,10 @@
 </BottomSheet>
 
 {#if formItem !== undefined}
-	{#if config.kind === 'dance'}
-		<ItemFormSheet
-			disciplineId={config.disciplineId}
-			item={formItem}
-			defaultSection={resolveDefaultSection(config.defaultSection)}
-			onClose={() => (formItem = undefined)}
-		/>
-	{:else}
-		<ExerciseFormSheet
-			exercise={formItem}
-			onClose={() => (formItem = undefined)}
-		/>
-	{/if}
+	<ExerciseFormSheet
+		exercise={formItem}
+		onClose={() => (formItem = undefined)}
+	/>
 {/if}
 
 <style>
@@ -372,7 +355,7 @@
 		border: 1px solid var(--color-border);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		svg {
 			inline-size: 14px;
@@ -499,7 +482,7 @@
 		block-size: 16px;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		display: inline-flex;
 		align-items: center;
 	}

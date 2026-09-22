@@ -2,9 +2,7 @@
 
 # Components
 
-Inventory of the UI components in `src/lib/components/` (plus `components/insights/` and `components/goals/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.9.0 lift plans.
-
-> **Three components are currently dead code** (zero imports anywhere): `HabitWidgets`, `HomeDanceCard`, `HomeWorkoutCard`. They are listed below for completeness and flagged for removal — see [the June 2026 audit](../maintenance/audit-2026-06.md).
+Inventory of the UI components in `src/lib/components/` (plus `components/insights/`, `components/goals/`, and `components/plans/`). Each is a self-contained Svelte 5 file with scoped styles and typed `$props()`. Updated for v1.10.0 (US-051 Remove Belly Dance, US-052 One Workout Section).
 
 ---
 
@@ -42,8 +40,7 @@ Mounted in the root layout (`+layout.svelte`).
 | Component             | Purpose                                                                   |
 | --------------------- | ------------------------------------------------------------------------- |
 | `BottomNav`           | Fixed tab bar (collapses to a side rail ≥720px).                          |
-| `SessionOverlay`      | Full-screen **strength** active session: timer, progress, exercise list.  |
-| `DanceSessionOverlay` | Full-screen **belly dance** active session (metric-aware: check/measure). |
+| `SessionOverlay`      | Full-screen active session: timer, progress, exercise list.               |
 | `SessionComplete`     | Post-session stats overlay with confetti celebration.                     |
 
 ---
@@ -57,22 +54,17 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 | `HomeCard`            | Base card shell (header, icon, body slot) the other home cards compose. |
 | `HomeActivityCard`    | Activity-log summary card.                                              |
 | `HomeHabitsCard`      | Habit-progress summary card.                                            |
-| `HomePracticeHubCard` | Practice/plans entry card.                                              |
-| `PracticeGroupCard`   | A practice group (Workout / Dance) tile on the home/practice surface.   |
-| `HabitWidgets`        | **Dead** (297 LOC, no imports) — scrollable habit mini-card strip.      |
-| `HomeDanceCard`       | **Dead** (86 LOC, no imports) — dance summary card.                     |
-| `HomeWorkoutCard`     | **Dead** (90 LOC, no imports) — workout summary card.                   |
+| `HomePracticeHubCard` | Workout entry card — file/prop names lag the "Workout" rename (v1.10.0, US-052). |
 
 ---
 
 ## Habits (`/habits`)
 
-| Component           | Purpose                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `HabitCard`         | A single habit with progress ring, +/− stepper, boolean toggle.                                             |
-| `HabitRow`          | Compact habit row variant.                                                                                  |
-| `HabitForm`         | Create / edit a custom habit (Settings).                                                                    |
-| `HabitHistorySheet` | Editable habit sheet for a past calendar day (add/subtract/toggle/exact-value, same controls as `/habits`). |
+| Component   | Purpose                                                         |
+| ----------- | --------------------------------------------------------------- |
+| `HabitCard` | A single habit with progress ring, +/− stepper, boolean toggle. |
+| `HabitRow`  | Compact habit row variant.                                      |
+| `HabitForm` | Create / edit a custom habit (Settings).                        |
 
 ---
 
@@ -88,65 +80,57 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ---
 
-## Program & routine editing (`/program`)
+## Plan detail & routine editing (`/workout/plan/[id]`)
 
-| Component            | Purpose                                                                    |
-| -------------------- | -------------------------------------------------------------------------- |
-| `WorkoutEditor`      | Full-screen routine editor (name, items, sets/reps).                       |
-| `LibrarySheet`       | Browse/filter an item library; configured per Discipline (see below).      |
-| `ExerciseFormSheet`  | Create or edit a custom strength item.                                     |
-| `ProgramSelectSheet` | List all programs; activate one (built-ins copy-first).                    |
-| `CreateProgramSheet` | 2-step full-screen flow — details then routine names; scaffolds all weeks. |
-
-`ProgramSelectSheet` and `CreateProgramSheet` are also used on `/workout` for the program-complete state.
+| Component           | Purpose                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WorkoutEditor`      | Full-screen routine editor (name, items, sets/reps); takes an explicit `programId` so it always edits the plan being viewed, active or not. |
+| `LibrarySheet`       | Browse/filter the exercise library.                                                                                                          |
+| `ExerciseFormSheet`  | Create or edit a custom strength item.                                                                                                       |
 
 ### Configuring `LibrarySheet`
 
-One sheet serves every Discipline. It owns the chrome — search, filter chips, expandable
-rows, add/edit/delete — and reads everything Discipline-specific from a `LibraryConfig`
-built in [`$lib/itemLibrary.ts`](../../src/lib/itemLibrary.ts):
-
-| Builder                                | Used by                       |
-| -------------------------------------- | ----------------------------- |
-| `strengthLibrary()`                    | `WorkoutEditor`, `/goals/new` |
-| `danceLibrary(disciplineId, section?)` | `DanceRoutineEditor`          |
-
-The config supplies the copy, which items belong in the list, how free-text search
-matches, the chip filter rows, and how one row renders (dot colour, subtitle, tag,
-optional right-hand readout). `kind` picks which form sheet the New/Edit buttons open.
-**A new movement type needs a builder here, not another copy of the sheet.**
+The sheet owns the chrome — search, filter chips, expandable rows, add/edit/delete —
+and reads item-specific config from a `LibraryConfig` built in
+[`$lib/itemLibrary.ts`](../../src/lib/itemLibrary.ts): `strengthLibrary()`, the only
+builder since Belly Dance was removed (v1.10.0, US-051). The config supplies the copy,
+which items belong in the list, how free-text search matches, the chip filter rows,
+and how one row renders (dot color, subtitle, tag, optional right-hand readout).
 
 ---
 
-## Practice & Belly Dance (`/practice`, `/practice/dance`, `/practice/[groupId]`)
+## Plans (`/workout`, `/workout/new`, `/workout/plan/[id]`) — v1.10.0, US-052
 
-| Component            | Purpose                                                   |
-| -------------------- | --------------------------------------------------------- |
-| `AddPracticeSheet`   | Add a plan/practice (activate a program into a group).    |
-| `DanceRoutineEditor` | Edit a belly dance routine across its four sections.      |
-| `LibrarySheet`       | Browse/filter an item library; configured per Discipline. |
-| `ItemFormSheet`      | Create or edit a custom dance item.                       |
+A **plan** is a Program, optionally paired with a GoalPlan (the wave the old "Lift
+plan" generated). Storage stays two records; these components are where the two read
+as one thing. `components/plans/` holds the merge; `components/goals/` keeps only the
+wave-specific pieces a goal-bearing plan still needs.
+
+| Component          | Purpose                                                                                                        |
+| -------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `ActivePlanCard`    | Active plan **without** a goal: week X of Y, today's routine, Start, Pause, Run it again / New plan on finish. |
+| `PlanRow`           | A non-active plan in the "Other plans" list — works for a plain plan or a paused/completed goal.               |
+| `PlanWizardSteps`   | Step indicator for the New Plan wizard (`start → routines → goal → review`).                                   |
+| `PlanStartStep`     | Pick a built-in template (copied) or start from scratch; name + weeks.                                         |
+| `PlanRoutinesStep`  | Edit A/B/C exercise slots — no focus constraint, used with or without a goal.                                  |
+| `PlanGoalStep`      | "Working toward a specific lift?" No/Yes; if Yes, pick the focus (from the routines already built) and enter start/goal weight × reps. |
+| `PlanReviewStep`    | Plan name + summary; wave block preview only when a goal was set.                                              |
+
+Wizard state lives in `$lib/plans/wizard.svelte.ts` (`PlanWizard`). Activating,
+pausing, and restarting a plan go through `$lib/plans/actions.ts`, which dispatches to
+`programStore` or `goalPlanStore` depending on whether the plan has a goal, and keeps
+"exactly one plan is ever active" true either way.
+
+Kept from the old lift-plan wizard, under `components/goals/`:
+
+| Component            | Purpose                                                            |
+| --------------------- | ------------------------------------------------------------------- |
+| `WeightRepsInputs`   | Shared weight × reps pair inputs — used by `PlanGoalStep`.          |
+| `ActiveGoalPlanCard` | Active plan **with** a goal: rename, now/finished state, actions.   |
+| `GoalBlockTimeline`  | Wave-block progress strip, in `ActiveGoalPlanCard` and the plan detail page. |
 
 ---
 
-## Goal progression plans (`/goals`, `/goals/new`) — v1.9.0
-
-Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.ts`.
-
-| Component            | Purpose                                                         |
-| -------------------- | --------------------------------------------------------------- |
-| `WeightRepsInputs`   | Shared weight × reps pair inputs (goal + starting point steps). |
-| `GoalWizardSteps`    | Step indicator for the create-plan wizard.                      |
-| `GoalFocusStep`      | Pick focus lift + goal weight × reps.                           |
-| `GoalSetupStep`      | Choose Priority / Focus-only / Scratch week scaffold.           |
-| `GoalExercisesStep`  | Edit A/B/C exercise slots; keep focus lift in the week.         |
-| `GoalStartStep`      | Confirm starting point (history prefill or manual).             |
-| `GoalPreviewStep`    | Plan name + generated block preview before create.              |
-| `ActiveGoalPlanCard` | Active plan: rename, now/finished state, actions.               |
-| `GoalBlockTimeline`  | Wave-block progress strip inside the active card.               |
-| `GoalPlanRow`        | Paused / completed plan list row.                               |
-
----
 
 ## Activity log (`/log`)
 
@@ -156,35 +140,26 @@ Under `components/goals/`. Wizard state lives in `$lib/goalPlans/wizard.svelte.t
 
 ---
 
-## Calendar & day detail (`/calendar`)
-
-| Component                  | Purpose                                                        |
-| -------------------------- | -------------------------------------------------------------- |
-| `DaySummarySheet`          | Read-only session detail for a completed day.                  |
-| `DayActionsSheet`          | Actions for a tapped day (view/edit/add across disciplines).   |
-| `DayActionItem`            | A single action row inside `DayActionsSheet`.                  |
-| `DayActionsActivityList`   | Activity entries for the day, inside `DayActionsSheet`.        |
-| `DayActionsWorkoutSummary` | Workout/session summary for the day, inside `DayActionsSheet`. |
-
----
-
 ## Streaks
 
 | Component         | Purpose                                                                |
 | ----------------- | ---------------------------------------------------------------------- |
 | `WeekStrip`       | 7-day mini calendar of this week's session activity (in `PageHeader`). |
-| `WeekStreakBadge` | Consecutive-weeks consistency badge (home + calendar).                 |
+| `WeekStreakBadge` | Consecutive-weeks consistency badge (home).                            |
 
 ---
 
 ## Settings (`/settings`)
 
-| Component           | Purpose                                                                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `AccentColorPicker` | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
-| `SettingsRow`       | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
-| `SettingsToggleRow` | Hub row with inline switch (e.g. health metrics)                                                            |
-| `SettingsGroup`     | Section header + grouped rows on hub                                                                        |
+| Component              | Purpose                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
+| `SettingsRow`          | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
+| `SettingsToggleRow`    | Hub row with inline switch (e.g. health metrics)                                                            |
+| `SettingsGroup`        | Section header + grouped rows on hub                                                                        |
+| `ColorSwatches`        | Preset color swatches (habit colors, accent color) — v1.10.0                                                |
+| `SegmentedControl`     | Single-choice button row (Personalization) — v1.10.0                                                        |
+| `OverviewLayoutEditor` | Overview card order; on Personalization and `/settings/overview` — v1.10.0                                  |
 
 Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits` with US-030.
 
@@ -192,17 +167,28 @@ Habit management components (`HabitRow`, `HabitForm`) moved to `/settings/habits
 
 ## Insights (`/insights`)
 
-Chart.js wrappers + a shared range control. See [v1.5.0 features](../features/v1.5.0/README.md).
+TanStack Charts components + a shared range control. The page renders from `INSIGHT_CHARTS` (`src/lib/insights/charts.ts`). See [v1.10.0](../features/v1.10.0/README.md).
 
-| Component           | Purpose                                   |
-| ------------------- | ----------------------------------------- |
-| `ChartMoodHabits`   | Mood vs. coffee/water multi-axis line.    |
-| `ChartWeeklyVolume` | Weekly training-volume bar chart.         |
-| `ChartActivityMix`  | Activity-type breakdown doughnut.         |
-| `ChartHabitRadar`   | Habit-balance radar.                      |
-| `RangeBar`          | Date-range chip bar shared by the charts. |
+| Component             | Purpose                                                             |
+| --------------------- | ------------------------------------------------------------------- |
+| `InsightCard`         | Card chrome: title, "Experimental" badge, ⋯ → Hide.                 |
+| `ChartMoodHabits`     | Mood vs coffee/water, two value rails.                              |
+| `ChartAllHabits`      | Heat chart: strips (all) / calendar grid (one habit). Experimental. |
+| `ChartBaselineGrowth` | Baseline metrics vs baseline lines, best-day rings. Experimental.   |
+| `ChartShowUpRate`     | % of days logged per week. Experimental.                            |
+| `ChartWeekVsWeek`     | This week vs same days last week (table). Experimental.             |
+| `ChartDayOfWeek`      | Average per weekday. Experimental.                                  |
+| `ChartOnDaysWhen`     | Outcome average on condition days vs other days. Experimental.      |
+| `ChartTimeOfDay`      | Baseline entries by hour. Experimental.                             |
+| `ChartWeeklyVolume`   | Weekly training-volume bars.                                        |
+| `ChartActivityMix`    | Activity-type donut with HTML legend.                               |
+| `ChartHabitRadar`     | Habit-balance radar.                                                |
+| `ChartHealthWeight`   | Weight line.                                                        |
+| `ChartHealthBP`       | Blood-pressure lines.                                               |
+| `ChipPicker`          | Single-choice chips for picking a baseline / metric / habit.        |
+| `RangeBar`            | Date-range chip bar shared by the charts.                           |
 
-> The exercise-progress chart (US-027) is rendered inline on the `/insights` route rather than as a standalone component.
+Shared chart plumbing lives in `src/lib/charts/` — `ScrollChart` (fixed-spacing sideways scroll, pinned rails), `scale.ts`, `theme.ts`, `color.ts`.
 
 ---
 
@@ -213,7 +199,6 @@ flowchart TB
     subgraph layout ["Root Layout"]
         BN[BottomNav]
         SO[SessionOverlay]
-        DSO[DanceSessionOverlay]
         SC[SessionComplete]
         TO[Toaster]
     end
@@ -232,55 +217,39 @@ flowchart TB
         PR[ProgressRing]
     end
 
-    subgraph editor ["Program editing"]
+    subgraph editor ["Plan detail editing"]
         WE[WorkoutEditor]
         LIB[LibrarySheet]
         EFS[ExerciseFormSheet]
     end
 
-    subgraph dance ["Belly dance"]
-        DRE[DanceRoutineEditor]
-        IFS[ItemFormSheet]
-    end
-
-    subgraph goals ["Lift plans"]
+    subgraph plans ["Plans"]
+        APC[ActivePlanCard]
+        PR2[PlanRow]
         AGPC[ActiveGoalPlanCard]
         GBT[GoalBlockTimeline]
-        GFS[GoalFocusStep]
+        PGS[PlanGoalStep]
         WRI[WeightRepsInputs]
-    end
-
-    subgraph dayactions ["Calendar day"]
-        DAS[DayActionsSheet]
-        DAI[DayActionItem]
-        DAAL[DayActionsActivityList]
-        DAWS[DayActionsWorkoutSummary]
     end
 
     SO --> EC --> PR & ST
     SO --> LS
     WE --> LIB --> EFS
-    DRE --> LIB --> IFS
     AGPC --> GBT
-    GFS --> WRI
-    DAS --> DAI & DAAL & DAWS
+    PGS --> WRI
     PH --> WeekStrip
-    LS & EFS & ILS & IFS & ELS & DAS --> BS
+    LS & EFS --> BS
 
     classDef layout fill:#465569,stroke:#28313e,color:#ffffff;
     classDef shared fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef strength fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef editor fill:#7a4f9e,stroke:#46295c,color:#ffffff;
-    classDef dance fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
-    classDef goals fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
-    classDef day fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
-    class BN,SO,DSO,SC,TO layout;
+    classDef plans fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
+    class BN,SO,SC,TO layout;
     class BS,IC,CD,PH shared;
     class EC,ST,LS,PR strength;
-    class WE,ELS,EFS editor;
-    class DRE,ILS,IFS dance;
-    class AGPC,GBT,GFS,WRI goals;
-    class DAS,DAI,DAAL,DAWS day;
+    class WE,EFS editor;
+    class APC,PR2,AGPC,GBT,PGS,WRI plans;
 ```
 
 ---

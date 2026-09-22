@@ -2,7 +2,7 @@
 
 # Baselines
 
-> **Status:** Specced as **v1.9.0** (Planned — not built)  
+> **Status:** Built in **v1.9.0**, reshaped in **[v1.10.0](../features/v1.10.0/README.md)** (1 to n typed metrics, logging = done, neutral comparison). The rules below describe the original v1.9.0 discovery; where they differ, v1.10.0 wins.  
 > **Stories:** [US-034](../features/v1.9.0/US-034-baselines-setup.md) · [US-035](../features/v1.9.0/US-035-baselines-logging.md) · [US-036](../features/v1.9.0/US-036-baselines-charts.md) · [v1.9.0 README](../features/v1.9.0/README.md)  
 > **Origin:** Real usage (walking, stretching, tiny daily movement, writing/drawing intent)  
 > **Product name:** Baselines. Distinct from [Lift plans](../features/v1.9.0/US-033-goal-progression-plans.md) (Strength wave-loading; older docs may say “Goal progression plans”).

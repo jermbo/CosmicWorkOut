@@ -6,20 +6,16 @@
 
 	const ALL_NAV_ITEMS = [
 		{ href: '/', label: 'Overview', exact: true },
-		{ href: '/practice', label: 'Practice', exact: false },
-		{ href: '/calendar', label: 'History', exact: false },
+		{ href: '/workout', label: 'Workout', exact: false },
 		{ href: '/insights', label: 'Insights', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
 	] as const;
 
 	let navItems = $derived(
-		ALL_NAV_ITEMS.filter((item) => item.href !== '/practice' || prefsStore.practiceEnabled),
+		ALL_NAV_ITEMS.filter((item) => item.href !== '/workout' || prefsStore.practiceEnabled),
 	);
 
 	function isActive(item: (typeof ALL_NAV_ITEMS)[number]): boolean {
-		if (item.href === '/practice') {
-			return pathname.startsWith('/practice') || pathname.startsWith('/workout');
-		}
 		if (item.exact) {
 			return pathname === item.href;
 		}
@@ -61,7 +57,7 @@
 						>
 							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 						</svg>
-					{:else if item.label === 'Practice'}
+					{:else if item.label === 'Workout'}
 						<svg
 							class="bottom-nav__icon"
 							aria-hidden="true"
@@ -73,44 +69,6 @@
 							stroke-linejoin="round"
 						>
 							<path d="M6 4v6M18 4v6M3 7h4M17 7h4M6 14v6M18 14v6M3 17h4M17 17h4M8 10h8v4H8z" />
-						</svg>
-					{:else if item.label === 'History'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<rect
-								x="3"
-								y="4"
-								width="18"
-								height="18"
-								rx="2"
-								ry="2"
-							/>
-							<line
-								x1="16"
-								y1="2"
-								x2="16"
-								y2="6"
-							/>
-							<line
-								x1="8"
-								y1="2"
-								x2="8"
-								y2="6"
-							/>
-							<line
-								x1="3"
-								y1="10"
-								x2="21"
-								y2="10"
-							/>
 						</svg>
 					{:else if item.label === 'Insights'}
 						<svg
@@ -259,7 +217,7 @@
 	}
 
 	.bottom-nav__link--active {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 
 		&:focus-visible {
 			outline-offset: -3px;

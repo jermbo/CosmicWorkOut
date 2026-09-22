@@ -1,124 +1,113 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { page } from '$app/state';
+	import type { GoalPlan } from '$lib/goalPlans/types';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { sessionStore } from '$lib/stores/session.svelte';
+	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import { loggingContext } from '$lib/stores/loggingContext.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
-	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
-	import ProgramSelectSheet from '$lib/components/ProgramSelectSheet.svelte';
-	import CreateProgramSheet from '$lib/components/CreateProgramSheet.svelte';
+	import { effectiveSections } from '$lib/discipline';
+	import { formatDuration, formatCountWithWord } from '$lib/format';
+	import { unitLabel } from '$lib/goalPlans/format';
+	import { allPlans, activatePlan, pausePlan, runItAgain } from '$lib/plans/actions';
 	import PageHeader from '$lib/components/PageHeader.svelte';
+	import ActiveGoalPlanCard from '$lib/components/goals/ActiveGoalPlanCard.svelte';
+	import ActivePlanCard from '$lib/components/plans/ActivePlanCard.svelte';
+	import PlanRow from '$lib/components/plans/PlanRow.svelte';
 	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import { todayIso, formatWeekdayShortDate } from '$lib/date';
-	import { formatDuration } from '$lib/format';
-	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
 	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 
-	const todayStr = todayIso();
-
 	let contextDate = $derived(loggingContext.date);
+	let plans = $derived(allPlans());
+	let activeMeta = $derived(plans.find((p) => p.isActive) ?? null);
+	let otherMeta = $derived(plans.filter((p) => !p.isActive));
 
-	let programId = $derived(
-		page.url.searchParams.get('program') ??
-			programStore.activeProgramFor(STRENGTH_DISCIPLINE_ID)?.id ??
-			null,
-	);
-	let viewingProgram = $derived.by(() => {
-		if (programId) return programStore.programById(programId);
-		return null;
-	});
+	let renaming = $state(false);
+	let renameValue = $state('');
+	let confirmAction = $state<'repeat' | 'complete' | 'pause' | null>(null);
 
-	let sessionForDate = $derived.by(() => {
-		if (programId) return programStore.sessionForProgramDate(programId, contextDate);
-		return programStore.sessionForDate(contextDate);
-	});
-	let suggestedWorkout = $derived.by(() => {
-		if (programId) return programStore.suggestedRoutineInCurrentWeekForProgram(programId);
-		return programStore.suggestedRoutineInCurrentWeek;
-	});
-	let weekWorkouts = $derived.by(() => {
-		if (programId) return programStore.routinesForCurrentWeekForProgram(programId);
-		return programStore.routinesForCurrentWeek;
-	});
-	let isProgramComplete = $derived.by(() => {
-		if (programId) return programStore.isProgramCompleteForProgram(programId);
-		return programStore.isProgramComplete;
-	});
-
-	let selectedWorkout = $derived.by(() => {
-		if (loggingContext.workoutId) {
-			return programStore.getRoutineById(loggingContext.workoutId) ?? suggestedWorkout;
-		}
-		return suggestedWorkout;
-	});
-
-	let showSuggestedHint = $derived(
-		selectedWorkout && suggestedWorkout && selectedWorkout.id !== suggestedWorkout.id,
-	);
-
-	// Goal-plan hook: when the viewed program belongs to the active goal plan (and the
-	// feature is on), prescribe this week's wave targets instead of last-used prefill.
-	let goalPlan = $derived.by(() => {
-		if (!prefsStore.liftPlansEnabled || !programId) return null;
-		const plan = goalPlanStore.activePlan;
-		if (plan && plan.programId === programId) return plan;
-		return null;
-	});
-	let prescribedTargets = $derived(
-		goalPlan ? goalPlanStore.prescribedTargets(goalPlan) : undefined,
-	);
-	let goalContext = $derived.by(() => {
-		if (!goalPlan) return null;
-		const block = goalPlanStore.currentBlock(goalPlan);
-		const focus = goalPlanStore.focusTarget(goalPlan);
-		if (!block || !focus) return null;
-		return {
-			blockNumber: block.blockNumber,
-			totalBlocks: goalPlan.blocks.length,
-			blockWeek: goalPlanStore.currentBlockWeek(goalPlan),
-			phase: focus.phase,
-		};
-	});
-
-	let showProgramSelect = $state(false);
-	let showCreateProgram = $state(false);
-	let showStartConfirm = $state(false);
-	let showConflictConfirm = $state(false);
-
-	async function doStartSession() {
-		const workout = selectedWorkout;
-		const program = viewingProgram;
-		if (!workout || !program) return;
-		await sessionStore.start(workout, program, programStore.itemMap, {
-			date: contextDate,
-			prescribed: prescribedTargets,
-		});
+	function focusName(plan: GoalPlan): string {
+		return programStore.getItemById(plan.focusItemId)?.name ?? 'Focus lift';
 	}
 
-	async function startSession() {
-		if (sessionStore.isActive && sessionStore.activeDisciplineId !== STRENGTH_DISCIPLINE_ID) {
-			showConflictConfirm = true;
-			return;
-		}
-		if (contextDate !== todayStr) {
-			showStartConfirm = true;
-			return;
-		}
-		await doStartSession();
+	function unitFor(plan: GoalPlan): string {
+		return unitLabel(programStore.getItemById(plan.focusItemId)?.unit);
 	}
 
-	async function editSession() {
-		const session = sessionForDate;
-		if (!session) return;
-		const workout = programStore.getRoutineForSession(session);
-		const program = programStore.programs.find((p) => p.id === session.programId);
-		if (!workout || !program) return;
-		await sessionStore.editSession(session, workout, program, programStore.itemMap);
+	let todayInfo = $derived.by(() => {
+		if (!activeMeta) return { name: '', meta: null as string | null };
+		const program = activeMeta.program;
+		const session = programStore.sessionForProgramDate(program.id, contextDate);
+		const suggested = programStore.suggestedRoutineInCurrentWeekForProgram(program.id);
+
+		if (session) {
+			const routine = programStore.getRoutineForSession(session);
+			const itemCount = routine
+				? effectiveSections(program, routine).reduce((n, s) => n + s.items.length, 0)
+				: session.items.length;
+			return {
+				name: routine?.name ?? 'Session logged',
+				meta: `${formatDuration(session.durationSeconds ?? 0)} · ${formatCountWithWord(itemCount, 'item')}`,
+			};
+		}
+
+		if (suggested) {
+			const count = effectiveSections(program, suggested).reduce((n, s) => n + s.items.length, 0);
+			return {
+				name: suggested.name,
+				meta: `Routine ${suggested.letter ?? '?'} · ${formatCountWithWord(count, 'item')}`,
+			};
+		}
+
+		return { name: program.name, meta: 'Ready when you are' };
+	});
+
+	let finished = $derived(
+		activeMeta ? programStore.isProgramCompleteForProgram(activeMeta.program.id) : false,
+	);
+	let weekNumber = $derived(
+		activeMeta ? programStore.currentWeekForProgram(activeMeta.program.id) : 1,
+	);
+
+	async function handleActivate(programId: string) {
+		await activatePlan(programId);
+	}
+
+	async function handlePause() {
+		if (!activeMeta) return;
+		await pausePlan(activeMeta.program.id);
+	}
+
+	async function handleRunItAgain() {
+		if (!activeMeta) return;
+		await runItAgain(activeMeta.program);
+	}
+
+	function startRename() {
+		if (!activeMeta?.goal) return;
+		renameValue = activeMeta.goal.name;
+		renaming = true;
+	}
+
+	async function saveRename() {
+		if (!activeMeta?.goal || !renameValue.trim()) return;
+		await goalPlanStore.renamePlan(activeMeta.goal.id, renameValue);
+		renaming = false;
+	}
+
+	async function handleConfirm() {
+		if (!activeMeta?.goal || !confirmAction) return;
+		const goal = activeMeta.goal;
+		const action = confirmAction;
+		confirmAction = null;
+		if (action === 'repeat') {
+			await goalPlanStore.repeatCurrentBlock(goal.id);
+		} else if (action === 'pause') {
+			await goalPlanStore.pausePlan(goal.id);
+		} else {
+			await goalPlanStore.completePlan(goal.id);
+		}
 	}
 </script>
 
@@ -126,218 +115,125 @@
 	<title>Workout — CosmicWorkOut</title>
 </svelte:head>
 
-<div class="page page--wide workout-page">
-	<PageHeader
-		title="Workout"
-		showBack
-	>
-		{#snippet trailing()}
-			<span class="workout-page__header-links">
-				{#if prefsStore.liftPlansEnabled}
-					<a
-						href={resolve('/goals')}
-						class="workout-page__programs-link">Goals</a
-					>
-				{/if}
-				<a
-					href={resolve('/program')}
-					class="workout-page__programs-link">Programs</a
-				>
-			</span>
-		{/snippet}
-	</PageHeader>
+<div class="page page--wide workout-hub">
+	<PageHeader title="Workout" />
 
 	{#if !programStore.loaded}
 		<div
-			class="workout-page__loading"
+			class="workout-hub__loading"
 			aria-busy="true"
-			aria-label="Loading workout"
 		>
-			<div class="workout-page__spinner"></div>
-		</div>
-	{:else if isProgramComplete}
-		<div class="workout-complete">
-			<div
-				class="workout-complete__icon"
-				aria-hidden="true"
-			>
-				🎉
-			</div>
-			<h2 class="workout-complete__title">
-				{viewingProgram?.name ?? 'Program'} complete!
-			</h2>
-			<p class="workout-complete__body">You finished every session. Time for something new.</p>
-			<button
-				class="workout-complete__cta"
-				onclick={() => (showProgramSelect = true)}
-			>
-				Choose a new program
-			</button>
-		</div>
-	{:else if !viewingProgram}
-		<div class="workout-page__no-program">
-			<p>No plan selected.</p>
-			<a
-				href={resolve('/practice/workout')}
-				class="workout-page__choose-btn"
-			>
-				Choose a plan
-			</a>
-			{#if prefsStore.liftPlansEnabled}
-				<a
-					href={resolve('/goals/new')}
-					class="workout-page__goal-link">Or start a goal plan</a
-				>
-			{/if}
-		</div>
-	{:else if sessionForDate && !sessionStore.isActive}
-		<div class="session-done">
-			<div
-				class="session-done__icon"
-				aria-hidden="true"
-			>
-				<svg
-					viewBox="0 0 48 48"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="3"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<polyline points="10 24 20 34 38 14" />
-				</svg>
-			</div>
-			<div class="session-done__info">
-				<p class="session-done__name">
-					{programStore.getRoutineById(sessionForDate.routineId)?.name ?? 'Session logged'}
-				</p>
-				<p class="session-done__meta">
-					{formatDuration(sessionForDate.durationSeconds ?? 0)}
-					· {sessionForDate.items.length} exercises · {sessionForDate.totalVolume}
-					lb
-				</p>
-			</div>
-			<button
-				class="session-done__edit"
-				onclick={editSession}
-			>
-				Edit
-			</button>
-		</div>
-	{:else if weekWorkouts.length > 0 && selectedWorkout}
-		<div class="workout-page__body">
-			{#if showSuggestedHint && suggestedWorkout}
-				<p class="workout-page__hint">Suggested: {suggestedWorkout.name}</p>
-			{/if}
-
-			<WorkoutPicker
-				workouts={weekWorkouts}
-				selectedId={selectedWorkout.id}
-				suggestedId={suggestedWorkout?.id}
-				onSelect={(id) => loggingContext.setWorkoutId(id)}
-			/>
-
-			<TodayWorkout
-				workout={selectedWorkout}
-				exerciseMap={programStore.itemMap}
-				onStart={startSession}
-				prescribed={prescribedTargets}
-				{goalContext}
-			/>
+			<div class="workout-hub__spinner"></div>
 		</div>
 	{:else}
-		<div class="workout-page__no-program">
-			<p>No workout scheduled for this week.</p>
+		<div class="workout-hub__toolbar">
 			<a
-				href={resolve('/program')}
-				class="workout-page__program-link">View program</a
+				class="workout-hub__new"
+				href={resolve('/workout/new')}>New plan</a
 			>
 		</div>
+
+		{#if activeMeta}
+			{#if activeMeta.goal}
+				{@const plan = activeMeta.goal}
+				<ActiveGoalPlanCard
+					{plan}
+					focusName={focusName(plan)}
+					unit={unitFor(plan)}
+					week={goalPlanStore.currentWeek(plan)}
+					block={goalPlanStore.currentBlock(plan)}
+					blockWeek={goalPlanStore.currentBlockWeek(plan)}
+					focus={goalPlanStore.focusTarget(plan)}
+					finished={goalPlanStore.isFinished(plan)}
+					completedCount={goalPlanStore.completedCountFor(plan)}
+					{renaming}
+					bind:renameValue
+					onStartRename={startRename}
+					onSaveRename={saveRename}
+					onCancelRename={() => (renaming = false)}
+					onRepeat={() => (confirmAction = 'repeat')}
+					onPause={() => (confirmAction = 'pause')}
+					onComplete={() => (confirmAction = 'complete')}
+				/>
+			{:else}
+				<ActivePlanCard
+					program={activeMeta.program}
+					{weekNumber}
+					todayName={todayInfo.name}
+					todayMeta={todayInfo.meta}
+					{finished}
+					onPause={handlePause}
+					onRunItAgain={handleRunItAgain}
+				/>
+			{/if}
+		{:else}
+			<section class="workout-hub__empty">
+				<h2 class="workout-hub__empty-title">No active plan</h2>
+				<p class="workout-hub__empty-body">
+					Start from a template or your own routine, with a goal if you want one.
+				</p>
+				<a
+					class="workout-hub__empty-cta"
+					href={resolve('/workout/new')}>Create your first plan</a
+				>
+			</section>
+		{/if}
+
+		{#if otherMeta.length > 0}
+			<section class="plan-list">
+				<h2 class="plan-list__title">Other plans</h2>
+				{#each otherMeta as meta (meta.program.id)}
+					<PlanRow
+						program={meta.program}
+						goal={meta.goal}
+						onActivate={() => handleActivate(meta.program.id)}
+					/>
+				{/each}
+			</section>
+		{/if}
 	{/if}
 </div>
 
-{#if showProgramSelect}
-	<ProgramSelectSheet
-		onClose={() => (showProgramSelect = false)}
-		onCreateNew={() => {
-			showProgramSelect = false;
-			showCreateProgram = true;
-		}}
-		disciplineId={STRENGTH_DISCIPLINE_ID}
-	/>
-{/if}
-
-{#if showCreateProgram}
-	<CreateProgramSheet onClose={() => (showCreateProgram = false)} />
-{/if}
-
-{#if showStartConfirm}
+{#if confirmAction === 'repeat'}
 	<ConfirmDialog
-		title="Log workout for {formatWeekdayShortDate(contextDate)}?"
-		confirmLabel="Start session"
-		onconfirm={async () => {
-			showStartConfirm = false;
-			await doStartSession();
-		}}
-		oncancel={() => (showStartConfirm = false)}
+		title="Repeat the current block?"
+		confirmLabel="Repeat block"
+		onconfirm={handleConfirm}
+		oncancel={() => (confirmAction = null)}
 	>
-		This session will be saved for a past date, not today.
+		The current 4-week block restarts from week 1 with its original targets. Nothing you've logged
+		is changed — the plan just takes longer.
 	</ConfirmDialog>
-{/if}
-
-{#if showConflictConfirm}
+{:else if confirmAction === 'pause'}
 	<ConfirmDialog
-		title="Another session is active"
-		confirmLabel="Switch anyway"
-		danger
-		onconfirm={async () => {
-			showConflictConfirm = false;
-			sessionStore.abandon();
-			await startSession();
-		}}
-		oncancel={() => (showConflictConfirm = false)}
+		title="Pause this plan?"
+		confirmLabel="Pause plan"
+		onconfirm={handleConfirm}
+		oncancel={() => (confirmAction = null)}
 	>
-		You have an unfinished session in another discipline. Starting this workout will discard it.
+		The plan holds its block and week until you resume. Resting between sessions doesn't need a
+		pause — the plan never moves on its own.
+	</ConfirmDialog>
+{:else if confirmAction === 'complete'}
+	<ConfirmDialog
+		title="Complete this plan?"
+		confirmLabel="Complete plan"
+		onconfirm={handleConfirm}
+		oncancel={() => (confirmAction = null)}
+	>
+		The stint ends and becomes read-only history. Starting the same goal again later creates a fresh
+		plan instance.
 	</ConfirmDialog>
 {/if}
 
 <style>
-	.workout-page {
-		inline-size: 100%;
-	}
-
-	.workout-page__header-links {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-	}
-
-	.workout-page__programs-link {
-		display: inline-flex;
-		align-items: center;
-		padding-inline: var(--space-3);
-		block-size: 34px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
-		white-space: nowrap;
-		transition: color var(--duration-fast) var(--ease-out);
-
-		&:hover {
-			color: var(--color-accent);
-		}
-	}
-
-	.workout-page__loading {
+	.workout-hub__loading {
 		display: flex;
 		justify-content: center;
-		padding-block: var(--space-16);
+		padding-block: var(--space-12);
 	}
 
-	.workout-page__spinner {
+	.workout-hub__spinner {
 		inline-size: 28px;
 		block-size: 28px;
 		border: 2px solid var(--color-border);
@@ -352,152 +248,64 @@
 		}
 	}
 
-	.workout-complete {
+	.workout-hub__toolbar {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		gap: var(--space-3);
-		padding-block: var(--space-12);
+		justify-content: flex-end;
+		margin-block-end: var(--space-4);
 	}
 
-	.workout-complete__icon {
-		font-size: 3.5rem;
-		line-height: 1;
-	}
-
-	.workout-complete__title {
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--color-accent);
-	}
-
-	.workout-complete__body {
-		font-size: 1rem;
-		color: var(--color-text-secondary);
-		max-inline-size: 28ch;
-	}
-
-	.workout-complete__cta {
-		margin-block-start: var(--space-2);
-		padding-inline: var(--space-6);
-		block-size: 52px;
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
-		border-radius: var(--radius-full);
-		font-size: 1rem;
-		font-weight: 700;
-	}
-
-	.workout-page__no-program {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		padding-block: var(--space-16);
-		text-align: center;
-		color: var(--color-text-secondary);
-		font-size: 1rem;
-	}
-
-	.workout-page__choose-btn {
+	.workout-hub__new {
 		display: inline-flex;
 		align-items: center;
-		justify-content: center;
-		padding-inline: var(--space-5);
-		block-size: 48px;
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
-		border-radius: var(--radius-full);
-		font-size: 0.9375rem;
-		font-weight: 700;
-		text-decoration: none;
-	}
-
-	.workout-page__goal-link {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
-		text-decoration: none;
-
-		&:hover {
-			color: var(--color-accent);
-		}
-	}
-
-	.workout-page__program-link {
-		color: var(--color-accent);
-		font-weight: 600;
-	}
-
-	.workout-page__hint {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		text-align: center;
-		margin-block-end: var(--space-2);
-	}
-
-	.workout-page__body {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-	}
-
-	.session-done {
-		display: flex;
-		align-items: center;
-		gap: var(--space-4);
-		padding: var(--space-5);
-		background: var(--color-surface-2);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
-		border-radius: var(--r-xl);
-		background: color-mix(in srgb, var(--color-accent) 5%, var(--color-surface-2));
-	}
-
-	.session-done__icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		inline-size: 52px;
-		block-size: 52px;
-		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 15%, transparent);
-		color: var(--color-accent);
-
-		svg {
-			inline-size: 28px;
-			block-size: 28px;
-		}
-	}
-
-	.session-done__info {
-		flex: 1;
-		min-inline-size: 0;
-	}
-
-	.session-done__name {
-		font-size: 1.0625rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-	}
-
-	.session-done__meta {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		margin-block-start: 3px;
-	}
-
-	.session-done__edit {
-		flex-shrink: 0;
 		padding-inline: var(--space-4);
 		block-size: 40px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
 		font-size: 0.875rem;
-		font-weight: 600;
+		font-weight: 700;
+	}
+
+	.workout-hub__empty {
+		padding: var(--space-8);
+		text-align: center;
+		color: var(--color-text-secondary);
+		background: var(--color-surface-2);
+		border-radius: var(--r-xl);
+		border: 1px dashed var(--color-border-strong);
+	}
+
+	.workout-hub__empty-title {
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		font-weight: 700;
 		color: var(--color-text-primary);
+	}
+
+	.workout-hub__empty-body {
+		margin-block-start: var(--space-2);
+		max-inline-size: 34ch;
+		margin-inline: auto;
+		line-height: 1.5;
+	}
+
+	.workout-hub__empty-cta {
+		display: inline-block;
+		margin-block-start: var(--space-4);
+		color: var(--color-accent-text);
+		font-weight: 700;
+	}
+
+	.plan-list {
+		margin-block-end: var(--space-6);
+	}
+
+	.plan-list__title {
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-text-secondary);
+		margin-block-end: var(--space-3);
 	}
 </style>

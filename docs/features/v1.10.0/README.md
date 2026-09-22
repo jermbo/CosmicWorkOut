@@ -1,0 +1,320 @@
+[Wiki](../../README.md) › [Features](../README.md) › v1.10.0
+
+# v1.10.0 — Baselines & Insights Refresh
+
+> **Status:** In progress. **Built:** US-037 – US-052 — checked with type check, lint, unit tests (109) and a production build; US-048 (light mode) and US-051/US-052 (Remove Belly Dance, One Workout Section) also checked with a full click-through in the browser at phone width. **Planned:** US-053 – US-054 (Topics 13 – 14, Insights).
+
+Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub. It grew on the branch: Topics 8 – 10 finish work the roadmap and the July 2026 audit had queued; Topics 11 – 14 reshape the app around one focused workout plan and make Insights answer "am I getting stronger?".
+
+---
+
+## What's Shipping
+
+| Story                                              | Title                              | Topic | Status  |
+| -------------------------------------------------- | ---------------------------------- | ----- | ------- |
+| [US-037](./US-037-flexible-baseline-metrics.md)    | Flexible Baseline Metrics          | 1     | Built   |
+| [US-038](./US-038-baseline-logging-comparison.md)  | Baseline Logging & Comparison      | 1     | Built   |
+| [US-039](./US-039-tanstack-charts-migration.md)    | Move All Charts to TanStack Charts | 3     | Built   |
+| [US-040](./US-040-scrolling-charts.md)             | Scrolling Charts on Mobile         | 2     | Built   |
+| [US-041](./US-041-all-habits-heat-chart.md)        | All-Habits Heat Chart              | 4     | Built   |
+| [US-042](./US-042-habit-colors.md)                 | Habit Colors                       | 4     | Built   |
+| [US-043](./US-043-insights-chart-visibility.md)    | Show / Hide Insights Charts        | 5     | Built   |
+| [US-044](./US-044-experimental-insights-charts.md) | Experimental Insights Charts       | 5     | Built   |
+| [US-045](./US-045-settings-feature-hub.md)         | Settings Feature Hub               | 6     | Built   |
+| [US-046](./US-046-personalization.md)              | Personalization                    | 6     | Built   |
+| [US-047](./US-047-retire-history.md)               | Retire History                     | 7     | Built   |
+| [US-048](./US-048-light-mode.md)                   | Light Mode                         | 8     | Built   |
+| [US-049](./US-049-lift-plan-rename.md)             | Lift Plan Wording in the UI        | 9     | Built   |
+| [US-050](./US-050-cheap-hardening.md)              | Cheap Hardening                    | 10    | Built   |
+| [US-051](./US-051-remove-belly-dance.md)           | Remove Belly Dance                 | 11    | Built   |
+| [US-052](./US-052-one-workout-section.md)          | One Workout Section                | 12    | Built   |
+| [US-053](./US-053-personal-records.md)             | Personal Records                   | 13    | Planned |
+| [US-054](./US-054-this-month-card.md)              | This Month Card                    | 14    | Planned |
+
+**Suggested build order:** US-039 (chart foundation) → US-040 → US-037 → US-038 → US-042 → US-041 → US-043 → US-044 → US-045 → US-046 → US-047 → US-048 → US-049 → US-050 → **US-051 → US-052 → US-053 → US-054** (each of the last four builds on the one before).
+
+**Not in this release:** removing `chart.js` from `package.json` — the user does that once the TanStack charts work the way they want.
+
+---
+
+## Topics
+
+| #   | Topic                                          | Status  |
+| --- | ---------------------------------------------- | ------- |
+| 1   | Baselines — 1 to n metrics ("daily 10")        | Decided |
+| 2   | Insights — charts unreadable on mobile past 7d | Decided |
+| 3   | Move charts to TanStack Charts                 | Decided |
+| 4   | Heat charts — habits                           | Decided |
+| 5   | Other useful chart insights                    | Decided |
+| 6   | Settings page — is it useful and intuitive?    | Decided |
+| 7   | Is History still needed?                       | Decided |
+| 8   | Light mode                                     | Decided |
+| 9   | Lift plan wording                              | Decided |
+| 10  | Audit Phase A — cheap hardening                | Decided |
+| 11  | Remove Belly Dance                             | Decided |
+| 12  | One Workout section                            | Decided |
+| 13  | Personal records                               | Decided |
+| 14  | This month card                                | Decided |
+| 15  | Dropped ideas                                  | Decided |
+
+---
+
+## Topic 1 — Baselines: 1 to n metrics
+
+| Topic                               | Decision                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Metric count**                    | A baseline has **1 to n** metrics. No fixed cap. (Replaces the "1 or 2" rule in [US-034](../v1.9.0/US-034-baselines-setup.md).)                                                                                                                                                                                                                                                                                         |
+| **Done = logged**                   | **Logging the baseline means it is done for the day.** Going over or under a target is _not_ the definition of done. (Replaces "clears only when every metric hits its target" from v1.9.0.)                                                                                                                                                                                                                            |
+| **Targets are a yardstick**         | Targets exist only to compare against — "how did I do versus my base?" They never fail a day.                                                                                                                                                                                                                                                                                                                           |
+| **The floor stays put**             | The baseline is set embarrassingly low so you show up when motivation is gone. It does not drift; every day and every chart is measured against it. Never auto-raised.                                                                                                                                                                                                                                                  |
+| **Log what you did**                | The user enters the real amount (30 pushups, 400 words, 5.5 miles). The app works out the difference from the baseline itself.                                                                                                                                                                                                                                                                                          |
+| **Show the comparison**             | Each metric shows how it compared to its baseline — e.g. pushups **+20** on a floor of 10.                                                                                                                                                                                                                                                                                                                              |
+| **Growth insight (per metric)**     | Insights must show **which metric** is growing over time, not just the baseline as a whole (e.g. pushups climbing while the rest stay at 10).                                                                                                                                                                                                                                                                           |
+| **Not just physical**               | Baselines must fit any pursuit — writing, reading, meditation, drawing, crafting, gaming, cooking, woodworking, socializing, boxing… Wording and measurements must stay generic.                                                                                                                                                                                                                                        |
+| **Measurement types**               | Each metric is one of three generic types: **Duration** (time), **Distance** (miles / km), **Count** (a number of things with the user's own label — reps, laps, words, pages, sketches). "Action" and Count mean the same thing for now.                                                                                                                                                                               |
+| **Distance unit per metric**        | Each Distance metric picks its own unit (mi, km, m, yd) — a bike ride in miles and pool laps in meters can live side by side. Not an app-wide setting.                                                                                                                                                                                                                                                                  |
+| **No migration**                    | v1.9.0 Baselines data is test data only. Start fresh — no conversion of old `direction` or free-typed units; existing baseline definitions and logs are dropped on upgrade.                                                                                                                                                                                                                                             |
+| **Neutral comparison**              | The app shows each metric **against its baseline, as plain numbers** (e.g. pushups 30 vs 10 → **+20**; mile time 16 vs 18 → **−2**). **No good / bad colors, no "stay under" direction, no derived speed.** The user decides what "better" means for them — a runner may want time to drop, a walker may want distance to climb. (Removes the up / under direction from [US-034](../v1.9.0/US-034-baselines-setup.md).) |
+| **Phrase it positively (guidance)** | Suggested, not enforced: word baselines so doing more is the win — e.g. "phone locked away: 30 minutes" rather than "phone time under 30". Used in examples and placeholder copy.                                                                                                                                                                                                                                       |
+
+### Measurement types
+
+| Type         | Measures                          | Examples                             |
+| ------------ | --------------------------------- | ------------------------------------ |
+| **Duration** | time                              | meditation, stretching, reading time |
+| **Distance** | miles or km                       | walk, bike, run                      |
+| **Count**    | a number of things, user-labelled | pushups (reps), laps, words, pages   |
+
+Mix them freely: reading = Duration + Count (pages); walking = Distance alone, or Distance + Duration; writing = Count (words).
+
+### Example — "Daily 10"
+
+One baseline, four metrics:
+
+| Metric        | Baseline   |
+| ------------- | ---------- |
+| Pushups       | 10 reps    |
+| Jumping jacks | 10 reps    |
+| Walk          | 10 minutes |
+| Lunges        | 10 reps    |
+
+Logging it marks the day done. A day with 30 pushups and 10 of everything else shows pushups at **+20**.
+
+### Example — distance + time (bike, walk)
+
+Baseline is a distance **and** a time, e.g. bike **5 miles / 30 minutes**, walk **0.5 miles / 10 minutes**. People read improvement differently — both of these can be progress:
+
+| Kind of improvement   | Bike            | Walk            |
+| --------------------- | --------------- | --------------- |
+| Further, same time    | 5.5 miles in 30 | 0.6 miles in 10 |
+| Same distance, faster | 5 miles in 28   | 0.5 miles in 8  |
+
+The app does not pick which is "better". It shows both numbers against the baseline and the user reads them. A runner at an 18-minute mile working toward 8 minutes watches duration fall; a walker watches distance climb.
+
+### Open questions
+
+_None for Topic 1._
+
+---
+
+## Topic 2 — Scrolling charts on mobile
+
+**Problem:** on a phone, any range past 7 days squeezes every day into the screen width and the chart becomes unreadable.
+
+| Topic                    | Decision                                                                                                                                                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fixed spacing, pan**   | Day spacing stays fixed. Longer ranges add more days off-screen; the user pans left / right. The chart never squeezes to fit.                                                                                                             |
+| **7 days on screen**     | On a phone, about **7 days** are visible at once — the same spacing as today's 7-day view.                                                                                                                                                |
+| **Opens on newest**      | The chart opens scrolled to the most recent day (right edge). Swipe to go back in time.                                                                                                                                                   |
+| **Range = how far back** | The range picker sets how much history you can scroll through, not how squeezed the chart is.                                                                                                                                             |
+| **Fixed up-down scale**  | The value scale covers the **whole range**, not just the days on screen, so older days sit visibly lower/higher and growth is obvious. Scale labels stay pinned while days scroll.                                                        |
+| **Wide screens**         | If the whole range fits, show it all with no scrolling.                                                                                                                                                                                   |
+| **Which charts scroll**  | **Day charts scroll** (7 days on screen): Mood & Habits, Weight, Blood pressure, Baselines. **Weekly volume scrolls** by week (about 7 weeks on screen). **Activity mix and Habit radar do not scroll** — they summarize the whole range. |
+| **Range picker**         | Keep the current picker as-is: **This week · 7 days · Month to date · Year to date · Custom**. Year to date becomes usable on phones thanks to panning.                                                                                   |
+
+---
+
+## Topic 3 — TanStack Charts
+
+`@tanstack/charts` **0.18.0** is installed (exact pin) alongside `chart.js` 4.5.1. Checked against its bundled docs (`node_modules/@tanstack/charts/docs`):
+
+| Need from Topics 1–4   | TanStack Charts                                              |
+| ---------------------- | ------------------------------------------------------------ |
+| Svelte 5               | Yes — `@tanstack/charts/svelte` adapter                      |
+| Line, bar              | Yes                                                          |
+| Donut, radar           | Yes — opt-in polar entry                                     |
+| Heatmaps               | Yes — matrix cells                                           |
+| Pan / scroll (Topic 2) | Yes — zoom & pan with touch, keyboard, and clamping built in |
+| Light / dark           | Yes — automatic, CSS palette tokens                          |
+| Accessibility          | Yes — names, keyboard focus, exact-value alternatives        |
+
+**Risk:** it is **Alpha**. Minor versions (0.18 → 0.19) may break the API. Mitigation: keep the exact pin and test before any upgrade.
+
+| Topic             | Decision                                                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Move all**      | Every chart moves to TanStack Charts — Insights charts and the Baselines chart. **Remove `chart.js`** once nothing uses it.  |
+| **Alpha is fine** | Personal project; accept Alpha risk. Keep the **exact version pin** and only upgrade deliberately, fixing breaks when we do. |
+
+---
+
+## Topic 4 — Heat charts for habits
+
+**Goal:** experiment. Try other views of the same data and find out whether they help understanding or just add noise.
+
+| Topic                                | Decision                                                                                                                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Habits only**                      | Heat charts are for **habits** (Mood, Water, Coffee, and the rest). Not workouts, baselines, or health — at least for now.                                                                                                                  |
+| **Keep what exists**                 | The combined Mood / Water / Coffee chart **stays**. Heat charts are added alongside it, not replacing it.                                                                                                                                   |
+| **Experimental**                     | Treat heat charts as a trial. Keep the ones that prove useful; drop the ones that turn out to be noise.                                                                                                                                     |
+| **Build both shapes**                | **A — calendar grid** (weeks × weekdays; spots weekday patterns) and **B — stacked strips** (one row per habit, days left→right, scrolls like other charts; spots links between habits). Try both.                                          |
+| **All-habits chart**                 | A new chart showing **all habits together**, with buttons to **focus on one habit at a time**. Separate from the Mood / Water / Coffee chart, which stays as-is.                                                                            |
+| **One chart, two views**             | The All-habits chart shows **B (stacked strips)** by default. Tapping a habit button switches to **A (calendar grid)** for just that habit. Tapping it again, or **All**, returns to the strips. Buttons: `[All] [Mood] [Water] [Coffee] …` |
+| **Shading — "the more, the darker"** | GitHub-contributions style. Each habit is shaded against **its own busiest day in the range** (not its goal). Color steps in **10% opacity increments** (10%, 20% … 100%). A day with nothing logged is empty.                              |
+| **Shading — yes/no habits**          | Done = full color; not done = empty.                                                                                                                                                                                                        |
+| **Shading — Mood**                   | **Two colors.** Good days (+1…+5) darken in one color, bad days (−1…−5) darken in another, 0 is light. A rough stretch stands out as much as a great one.                                                                                   |
+| **Habit colors**                     | Each habit has a **user-chosen base color** (set on the habit), with sensible defaults. Heat charts shade from that color. Mood gets two pickable colors (good / bad).                                                                      |
+
+---
+
+## Topic 5 — More insights (experiments)
+
+**Approach:** the Insights page becomes a **testing ground**. Ship many chart options, use them, and let real use and user feedback decide what stays. No single "right" chart is chosen up front.
+
+Candidate charts — all in as experiments:
+
+| #   | Chart                                                                     | Question it answers                                        |
+| --- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 1   | **Baseline growth line** — each metric over time, baseline as a flat line | How far above my floor am I, and which metric is climbing? |
+| 2   | **Showing-up rate** — % of days logged per week, per baseline / habit     | Am I showing up more or less than last month?              |
+| 3   | **Day-of-week pattern** — average per weekday                             | Are Sundays always my weak day?                            |
+| 4   | **"On days when…"** — e.g. mood on workout days vs rest days              | Does X actually help Y?                                    |
+| 5   | **This week vs last week** — totals with ↑ / ↓                            | Am I trending up right now?                                |
+| 6   | **Time of day** — when a baseline usually gets logged                     | When do I actually get it done?                            |
+| 7   | **Personal bests** — marked on exercise and baseline charts               | When did I hit my best?                                    |
+
+| Topic                  | Decision                                                                                                                                                                            |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Show / hide charts** | Every Insights chart can be hidden from its card (e.g. "⋯ → Hide"). Hidden charts can be brought back from Settings. What stays visible over time is the signal for what is useful. |
+
+---
+
+## Topic 6 — Settings page
+
+**Problems found (v1.9.0 Settings hub):**
+
+1. One long "Tracking" list of toggles with Manage links that appear / disappear — hard to scan.
+2. Managing is inconsistent: habits and baselines are managed in Settings; Lift plans jump out to `/goals`; Health and Activity have no manage page.
+3. Stale wording: "Goal progression plans" (should be **Lift plans**); Baselines described as "floors and ceilings" (ceilings are gone — Topic 1).
+4. Weight unit (lb / kg) exists in `prefsStore` but no screen can change it.
+5. No home for new settings (hidden Insights charts, habit colors).
+
+| Topic                          | Decision                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One row per feature**        | The Settings home becomes a short list, one row per feature, iPhone-Settings style. Each row shows on / off and opens that feature's own page: its toggle, its manage list, and its own options.                                                                                                                                              |
+| **Bring back Personalization** | Restore a look-and-feel page. It was removed after v1.7.0 ([US-030](../v1.7.0/US-030-settings-restructure.md) post-ship note: "single-user app"); that reason no longer holds now that the app is meant for other people too. The old page had accent color, weight unit, density, and roundness — all still applied on boot by `prefsStore`. |
+| **Personalization contents**   | Bring back the four old options: **accent color, weight unit (lb / kg), density, roundness** — plus **Overview layout** (home card order), moved in from its own Settings row.                                                                                                                                                                |
+| **Light mode — deferred**      | **Pulled back in later — [Topic 8](#topic-8--light-mode), [US-048](./US-048-light-mode.md).** Wanted (light / dark / match device), but **not in v1.10.0**. The app is dark-only today, so it needs a full light palette. Revisit next version — logged in the [Roadmap](../../roadmap/README.md).                                            |
+
+```
+Habits            On  ›
+Baselines         On  ›
+Practice          On  ›
+Activity          Off ›
+Health            On  ›
+Insights              ›
+Personalization       ›   (accent, weight unit, density, roundness, Overview layout)
+Data & backup         ›
+```
+
+---
+
+## Topic 7 — Is History still needed?
+
+**Problem:** After the Insights refresh, the History calendar showed the same things Insights does (consistency, mood, volume). Its only other job — opening a past day to change it — is already handled by each tracker's date picker. The user doesn't use the page.
+
+| Topic                   | Decision                                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Remove History**      | Drop the History tab and `/calendar`. Insights is where you look back; the tracker pages are where you change the past.                               |
+| **Keep session delete** | Deleting a session only existed in the calendar's day sheet. Move it next to **Edit** on the logged-session card on `/workout` and `/practice/dance`. |
+| **Data**                | Untouched. Nothing is migrated or cleared.                                                                                                            |
+
+---
+
+## Topic 8 — Light mode
+
+Deferred in Topic 6 to "next version", then pulled into this release.
+
+| Topic           | Decision                                                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Choices**     | **Dark**, **Light**, **Match device** — on Personalization, above Accent color.                                                    |
+| **Default**     | **Dark.** Nothing changes for anyone until they pick otherwise.                                                                    |
+| **Accent**      | The chosen accent stays the same in both themes as a fill. Accent used as **text** is darkened in light mode so it stays readable. |
+| **Principle 4** | "Dark, Tactile, Satisfying" becomes "Tactile and Satisfying — Dark First". Dark stays the default and the reference look.          |
+
+## Topic 9 — Lift plan wording
+
+The UI still said "Goal plans" outside Settings; every user-facing string became **Lift plan(s)**. _Interim:_ Topic 12 retires "Lift plan" as a separate idea — a plan simply has a goal or not.
+
+## Topic 10 — Audit Phase A
+
+Phase A of the [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#proposed-order-ifwhen-we-act): backup file-size cap, save-error handling in sheets, streak boundary test.
+
+---
+
+## Topic 11 — Remove Belly Dance
+
+**Problem:** Nobody in the user group uses Belly Dance, and it would stand better as its own app. Keeping it shapes everything around it — the Practice hub, records, discipline filters.
+
+| Topic      | Decision                                                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Remove** | All dance screens, content, charts and copy. A new user never sees that it existed.                                                          |
+| **Engine** | **Keep the Discipline model.** Delete dance, leave the engine; collapsing to strength-only code is a refactor with risk and no visible gain. |
+| **Data**   | No migration or cleanup — nobody has dance data.                                                                                             |
+
+## Topic 12 — One Workout section
+
+**Problem:** Practice (programs) and Lift plans do the same job — follow routines week by week — through two sections, two creation flows and two Settings switches. What the user actually wants from both is to see workout progress while staying focused.
+
+| Topic                   | Decision                                                                                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **One concept**         | A **plan** with an **optional goal**. "Set start = goal" was considered as the way to get a no-progression plan, but today's generator still builds a wave and ends after 4 weeks — so no-goal needs to be a real option, not a workaround. |
+| **Merge where**         | **Screens only.** Programs and goal plans stay separate records; the UI shows them as one thing. Merging storage is a possible follow-up once this feels right.                                                                             |
+| **Active plans**        | **Exactly one, enforced.** The point is focus; several active plans is not how the app is meant to be used.                                                                                                                                 |
+| **Starting points**     | Template (a built-in, copied) or scratch. The lift-plan scaffolds go away.                                                                                                                                                                  |
+| **Plan end**            | Every plan has a length and an end, with **Run it again** or **New plan**.                                                                                                                                                                  |
+| **Goal after creation** | Set only at creation; removable later. Adding a goal to a running plan is out of scope.                                                                                                                                                     |
+| **Switch**              | One on / off switch for the whole section; the Lift plans switch goes away.                                                                                                                                                                 |
+| **Name**                | **Workout.** "Training" was considered — it may mean something else if this becomes a product.                                                                                                                                              |
+| **URLs**                | `/workout`, `/workout/today`, `/workout/new`, `/workout/plan/[id]`, `/settings/workout`. Old URLs **just disappear** — the user group is small and opens the app from its icon.                                                             |
+
+## Topic 13 — Personal records
+
+**Question it answers:** "Did I get stronger?"
+
+| Topic          | Decision                                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Rule**       | A set is a record if you've **never done at least that weight for at least that many reps** on that exercise. Bodyweight / band: reps only. |
+| **Not chosen** | Heaviest weight only (ignores reps); estimated 1RM (abstract); fixed rep-count boards (miss 6s, 7s, 12s).                                   |
+| **Scope**      | Strength only.                                                                                                                              |
+| **First time** | An exercise's first session sets the baseline silently.                                                                                     |
+| **Where**      | Completion screen ("New bests", one line per exercise) and an Insights **Records** card (records in the range, with what each beat).        |
+| **Later**      | A "best to beat" hint on the logging screen — once the first version has been lived with. The logging screen is the most sensitive screen.  |
+
+## Topic 14 — This month card
+
+**Question it answers:** "How am I doing, at a glance?" First card on Insights, always the current month: workouts, week streak, habit days, new records.
+
+## Topic 15 — Dropped ideas
+
+| Idea                              | Why dropped                                                                                                                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Filter Insights by discipline** | Only one discipline is left after Topic 11.                                                                                                                                        |
+| **Tap a chart to open that day**  | **One way to reach a day:** the date picker in the page header and the week strip. Charts are for reading, not navigating — a second route to a day would cause UX problems later. |
+
+---
+
+## Related Docs
+
+- [US-034 — Baselines Setup](../v1.9.0/US-034-baselines-setup.md)
+- [US-036 — Baselines Progress Charts](../v1.9.0/US-036-baselines-charts.md)
+- [Map — History & Insights](../../map-history-and-insights.md)

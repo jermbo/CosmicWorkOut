@@ -8,7 +8,7 @@
 
 ## What We're Building
 
-A web-based movement tracker that lets a small group of people follow structured, multi-week programs across more than one **Discipline** (Strength and Belly Dance today), plus lightweight tracking for the rest of their day — quick **activities**, daily **habits**, and optional **health metrics**. It logs sessions, tracks history, surfaces insights, and stays out of the way.
+A web-based movement tracker that lets a small group of people follow structured, multi-week programs — with an optional goal for one focus lift — plus lightweight tracking for the rest of their day — quick **activities**, daily **habits**, and optional **health metrics**. The engine is built around **Discipline** as a general concept (Strength is the only one today; Belly Dance shipped and was later retired, v1.10.0), so a new structured practice is still config, not a rewrite. It logs sessions, tracks history, surfaces insights, and stays out of the way.
 
 It is not a social platform. It is not a coaching app. It is not a marketplace for programs. It is a personal tool — closer to a digital training notebook than a fitness product.
 
@@ -26,7 +26,7 @@ The specific friction this app eliminates: **logging what you did should take un
 
 The developer and a small group of friends. These are people who:
 
-- Already have a plan (lifting, dance, or both) or are willing to build one
+- Already have a lifting plan, or are willing to build one
 - Want to track progress over a structured multi-week program
 - Also want a quick place to log activities, habits, and how they feel
 - Prefer a fast, clean tool over feature-rich complexity
@@ -42,7 +42,7 @@ flowchart LR
     Today --> Start[Start session]
     Start --> Log[Log items — one tap each]
     Log --> Finish[Finish session]
-    Finish --> History[Review in calendar + insights]
+    Finish --> History[Review in insights]
     History --> Open
 
     classDef entry fill:#3b3f8c,stroke:#23264f,color:#ffffff;

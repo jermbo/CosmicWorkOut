@@ -1,10 +1,12 @@
-[Wiki](../README.md) › [5k — Requirements](../README.md#5k--requirements) › History & Calendar
+[Wiki](../README.md) › [5k — Requirements](../README.md#5k--requirements) › History & Past Days
 
-# History & Calendar
+# History & Past Days
 
-Viewing past sessions and tracking progress over time.
+Looking back at what you did, and fixing or backfilling past days.
 
 **Tied to:** [Data Model](../architecture/data-model.md) | [App Structure](../implementation/app-structure.md)
+
+> **The History calendar (`/calendar`) was removed in v1.10.0** — see [US-047](../features/v1.10.0/US-047-retire-history.md). Insights covers looking back; each tracker's date picker covers changing the past. The file keeps its old name so existing links still work.
 
 ---
 
@@ -12,54 +14,38 @@ Viewing past sessions and tracking progress over time.
 
 > **See [Implementation Status](../implementation/status.md)** for the full checklist.
 
-| Area                              | Status |
-| --------------------------------- | ------ | ------------------------------- |
-| Monthly calendar + navigation     | Built  |                                 |
-| Completed day highlighting        | Built  |                                 |
-| Day summary sheet                 | Built  |                                 |
-| Edit/delete sessions & activities | Built  |                                 |
-| Habit heatmap on calendar         | Built  |                                 |
-| Week strip on home                | Built  |                                 |
-| Weekly consistency streak         | Built  | Per active program / discipline |
-| Backfill past days                | Built  | Date picker + calendar tap      |
-
-Insights charts (volume trends, etc.) shipped in v1.5.0 — see [/insights](../implementation/app-structure.md).
+| Area                             | Status  | Notes                                                                                  |
+| -------------------------------- | ------- | -------------------------------------------------------------------------------------- |
+| Monthly calendar + navigation    | Removed | v1.10.0 — Insights charts show gaps and streaks instead                                |
+| Day summary / day actions sheets | Removed | v1.10.0 — edit on the tracker's own page                                               |
+| Habit heatmap on calendar        | Removed | v1.10.0 — replaced by the All Habits heat chart on Insights                            |
+| Week strip on home               | Built   | Also sets the logging date                                                             |
+| Weekly consistency streak        | Built   | Per active program / discipline                                                        |
+| Backfill past days               | Built   | Date picker in each tracker's page header, or a week-strip tap                         |
+| Edit / delete a logged session   | Built   | **Edit** and **Delete** on the logged-session card on `/workout/today` |
 
 ---
 
 ## Goal
 
-Users can look back at their workout history to see what they've done, confirm they're on track, and review individual session details.
+Users can see what they've done over time, and correct or backfill any past day.
 
 ---
 
-## Day Status Logic (Implemented)
+## Where each job lives
 
-```mermaid
-flowchart TD
-    Day[Calendar day] --> Today{date === today?}
-    Today -->|yes| StatusToday[today — outlined]
-    Today -->|no| HasSession{Session exists<br/>for date + program?}
-    HasSession -->|yes| StatusDone[completed — accent fill, tappable]
-    HasSession -->|no| Future{date > today?}
-    Future -->|yes| StatusFuture[future — muted]
-    Future -->|no| StatusDefault[past, no session — default]
-
-    classDef start fill:#3b3f8c,stroke:#23264f,color:#ffffff;
-    classDef decision fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
-    classDef done fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
-    classDef muted fill:#465569,stroke:#28313e,color:#ffffff;
-    class Day start;
-    class Today,HasSession,Future decision;
-    class StatusDone done;
-    class StatusToday,StatusFuture,StatusDefault muted;
-```
-
-Scheduled, rest, and skipped **calendar cell styles** beyond completed/today/past are not implemented — see [roadmap](../roadmap/README.md) if needed after user testing.
+| Job                                   | Where                                                                |
+| ------------------------------------- | -------------------------------------------------------------------- |
+| See consistency and gaps              | Insights — All Habits heat chart, Showing Up, Weekly Volume          |
+| See a streak                          | Home header (week streak) · Practice hub (combined streak)           |
+| Log or edit habits for a past day     | `/habits` with the header date set to that day                       |
+| Log, edit or delete a past session    | `/workout/today` with the header date set to that day |
+| Log, edit or delete a past activity   | `/log` with the header date set to that day                          |
+| Log or edit health / baseline entries | `/health` or `/baselines` with the header date set to that day       |
 
 ---
 
-## Streak Behavior (Built Today)
+## Streak Behavior
 
 | Location         | What it shows   | How it works                                                          |
 | ---------------- | --------------- | --------------------------------------------------------------------- |
@@ -70,69 +56,10 @@ See `programStore.weekStreakFor` and `combinedWeekStreak` in [State Management](
 
 ---
 
-## User Stories
-
-### Viewing the Calendar
-
-> As a user, I want to see a monthly calendar that shows which days I trained, so I can see my consistency at a glance.
-
-- Calendar shows current month by default
-- Each day is colored by status:
-  - **Completed** — filled with accent color
-  - **Today** — outlined/highlighted
-  - **Scheduled** — subtle indicator (upcoming training day per program)
-  - **Rest** — no indicator
-  - **Skipped** — muted/crossed indicator
-- I can navigate to previous months
-- Day statuses are derived from the active program schedule + session logs in IndexedDB
-
----
-
-### Viewing a Day Summary
-
-> As a user, I want to tap a completed day and see what I did, so I can review the session.
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant Cal as Calendar page
-    participant Sheet as DaySummarySheet
-    participant Store as programStore
-
-    User->>Cal: tap completed day
-    Cal->>Store: getSessionForDay(date)
-    Store-->>Cal: Session
-    Cal->>Sheet: open with session + itemMap
-    Sheet-->>User: routine name, volume, sets/reps/weight
-    User->>Sheet: close
-```
-
-- Tapping a completed day opens a summary sheet
-- Summary shows: routine name, date, total volume, items logged with sets/reps/weight
-- Past sessions and activities can be edited or deleted from this view
-
----
-
-### Seeing My Streak / Consistency
-
-> As a user, I want to know how many weeks I've trained consistently, so I stay motivated.
-
-**Built today:** A week streak (`computeWeekStreak`) counts consecutive weeks with sessions meeting `daysPerWeek`, shown on the home header; the Practice hub shows a combined cross-discipline streak when multiple plans are active — see table above.
-
----
-
 ## Constraints
 
-- History supports edit and delete from the day summary sheet
-- Calendar must work fully offline — all data comes from IndexedDB
-- Performance: month rendering should not be slow even if IndexedDB has years of sessions
+- Everything works offline — all data comes from IndexedDB.
 - **No date-based edit lock, anywhere.** Any past date is editable exactly like today — this applies to every trackable domain (habit logs, workout/practice sessions, activities, health readings) and to any domain added later. There is no "read-only after N days" rule, no built-in cutoff, and no per-feature exception. If a date-based restriction is ever proposed, it must be re-approved explicitly here before being implemented; it should never be added incidentally as part of an unrelated feature.
-
----
-
-## Open Questions
-
-Resolved for now — revisit after user testing. Add items to [roadmap](../roadmap/README.md) if feedback demands them.
 
 ---
 
@@ -144,7 +71,8 @@ Volume trends and export shipped in v1.5.0 Insights and v1.7.0 backup. Other def
 
 ## Related
 
-- [How It Works](../implementation/behavior.md) — Calendar and streak behavior
+- [US-047 — Retire History](../features/v1.10.0/US-047-retire-history.md) — why the calendar went away
+- [How It Works](../implementation/behavior.md#reviewing-and-fixing-past-days) — past-day behavior
 - [Data Model — Session](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — How sessions are created
 - [Program Management](program-management.md) — Where the schedule comes from

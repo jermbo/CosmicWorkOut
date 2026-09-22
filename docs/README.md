@@ -47,7 +47,7 @@ what you are looking for but not which folder it is in.
 - [Daily Tracking](map-daily-tracking.md) — habits, activities, health metrics, baselines
 - [Data & Persistence](map-data-and-persistence.md) — IndexedDB, stores, backup, clearing, offline
 - [Interface & Navigation](map-interface-and-navigation.md) — routes, components, Overview, Settings
-- [History & Insights](map-history-and-insights.md) — calendar, streaks, charts
+- [History & Insights](map-history-and-insights.md) — streaks, charts, fixing past days
 
 ### One complete thought per file
 
@@ -145,7 +145,7 @@ flowchart TB
 
 - [Program Management](requirements/program-management.md) — Programs, workouts, exercise library
 - [Session Logging](requirements/session-logging.md) — Core workout logging flow
-- [History & Calendar](requirements/history-calendar.md) — Past sessions and progress
+- [History & Past Days](requirements/history-calendar.md) — Streaks, backfill, and where the calendar went
 - [Settings & Preferences](requirements/settings-preferences.md) — User customization
 
 ---

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Baseline } from '$lib/db/types';
-	import { directionLabel, targetLabel } from '$lib/baselines/logic';
+	import { baselineSummary, visibleMetrics } from '$lib/baselines/logic';
 	import Icon from './Icon.svelte';
 
 	type Props = {
@@ -36,10 +36,9 @@
 	}: Props = $props();
 
 	let meta = $derived(
-		[
-			directionLabel(baseline.direction),
-			...baseline.metrics.map((m) => targetLabel(baseline.direction, m)),
-		].join(' · '),
+		visibleMetrics(baseline)
+			.map((m) => baselineSummary(m))
+			.join(' · '),
 	);
 
 	function toggleAriaLabel(): string {

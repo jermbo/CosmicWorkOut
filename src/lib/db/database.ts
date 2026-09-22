@@ -22,7 +22,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 10;
+const DB_VERSION = 11;
 
 /** Every IndexedDB object store — keep in sync with onupgradeneeded. */
 export const ALL_STORE_NAMES = [
@@ -98,6 +98,13 @@ function openDB(): Promise<IDBDatabase> {
 			const blStore = ensureStore('baselineLogs', { keyPath: 'id' });
 			ensureIndex(blStore, 'by_date', 'date');
 			ensureIndex(blStore, 'by_baseline', 'baselineId');
+
+			// v11 (v1.10.0): Baselines were reshaped — 1 to n typed metrics, no direction.
+			// v1.9.0 baseline data was test-only, so it is dropped rather than converted.
+			if (event.oldVersion >= 10 && event.oldVersion < 11) {
+				tx.objectStore('baselines').clear();
+				blStore.clear();
+			}
 		};
 
 		request.onsuccess = (event) => {

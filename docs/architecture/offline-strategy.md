@@ -133,7 +133,7 @@ Device-to-device sync (QR + LAN merge) is on the [roadmap](../roadmap/device-syn
 Optional body measurements (weight, blood pressure). See [US-029](../features/v1.7.0/US-029-health-metrics.md):
 
 - Readings write immediately to `healthReadings` on log, edit, or delete.
-- Feature flags in `cwout:prefs` (`habitsEnabled`, `activityLogEnabled`, `practiceEnabled`, `healthMetricsEnabled`, `goalProgressionPlansEnabled`, `baselinesEnabled`) gate UI only — every store still loads and seeds at boot, so data persists when a toggle is off.
+- Feature flags in `cwout:prefs` (`habitsEnabled`, `activityLogEnabled`, `practiceEnabled`, `healthMetricsEnabled`, `baselinesEnabled`) gate UI only — every store still loads and seeds at boot, so data persists when a toggle is off. `practiceEnabled` alone gates the Workout section, plans-with-a-goal included, since v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) folded the separate `goalProgressionPlansEnabled` flag into it.
 
 ---
 

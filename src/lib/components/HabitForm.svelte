@@ -3,6 +3,14 @@
 	import type { Habit, HabitType } from '$lib/db/types';
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '$lib/habits';
+	import {
+		COLOR_NAMES,
+		HABIT_COLOR_PALETTE,
+		habitColor,
+		moodBadColor,
+		nextDefaultColor,
+	} from '$lib/habitColors';
+	import ColorSwatches from './ColorSwatches.svelte';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';
 	import DialogTitle from './DialogTitle.svelte';
@@ -18,8 +26,22 @@
 	let unit = $state(untrack(() => editing?.unit ?? ''));
 	let type = $state<HabitType>(untrack(() => editing?.type ?? 'times'));
 	let goal = $state<number | undefined>(untrack(() => editing?.dailyGoal));
+	let color = $state(
+		untrack(() =>
+			editing
+				? habitColor(editing)
+				: nextDefaultColor(
+						habitStore.habits.map((h) => h.color),
+						habitStore.habits.length,
+					),
+		),
+	);
+	let negativeColor = $state(untrack(() => (editing ? moodBadColor(editing) : '')));
 	let saving = $state(false);
 	let showPresets = $state(untrack(() => editing === null));
+
+	/** Mood is built in: only its colors can be changed. */
+	let isMood = $derived(editing?.type === 'mood');
 
 	let typeHasGoal = $derived(type === 'times' || type === 'minutes' || type === 'count');
 	let typeRequiresUnit = $derived(type === 'count');
@@ -45,7 +67,18 @@
 	}
 
 	async function save() {
-		if (!name.trim() || saving) return;
+		if (saving) return;
+		if (isMood && editing) {
+			saving = true;
+			try {
+				await habitStore.updateHabit({ ...editing, color, negativeColor });
+				onclose();
+			} finally {
+				saving = false;
+			}
+			return;
+		}
+		if (!name.trim()) return;
 		if (typeRequiresUnit && !unit.trim()) return;
 		saving = true;
 		try {
@@ -56,6 +89,7 @@
 					name: name.trim(),
 					unit: unit.trim(),
 					dailyGoal,
+					color,
 				});
 			} else {
 				await habitStore.addHabit({
@@ -63,6 +97,7 @@
 					unit: unit.trim(),
 					type,
 					dailyGoal,
+					color,
 				});
 			}
 			onclose();
@@ -84,10 +119,46 @@
 	aria-modal="true"
 >
 	<DialogTitle id={titleId}>
-		{#if editing}Edit Habit{:else}New Habit{/if}
+		{#if isMood}Mood colors{:else if editing}Edit Habit{:else}New Habit{/if}
 	</DialogTitle>
 
-	{#if showPresets && !editing}
+	{#if isMood}
+		<div class="hf-field">
+			<FieldLabel hint="+1 to +5">Good-day color</FieldLabel>
+			<ColorSwatches
+				value={color}
+				colors={HABIT_COLOR_PALETTE}
+				names={COLOR_NAMES}
+				label="Good-day mood color"
+				onchange={(c) => (color = c)}
+			/>
+		</div>
+		<div class="hf-field">
+			<FieldLabel hint="−1 to −5">Bad-day color</FieldLabel>
+			<ColorSwatches
+				value={negativeColor}
+				colors={HABIT_COLOR_PALETTE}
+				names={COLOR_NAMES}
+				label="Bad-day mood color"
+				onchange={(c) => (negativeColor = c)}
+			/>
+		</div>
+		<div class="modal__actions">
+			<Button
+				variant="ghost"
+				grow
+				onclick={onclose}
+				disabled={saving}>Cancel</Button
+			>
+			<Button
+				grow
+				onclick={save}
+				disabled={saving || color === negativeColor}
+			>
+				{#if saving}Saving…{:else}Save{/if}
+			</Button>
+		</div>
+	{:else if showPresets && !editing}
 		<div class="hf-presets">
 			<p class="hf-presets__label">Start from a preset</p>
 			<div class="hf-presets__grid">
@@ -161,6 +232,17 @@
 				/>
 			</div>
 		{/if}
+
+		<div class="hf-field">
+			<FieldLabel hint="used in charts">Color</FieldLabel>
+			<ColorSwatches
+				value={color}
+				colors={HABIT_COLOR_PALETTE}
+				names={COLOR_NAMES}
+				label="Habit color"
+				onchange={(c) => (color = c)}
+			/>
+		</div>
 
 		{#if typeHasGoal}
 			<div class="hf-field">
@@ -332,7 +414,7 @@
 
 		&:hover {
 			border-color: var(--color-accent);
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 

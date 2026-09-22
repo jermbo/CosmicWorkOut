@@ -51,13 +51,6 @@ export function habitTypeLabel(type: HabitType): string {
 	return HABIT_TYPES.find((t) => t.value === type)?.label ?? type;
 }
 
-export function formatHabitLogValue(habit: Habit, value: number): string {
-	if (habit.type === 'boolean') return formatHabitBooleanValue(value);
-	if (habit.type === 'mood') return formatMoodValue(value);
-	if (habit.type === 'minutes') return formatMinutes(value);
-	return formatCount(value, habit.unit || undefined);
-}
-
 export function formatHabitBooleanValue(value: number): string {
 	if (value === 1) return 'Yes';
 	return 'No';

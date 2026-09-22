@@ -24,7 +24,7 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 
 ## Vocabulary
 
-[Discipline](glossary.md#discipline) · [Practice](glossary.md#practice) · [Program](glossary.md#program) ·
+[Discipline](glossary.md#discipline) · [Workout](glossary.md#workout) · [Plan](glossary.md#plan) · [Program](glossary.md#program) ·
 [Routine](glossary.md#routine) · [Item](glossary.md#item) · [Section](glossary.md#section) ·
 [Metric](glossary.md#metric) · [Focus](glossary.md#focus) · [Session](glossary.md#session) ·
 [Bookends](glossary.md#bookends) · [Lift plan](glossary.md#lift-plan) ·
@@ -58,10 +58,11 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 | [v1.6.0](features/v1.6.0/README.md) | Belly dance catalog and course programs                                                                                                                                                                                                                                                                                                                           |
 | [v1.7.0](features/v1.7.0/README.md) | Full strength catalog                                                                                                                                                                                                                                                                                                                                             |
 | [v1.9.0](features/v1.9.0/README.md) | [Lift plans](features/v1.9.0/US-033-goal-progression-plans.md) — wave-loading toward a target                                                                                                                                                                                                                                                                     |
+| [v1.10.0](features/v1.10.0/README.md) | [Remove Belly Dance](features/v1.10.0/US-051-remove-belly-dance.md) · [One Workout Section](features/v1.10.0/US-052-one-workout-section.md) — Practice and Lift plans merge into one Workout section with an optional goal                                                                                                                                      |
 
 ## Where in the code
 
-- [App Structure](implementation/app-structure.md) — `/workout`, `/practice`, `/program`, `/goals`
+- [App Structure](implementation/app-structure.md) — `/workout`, `/workout/today`, `/workout/new`, `/workout/plan/[id]`
 - [Components](implementation/components.md) — session overlays, editors, `LibrarySheet`
 - [Program Progression](implementation/program-progression.md) — the count-driven rotation
 - [Implementation Status](implementation/status.md) — built vs not

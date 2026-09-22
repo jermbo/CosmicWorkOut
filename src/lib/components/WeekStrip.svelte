@@ -21,7 +21,7 @@
 		sessions: Session[];
 		stayOnPage?: boolean;
 		showMoodDots?: boolean;
-		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>>;
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'activity' | 'health'>>;
 	};
 
 	let { sessions, stayOnPage = false, showMoodDots = false, dayIndicators = {} }: Props = $props();
@@ -108,9 +108,7 @@
 		return null;
 	}
 
-	function indicatorsForDay(
-		dateStr: string,
-	): Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'> {
+	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'activity' | 'health'> {
 		return dayIndicators[dateStr] ?? [];
 	}
 
@@ -334,7 +332,7 @@
 	.week-strip__offset {
 		font-size: 0.6875rem;
 		font-weight: 600;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 	}
@@ -388,7 +386,7 @@
 		}
 
 		.week-day--actual-today:not(.week-day--selected) & {
-			color: var(--color-accent);
+			color: var(--color-accent-text);
 		}
 	}
 
@@ -459,10 +457,6 @@
 		background: var(--color-accent);
 	}
 
-	.week-day__indicator-dot--dance {
-		background: var(--color-lavender);
-	}
-
 	.week-day__indicator-dot--activity {
 		background: var(--color-lavender);
 	}
@@ -526,10 +520,10 @@
 	}
 
 	.week-day__indicator--mood-pos {
-		background: #4ade80;
+		background: var(--color-mood-good);
 	}
 	.week-day__indicator--mood-neg {
-		background: #f87171;
+		background: var(--color-mood-bad);
 	}
 	.week-day__indicator--mood-neutral {
 		background: var(--color-text-muted);
@@ -543,7 +537,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 		white-space: nowrap;
 	}
 </style>

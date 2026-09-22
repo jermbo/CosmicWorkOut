@@ -104,6 +104,6 @@
 	}
 
 	.timeline-block__repeat {
-		color: var(--color-accent);
+		color: var(--color-accent-text);
 	}
 </style>

@@ -8,8 +8,12 @@ import type {
 } from '$lib/db/types';
 
 export const STRENGTH_DISCIPLINE_ID = 'strength';
-export const BELLYDANCE_DISCIPLINE_ID = 'bellydance';
 
+/**
+ * Strength is the only registered Discipline today (Belly Dance removed in v1.10.0,
+ * US-051 — nobody used it, and it fits better as its own app). The model stays
+ * general: a future movement type is still config here, not a rewrite.
+ */
 export const disciplines: Discipline[] = [
 	{
 		id: STRENGTH_DISCIPLINE_ID,
@@ -17,23 +21,6 @@ export const disciplines: Discipline[] = [
 		color: 'lime',
 		icon: 'dumbbell',
 		sections: [{ key: 'exercises', label: 'Exercises', metric: 'setsReps' }],
-	},
-	{
-		id: BELLYDANCE_DISCIPLINE_ID,
-		label: 'Belly Dance',
-		color: 'lavender',
-		icon: 'sparkles',
-		sections: [
-			{ key: 'warm-up', label: 'Warm-up', metric: 'check', isBookend: true },
-			{ key: 'conditioning', label: 'Conditioning', metric: 'measure' },
-			{ key: 'moves', label: 'Moves', metric: 'measure' },
-			{
-				key: 'cool-down',
-				label: 'Cool-down',
-				metric: 'check',
-				isBookend: true,
-			},
-		],
 	},
 ];
 

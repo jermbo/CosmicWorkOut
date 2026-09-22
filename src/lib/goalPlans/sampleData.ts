@@ -1,12 +1,11 @@
-import type { Item, LoggedItem, LoggedSet, Program, Session } from '../db/types';
-import type { GoalPlan, SupportingBaseline } from './types';
+import type { LoggedItem, LoggedSet, Program, Session } from '../db/types';
+import type { GoalPlan, GoalTemplateRoutine, SupportingBaseline } from './types';
 import {
 	generateBlocks,
 	totalPlanWeeks,
 	focusTargetForWeek,
 	supportingWeightForWeek,
 } from './generator';
-import { buildPriorityRoutines, PRIORITY_TEMPLATE_ID } from './templates';
 import { buildGoalProgram } from './buildProgram';
 
 /**
@@ -22,17 +21,44 @@ const STRENGTH = 'strength';
 const FOCUS_ITEM_ID = 'st-bb-bench-press';
 const DAYS_PER_WEEK = 3;
 
-/** Minimal focus item for `buildPriorityRoutines` — matches the built-in bench seed. */
-const FOCUS_ITEM = {
-	id: FOCUS_ITEM_ID,
-	name: 'Barbell Bench Press',
-	cat: 'Chest',
-	defaultSets: 4,
-	defaultReps: '8',
-} as Item;
-
-/** Priority A/B/C scaffold for the sample focus lift (same path as the wizard). */
-const PRIORITY_ROUTINES = buildPriorityRoutines(FOCUS_ITEM);
+/** Fixed A/B/C scaffold for the sample bench-press stint. Not the wizard's path. */
+const PRIORITY_ROUTINES: GoalTemplateRoutine[] = [
+	{
+		letter: 'A',
+		name: 'Bench Press — Heavy',
+		focus: 'Bench Press · primary',
+		estMin: 50,
+		slots: [
+			{ itemId: FOCUS_ITEM_ID, sets: 4, reps: '8' },
+			{ itemId: 'st-incline-db-bench', sets: 3, reps: '10' },
+			{ itemId: 'st-pec-deck', sets: 3, reps: '12' },
+			{ itemId: 'st-tricep-rope-pushdown', sets: 3, reps: '12' },
+		],
+	},
+	{
+		letter: 'B',
+		name: 'Bench Press — Volume',
+		focus: 'Bench Press · support',
+		estMin: 45,
+		slots: [
+			{ itemId: FOCUS_ITEM_ID, sets: 3, reps: '8' },
+			{ itemId: 'st-db-ohp', sets: 3, reps: '10' },
+			{ itemId: 'st-lateral-raise', sets: 3, reps: '12' },
+			{ itemId: 'st-face-pull', sets: 3, reps: '15' },
+		],
+	},
+	{
+		letter: 'C',
+		name: 'Bench Press — Assist',
+		focus: 'Bench Press · assist',
+		estMin: 45,
+		slots: [
+			{ itemId: FOCUS_ITEM_ID, sets: 3, reps: '10' },
+			{ itemId: 'st-bb-bent-over-row', sets: 3, reps: '10' },
+			{ itemId: 'st-tricep-rope-pushdown', sets: 3, reps: '12' },
+		],
+	},
+];
 
 /** Supporting start weights (lb) — accessories from the priority bench scaffold. */
 const SUPPORTING: Record<string, { start: number; increment: number }> = {
@@ -171,7 +197,7 @@ export function generateGoalPlanSampleData(): {
 		id: 'gp-seed-01',
 		disciplineId: STRENGTH,
 		programId: 'gp-seed-01-program',
-		templateId: PRIORITY_TEMPLATE_ID,
+		templateId: 'sample',
 		name: 'Barbell Bench Press Goal 01',
 		focusItemId: FOCUS_ITEM_ID,
 		goal: goal1,
@@ -202,7 +228,7 @@ export function generateGoalPlanSampleData(): {
 		id: 'gp-seed-02',
 		disciplineId: STRENGTH,
 		programId: 'gp-seed-02-program',
-		templateId: PRIORITY_TEMPLATE_ID,
+		templateId: 'sample',
 		name: 'Barbell Bench Press Goal 02',
 		focusItemId: FOCUS_ITEM_ID,
 		goal: goal2,

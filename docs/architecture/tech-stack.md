@@ -139,9 +139,13 @@ See [Offline Strategy](offline-strategy.md) for the caching and install details.
 
 ---
 
-## Charts — Chart.js
+## Charts — TanStack Charts
 
-Insights charts render with **Chart.js** (`chart.js`), the app's only runtime UI dependency beyond fonts. Chart config helpers live in `src/lib/chart-utils.ts`; each chart is a component under `src/lib/components/insights/`. See [Insights Hub](../features/v1.5.0/README.md).
+Since v1.10.0 every chart renders with **TanStack Charts** (`@tanstack/charts`, Svelte adapter, SVG) — [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md). Shared pieces live in `src/lib/charts/`: `ScrollChart.svelte` (fixed-spacing sideways scroll with pinned value rails — [US-040](../features/v1.10.0/US-040-scrolling-charts.md)), `scale.ts` (nice-axis math), `theme.ts` (column width, margins, colors, tooltip), `color.ts`. Each chart is a component under `src/lib/components/insights/` (plus `BaselineChart`).
+
+- **Alpha library.** TanStack Charts is `0.x`; minor versions may break the API. It is pinned to an **exact** version — upgrade deliberately and fix breaks then.
+- **No transitive imports.** Only import `@tanstack/charts` subpaths. Its D3 modules (e.g. `d3-shape`) are not direct dependencies — the radar closes its shape by repeating the first point instead of importing a curve.
+- **`chart.js`** is still listed in `package.json` until the user removes it after testing; nothing imports it.
 
 ---
 
@@ -156,7 +160,8 @@ Pinned in `package.json` (kept here as a snapshot; `package.json` is authoritati
 | `@sveltejs/adapter-static` | 3.0.10  |
 | `vite`                     | 8.0.16  |
 | `typescript`               | 6.0.3   |
-| `chart.js`                 | 4.5.1   |
+| `@tanstack/charts`         | 0.18.0  |
+| `chart.js` (unused)        | 4.5.1   |
 
 ---
 

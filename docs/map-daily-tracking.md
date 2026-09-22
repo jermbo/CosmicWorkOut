@@ -21,12 +21,12 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 
 ### The four trackers
 
-| Tracker                                    | Answers                     | Shape                                  | Flag                   |
-| ------------------------------------------ | --------------------------- | -------------------------------------- | ---------------------- |
-| [Habit](glossary.md#habit)                 | "Did I do it today?"        | One row per (habit, date), upserted    | `habitsEnabled`        |
-| [Activity](glossary.md#activity)           | "What else did I move for?" | One row per logged activity            | `activityLogEnabled`   |
-| [Health metric](glossary.md#health-metric) | "What does my body read?"   | Weight once per date; BP many per date | `healthMetricsEnabled` |
-| [Baseline](glossary.md#baseline)           | "Did I clear my floor?"     | Many entries per day; the day sums     | `baselinesEnabled`     |
+| Tracker                                    | Answers                       | Shape                                  | Flag                   |
+| ------------------------------------------ | ----------------------------- | -------------------------------------- | ---------------------- |
+| [Habit](glossary.md#habit)                 | "Did I do it today?"          | One row per (habit, date), upserted    | `habitsEnabled`        |
+| [Activity](glossary.md#activity)           | "What else did I move for?"   | One row per logged activity            | `activityLogEnabled`   |
+| [Health metric](glossary.md#health-metric) | "What does my body read?"     | Weight once per date; BP many per date | `healthMetricsEnabled` |
+| [Baseline](glossary.md#baseline)           | "Did I show up for my floor?" | Many entries per day; the day sums     | `baselinesEnabled`     |
 
 ---
 
@@ -52,17 +52,18 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 ## 5k — Detail
 
 - [Settings & Preferences](requirements/settings-preferences.md) — the feature flags and their contract
-- [History & Calendar](requirements/history-calendar.md) — how a tracked day is read back
+- [History & Past Days](requirements/history-calendar.md) — how a past day is read back and fixed
 
 ## Ground — Stories by release
 
-| Release                             | What it added                                                                                                                                                                                    |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [v1.1.0](features/v1.1.0/README.md) | [Activity logging](features/v1.1.0/US-003-activity-logging.md) · [Habit tracking](features/v1.1.0/US-004-habit-tracking.md)                                                                      |
-| [v1.2.0](features/v1.2.0/README.md) | [Habit log page](features/v1.2.0/US-008-habit-log-page.md)                                                                                                                                       |
-| [v1.3.0](features/v1.3.0/README.md) | [Habit creation & management](features/v1.3.0/US-009-habit-creation.md) · [Activity edit from calendar](features/v1.3.0/US-013-activity-calendar-edit.md)                                        |
-| [v1.7.0](features/v1.7.0/README.md) | [Health metrics](features/v1.7.0/US-029-health-metrics.md) · [Default habits & mood scale](features/v1.7.0/US-031-default-habits-tweak.md)                                                       |
-| [v1.9.0](features/v1.9.0/README.md) | [Baselines setup](features/v1.9.0/US-034-baselines-setup.md) · [Baselines logging](features/v1.9.0/US-035-baselines-logging.md) · [Baselines charts](features/v1.9.0/US-036-baselines-charts.md) |
+| Release                               | What it added                                                                                                                                                                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [v1.1.0](features/v1.1.0/README.md)   | [Activity logging](features/v1.1.0/US-003-activity-logging.md) · [Habit tracking](features/v1.1.0/US-004-habit-tracking.md)                                                                                                           |
+| [v1.2.0](features/v1.2.0/README.md)   | [Habit log page](features/v1.2.0/US-008-habit-log-page.md)                                                                                                                                                                            |
+| [v1.3.0](features/v1.3.0/README.md)   | [Habit creation & management](features/v1.3.0/US-009-habit-creation.md) · [Activity edit from calendar](features/v1.3.0/US-013-activity-calendar-edit.md)                                                                             |
+| [v1.7.0](features/v1.7.0/README.md)   | [Health metrics](features/v1.7.0/US-029-health-metrics.md) · [Default habits & mood scale](features/v1.7.0/US-031-default-habits-tweak.md)                                                                                            |
+| [v1.9.0](features/v1.9.0/README.md)   | [Baselines setup](features/v1.9.0/US-034-baselines-setup.md) · [Baselines logging](features/v1.9.0/US-035-baselines-logging.md) · [Baselines charts](features/v1.9.0/US-036-baselines-charts.md)                                      |
+| [v1.10.0](features/v1.10.0/README.md) | [Flexible baseline metrics](features/v1.10.0/US-037-flexible-baseline-metrics.md) · [Baseline logging & comparison](features/v1.10.0/US-038-baseline-logging-comparison.md) · [Habit colors](features/v1.10.0/US-042-habit-colors.md) |
 
 ## Where in the code
 

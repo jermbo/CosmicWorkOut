@@ -110,7 +110,7 @@
 		max-inline-size: var(--max-width);
 		margin-inline: auto;
 		background: var(--color-surface-2);
-		border-radius: 26px 26px 0 0;
+		border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
 		border-block-start: 1px solid var(--color-border);
 		padding-block-end: calc(var(--safe-bottom) + var(--space-5));
 		overflow-y: auto;

@@ -4,13 +4,13 @@
 
 All data is stored locally on the device. **Source of truth: `src/lib/db/types.ts`** (entity shapes) and `src/lib/db/database.ts` (stores + DB version). See [Offline Strategy](offline-strategy.md) for write timing.
 
-> The Discipline model is **shipped** (since v1.4.0). Strength and Belly Dance are two Disciplines running on one generic engine. Terms are defined in the [Glossary](../glossary.md).
+> The Discipline model is **shipped** (since v1.4.0). Strength is the only registered Discipline today — Belly Dance, the second one, was removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)); the engine stayed general so a future Discipline is still config, not a rewrite. Terms are defined in the [Glossary](../glossary.md).
 
 ---
 
 ## Discipline model
 
-A **Discipline** is a data-driven definition of a structured movement practice. It makes the engine specific (each Discipline brings its own sections, metrics, and seed content) while the engine itself stays generic — no belly-dance or strength knowledge is baked into the code.
+A **Discipline** is a data-driven definition of a structured movement practice. It makes the engine specific (each Discipline brings its own sections, metrics, and seed content) while the engine itself stays generic — no discipline-specific knowledge is baked into the code.
 
 Disciplines are **seeded, read-only config** — they live in `src/lib/discipline.ts`, **not** in IndexedDB, and are not user-editable. Programs, Items, Routines, and Sessions all carry a `disciplineId`.
 
@@ -19,33 +19,32 @@ type Metric = 'setsReps' | 'measure' | 'check';
 // setsReps → sets × reps × weight (volume); measure → duration or reps; check → done/not-done
 
 type Section = {
-	key: string; // "exercises" | "warm-up" | "conditioning" | "moves" | "cool-down"
+	key: string; // "exercises", or a future Discipline's own section keys
 	label: string;
 	metric: Metric;
-	isBookend?: boolean; // warm-up / cool-down inherit from Routine A
+	isBookend?: boolean; // a section that inherits from Routine A, if a Discipline has one
 };
 
 type Discipline = {
-	id: string; // "strength" | "bellydance"
+	id: string; // "strength"
 	label: string;
 	color?: string;
 	icon?: string;
-	sections: Section[]; // strength: one section; belly dance: four
+	sections: Section[];
 };
 ```
 
-The two shipped Disciplines (`src/lib/discipline.ts`):
+The one shipped Discipline (`src/lib/discipline.ts`):
 
-| Discipline  | id           | Sections                                        | Section metrics                        |
-| ----------- | ------------ | ----------------------------------------------- | -------------------------------------- |
-| Strength    | `strength`   | `exercises`                                     | `setsReps`                             |
-| Belly Dance | `bellydance` | `warm-up`, `conditioning`, `moves`, `cool-down` | `check`, `measure`, `measure`, `check` |
+| Discipline | id         | Sections    | Section metrics |
+| ---------- | ---------- | ----------- | ---------------- |
+| Strength   | `strength` | `exercises` | `setsReps`       |
 
-Belly Dance's `warm-up` and `cool-down` are **bookends** — routines other than A inherit Routine A's bookend items unless they set `overridesBookends`.
+`isBookend` sections (routines other than A inherit Routine A's bookend items unless they set `overridesBookends`) exist in the model for a future Discipline that needs them — Strength's single section doesn't use it.
 
-### Active program is per-Discipline
+### Exactly one active plan
 
-The model is **one active program per Discipline** — a Strength program and a Belly Dance program can be active at the same time. The user runs them concurrently (strength on some days, dance on others); the app does **not** bind a Discipline to days of the week. Note this is a soft convention, not a hard invariant: `activeProgramIds` is a flat array, `setActiveProgram()` appends without deactivating another program of the same Discipline, and `activeProgramFor()` returns the first match — so a second same-Discipline activation is possible and only the first takes effect. (Tracked as a correctness item in the [hardening audit](../maintenance/audit-2026-07-hardening.md#correctness-deferred).) All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive per Discipline, and "one session per program per day" is enforced per Discipline. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
+Only one program is ever active, full stop (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) — the point is staying focused, not juggling plans). `activeProgramIds` holds at most one id; `setActiveProgram(id)` replaces it outright rather than appending. This also resolves what used to be a correctness gap: with two Disciplines able to run concurrently, `setActiveProgram()` appended without deactivating another program of the *same* Discipline, so a second same-Discipline activation could silently coexist (tracked in the [hardening audit](../maintenance/audit-2026-07-hardening.md#correctness-deferred)). With one Discipline and exactly one active plan, that gap is closed by construction. All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive from the active program; "one session per program per day" is unchanged. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
 
 ---
 
@@ -54,17 +53,17 @@ The model is **one active program per Discipline** — a Strength program and a 
 Built-in **Items are derived from catalog seeds**, not hand-written one by one:
 
 - **Strength:** `strength-exercises.ts` (72 exercise catalog entries) → `strengthItems` (section `exercises`, metric `setsReps`).
-- **Belly Dance:** `bellydance-moves.ts` (39 moves) + `bellydance-bookends.ts` (10 warm-up/cool-down) → `bellyDanceItems` (moves metric `measure`; bookends metric `check`).
 
-`src/lib/db/seed.ts` composes `builtInItems = [...strengthItems, ...bellyDanceItems]` (**121 built-in items**) and `builtInPrograms = [...strengthPrograms, ...bellyDancePrograms]` (**12 programs**).
+`src/lib/db/seed.ts` composes `builtInItems = [...strengthItems]` (**72 built-in items**) and `builtInPrograms = [...strengthPrograms]` (**6 programs**) — Belly Dance's catalog and course programs were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
 
 ---
+
 
 ## Entities
 
 ### Item
 
-A single movement — the atomic unit of any routine. One model spans every Discipline; strength-only fields are optional so `measure`/`check` items (belly dance) share the shape.
+A single movement — the atomic unit of any routine. One model spans every Discipline; strength-only fields are optional so a future `measure`/`check` Discipline's items can share the shape without carrying strength baggage.
 
 ```typescript
 type Item = {
@@ -75,9 +74,6 @@ type Item = {
 	section: string; // section key within the Discipline (strength: "exercises")
 	metric: Metric;
 	focus?: string[]; // body-part focus tags, e.g. ["hips", "core"]
-	// Belly dance catalog metadata (dance items only)
-	danceCat?: string;
-	movementType?: 'sharp' | 'smooth' | 'variable';
 	difficulty?: 'beginner' | 'intermediate' | 'advanced';
 	// setsReps (strength) fields — absent on measure/check items
 	muscles?: string;
@@ -96,12 +92,12 @@ Strength categories (`STRENGTH_CATS`) are **body-part based**: Chest, Back, Shou
 
 ### Routine
 
-A single training day. Holds **sections** (not a flat item list), so one engine serves strength's single section and belly dance's four.
+A single training day. Holds **sections** (not a flat item list) so the engine can serve more than one section per Discipline — Strength uses a single `exercises` section.
 
 ```typescript
 type RoutineItem = {
 	itemId: string;
-	sets?: number; // strength only — dance items enter values during the session
+	sets?: number; // strength only — a measure/check Discipline's items enter values during the session
 	reps?: string;
 	notes?: string;
 };
@@ -144,7 +140,7 @@ type Program = {
 };
 ```
 
-Twelve built-in programs ship: six Strength and six Belly Dance "course" programs (Beginner 101–103, Intermediate 101–103).
+Six built-in programs ship, all Strength "course" programs (Beginner 101–103, Intermediate 101–103) — the six Belly Dance course programs were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
 
 ### Session
 
@@ -245,6 +241,8 @@ type Habit = {
 	active: boolean;
 	sortOrder: number;
 	createdAt: string;
+	color?: string; // chart color (v1.10.0, US-042); a default is saved on load when missing
+	negativeColor?: string; // mood only — bad-day color; `color` is the good-day color
 };
 
 type HabitLog = {
@@ -319,9 +317,9 @@ type HealthReading = {
 
 ### GoalPlan
 
-> **Shipped — [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).** Opt-in Strength stint toward one focus lift. Types live in `src/lib/goalPlans/types.ts`.
+> **Shipped — [US-033](../features/v1.9.0/US-033-goal-progression-plans.md); merged into one Workout section in [US-052](../features/v1.10.0/US-052-one-workout-section.md).** The wave a plan can optionally build toward one focus lift. Types live in `src/lib/goalPlans/types.ts`; storage is unchanged by the merge.
 
-Each instance owns a generated backing `Program` (for A/B/C rotation) plus wave metadata. Backing programs are hidden from generic plan pickers and managed on `/goals`.
+Each instance owns a generated backing `Program` (for A/B/C rotation) plus wave metadata. Backing programs are hidden from generic plan pickers and managed on the plan's own page, `/workout/plan/[id]`.
 
 ```typescript
 type GoalPlanStatus = 'active' | 'paused' | 'completed';
@@ -358,7 +356,7 @@ type GoalPlan = {
 	id: string;
 	disciplineId: string; // always "strength"
 	programId: string; // backing Program
-	templateId: string; // scaffold id (e.g. "gp-priority")
+	templateId: string; // starting-point id from the New Plan wizard — a built-in program id, or "scratch"
 	name: string; // default: "<Focus> Goal NN"
 	focusItemId: string;
 	goal: GoalTarget;
@@ -376,28 +374,33 @@ type GoalPlan = {
 };
 ```
 
-- **Feature gate:** `UserPrefs.goalProgressionPlansEnabled` (default `false`). When off, UI is hidden; plans remain in IndexedDB.
-- **Clear data:** the "Clear goal plans" control (UI label still uses the old name) deletes `goalPlans` **and** their backing programs. "Clear custom programs" skips goal-backed programs so plans stay consistent.
-- **UI name:** Prefer **Lift plan** in product copy ([Glossary](../glossary.md#lift-plan)); routes/code may still say `goalPlan` / `/goals`.
+- **Feature gate:** `UserPrefs.practiceEnabled` (default `false`) — the same flag as the rest of Workout; the separate `goalProgressionPlansEnabled` flag was retired in v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)).
+- **Clear data:** Settings → Data & backup's **"Plan goals"** row deletes `goalPlans` **and** their backing programs. "Custom programs" skips goal-backed programs so plans stay consistent.
+- **Remove a goal without deleting the plan:** `goalPlanStore.removeGoal(id)` deletes only the `GoalPlan` row; the backing `Program` keeps running as a plain plan to its original end.
+- **UI name:** Prefer **Lift plan** in product copy ([Glossary](../glossary.md#lift-plan)) — or, since v1.10.0, just **a plan with a goal**; routes/code may still say `goalPlan` / `goalPlanStore`.
 
 ### Baseline
 
-> **[US-034](../features/v1.9.0/US-034-baselines-setup.md).** Opt-in daily floor/ceiling tracking with growth charts. Not a Habit; not a Lift plan. Discovery: [Roadmap — Baselines](../roadmap/baselines.md).
+> **[US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) / [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md)** (v1.10.0, replacing the v1.9.0 shape from [US-034](../features/v1.9.0/US-034-baselines-setup.md)). Opt-in daily baselines with growth charts. Not a Habit; not a Lift plan.
 
 ```typescript
-type BaselineDirection = 'up' | 'under';
+type BaselineMeasure = 'duration' | 'distance' | 'count';
+type DistanceUnit = 'mi' | 'km' | 'm' | 'yd';
 
 type BaselineMetric = {
 	id: string;
-	label: string; // user-typed unit label
-	target: number;
+	name: string; // e.g. "Pushups", "Walk"
+	measure: BaselineMeasure; // fixed at creation
+	baseline: number; // the floor; duration is stored in minutes
+	unit?: DistanceUnit; // distance only
+	label?: string; // count only — user-typed, e.g. "reps", "words"
+	removed?: boolean; // hidden from the baseline; its logs are kept
 };
 
 type Baseline = {
 	id: string;
 	name: string;
-	direction: BaselineDirection;
-	metrics: BaselineMetric[]; // length 1 or 2
+	metrics: BaselineMetric[]; // 1 to n, display order
 	sortOrder: number;
 	active: boolean;
 	createdAt: string;
@@ -412,13 +415,16 @@ type BaselineLog = {
 };
 ```
 
-- **Aggregation:** many `BaselineLog` rows per `(baselineId, date)`; day total per metric = sum of `values[metricId]`. Sums are rounded to 4 decimal places so user-typed decimals (`0.6 + 0.7`) don't render as `1.2999999999999998`.
+- **Done = logged:** any entry on a date marks the baseline done for that date. Values never fail a day.
+- **Comparison:** each metric shows `total − baseline` as a neutral signed difference. The app does not decide what "better" means.
+- **Aggregation:** many `BaselineLog` rows per `(baselineId, date)`; day total per metric = sum of `values[metricId]`, rounded to 4 decimal places.
+- **Entry values:** an entry stores only the metrics the user filled in. A metric blank in every entry that day shows as "not logged".
+- **Metric identity:** metric `id`s are generated once and never reassigned, because `BaselineLog.values` is keyed by them. Edits match by id; new metrics are appended; removed metrics are soft-deleted (`removed: true`).
 - **Feature gate:** `UserPrefs.baselinesEnabled` (default `false`). When off, UI is hidden; data remains in IndexedDB.
-- **Routes:** `/baselines` (logging + charts), `/settings/baselines` (CRUD).
-- **Metric identity:** metric `id`s are generated once at creation and never reassigned, because `BaselineLog.values` is keyed by them. Edits carry ids over by position; the metric **count** is fixed after creation (same spirit as habit type immutability).
-- **Entry values:** an entry stores only the metrics the user filled in, so a partial log (minutes but no miles) is valid and a missing metric counts as `0`.
+- **Routes:** `/baselines` (logging + charts), `/settings/baselines` (toggle + CRUD).
 - **Delete:** deleting a `Baseline` retains its `BaselineLog` rows, matching habits.
 - **Clear data:** "Clear baselines" clears both `baselines` and `baselineLogs`.
+- **Backups:** restoring a backup with v1.9.0-shaped baselines drops its baselines and baseline logs and restores everything else.
 
 ### UserPrefs
 
@@ -427,16 +433,17 @@ Stored in localStorage (`cwout:prefs`).
 ```typescript
 type UserPrefs = {
 	accentColor: string; // hex, default "#b2f042"
+	theme: 'dark' | 'light' | 'system'; // default "dark" (v1.10.0, US-048)
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
 	homeCardOrder: string[]; // Overview card order; repaired on read via resolveHomeCardOrder()
 	habitsEnabled: boolean; // default false — gates Habits, including mood
 	activityLogEnabled: boolean; // default false — gates the Activity log
-	practiceEnabled: boolean; // default false — gates the whole Practice / session engine
+	practiceEnabled: boolean; // default false — gates the whole Workout section, plan goals included (v1.10.0, US-052)
 	healthMetricsEnabled: boolean; // default false — US-029
-	goalProgressionPlansEnabled: boolean; // default false — US-033 (Lift plans); only live when practiceEnabled
 	baselinesEnabled: boolean; // default false — US-034
+	hiddenCharts: string[]; // Insights chart ids hidden by the user — US-043
 };
 ```
 
@@ -472,39 +479,40 @@ erDiagram
 
 **Lift plans** (`GoalPlan`) pair with a generated `Program` for session rotation; prescribed loads come from the plan's blocks, not `itemLastUsed`.
 
-**Baselines** (`Baseline` + `BaselineLog`) are standalone daily growth tracking — see [US-034](../features/v1.9.0/US-034-baselines-setup.md).
+**Baselines** (`Baseline` + `BaselineLog`) are standalone daily growth tracking — see [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md).
 
 ---
 
 ## IndexedDB stores
 
-DB name `cosmic-workout`, version **9**. The upgrade path is **non-destructive**: `onupgradeneeded` creates only the stores and indexes that don't already exist (via idempotent `ensureStore` / `ensureIndex` helpers) and never drops user data. Future schema changes append new store/index creation plus, where needed, data transforms keyed on `event.oldVersion`. See the [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16) for why this replaced the earlier wipe-on-bump behavior.
+DB name `cosmic-workout`, version **11**. The upgrade path is **non-destructive**: `onupgradeneeded` creates only the stores and indexes that don't already exist (via idempotent `ensureStore` / `ensureIndex` helpers) and never drops user data. Future schema changes append new store/index creation plus, where needed, data transforms keyed on `event.oldVersion`. See the [July 2026 Hardening Audit](../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16) for why this replaced the earlier wipe-on-bump behavior.
 
 **Version history** (bumps up to v9 predate the non-destructive upgrade and ran under the old wipe-and-reseed path; from now on bumps preserve data):
 
-| Version      | Change                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v4 (v1.4.0)  | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                                                                                    |
-| v5 (v1.4.0)  | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                                                                                           |
-| v6 (v1.6.0)  | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                                                                                    |
-| v7 (v1.7.0)  | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                                                                               |
-| v8 (v1.7.0)  | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                                                                                         |
-| v9 (v1.9.0)  | `goalPlans` — Lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).                                                                                                                                                                                                                                                                                               |
-| v10 (v1.9.0) | `baselines` + `baselineLogs` — Baselines ([US-034](../features/v1.9.0/US-034-baselines-setup.md)). Originally planned to fold into the v9 bump, but `onupgradeneeded` only runs when the version **increases**, so any DB already opened at v9 would silently lack the two stores. A separate bump upgrades existing installs cleanly; the migration is idempotent and non-destructive. |
+| Version       | Change                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v4 (v1.4.0)   | Discipline model. Strength-only schema generalized; stores renamed (`exercises`→`items`, `exerciseLastUsed`→`itemLastUsed`) with new record shapes. Wipe + re-seed both Disciplines.                                                                                                                                                                                                    |
+| v5 (v1.4.0)   | Belly Dance content lands — Belly Dance items + program seed.                                                                                                                                                                                                                                                                                                                           |
+| v6 (v1.6.0)   | Full belly dance move catalog + six course programs (Beginner/Intermediate 101–103).                                                                                                                                                                                                                                                                                                    |
+| v7 (v1.7.0)   | Full gym exercise catalog + six strength course programs.                                                                                                                                                                                                                                                                                                                               |
+| v8 (v1.7.0)   | `healthReadings` store — [US-029](../features/v1.7.0/US-029-health-metrics.md).                                                                                                                                                                                                                                                                                                         |
+| v9 (v1.9.0)   | `goalPlans` — Lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).                                                                                                                                                                                                                                                                                               |
+| v10 (v1.9.0)  | `baselines` + `baselineLogs` — Baselines ([US-034](../features/v1.9.0/US-034-baselines-setup.md)). Originally planned to fold into the v9 bump, but `onupgradeneeded` only runs when the version **increases**, so any DB already opened at v9 would silently lack the two stores. A separate bump upgrades existing installs cleanly; the migration is idempotent and non-destructive. |
+| v11 (v1.10.0) | Baselines reshaped ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md)). Upgrading from v10 **clears** `baselines` + `baselineLogs` — v1.9.0 baseline data was test-only, so it is dropped rather than converted. No other store is touched.                                                                                                                             |
 
-| Store            | Key      | Indexes                  | Contents                              |
-| ---------------- | -------- | ------------------------ | ------------------------------------- |
-| `items`          | `id`     | —                        | Item library (built-in + custom)      |
-| `programs`       | `id`     | —                        | All programs                          |
-| `sessions`       | `id`     | `by_date`                | Completed sessions                    |
-| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item             |
-| `activities`     | `id`     | `by_date`                | Activity log entries                  |
-| `habits`         | `id`     | —                        | Habit definitions                     |
-| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                |
-| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)       |
-| `goalPlans`      | `id`     | `by_status`              | Lift plans (US-033)                   |
-| `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10) |
-| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10) |
+| Store            | Key      | Indexes                  | Contents                                            |
+| ---------------- | -------- | ------------------------ | --------------------------------------------------- |
+| `items`          | `id`     | —                        | Item library (built-in + custom)                    |
+| `programs`       | `id`     | —                        | All programs                                        |
+| `sessions`       | `id`     | `by_date`                | Completed sessions                                  |
+| `itemLastUsed`   | `itemId` | —                        | Last weight/reps per item                           |
+| `activities`     | `id`     | `by_date`                | Activity log entries                                |
+| `habits`         | `id`     | —                        | Habit definitions                                   |
+| `habitLogs`      | `id`     | `by_date`, `by_habit`    | Daily habit log values                              |
+| `healthReadings` | `id`     | `by_date`, `by_metric`   | Health metric readings (US-029)                     |
+| `goalPlans`      | `id`     | `by_status`              | Lift plans (US-033)                                 |
+| `baselines`      | `id`     | —                        | Baseline definitions (US-034, DB v10; reshaped v11) |
+| `baselineLogs`   | `id`     | `by_date`, `by_baseline` | Baseline log entries (US-034, DB v10)               |
 
 Built-in items and programs are **upserted on every boot** (`initDB()` → `upsertBuiltInRecords`): missing built-ins are added and built-in rows refreshed when seed content changes; user-created records are never touched.
 
@@ -530,4 +538,5 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 - [Program Progression](../implementation/program-progression.md) — How sessions advance the schedule
 - [US-029 — Health Metrics](../features/v1.7.0/US-029-health-metrics.md) — Health readings store
 - [US-033 — Goal Progression Plans](../features/v1.9.0/US-033-goal-progression-plans.md) — Lift plan store
-- [US-034 — Baselines Setup](../features/v1.9.0/US-034-baselines-setup.md) — Baselines stores (planned)
+- [US-034 — Baselines Setup](../features/v1.9.0/US-034-baselines-setup.md) — Baselines stores
+- [US-037 — Flexible Baseline Metrics](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — current baseline shape

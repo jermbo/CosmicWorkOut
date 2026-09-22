@@ -75,8 +75,14 @@ flowchart TB
 
 `npm test` runs Node's built-in test runner over `*.test.ts` files with type
 stripping — no framework, no browser, no new dependencies. Covered today:
-goal-plan generation, baseline aggregation, Overview card ordering, and the
-backup/restore payload path.
+goal-plan generation, baseline aggregation and duration parsing, Overview card
+ordering, the backup/restore payload path, chart axis math (`charts.test.ts`),
+Insights aggregation and heat shading (`insights.test.ts`), and habit color
+defaults (`habitColors.test.ts`).
+
+The `npm test` globs cover `src/lib/*.test.ts` plus a few named folders, so new
+test files for other folders live at `src/lib/` (e.g. `src/lib/charts.test.ts`
+tests `src/lib/charts/scale.ts`) rather than changing the script.
 
 Tests therefore reach **pure modules only**. A file is testable when it imports
 nothing at runtime beyond other pure modules — `import type` from `$lib/...` is
