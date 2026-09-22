@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { WizardStep } from '$lib/goalPlans/wizard.svelte';
-	import { WIZARD_STEPS, WIZARD_STEP_LABELS } from '$lib/goalPlans/wizard.svelte';
+	import type { PlanWizardStep } from '$lib/plans/wizard.svelte';
+	import { PLAN_WIZARD_STEPS, PLAN_WIZARD_STEP_LABELS } from '$lib/plans/wizard.svelte';
 
 	type Props = {
-		step: WizardStep;
+		step: PlanWizardStep;
 		stepIndex: number;
 	};
 
@@ -11,24 +11,24 @@
 </script>
 
 <ol
-	class="goal-steps"
+	class="plan-steps"
 	aria-label="Plan creation steps"
 >
-	{#each WIZARD_STEPS as s, i (s)}
+	{#each PLAN_WIZARD_STEPS as s, i (s)}
 		<li
-			class="goal-steps__item"
-			class:goal-steps__item--active={s === step}
-			class:goal-steps__item--done={i < stepIndex}
+			class="plan-steps__item"
+			class:plan-steps__item--active={s === step}
+			class:plan-steps__item--done={i < stepIndex}
 			aria-current={s === step ? 'step' : undefined}
 		>
-			<span class="goal-steps__num">{i + 1}</span>
-			<span class="goal-steps__label">{WIZARD_STEP_LABELS[s]}</span>
+			<span class="plan-steps__num">{i + 1}</span>
+			<span class="plan-steps__label">{PLAN_WIZARD_STEP_LABELS[s]}</span>
 		</li>
 	{/each}
 </ol>
 
 <style>
-	.goal-steps {
+	.plan-steps {
 		display: flex;
 		gap: var(--space-2);
 		margin-block-end: var(--space-5);
@@ -37,7 +37,7 @@
 		padding-block-end: var(--space-1);
 	}
 
-	.goal-steps__item {
+	.plan-steps__item {
 		display: inline-flex;
 		align-items: center;
 		gap: 6px;
@@ -53,16 +53,16 @@
 		flex-shrink: 0;
 	}
 
-	.goal-steps__item--active {
+	.plan-steps__item--active {
 		border-color: var(--color-accent);
 		color: var(--color-text-primary);
 	}
 
-	.goal-steps__item--done {
+	.plan-steps__item--done {
 		color: var(--color-text-secondary);
 	}
 
-	.goal-steps__num {
+	.plan-steps__num {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -74,7 +74,7 @@
 		font-size: 0.625rem;
 	}
 
-	.goal-steps__item--active .goal-steps__num {
+	.plan-steps__item--active .plan-steps__num {
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 	}

@@ -14,7 +14,7 @@
 		showBack?: boolean;
 		backHref?: string;
 		showMoodDots?: boolean;
-		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>>;
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'activity' | 'health'>>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
 	};
@@ -35,7 +35,7 @@
 
 	let contextDate = $derived(loggingContext.date);
 	let displayDate = $derived(formatWeekdayShortDate(contextDate, ' · '));
-	// Feeds the week strip's "done" pips — empty while Practice is off so other pages
+	// Feeds the week strip's "done" pips — empty while Workout is off so other pages
 	// don't show session marks for a hidden feature.
 	let activeSessions = $derived(
 		prefsStore.practiceEnabled

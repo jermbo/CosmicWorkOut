@@ -10,8 +10,7 @@
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { todayIso } from '$lib/date';
-	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
-	import { computePracticeNextUp } from '$lib/practice';
+	import { computeWorkoutNextUp } from '$lib/workoutNextUp';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import WeekStreakBadge from '$lib/components/WeekStreakBadge.svelte';
 	import HomeHabitsCard from '$lib/components/HomeHabitsCard.svelte';
@@ -58,39 +57,29 @@
 	let baselinesTotal = $derived(baselineStore.activeBaselines.length);
 	let baselinesDone = $derived(baselineStore.loggedCountForDate(contextDate));
 
-	let liveDiscipline = $derived.by(() => {
-		if (sessionStore.isActive) return sessionStore.activeDisciplineId;
-		return null;
-	});
-
-	let practiceNextUp = $derived(
-		computePracticeNextUp({
-			activePrograms: programStore.activePrograms,
+	let workoutNextUp = $derived(
+		computeWorkoutNextUp({
+			activeProgram: programStore.activeProgram,
 			contextDate,
-			liveDisciplineId: liveDiscipline,
+			isLive: sessionStore.isActive,
 			liveRoutineName: sessionStore.active?.routineName ?? null,
-			sessionsForProgram: (programId, date) => programStore.sessionForProgramDate(programId, date),
+			sessionForProgram: (programId, date) => programStore.sessionForProgramDate(programId, date),
 			suggestedRoutineForProgram: (programId) =>
 				programStore.suggestedRoutineInCurrentWeekForProgram(programId),
 		}),
 	);
 
 	let weekIndicators = $derived.by(() => {
-		const indicators: Record<
-			string,
-			Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>
-		> = {};
+		const indicators: Record<string, Array<'habits' | 'strength' | 'activity' | 'health'>> = {};
 
-		function add(date: string, indicator: 'habits' | 'strength' | 'dance' | 'activity' | 'health') {
+		function add(date: string, indicator: 'habits' | 'strength' | 'activity' | 'health') {
 			if (!indicators[date]) indicators[date] = [];
 			if (!indicators[date].includes(indicator)) indicators[date].push(indicator);
 		}
 
 		if (practiceEnabled) {
 			for (const session of programStore.sessions) {
-				let kind: 'dance' | 'strength' = 'strength';
-				if (session.disciplineId === BELLYDANCE_DISCIPLINE_ID) kind = 'dance';
-				add(session.date, kind);
+				add(session.date, 'strength');
 			}
 		}
 
@@ -138,7 +127,7 @@
 		<div class="home-empty">
 			<p class="home-empty__msg">Nothing is being tracked yet.</p>
 			<p class="home-empty__hint">
-				Habits, Activity log, Practice, Health metrics, and Baselines are each opt-in — turn on what
+				Habits, Activity log, Workout, Health metrics, and Baselines are each opt-in — turn on what
 				you want to track.
 			</p>
 			<a
@@ -157,10 +146,10 @@
 				/>
 			{:else if cardId === 'practice'}
 				<HomePracticeHubCard
-					completedCount={practiceNextUp.completedCount}
-					live={practiceNextUp.live}
-					headline={practiceNextUp.headline}
-					detail={practiceNextUp.detail}
+					completedCount={workoutNextUp.completedCount}
+					live={workoutNextUp.live}
+					headline={workoutNextUp.headline}
+					detail={workoutNextUp.detail}
 				/>
 			{:else if cardId === 'activity'}
 				<HomeActivityCard activities={dateActivities} />

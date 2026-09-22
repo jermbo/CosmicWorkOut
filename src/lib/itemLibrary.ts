@@ -1,6 +1,5 @@
 import type { Item } from '$lib/db/types';
-import { FOCUS_TAGS, STRENGTH_CATS } from '$lib/db/types';
-import { disciplineById } from '$lib/discipline';
+import { STRENGTH_CATS } from '$lib/db/types';
 
 /**
  * Per-discipline configuration for `LibrarySheet`. The sheet owns the chrome —
@@ -52,10 +51,7 @@ type LibraryBase = {
 	row: (item: Item) => LibraryRow;
 };
 
-/** `kind` also picks which form sheet the New/Edit buttons open. */
-export type LibraryConfig =
-	| (LibraryBase & { kind: 'dance'; disciplineId: string; defaultSection?: string })
-	| (LibraryBase & { kind: 'strength' });
+export type LibraryConfig = LibraryBase;
 
 const CAT_COLORS: Record<string, string> = {
 	Chest: 'var(--color-red)',
@@ -68,54 +64,9 @@ const CAT_COLORS: Record<string, string> = {
 	'Full Body': 'var(--color-lavender)',
 };
 
-/** Items grouped by the discipline's own sections, with a secondary focus-tag filter. */
-export function danceLibrary(disciplineId: string, defaultSection?: string): LibraryConfig {
-	const sections = disciplineById(disciplineId)?.sections ?? [];
-	const sectionLabel = (key: string) => sections.find((s) => s.key === key)?.label ?? key;
-
-	return {
-		kind: 'dance',
-		disciplineId,
-		defaultSection,
-		title: 'Item Library',
-		searchPlaceholder: 'Search items…',
-		searchLabel: 'Search items',
-		addLabel: 'Add custom item',
-		emptyText: 'No items match.',
-		capitalize: true,
-		accepts: (it) => it.disciplineId === disciplineId,
-		search: (it, q) =>
-			it.name.toLowerCase().includes(q) || (it.focus ?? []).some((f) => f.includes(q)),
-		filters: [
-			{
-				ariaLabel: 'Filter by section',
-				anyValue: 'all',
-				anyLabel: 'All',
-				initial: defaultSection,
-				options: sections.map((s) => ({ value: s.key, label: s.label })),
-				matches: (it, value) => it.section === value,
-			},
-			{
-				ariaLabel: 'Filter by focus',
-				anyValue: '',
-				anyLabel: 'Any focus',
-				small: true,
-				clearOnReselect: true,
-				options: FOCUS_TAGS.map((tag) => ({ value: tag, label: tag })),
-				matches: (it, value) => (it.focus ?? []).includes(value),
-			},
-		],
-		row: (it) => ({
-			subtitle: (it.focus ?? []).join(' · '),
-			tag: sectionLabel(it.section),
-		}),
-	};
-}
-
 /** Strength items, grouped by muscle category and colour-coded to match. */
 export function strengthLibrary(): LibraryConfig {
 	return {
-		kind: 'strength',
 		title: 'Exercise Library',
 		searchPlaceholder: 'Search exercises or muscles…',
 		searchLabel: 'Search exercises',

@@ -45,8 +45,8 @@
 			detail={onOff(prefsStore.baselinesEnabled, `${activeBaselineCount} active`)}
 		/>
 		<SettingsRow
-			href="/settings/practice"
-			label="Practice"
+			href="/settings/workout"
+			label="Workout"
 			detail={onOff(prefsStore.practiceEnabled)}
 		/>
 		<SettingsRow

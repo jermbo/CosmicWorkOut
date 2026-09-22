@@ -2,7 +2,7 @@
 
 # v1.10.0 — Baselines & Insights Refresh
 
-> **Status:** In progress. **Built:** US-037 – US-050 — checked with type check, lint, unit tests (109) and a production build; light mode (US-048) also checked in a browser at phone width, the rest awaits user testing. **Planned:** US-051 – US-054 (Topics 11 – 14).
+> **Status:** In progress. **Built:** US-037 – US-052 — checked with type check, lint, unit tests (109) and a production build; US-048 (light mode) and US-051/US-052 (Remove Belly Dance, One Workout Section) also checked with a full click-through in the browser at phone width. **Planned:** US-053 – US-054 (Topics 13 – 14, Insights).
 
 Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub. It grew on the branch: Topics 8 – 10 finish work the roadmap and the July 2026 audit had queued; Topics 11 – 14 reshape the app around one focused workout plan and make Insights answer "am I getting stronger?".
 
@@ -26,8 +26,8 @@ Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub. It grew 
 | [US-048](./US-048-light-mode.md)                   | Light Mode                         | 8     | Built   |
 | [US-049](./US-049-lift-plan-rename.md)             | Lift Plan Wording in the UI        | 9     | Built   |
 | [US-050](./US-050-cheap-hardening.md)              | Cheap Hardening                    | 10    | Built   |
-| [US-051](./US-051-remove-belly-dance.md)           | Remove Belly Dance                 | 11    | Planned |
-| [US-052](./US-052-one-workout-section.md)          | One Workout Section                | 12    | Planned |
+| [US-051](./US-051-remove-belly-dance.md)           | Remove Belly Dance                 | 11    | Built   |
+| [US-052](./US-052-one-workout-section.md)          | One Workout Section                | 12    | Built   |
 | [US-053](./US-053-personal-records.md)             | Personal Records                   | 13    | Planned |
 | [US-054](./US-054-this-month-card.md)              | This Month Card                    | 14    | Planned |
 

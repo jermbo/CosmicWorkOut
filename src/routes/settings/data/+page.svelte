@@ -239,10 +239,10 @@
 			description="Weight and blood pressure readings."
 			onclick={() => openClearDialog('health')}
 		/>
-		{#if prefsStore.liftPlansEnabled}
+		{#if prefsStore.practiceEnabled}
 			<SettingsActionRow
-				label="Lift plans"
-				description="Lift plan records. Their generated programs and sessions stay in place."
+				label="Plan goals"
+				description="Goal records — start, target, and wave. Also deletes the plans they generated; logged sessions stay in place."
 				onclick={() => openClearDialog('goalPlans')}
 			/>
 		{/if}
@@ -276,9 +276,9 @@
 		<div class="data-action">
 			<p class="data-action__desc data-action__desc--small">
 				Load ~6 months of realistic debug data — workout sessions, activities, habit logs, health
-				readings, two sample lift plans (one completed, one mid-plan; visible when lift plans are
-				on), and two sample baselines — for testing graphs and visualizations. Existing data is
-				kept. Remove with "Workout sessions", "Activity log", and "Lift plans" above.
+				readings, two sample plan goals (one completed, one mid-plan; visible when Workout is on),
+				and two sample baselines — for testing graphs and visualizations. Existing data is kept.
+				Remove with "Workout sessions", "Activity log", and "Plan goals" above.
 			</p>
 			<button
 				class="data-action__btn data-action__btn--ghost"
@@ -398,8 +398,8 @@
 	</ConfirmDialog>
 {:else if activeDialog === 'goalPlans'}
 	<ConfirmDialog
-		title="Clear lift plans?"
-		confirmLabel="Clear lift plans"
+		title="Clear plan goals?"
+		confirmLabel="Clear plan goals"
 		confirmBusyLabel="Clearing…"
 		danger
 		busy={clearingData}
@@ -407,9 +407,9 @@
 		onconfirm={handleClearConfirm}
 		oncancel={() => (activeDialog = null)}
 	>
-		This removes all lift plan records — active, paused, and completed. The programs and sessions
-		they generated stay and can be cleared with "Custom programs" and "Workout sessions". This
-		cannot be undone.
+		This removes every goal record — active, paused, and completed — and the plans they generated.
+		Logged sessions stay and can be cleared separately with "Workout sessions". This cannot be
+		undone.
 	</ConfirmDialog>
 {:else if activeDialog === 'baselines'}
 	<ConfirmDialog

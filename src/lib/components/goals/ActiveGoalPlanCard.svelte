@@ -140,7 +140,7 @@
 	<div class="plan-card__actions">
 		<a
 			class="plan-card__cta"
-			href={resolve(`/workout?program=${plan.programId}`)}>Go to workout</a
+			href={resolve(`/workout/today?program=${plan.programId}`)}>Go to workout</a
 		>
 		<button
 			class="plan-card__action"

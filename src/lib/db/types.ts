@@ -72,8 +72,6 @@ export interface Item {
 	section: string;
 	metric: Metric;
 	focus?: string[];
-	danceCat?: string;
-	movementType?: DanceMovementType;
 	difficulty?: CatalogDifficulty;
 	muscles?: string;
 	cat?: ItemCat;
@@ -85,9 +83,6 @@ export interface Item {
 	weightIncrement?: number;
 	isBuiltIn: boolean;
 }
-
-export type DanceMovementType = 'sharp' | 'smooth' | 'variable';
-export type DanceDifficulty = CatalogDifficulty;
 
 export const FOCUS_TAGS = [
 	'hips',
@@ -194,7 +189,6 @@ export interface UserPrefs {
 	activityLogEnabled: boolean;
 	practiceEnabled: boolean;
 	healthMetricsEnabled: boolean;
-	goalProgressionPlansEnabled: boolean;
 	baselinesEnabled: boolean;
 	/** Insights chart ids the user has hidden (v1.10.0, US-043). Unknown ids are ignored. */
 	hiddenCharts: string[];

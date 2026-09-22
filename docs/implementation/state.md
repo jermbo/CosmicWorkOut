@@ -32,12 +32,11 @@ Owns the long-lived workout data — programs, items, sessions, and derived sche
 **Key actions:**
 
 - `load()` — boot-time data load
-- `saveWorkoutExercises(name, exercises)` — update workout across all weeks
-- `addWorkout(workout)` — add new workout template to all weeks
+- `saveRoutine(programId, name, updates)` / `addRoutine(programId, routine)` / `removeRoutine(programId, name)` — edit a routine by program id, whether or not it's active (v1.10.0, US-052 — editing used to silently target the active program even when viewing a different one)
 - `refreshSessions()` — reload sessions after finish
-- `getWorkoutById(id)` — lookup by ID
-- `getWorkoutForSession(session)` — lookup workout for a completed session
-- `setSoleActiveProgram(id)` — activate one program and deactivate others in its discipline (used by lift plans)
+- `getRoutineById(id)` — lookup by ID
+- `getRoutineForSession(session)` — lookup routine for a completed session
+- `setActiveProgram(id)` — activate one program, deactivating every other active program (v1.10.0, US-052 — exactly one plan is ever active)
 
 ---
 
@@ -84,16 +83,15 @@ User preferences. Loaded once at boot, saved on every change.
 | `homeCardOrder`               | see below     | Order of the Overview summary cards                                                                |
 | `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI                                                              |
 | `activityLogEnabled`          | `false`       | Gates `/log` and related UI                                                                        |
-| `practiceEnabled`             | `false`       | Gates the Practice engine (below)                                                                  |
+| `practiceEnabled`             | `false`       | Gates the whole Workout section (below) — code name lags the "Workout" rename (v1.10.0, US-052)   |
 | `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI                                                                     |
-| `goalProgressionPlansEnabled` | `false`       | Gates `/goals` and related UI                                                                      |
 | `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI                                                                  |
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 
 ### Overview card order
 
-No tracking feature owns the top of Overview. `homeCardOrder` is a user-set list of card ids, edited by drag or arrow buttons on `/settings/overview`. Registry and pure logic live in `src/lib/homeCards.ts` (tested in `homeCards.test.ts`); default order is `habits · practice · activity · baselines · health`.
+No tracking feature owns the top of Overview. `homeCardOrder` is a user-set list of card ids, edited by drag or arrow buttons on `/settings/overview`. Registry and pure logic live in `src/lib/homeCards.ts` (tested in `homeCards.test.ts`); default order is `habits · practice · activity · baselines · health` — the `practice` id's label is now **Workout** (v1.10.0, US-052).
 
 The stored value comes from localStorage, so `resolveHomeCardOrder()` repairs it on every read: unknown and duplicate ids are dropped, and **any card the stored order doesn't mention is appended in default order**. That last rule is what makes a newly shipped card appear for existing users instead of silently vanishing — adding a card means adding it to `HOME_CARD_IDS`, nothing more.
 
@@ -101,18 +99,15 @@ Order is stored for every card, including ones whose feature is off; Overview fi
 
 ### Feature flags hide UI; data always persists
 
-**Every tracking feature is opt-in and defaults off** — Habits, Activity log, Practice, Health metrics, and Baselines. A flag only controls visibility: IndexedDB rows and localStorage keys are untouched (boot still runs every store's `load()` and `seedHabitsIfEmpty()`), so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/goals` and `/baselines` additionally show a short "turned off" panel.
+**Every tracking feature is opt-in and defaults off** — Habits, Activity log, Workout, Health metrics, and Baselines. A flag only controls visibility: IndexedDB rows and localStorage keys are untouched (boot still runs every store's `load()` and `seedHabitsIfEmpty()`), so flipping a flag back on restores the feature with its history intact. Route guards use `redirectWhenDisabled()` from `src/lib/featureGate.svelte.ts`, which bounces to Overview; `/baselines` additionally shows a short "turned off" panel.
 
 Because nothing is on for a fresh install, `prefsStore.anyTrackingEnabled` drives an Overview empty state pointing at Settings.
 
-Each flag covers its own Overview card, week-strip indicator, Insights charts, and Settings → Data clear row. Two wrinkles are worth knowing:
+Each flag covers its own Overview card, week-strip indicator, Insights charts, and Settings → Data clear row. One wrinkle is worth knowing:
 
 - **Mood belongs to Habits.** Mood is a protected `Habit` row (`type: 'mood'`) that can't be deactivated _within_ Habits, but it is not exempt from the flag — the mood strip, the week-strip mood pips, and the Mood vs Habits chart all hide with `habitsEnabled`.
-- **Practice is the broad one** (see below), and Lift plans nest inside it.
 
-**`practiceEnabled` reaches furthest.** Practice is the session engine, not a single screen, so the flag covers: the Practice bottom-nav tab; the routes `/practice`, `/practice/dance`, `/practice/[groupId]`, `/workout`, `/program`; the Overview practice card, week-streak badge, and strength/dance week-strip indicators; the session overlays, completion screen, and crash-recovery banner in `+layout.svelte`; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data.
-
-**Lift plans nest inside Practice.** A plan generates a backing program and can only be _trained_ through `/workout`, so `goalProgressionPlansEnabled` alone is not enough. `prefsStore.liftPlansEnabled` is a derived `practiceEnabled && goalProgressionPlansEnabled` — every consumer reads that instead of and-ing the two flags itself, and the Lift plans toggle is only shown while Practice is on.
+**`practiceEnabled` reaches furthest.** Workout is the session engine, not a single screen, so the flag covers: the Workout bottom-nav tab; every `/workout*` route; the Overview workout card, week-streak badge, and week-strip session indicators; the session overlay, completion screen, and crash-recovery banner in `+layout.svelte`; the Insights weekly volume chart; and the exercise / program / session clear rows in Settings → Data. A plan's own goal, if it has one, is part of the same Program/GoalPlan record pair and needs no separate flag (v1.10.0, US-052 folded the old, separate Lift plans toggle into this one).
 
 ---
 
@@ -224,11 +219,11 @@ Reads `loggingContext.date` for the active logging date (same as `habitStore` an
 
 **File:** `src/lib/stores/goalPlans.svelte.ts`
 
-Owns lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.liftPlansEnabled` (Practice **and** Lift plans both on).
+Owns the goal a plan can optionally have ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md); merged into one Workout section in [US-052](../features/v1.10.0/US-052-one-workout-section.md)). Pure logic lives in `src/lib/goalPlans/`. Gated by `prefsStore.practiceEnabled`. `src/lib/plans/actions.ts` is the layer above this and `programStore` that the UI actually calls — `activatePlan`/`pausePlan`/`runItAgain` dispatch to whichever store owns a given program id, so exactly one plan (goal-bearing or not) is ever active.
 
-| State   | Source    | Purpose               |
-| ------- | --------- | --------------------- |
-| `plans` | IndexedDB | All lift plan records |
+| State   | Source    | Purpose          |
+| ------- | --------- | ---------------- |
+| `plans` | IndexedDB | All goal records |
 
 **Key derived values:**
 
@@ -240,8 +235,9 @@ Owns lift plans ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)).
 
 - `load()` — boot-time data load
 - `createPlan(input)` — generate blocks, upsert backing Program, store paused plan
-- `activatePlan(id)` — sole active Strength program via `setSoleActiveProgram`
+- `activatePlan(id)` — sole active Strength program via `programStore.setActiveProgram`
 - `pausePlan(id)` / `completePlan(id)` — lifecycle; deactivate backing program
+- `removeGoal(id)` — drop the goal only; the backing program keeps running as a plain plan to its original end (v1.10.0, US-052)
 - `repeatCurrentBlock(id)` — rewind targets via `countOffset`; extend backing program weeks
 - `renamePlan(id, name)` — rename plan + backing program
 

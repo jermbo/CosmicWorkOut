@@ -19,7 +19,7 @@ Defining, selecting, and editing fitness programs.
 | Copy built-in before editing | Built  |                                                                                |
 | Custom item CRUD             | Built  |                                                                                |
 | Browse all program weeks     | Built  |                                                                                |
-| Multi-plan activation        | Built  | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) |
+| Multi-plan activation        | Removed | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) let more than one plan run at once; v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) made exactly one plan active, always |
 
 **Roadmap:** week-by-week schedule preview in program picker — [roadmap](../roadmap/README.md#ux-polish).
 
@@ -60,7 +60,7 @@ flowchart TB
 
 The app ships with a small set of ready-to-use programs. These act as starting points — users should be able to copy and modify them, not just run them as-is.
 
-Currently shipped: **12 built-in "course" programs** — 6 Strength and 6 Belly Dance (Beginner/Intermediate 101–103 each), seeded from `src/lib/db/seed.ts`.
+Currently shipped: **6 built-in "course" programs** — Strength Beginner/Intermediate 101–103, seeded from `src/lib/db/seed.ts` (the 6 Belly Dance course programs were removed in v1.10.0, [US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
 
 Built-in programs are read-only: editing one prompts a copy-first guard that clones the program before any change is saved.
 
@@ -145,13 +145,13 @@ sequenceDiagram
 - A program must have at least 1 week and 1 training day per week
 - Maximum is not defined — don't artifically cap it
 - A workout must have at least 1 exercise
-- Programs can coexist in storage; only one is "active" at a time
+- Programs can coexist in storage; **exactly one is ever active** (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md))
 
 ---
 
 ## Answered by Current Behavior
 
-- **One active program per Discipline.** Active plan ids stored in `cwout:activeProgramIds`; a Strength and a Belly Dance plan can run concurrently.
+- **Exactly one active program, enforced.** The single active plan id is stored in `cwout:activeProgramIds`; activating a different plan pauses the current one (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) — the point is staying focused).
 - **Skipping days doesn't shift the schedule.** Next open always shows the next routine in linear sequence.
 - **Editing mid-cycle doesn't change history.** Completed Sessions keep their original data; edits affect future sessions only.
 

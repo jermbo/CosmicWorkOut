@@ -21,7 +21,7 @@
 		sessions: Session[];
 		stayOnPage?: boolean;
 		showMoodDots?: boolean;
-		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'>>;
+		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'activity' | 'health'>>;
 	};
 
 	let { sessions, stayOnPage = false, showMoodDots = false, dayIndicators = {} }: Props = $props();
@@ -108,9 +108,7 @@
 		return null;
 	}
 
-	function indicatorsForDay(
-		dateStr: string,
-	): Array<'habits' | 'strength' | 'dance' | 'activity' | 'health'> {
+	function indicatorsForDay(dateStr: string): Array<'habits' | 'strength' | 'activity' | 'health'> {
 		return dayIndicators[dateStr] ?? [];
 	}
 
@@ -457,10 +455,6 @@
 
 	.week-day__indicator-dot--strength {
 		background: var(--color-accent);
-	}
-
-	.week-day__indicator-dot--dance {
-		background: var(--color-lavender);
 	}
 
 	.week-day__indicator-dot--activity {

@@ -2,7 +2,9 @@
 
 # US-052 — One Workout Section
 
-> **Status:** Planned — decided in [v1.10.0 — Topic 12](./README.md#topic-12--one-workout-section). Build after [US-051](./US-051-remove-belly-dance.md). Rows marked **Proposed** were filled in while writing this story and still need a yes.
+> **Status:** Built — decided in [v1.10.0 — Topic 12](./README.md#topic-12--one-workout-section). Checked with type check, lint, unit tests (109), a production build, and a full click-through in the browser (create a goal plan end to end, remove its goal, activate a different plan, delete a plan) at phone width.
+>
+> **As built:** The URL map below shipped exactly as planned. `programStore.setActiveProgram` is now always exclusive (deactivates every other program); `setSoleActiveProgram` was folded into it since with one discipline they're the same operation. A new `src/lib/plans/` module holds the merge: `actions.ts` (`activatePlan`/`pausePlan`/`runItAgain`/`allPlans`, dispatching between `programStore` and `goalPlanStore` so exactly one of {a plain program, a goal's program} is ever active) and `wizard.svelte.ts` (the new `PlanWizard`, replacing the old goal-only `GoalWizard`). `goalPlanStore` gained `removeGoal()` — deletes the `GoalPlan` row only, leaving the program (and its own `durationWeeks`) to keep running as a plain plan. `buildGoalProgram`'s `goal` param is now optional. `programStore.saveRoutine` / `addRoutine` / `removeRoutine` now take an explicit `programId` instead of always assuming the active program — a real fix, since the old `/program` page let you view a non-active program's schedule but any edit there silently landed on the *active* program. The lift-plan wizard's "Priority week / Focus only / From scratch" scaffolds are gone, along with `GoalFocusStep`, `GoalSetupStep`, `GoalStartStep`, `GoalExercisesStep`, `GoalPreviewStep`, `GoalWizardSteps`, `GoalPlanRow`, `AddPracticeSheet`, `PracticeGroupCard`, `ProgramSelectSheet`, and `CreateProgramSheet` — all either replaced by the new `src/lib/components/plans/*` step components or made redundant by the merge.
 
 As a **fitness user**, I want one place for my workout plan, with an optional goal,
 so that I can stay focused on one plan and see my progress without juggling two features that do the same job.
@@ -117,17 +119,19 @@ New plan                                  /workout/new
 
 ---
 
-## Proposed — confirm while reading
+## Proposed — resolved during implementation
 
-| #   | Detail                              | Proposal                                                                                                                                                          |
-| --- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P1  | **"Lift plan" as a word**           | Retires from the UI. A plan either has a **Goal** or doesn't. (US-049 put "Lift plan" everywhere a few hours ago — this replaces it.)                             |
-| P2  | **Which lift can be the focus**     | Any exercise already in the plan's routines. From scratch, you add exercises first, then pick.                                                                    |
-| P3  | **Supporting lifts in a goal plan** | Behave as they do in lift plans today (climb by their increment each week). Plain plans keep last-used prefill.                                                   |
-| P4  | **Run it again, with a goal**       | Repeats the **last block** of the wave (today's "Repeat block"), not the whole wave from the start weight — starting over would drop you back to where you began. |
-| P5  | **Plain plan length**               | Template: its own weeks (the built-ins are 4). Scratch: the weeks field you have today (1–52, default 12).                                                        |
-| P6  | **Data & backup clear rows**        | "Custom programs" → **Custom plans**; "Lift plans" → **Plan goals** (clears goals, keeps the plans).                                                              |
-| P7  | **Overview card**                   | Named **Workout**; shows the active plan and today's routine, as the Practice card does now.                                                                      |
+| #   | Detail                               | As built                                                                                                                                                                                                                              |
+| --- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | **"Lift plan" as a word**             | Retired from the UI. A plan either has a **Goal** or doesn't.                                                                                                                                                                          |
+| P2  | **Which lift can be the focus**       | Any exercise already in the plan's routines (`PlanWizard.focusCandidates`). From scratch, you add exercises first (Routines step), then pick the focus (Goal step).                                                                   |
+| P3  | **Supporting lifts in a goal plan**   | Unchanged — climb by their increment each week (`goalPlanStore`'s existing `SupportingBaseline` machinery). Plain plans keep last-used prefill.                                                                                       |
+| P4  | **Run it again, with a goal**         | Repeats the **last block** of the wave via the existing `repeatCurrentBlock`, not a restart from the start weight.                                                                                                                     |
+| P5  | **Plain plan length**                 | Template: its own weeks (the built-ins are 4). Scratch: fixed at **3 days/week** to match every built-in and the goal wave's own assumption, with a 1–52 week picker (default 12) — see the days-per-week note below.                  |
+| P6  | **Data & backup clear rows**          | "Lift plans" → **Plan goals**; description corrected to say it also deletes the plans it generated (that was already true — the old copy was wrong). "Custom programs" kept its name; a plan built from scratch is still a Program under the hood. |
+| P7  | **Overview card**                     | Card id stays `practice` in code; its label is now **Workout** (`homeCards.ts`), and its href/aria-label point at `/workout`.                                                                                                          |
+
+**Days-per-week simplification (found while building):** every built-in template and the whole goal wave engine assumes exactly 3 routines (A/B/C). Rather than plumb a variable day count through the wave math for this pass, the wizard fixes new plans at 3 days/week (`DAYS_PER_WEEK` in `plans/wizard.svelte.ts`) for both template and scratch starts — dropping the old `CreateProgramSheet`'s 1–7 day picker. A plan with a different day count is a reasonable roadmap item, not required for this merge.
 
 ---
 

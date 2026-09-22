@@ -6,19 +6,16 @@
 
 	const ALL_NAV_ITEMS = [
 		{ href: '/', label: 'Overview', exact: true },
-		{ href: '/practice', label: 'Practice', exact: false },
+		{ href: '/workout', label: 'Workout', exact: false },
 		{ href: '/insights', label: 'Insights', exact: false },
 		{ href: '/settings', label: 'Settings', exact: false },
 	] as const;
 
 	let navItems = $derived(
-		ALL_NAV_ITEMS.filter((item) => item.href !== '/practice' || prefsStore.practiceEnabled),
+		ALL_NAV_ITEMS.filter((item) => item.href !== '/workout' || prefsStore.practiceEnabled),
 	);
 
 	function isActive(item: (typeof ALL_NAV_ITEMS)[number]): boolean {
-		if (item.href === '/practice') {
-			return pathname.startsWith('/practice') || pathname.startsWith('/workout');
-		}
 		if (item.exact) {
 			return pathname === item.href;
 		}
@@ -60,7 +57,7 @@
 						>
 							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 						</svg>
-					{:else if item.label === 'Practice'}
+					{:else if item.label === 'Workout'}
 						<svg
 							class="bottom-nav__icon"
 							aria-hidden="true"

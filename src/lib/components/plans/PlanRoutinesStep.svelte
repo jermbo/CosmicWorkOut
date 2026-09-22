@@ -1,38 +1,18 @@
 <script lang="ts">
-	import type { Item } from '$lib/db/types';
 	import type { GoalTemplateRoutine } from '$lib/goalPlans/types';
 	import { programStore } from '$lib/stores/program.svelte';
 
 	type Props = {
-		focusItem: Item;
-		focusItemId: string;
 		routines: GoalTemplateRoutine[];
-		isScratch: boolean;
-		exercisesValid: boolean;
-		focusInPlan: boolean;
+		routinesValid: boolean;
 		onRemoveSlot: (letter: 'A' | 'B' | 'C', itemId: string) => void;
 		onAddToLetter: (letter: 'A' | 'B' | 'C') => void;
 	};
 
-	let {
-		focusItem,
-		focusItemId,
-		routines,
-		isScratch,
-		exercisesValid,
-		focusInPlan,
-		onRemoveSlot,
-		onAddToLetter,
-	}: Props = $props();
+	let { routines, routinesValid, onRemoveSlot, onAddToLetter }: Props = $props();
 </script>
 
-<p class="lead">
-	{#if isScratch}
-		Add supporting exercises. Keep {focusItem.name} in the week — it's your wave lift.
-	{:else}
-		Edit the week. Support work helps {focusItem.name}; remove anything you won't train.
-	{/if}
-</p>
+<p class="lead">Add exercises to each day. Every day needs at least one.</p>
 {#each routines as routine (routine.letter)}
 	<section class="routine-group">
 		<h2 class="routine-group__title">
@@ -45,16 +25,9 @@
 		>
 			{#each routine.slots as slot (slot.itemId)}
 				{@const item = programStore.getItemById(slot.itemId)}
-				{@const isFocus = slot.itemId === focusItemId}
-				<li
-					class="slot-row"
-					class:slot-row--focus={isFocus}
-				>
+				<li class="slot-row">
 					<div class="slot-row__info">
-						<span class="slot-row__name">
-							{item?.name ?? slot.itemId}
-							{#if isFocus}<span class="slot-row__badge">Focus</span>{/if}
-						</span>
+						<span class="slot-row__name">{item?.name ?? slot.itemId}</span>
 						<span class="slot-row__meta">{slot.sets}×{slot.reps}</span>
 					</div>
 					<button
@@ -78,14 +51,8 @@
 		</button>
 	</section>
 {/each}
-{#if !exercisesValid}
-	<p class="error">
-		{#if !focusInPlan}
-			Keep {focusItem.name} on at least one day — it's the wave lift.
-		{:else}
-			Each day needs at least one exercise.
-		{/if}
-	</p>
+{#if !routinesValid}
+	<p class="error">Each day needs at least one exercise.</p>
 {/if}
 
 <style>
@@ -160,11 +127,6 @@
 		border-radius: var(--radius-lg);
 	}
 
-	.slot-row--focus {
-		border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-		background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-2));
-	}
-
 	.slot-row--empty {
 		justify-content: center;
 		color: var(--color-text-muted);
@@ -183,22 +145,6 @@
 	.slot-row__name {
 		font-size: 0.9375rem;
 		font-weight: 600;
-		display: inline-flex;
-		align-items: center;
-		gap: var(--space-2);
-		flex-wrap: wrap;
-	}
-
-	.slot-row__badge {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		padding-inline: 6px;
-		padding-block: 2px;
-		border-radius: var(--radius-full);
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
 	}
 
 	.slot-row__meta {

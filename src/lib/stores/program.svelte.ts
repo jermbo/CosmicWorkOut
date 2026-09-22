@@ -1,31 +1,13 @@
-import type {
-	Program,
-	Item,
-	Routine,
-	RoutineItem,
-	RoutineSection,
-	Session,
-	Week,
-	RoutineColor,
-} from '$lib/db/types';
+import type { Program, Item, Routine, RoutineItem, Session, RoutineColor } from '$lib/db/types';
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
-import {
-	STRENGTH_DISCIPLINE_ID,
-	flattenItems,
-	singleSection,
-	disciplines,
-	emptySections,
-} from '$lib/discipline';
-import { practiceGroups, practiceGroupById } from '$lib/practice';
+import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines } from '$lib/discipline';
 import { SvelteMap } from 'svelte/reactivity';
 
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
 const LEGACY_ACTIVE_PROGRAM_KEY = 'cwout:activeProgramId';
-
-const ROUTINE_COLORS: RoutineColor[] = ['lime', 'lavender', 'red'];
 
 class ProgramStore {
 	programs = $state<Program[]>([]);
@@ -59,18 +41,6 @@ class ProgramStore {
 			.map((id) => this.programs.find((p) => p.id === id))
 			.filter((p): p is Program => !!p),
 	);
-
-	activeProgramsForGroup(groupId: string): Program[] {
-		const group = practiceGroupById(groupId);
-		if (!group) return [];
-		return this.activePrograms.filter((p) => group.disciplineIds.includes(p.disciplineId));
-	}
-
-	isGroupActive(groupId: string): boolean {
-		return this.activeProgramsForGroup(groupId).length > 0;
-	}
-
-	activeGroups = $derived(practiceGroups.filter((g) => this.isGroupActive(g.id)));
 
 	activeProgramsForDiscipline(disciplineId: string): Program[] {
 		return this.activePrograms.filter((p) => p.disciplineId === disciplineId);
@@ -402,7 +372,12 @@ class ProgramStore {
 		await this.refreshSessions();
 	}
 
+	/**
+	 * Rename/re-letter/re-focus a routine and replace its exercises, by program id —
+	 * works whether or not `programId` is the active plan.
+	 */
 	async saveRoutine(
+		programId: string,
 		originalName: string,
 		updates: {
 			name: string;
@@ -412,7 +387,7 @@ class ProgramStore {
 			items: RoutineItem[];
 		},
 	): Promise<void> {
-		const program = this.activeProgram;
+		const program = this.programs.find((p) => p.id === programId);
 		if (!program) return;
 
 		const updatedWeeks = program.weeks.map((week) => ({
@@ -430,41 +405,11 @@ class ProgramStore {
 			}),
 		}));
 
-		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
+		await this.commitProgram({ ...program, weeks: updatedWeeks });
 	}
 
-	async saveRoutineSections(
-		programId: string,
-		originalName: string,
-		updates: {
-			name: string;
-			focus?: string;
-			color?: RoutineColor;
-			sections: RoutineSection[];
-		},
-	): Promise<void> {
+	async addRoutine(programId: string, routine: Omit<Routine, 'id'>): Promise<void> {
 		const program = this.programs.find((p) => p.id === programId);
-		if (!program) return;
-
-		const updatedWeeks = program.weeks.map((week) => ({
-			...week,
-			routines: week.routines.map((r) => {
-				if (r.name !== originalName) return r;
-				return {
-					...r,
-					name: updates.name,
-					focus: updates.focus ?? r.focus,
-					color: updates.color ?? r.color,
-					sections: structuredClone(updates.sections),
-				};
-			}),
-		}));
-
-		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
-	}
-
-	async addRoutine(routine: Omit<Routine, 'id'>): Promise<void> {
-		const program = this.activeProgram;
 		if (!program) return;
 
 		const updatedWeeks = program.weeks.map((week) => ({
@@ -472,7 +417,7 @@ class ProgramStore {
 			routines: [...week.routines, { ...routine, id: generateId() }],
 		}));
 
-		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
+		await this.commitProgram({ ...program, weeks: updatedWeeks });
 	}
 
 	/** Write a fully-built program record (used by generators like lift plans). */
@@ -490,7 +435,7 @@ class ProgramStore {
 		}
 	}
 
-	private async commitActiveProgram(updated: Program): Promise<void> {
+	private async commitProgram(updated: Program): Promise<void> {
 		try {
 			await db.programs.put($state.snapshot(updated));
 		} catch (e) {
@@ -503,26 +448,14 @@ class ProgramStore {
 		});
 	}
 
-	setActiveProgram(programId: string): void {
-		if (!this.programs.some((p) => p.id === programId) || this.isProgramActive(programId)) return;
-		this.activeProgramIds = [...this.activeProgramIds, programId];
-		this.persistActiveProgramIds();
-	}
-
 	/**
-	 * Activate `programId` and deactivate every other active program in the same
-	 * discipline — used when a lift plan must be the sole Strength plan.
+	 * Activate `programId` and deactivate every other active program — exactly one
+	 * plan is ever active (v1.10.0, US-052: the point is staying focused, not
+	 * juggling several plans at once).
 	 */
-	setSoleActiveProgram(programId: string): void {
-		const program = this.programById(programId);
-		if (!program) return;
-		const keep = new Set([programId]);
-		const next = this.activeProgramIds.filter((id) => {
-			const other = this.programById(id);
-			return !other || other.disciplineId !== program.disciplineId || keep.has(id);
-		});
-		if (!next.includes(programId)) next.push(programId);
-		this.activeProgramIds = next;
+	setActiveProgram(programId: string): void {
+		if (!this.programs.some((p) => p.id === programId)) return;
+		this.activeProgramIds = [programId];
 		this.persistActiveProgramIds();
 	}
 
@@ -533,11 +466,23 @@ class ProgramStore {
 	}
 
 	async copyProgram(program: Program): Promise<Program> {
+		return this.cloneProgram(program, `${program.name} (Copy)`);
+	}
+
+	/**
+	 * Restart a finished plan with a fresh week 1 — same name, same routines, a new
+	 * program record. Logged sessions stay attached to the original as history.
+	 */
+	async restartProgram(program: Program): Promise<Program> {
+		return this.cloneProgram(program, program.name);
+	}
+
+	private async cloneProgram(program: Program, name: string): Promise<Program> {
 		const snap = $state.snapshot(program) as Program;
 		const copy: Program = {
 			...structuredClone(snap),
 			id: generateId(),
-			name: `${snap.name} (Copy)`,
+			name,
 			isBuiltIn: false,
 			createdAt: new Date().toISOString(),
 		};
@@ -553,56 +498,6 @@ class ProgramStore {
 		}
 		this.programs = [...this.programs, copy];
 		return copy;
-	}
-
-	async createProgram(data: {
-		name: string;
-		description: string;
-		durationWeeks: number;
-		daysPerWeek: number;
-		routineTemplates: { name: string; focus: string }[];
-		disciplineId?: string;
-	}): Promise<Program> {
-		const disciplineId = data.disciplineId ?? STRENGTH_DISCIPLINE_ID;
-		const defaultSections = this.defaultSectionsFor(disciplineId);
-		const weeks: Week[] = Array.from({ length: data.durationWeeks }, (_, wi) => ({
-			weekNumber: wi + 1,
-			routines: data.routineTemplates.map((tmpl, i) => ({
-				id: `w${wi + 1}-${generateId().slice(0, 8)}`,
-				disciplineId,
-				name: tmpl.name,
-				letter: String.fromCharCode(65 + i),
-				focus: tmpl.focus,
-				color: ROUTINE_COLORS[i % ROUTINE_COLORS.length],
-				sections: structuredClone(defaultSections),
-			})),
-		}));
-
-		const program: Program = {
-			id: generateId(),
-			disciplineId,
-			name: data.name,
-			description: data.description,
-			durationWeeks: data.durationWeeks,
-			daysPerWeek: data.daysPerWeek,
-			weeks,
-			createdAt: new Date().toISOString(),
-			isBuiltIn: false,
-		};
-
-		try {
-			await db.programs.put(program);
-		} catch (e) {
-			console.error('Failed to create program:', e);
-			throw e;
-		}
-		this.programs = [...this.programs, program];
-		return program;
-	}
-
-	private defaultSectionsFor(disciplineId: string): RoutineSection[] {
-		if (disciplineId === STRENGTH_DISCIPLINE_ID) return singleSection([]);
-		return emptySections(disciplineId);
 	}
 
 	async addItem(
@@ -670,8 +565,8 @@ class ProgramStore {
 		this.items = this.items.filter((i) => i.id !== id);
 	}
 
-	async removeRoutine(routineName: string): Promise<void> {
-		const program = this.activeProgram;
+	async removeRoutine(programId: string, routineName: string): Promise<void> {
+		const program = this.programs.find((p) => p.id === programId);
 		if (!program) return;
 
 		const firstWeek = program.weeks[0];
@@ -682,7 +577,7 @@ class ProgramStore {
 			routines: week.routines.filter((r) => r.name !== routineName),
 		}));
 
-		await this.commitActiveProgram({ ...program, weeks: updatedWeeks });
+		await this.commitProgram({ ...program, weeks: updatedWeeks });
 	}
 
 	async deleteProgram(id: string): Promise<void> {

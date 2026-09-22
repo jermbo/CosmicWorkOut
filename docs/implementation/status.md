@@ -171,12 +171,12 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 | Light mode (Dark / Light / Match device) | Built   | [US-048](../features/v1.10.0/US-048-light-mode.md) — default Dark; `data-theme` on `<html>`; charts follow theme                                                |
 | Lift plan wording in the UI              | Built   | [US-049](../features/v1.10.0/US-049-lift-plan-rename.md) — interim; US-052 retires "Lift plan"                                                                  |
 | Cheap hardening (audit Phase A)          | Built   | [US-050](../features/v1.10.0/US-050-cheap-hardening.md) — backup size cap, save-error resets, streak tests                                                      |
-| Remove Belly Dance                       | Planned | [US-051](../features/v1.10.0/US-051-remove-belly-dance.md)                                                                                                      |
-| One Workout section                      | Planned | [US-052](../features/v1.10.0/US-052-one-workout-section.md)                                                                                                     |
+| Remove Belly Dance                       | Built   | [US-051](../features/v1.10.0/US-051-remove-belly-dance.md)                                                                                                      |
+| One Workout section                      | Built   | [US-052](../features/v1.10.0/US-052-one-workout-section.md) — `/workout`, `/workout/today`, `/workout/new`, `/workout/plan/[id]`; old `/practice`, `/goals`, `/program` gone |
 | Personal records                         | Planned | [US-053](../features/v1.10.0/US-053-personal-records.md)                                                                                                        |
 | This month card                          | Planned | [US-054](../features/v1.10.0/US-054-this-month-card.md)                                                                                                         |
 
-Built rows checked with type check, lint, unit tests and a production build; light mode also checked in a browser. Planned rows (US-051 – US-054) are decided, not built.
+Built rows checked with type check, lint, unit tests and a production build; US-048, US-051 and US-052 also checked with a browser click-through. Planned rows (US-053 – US-054) are decided, not built.
 
 ---
 

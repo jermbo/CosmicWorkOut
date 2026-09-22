@@ -17,7 +17,6 @@ const DEFAULTS: UserPrefs = {
 	activityLogEnabled: false,
 	practiceEnabled: false,
 	healthMetricsEnabled: false,
-	goalProgressionPlansEnabled: false,
 	baselinesEnabled: false,
 	hiddenCharts: [],
 };
@@ -35,21 +34,13 @@ class PrefsStore {
 	activityLogEnabled = $state(DEFAULTS.activityLogEnabled);
 	practiceEnabled = $state(DEFAULTS.practiceEnabled);
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
-	goalProgressionPlansEnabled = $state(DEFAULTS.goalProgressionPlansEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 	hiddenCharts = $state<string[]>([]);
 
-	/**
-	 * Lift plans generate backing programs and can only be trained through `/workout`,
-	 * which Practice owns — so they are only ever live when Practice is on. Every
-	 * consumer reads this instead of and-ing the two flags itself.
-	 */
 	/** The theme actually on screen — `system` resolved against the device. */
 	resolvedTheme = $derived<'dark' | 'light'>(
 		this.theme === 'system' ? (this.systemPrefersLight ? 'light' : 'dark') : this.theme,
 	);
-
-	liftPlansEnabled = $derived(this.practiceEnabled && this.goalProgressionPlansEnabled);
 
 	/**
 	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
@@ -78,8 +69,6 @@ class PrefsStore {
 				this.activityLogEnabled = parsed.activityLogEnabled ?? DEFAULTS.activityLogEnabled;
 				this.practiceEnabled = parsed.practiceEnabled ?? DEFAULTS.practiceEnabled;
 				this.healthMetricsEnabled = parsed.healthMetricsEnabled ?? DEFAULTS.healthMetricsEnabled;
-				this.goalProgressionPlansEnabled =
-					parsed.goalProgressionPlansEnabled ?? DEFAULTS.goalProgressionPlansEnabled;
 				this.baselinesEnabled = parsed.baselinesEnabled ?? DEFAULTS.baselinesEnabled;
 				this.hiddenCharts = Array.isArray(parsed.hiddenCharts)
 					? parsed.hiddenCharts.filter((id): id is string => typeof id === 'string')
@@ -109,7 +98,6 @@ class PrefsStore {
 			activityLogEnabled: this.activityLogEnabled,
 			practiceEnabled: this.practiceEnabled,
 			healthMetricsEnabled: this.healthMetricsEnabled,
-			goalProgressionPlansEnabled: this.goalProgressionPlansEnabled,
 			baselinesEnabled: this.baselinesEnabled,
 			hiddenCharts: this.hiddenCharts,
 		};
@@ -142,11 +130,6 @@ class PrefsStore {
 
 	setHealthMetricsEnabled(enabled: boolean): void {
 		this.healthMetricsEnabled = enabled;
-		this.save();
-	}
-
-	setGoalProgressionPlansEnabled(enabled: boolean): void {
-		this.goalProgressionPlansEnabled = enabled;
 		this.save();
 	}
 

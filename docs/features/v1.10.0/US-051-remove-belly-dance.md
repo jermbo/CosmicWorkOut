@@ -2,7 +2,9 @@
 
 # US-051 — Remove Belly Dance
 
-> **Status:** Planned — decided in [v1.10.0 — Topic 11](./README.md#topic-11--remove-belly-dance). Build this first; US-052 builds on a strength-only Workout section.
+> **Status:** Built — decided in [v1.10.0 — Topic 11](./README.md#topic-11--remove-belly-dance). Checked with type check, lint, unit tests (109), a production build, and a browser pass at phone width.
+>
+> **As built:** Every dance surface is gone — `/practice/dance`, `DanceSessionOverlay`, `DanceRoutineEditor`, `danceLibrary()`, the four `bellydance-*` seed files, and the `Dance` variant on `HomeCard`/`WeekStrip`. `discipline.ts` registers only Strength; `BELLYDANCE_DISCIPLINE_ID` is gone. Also removed as newly-dead code once dance was gone: `ItemFormSheet.svelte` (only the dance library path used it). No stored data was touched — old dance rows in IndexedDB, if any existed, are simply never read. Built together with [US-052](./US-052-one-workout-section.md) in one pass, since the Practice hub this story would have left behind is exactly what US-052 replaces.
 
 As a **fitness user**, I want the app to be about the training I actually do
 so that I'm not stepping around a feature nobody uses.

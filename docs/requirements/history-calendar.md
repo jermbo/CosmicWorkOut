@@ -22,7 +22,7 @@ Looking back at what you did, and fixing or backfilling past days.
 | Week strip on home               | Built   | Also sets the logging date                                                             |
 | Weekly consistency streak        | Built   | Per active program / discipline                                                        |
 | Backfill past days               | Built   | Date picker in each tracker's page header, or a week-strip tap                         |
-| Edit / delete a logged session   | Built   | **Edit** and **Delete** on the logged-session card on `/workout` and `/practice/dance` |
+| Edit / delete a logged session   | Built   | **Edit** and **Delete** on the logged-session card on `/workout/today` |
 
 ---
 
@@ -39,7 +39,7 @@ Users can see what they've done over time, and correct or backfill any past day.
 | See consistency and gaps              | Insights — All Habits heat chart, Showing Up, Weekly Volume          |
 | See a streak                          | Home header (week streak) · Practice hub (combined streak)           |
 | Log or edit habits for a past day     | `/habits` with the header date set to that day                       |
-| Log, edit or delete a past session    | `/workout` or `/practice/dance` with the header date set to that day |
+| Log, edit or delete a past session    | `/workout/today` with the header date set to that day |
 | Log, edit or delete a past activity   | `/log` with the header date set to that day                          |
 | Log or edit health / baseline entries | `/health` or `/baselines` with the header date set to that day       |
 

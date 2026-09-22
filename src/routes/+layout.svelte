@@ -13,10 +13,8 @@
 	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
-	import DanceSessionOverlay from '$lib/components/DanceSessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
 	import Toaster from '$lib/components/Toaster.svelte';
-	import { BELLYDANCE_DISCIPLINE_ID } from '$lib/discipline';
 
 	let { children } = $props();
 
@@ -92,11 +90,7 @@
 
 		{#if prefsStore.practiceEnabled}
 			{#if sessionStore.isActive}
-				{#if sessionStore.activeDisciplineId === BELLYDANCE_DISCIPLINE_ID}
-					<DanceSessionOverlay />
-				{:else}
-					<SessionOverlay />
-				{/if}
+				<SessionOverlay />
 			{/if}
 
 			{#if sessionStore.isComplete}

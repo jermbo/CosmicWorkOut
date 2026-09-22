@@ -8,11 +8,12 @@
 	import { strengthLibrary } from '$lib/itemLibrary';
 
 	type Props = {
+		programId: string;
 		workout: Routine | null;
 		onBack: () => void;
 	};
 
-	let { workout: initWorkout, onBack }: Props = $props();
+	let { programId, workout: initWorkout, onBack }: Props = $props();
 
 	function initialExercises(): (RoutineItem & { _key: number })[] {
 		if (!initWorkout) return [];
@@ -85,8 +86,9 @@
 			});
 
 			if (isNew) {
-				await programStore.addRoutine({
-					disciplineId: programStore.activeProgram?.disciplineId ?? STRENGTH_DISCIPLINE_ID,
+				const program = programStore.programById(programId);
+				await programStore.addRoutine(programId, {
+					disciplineId: program?.disciplineId ?? STRENGTH_DISCIPLINE_ID,
 					name: title,
 					letter,
 					focus,
@@ -94,7 +96,7 @@
 					sections: singleSection(clean),
 				});
 			} else {
-				await programStore.saveRoutine(initWorkout!.name, {
+				await programStore.saveRoutine(programId, initWorkout!.name, {
 					name: title,
 					letter,
 					focus,

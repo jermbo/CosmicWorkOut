@@ -12,7 +12,7 @@ Every way a person records movement in this app falls into one of three archetyp
 
 | Archetype      | What it is                                            | Logged how                                          | Examples                          |
 | -------------- | ----------------------------------------------------- | --------------------------------------------------- | --------------------------------- |
-| **Structured** | A multi-week plan you're guided through, step by step | Start a session, work through routine items, finish | Strength, Belly Dance             |
+| **Structured** | A multi-week plan you're guided through, step by step | Start a session, work through routine items, finish | Strength                          |
 | **Quick-log**  | A thing you did that you just want on the record      | One short entry: type + duration + intensity        | Run, Bike, Pickleball, Swim, Hike |
 | **Habit**      | A daily recurring value                               | Tap a counter / toggle / mood                       | Water, Mood, Steps                |
 
@@ -31,7 +31,7 @@ Pickleball is already an Activity type — it cost zero architecture. That's the
 
 ## Structured archetype terms
 
-These generalize the original strength model so belly dance (and anything after it) reuses one engine. The model shipped in v1.4.0; the strength-only names below were renamed at that point.
+These generalize the original strength model so a future structured practice can reuse one engine instead of forking it. The model shipped in v1.4.0 with a second Discipline, Belly Dance, which was removed in v1.10.0 ([US-051](features/v1.10.0/US-051-remove-belly-dance.md)) — nobody used it, and it fit better as its own app. The engine itself stayed; only its second occupant left.
 
 ### Discipline
 
@@ -44,34 +44,35 @@ A first-class, data-driven definition of a structured movement practice. A Disci
 - its **built-in content** (seed items + starter programs),
 - its display **label, color, and icon**.
 
-Strength and Belly Dance are both Disciplines (seeded, read-only config in `src/lib/discipline.ts`). Adding a third structured practice = authoring a new Discipline config, not forking the engine.
+**Strength is the only registered Discipline today** (seeded, read-only config in `src/lib/discipline.ts`). Adding a second structured practice = authoring a new Discipline config, not forking the engine — that's the whole point of keeping the model general even with one occupant.
 
-> **Discipline vs. Practice — don't conflate them.** _Discipline_ is the **data-model** term (config in code). _Practice_ (below) is the **UI** term for the place you go to do a session. One Practice destination surfaces sessions from whichever Disciplines are active.
+> **Discipline vs. Workout — don't conflate them.** _Discipline_ is the **data-model** term (config in code). _Workout_ (below) is the **UI** term for the place you go to follow a plan. With one Discipline, the two line up closely today; the split still matters if a second Discipline ever returns.
 
-### Practice
+### Workout
 
-<span id="practice"></span>
+<span id="workout"></span>
 
-The **Practice destination** and page shell for guided sessions (`/practice`). Organized as:
+<!-- prettier-ignore -->
+> Was **Practice** through v1.10.0 Topic 12 ([US-052](features/v1.10.0/US-052-one-workout-section.md)) — renamed when Practice (programs) and Lift plans merged into one section with an optional goal. Code identifiers (`practiceEnabled`, `$lib/practice.ts`'s successor `$lib/plans/`) lag the rename, same pattern as [Lift plan](#lift-plan).
 
-- **Practice groups** — broad buckets like Workout and Dance (UI config, not stored in IndexedDB).
-- **Plans** — multi-week Programs the user activates. Many plans can be active at once (one per Discipline).
-- **Disciplines** — the data-model layer (strength, bellydance) that powers logging engines inside each group.
+The **Workout destination** (`/workout`) where you follow a [Plan](#plan). One plan is active at a time — enforced, not just a default — so there's always exactly one answer to "what am I training right now." Other plans are listed below it, and can be activated (pausing the current one), edited, or deleted.
 
-Inactive groups and plans are hidden from the main Practice flow; history is always preserved when paused.
+**Opt-in:** gated by `practiceEnabled` in Settings (default off). Workout is the session engine rather than a single screen, so the flag hides every `/workout*` route, the session overlay, and the session marks on Insights — plans and session history stay in IndexedDB.  See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
 
-**Opt-in:** gated by `practiceEnabled` in Settings (default off). Practice is the session engine rather than a single screen, so the flag also hides `/workout`, `/program`, the session overlays, and the session marks on Insights — programs and session history stay in IndexedDB. [Lift plans](#lift-plan) are nested inside it. See [state.md](implementation/state.md#feature-flags-hide-ui-data-always-persists).
+### Plan
+
+<span id="plan"></span>
+
+<!-- prettier-ignore -->
+> New term, v1.10.0 ([US-052](features/v1.10.0/US-052-one-workout-section.md)). Replaces the separate "Program" (Practice) and "Lift plan" (Goal progression plan) ideas — they were always the same underlying `Program` record; a plan just may or may not have a [Lift plan](#lift-plan)'s goal attached.
+
+Routines A/B/C over a number of weeks, created from a built-in template (copied) or from scratch, with an optional goal set only at creation. A plan without a goal progresses by beating what you logged last time; a plan with a goal follows the generated wave. Every plan has a length and an end — reaching it offers **Run it again** (same plan, fresh week 1) or **New plan**.
 
 ### Section
 
 <span id="section"></span>
 
-An ordered division of a routine. A Discipline defines its own sections.
-
-- **Strength:** a single implicit section — the exercise list.
-- **Belly Dance:** four — `warm-up · conditioning · moves · cool-down`.
-
-Each section is tied to a **metric**, which decides how its items are logged.
+An ordered division of a routine. A Discipline defines its own sections. Strength uses a single implicit section — the exercise list — each tied to a **metric**, which decides how its items are logged.
 
 ### Metric
 
@@ -101,7 +102,7 @@ A descriptive tag on an item for filtering — _hips · core · arms · legs · 
 
 <span id="program"></span>
 
-A multi-week plan within **one** Discipline: name, duration in weeks, days per week, and its routines. Ships built-in (read-only; edit = copy-first) or custom. Every Program belongs to a Discipline.
+A multi-week plan within **one** Discipline: name, duration in weeks, days per week, and its routines. Ships built-in (read-only; edit = copy-first) or custom. Every Program belongs to a Discipline. Since v1.10.0 ([US-052](features/v1.10.0/US-052-one-workout-section.md)) a Program is what the UI calls a [Plan](#plan) — the record didn't change, the concept it's shown as did.
 
 Two program **flavors** exist for Strength today:
 
@@ -109,6 +110,8 @@ Two program **flavors** exist for Strength today:
 | ------------------------ | ----------------------------------------------- | ---------------------------------------------------------- |
 | **Course program**       | General syllabus (e.g. Strength Foundation 101) | A/B/C rotation; weight via last-used prefill + manual bump |
 | **Lift plan** _(v1.9.0)_ | Isolated stint toward one focus lift target     | Wave blocks + generator; see [Lift plan](#lift-plan)       |
+
+Since v1.10.0 this is a UI distinction, not a stored one: any Program can have a [GoalPlan](#lift-plan) attached, and creating a plan asks "working toward a specific lift?" instead of splitting into two separate flows.
 
 ### Lift plan _(v1.9.0)_
 
@@ -126,7 +129,7 @@ Two program **flavors** exist for Strength today:
 
 Quote a UI string as it actually appears, and say that it is the old name.
 
-A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program. **Opt-in:** gated by `goalProgressionPlansEnabled` in Settings (default off), same contract as health metrics — and **nested under [Practice](#practice)**, since a plan can only be trained through `/workout`. Code reads the derived `prefsStore.liftPlansEnabled`. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md).
+A Strength program type where the user sets a **focus exercise** and a lift **target** (weight × reps), confirms a **starting point**, and the app **generates** multi-month **progression blocks**. Each instance (e.g. Bench 01 vs Bench 02) is a separate plan record. Only one may be **active** at a time; while active, its backing program is the sole active Strength program — since v1.10.0 that's just the app's general "exactly one plan is ever active" rule, not a rule specific to goals. **Opt-in:** gated by `practiceEnabled` (the [Workout](#workout) flag) — the separate `goalProgressionPlansEnabled` flag was retired in [US-052](features/v1.10.0/US-052-one-workout-section.md); a goal is now just something any plan may or may not have. A goal can be **removed** from a plan (`goalPlanStore.removeGoal`) — the plan then continues as a plain plan to its original end. Full spec: [v1.9.0 / US-033](features/v1.9.0/US-033-goal-progression-plans.md); the merge: [v1.10.0 / US-052](features/v1.10.0/US-052-one-workout-section.md).
 
 Do **not** confuse with [Baseline](#baseline) — that is daily floor/ceiling tracking across any topic, not a Strength wave plan.
 
@@ -147,6 +150,8 @@ The single lift a lift plan is built around. It follows the full wave block sche
 <span id="routine"></span>
 
 A single training day within a program — optionally lettered **A / B / C**, an ordered set of sections of items. The app suggests the next one by linear progression: `completedSessions % routineCount`.
+
+> **Naming collision, read this if confused:** a single training day used to be called "Workout" and was renamed to **Routine** in v1.4.0 to free up the word. In v1.10.0 ([US-052](features/v1.10.0/US-052-one-workout-section.md)) "Workout" came back as the name of the whole [Workout](#workout) destination/tab — a different, higher-altitude thing. "Today's workout" in the UI means a Routine; the Workout tab/section means the destination.
 
 ### Session _(renamed from **SessionLog**)_
 
@@ -250,14 +255,15 @@ One logged measurement instance. Stored in IndexedDB (`healthReadings`). Weight:
 
 The v1.4.0 generalization renamed the strength-only **data entities**. The old names no longer exist as stored types or interfaces, though "Exercise" and "Workout" still appear as UI copy and component/route identifiers (e.g. `ExerciseCard`, `WorkoutPicker`, `/workout`).
 
-| Original                          | Current                             | Why                                                                        |
-| --------------------------------- | ----------------------------------- | -------------------------------------------------------------------------- |
-| Exercise                          | Item                                | Items exist in any Discipline, not just strength                           |
-| Workout                           | Routine                             | "Workout" reads as strength-only                                           |
-| SessionLog                        | Session                             | One concept across all Disciplines                                         |
-| Program _(strength)_              | Program _(Discipline-scoped)_       | Now belongs to a Discipline                                                |
-| —                                 | Discipline, Section, Metric, Focus  | New in the generalized model                                               |
-| Goal progression plan _(docs/UI)_ | **Lift plan** _(preferred UI name)_ | Avoid clash with [Baseline](#baseline); code ids may still say `goalPlan*` |
+| Original                           | Current                                     | Why                                                                                                                                      |
+| ------------------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exercise                           | Item                                         | Items exist in any Discipline, not just strength                                                                                          |
+| Workout                            | Routine                                      | "Workout" reads as strength-only — **the name came back in v1.10.0 for a different thing**, see the [Routine](#routine) collision note   |
+| SessionLog                         | Session                                       | One concept across all Disciplines                                                                                                       |
+| Program _(strength)_               | Program _(Discipline-scoped)_                | Now belongs to a Discipline                                                                                                               |
+| —                                   | Discipline, Section, Metric, Focus            | New in the generalized model                                                                                                             |
+| Goal progression plan _(docs/UI)_  | **Lift plan** _(preferred UI name)_          | Avoid clash with [Baseline](#baseline); code ids may still say `goalPlan*`                                                                |
+| Practice + Lift plan _(two ideas)_ | **Plan**, with an optional goal _(v1.10.0)_  | [US-052](features/v1.10.0/US-052-one-workout-section.md) — one Workout section, not two                                                   |
 
 ---
 
