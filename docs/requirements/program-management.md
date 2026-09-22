@@ -72,7 +72,7 @@ Built-in programs are read-only: editing one prompts a copy-first guard that clo
 
 > As a user, I want to see what programs are available and activate one, so I know what to do each week.
 
-**Built today:** A `ProgramSelectSheet` lists programs per Discipline; activating one stores its id in `cwout:activeProgramIds` (one active plan per Discipline). Switching programs preserves all history. Built-in programs deep-clone before activating where needed.
+**Built today:** `/workout` lists plans (a template-based plan, a from-scratch plan, or a plan with a goal); activating one stores its id in `cwout:activeProgramIds`. As of v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) exactly one plan is ever active — `setActiveProgram()` replaces the id outright instead of appending, and the old per-Discipline `ProgramSelectSheet` is gone. Switching plans asks for confirmation and pauses the current one, preserving all history. Built-in programs deep-clone before activating.
 
 ---
 

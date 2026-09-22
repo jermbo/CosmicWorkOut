@@ -166,6 +166,7 @@ src/
     ├── insights/                  (v1.10.0 — chart list, pure aggregation, heat shading)
     ├── baselines/logic.ts
     ├── habitColors.ts
+    ├── workoutNextUp.ts            (Overview "next up" headline/detail for the active plan)
     ├── components/
     │   ├── insights/*.svelte
     │   ├── plans/*.svelte         (v1.10.0 — the merged New Plan wizard + plan cards)

@@ -12,7 +12,7 @@ Verified against the codebase (July 2026).
 
 | Feature                                                   | Status  | Notes                                                                                 |
 | --------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------- |
-| Today view + start session                                | Built   | Home practice card navigates to `/practice`; workout page handles start/edit          |
+| Today view + start session                                | Built   | Home Workout card navigates to `/workout`; `/workout/today` handles start/edit        |
 | Session logging — smart tap (instant or first-time entry) | Built   | Instant if weight known; opens sheet for first-time weight entry                      |
 | Session logging — adjust completed set                    | Built   | Tap any completed tile to reopen sheet; cascades forward                              |
 | Weight remembered across sessions (`itemLastUsed`)        | Built   | Pre-fills on session start                                                            |
@@ -146,7 +146,7 @@ See [v1.8.0 feature README](../features/v1.8.0/README.md).
 | Baselines feature flag + Settings CRUD           | Built  | [US-034](../features/v1.9.0/US-034-baselines-setup.md) — `baselines` / `baselineLogs` in DB v10                                                                                             |
 | Baselines daily logging (multi-entry, edit past) | Built  | [US-035](../features/v1.9.0/US-035-baselines-logging.md) — `/baselines`, global date context                                                                                                |
 | Baselines progress charts                        | Built  | [US-036](../features/v1.9.0/US-036-baselines-charts.md) — inline per baseline; reuses `RangeBar`                                                                                            |
-| Practice feature flag (`practiceEnabled`)        | Built  | Default off. Hides nav tab, `/practice*`, `/workout`, `/program`, session overlays, and session marks on Insights; data persists. Lift plans nest inside it via derived `liftPlansEnabled`. |
+| Practice feature flag (`practiceEnabled`)        | Built  | Default off. Hides nav tab, `/workout*`, session overlays, and session marks on Insights; data persists. As of v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) this single flag gates the whole Workout section, goals included — the separate `liftPlansEnabled` flag is gone. |
 | Habits + Activity log feature flags              | Built  | `habitsEnabled` (incl. mood) and `activityLogEnabled`, both default off. Every tracking feature is now opt-in, so Overview shows a "choose what to track" empty state on a fresh install.   |
 
 See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Baselines](../roadmap/baselines.md).
@@ -167,7 +167,7 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 | Experimental Insights charts             | Built   | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
 | Settings feature hub                     | Built   | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
 | Personalization                          | Built   | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
-| Retire History (`/calendar`)             | Removed | [US-047](../features/v1.10.0/US-047-retire-history.md) — History tab gone; session Delete moved to `/workout` and `/practice/dance`                             |
+| Retire History (`/calendar`)             | Removed | [US-047](../features/v1.10.0/US-047-retire-history.md) — History tab gone; session Delete moved to the Workout section (`/practice/dance` itself was later removed by US-051) |
 | Light mode (Dark / Light / Match device) | Built   | [US-048](../features/v1.10.0/US-048-light-mode.md) — default Dark; `data-theme` on `<html>`; charts follow theme                                                |
 | Lift plan wording in the UI              | Built   | [US-049](../features/v1.10.0/US-049-lift-plan-rename.md) — interim; US-052 retires "Lift plan"                                                                  |
 | Cheap hardening (audit Phase A)          | Built   | [US-050](../features/v1.10.0/US-050-cheap-hardening.md) — backup size cap, save-error resets, streak tests                                                      |
@@ -182,8 +182,8 @@ Built rows checked with type check, lint, unit tests and a production build; US-
 
 ## Built-In Content
 
-- **12 programs:** 6 Strength + 6 Belly Dance course programs (Beginner/Intermediate 101–103 each).
-- **121 items:** 72 strength exercises + 39 belly dance moves + 10 bookend (warm-up/cool-down) items, all derived from catalog seeds (`db/seeds/`).
+- **6 programs:** Strength course programs (Beginner/Intermediate 101–103). Belly Dance's 6 course programs were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
+- **72 items:** strength exercises, all derived from catalog seeds (`db/seeds/`). Belly Dance's 39 moves + 10 warm-up/cool-down bookends were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
 - **8 strength categories** (body-part): Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, Full Body.
 - **5 built-in trackable habits** + Mood (always on): Water, Coffee, Meditation, Writing, Reading, plus Mood.
 - Items and programs are **upserted on every boot**; habits seed on first run only. Schema upgrades are **non-destructive** (no wipe) — new stores/indexes are added idempotently and user data is preserved. See [Data Model](../architecture/data-model.md#indexeddb-stores).

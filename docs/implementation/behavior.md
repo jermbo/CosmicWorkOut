@@ -10,17 +10,17 @@ The mental model for CosmicWorkOut — what actually happens when you use the ap
 
 CosmicWorkOut is a **single-user, local-only** movement tracker. There is no server, no account, and no sync — everything lives on your device. It tracks several kinds of things, each with its own logging style (see the [Glossary](../glossary.md) archetypes):
 
-- **Structured practice** — multi-week programs you're guided through, one session at a time. Two Disciplines ship today: **Strength** and **Belly Dance**.
-- **Goal progression plans** _(opt-in)_ — wave-loading Strength stints toward one focus lift (see [below](#goal-progression-plans-opt-in)).
+- **Workout** _(opt-in)_ — one multi-week plan at a time, guided one session at a time, with an optional goal lift (see [below](#workout-one-plan-with-an-optional-goal)). One Discipline ships today: **Strength**. (Belly Dance shipped as a second Discipline and was removed in v1.10.0 — [US-051](../features/v1.10.0/US-051-remove-belly-dance.md).)
 - **Activities** — quick one-line records of things you did (Run, Bike, Pickleball, Yoga, …).
 - **Habits** — daily counters, toggles, and a mood check-in.
+- **Baselines** _(opt-in)_ — daily floors you log against, with growth charts.
 - **Health metrics** — optional weight and blood-pressure readings (off by default).
 
 ```mermaid
 flowchart TB
     Boot[Open app] --> Overview[Overview]
-    Overview --> Practice[Practice hub]
-    Practice --> Session[Session overlay]
+    Overview --> Workout[Workout]
+    Workout --> Session[Session overlay]
     Session -->|Finish| Done[Completion screen]
     Done --> Overview
     Overview --> Insights[Insights]
@@ -29,17 +29,17 @@ flowchart TB
     classDef screen fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef session fill:#7a4f9e,stroke:#46295c,color:#ffffff;
     class Boot entry;
-    class Overview,Practice,Insights screen;
+    class Overview,Workout,Insights screen;
     class Session,Done session;
 ```
 
-The bottom nav has four tabs: **Overview**, **Practice** (only while Practice is on), **Insights**, **Settings**. Active sessions and completion screens appear as overlays — you never navigate away mid-session.
+The bottom nav has four tabs: **Overview**, **Workout** (only while the Workout section is on), **Insights**, **Settings**. Active sessions and completion screens appear as overlays — you never navigate away mid-session.
 
 ---
 
 ## The Global Logging Date
 
-One idea ties the whole app together: a **global logging date**. A date picker in the page header sets which day you are logging for, and the Overview, habits, activities, health, and practice screens all read and write against it. It defaults to today and resets to today on reload. Backdating a session asks for confirmation first.
+One idea ties the whole app together: a **global logging date**. A date picker in the page header sets which day you are logging for, and the Overview, habits, activities, health, and workout screens all read and write against it. It defaults to today and resets to today on reload. Backdating a session asks for confirmation first.
 
 ---
 
@@ -48,25 +48,27 @@ One idea ties the whole app together: a **global logging date**. A date picker i
 The Overview is a dashboard for the selected date, not a single workout screen. It surfaces:
 
 - **Habits** progress (rings / counters) for the day,
-- **Practice** "next up" — the next routine for each active plan,
+- **Workout** "next up" — the next routine for the active plan,
 - **Activity** chips for anything logged that day,
 - an optional **Health** card (only when health metrics are enabled),
-- a **week strip** with per-day indicators (strength, dance, activity, habits, health) and a week-streak badge.
+- a **week strip** with per-day indicators (strength, activity, habits, health) and a week-streak badge.
 
 Each card is a jumping-off point to its dedicated screen.
 
 ---
 
-## Practice: Disciplines, Groups, and Plans
+## Workout: One Plan, With an Optional Goal
 
-**Practice** is where guided sessions live. It is organized into **groups** — broad buckets like **Workout** (Strength) and **Dance** (Belly Dance). Each group runs one or more active **plans** (Programs).
+**Workout** (`/workout`, opt-in via Settings) is where guided sessions live. As of v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) it replaced the old two-feature split — a Practice hub of programs, and a separate Lift plans section — with one concept: a **plan**, which may optionally carry a **goal** (one focus lift with a target weight × reps).
 
-- You can have **one active plan per Discipline** at a time — a Strength plan and a Belly Dance plan can both be active, and you run them on whatever days you like. The app never binds a Discipline to specific weekdays.
-- Inactive groups and plans are hidden from the main flow; their history is always preserved when paused.
+- **Exactly one plan is active at a time**, enforced by the app — the point is staying focused, not juggling plans. Starting another plan asks to switch, and pauses the current one.
+- A new plan starts from a built-in **template** (copied so it's yours) or **from scratch**, then asks "Working toward a specific lift?" — a goal can only be set at creation, but can be **removed** later (the plan then keeps running as a plain plan to its end).
+- Inactive (paused/done) plans are hidden from the main flow; their history is always preserved.
+- Routes: `/workout` (plan list, active plan on top), `/workout/today` (today's routine, Start, Edit/Delete on the logged session), `/workout/new` (new-plan wizard), `/workout/plan/[id]` (one plan's weeks, routines, and goal wave if it has one).
 
 ### What "today's routine" means
 
-The app does **not** know your weekly schedule. For each active plan it gives you the **next routine in sequence**, based on how many sessions you've already finished for that plan:
+The app does **not** know your weekly schedule. For the active plan it gives you the **next routine in sequence**, based on how many sessions you've already finished for that plan:
 
 | You've completed | You see next       |
 | ---------------- | ------------------ |
@@ -75,7 +77,7 @@ The app does **not** know your weekly schedule. For each active plan it gives yo
 | 2 sessions       | Routine C          |
 | 3 sessions       | Routine A (week 2) |
 
-The index is `completedSessions % routineCount`, computed **per Discipline**. If you already logged a session for a plan **today**, that plan shows a "complete for today" state — one session per plan per calendar day. See [Program Progression](program-progression.md) for the full logic.
+The index is `completedSessions % routineCount`. If you already logged a session **today**, the plan shows a "complete for today" state — one session per plan per calendar day. See [Program Progression](program-progression.md) for the full logic.
 
 ---
 
@@ -93,10 +95,7 @@ stateDiagram-v2
     Active --> Active: browser crash → resume on reopen
 ```
 
-A session is written to local storage the moment it starts, so a crash never loses progress. **Strength** and **Belly Dance** share this lifecycle but log differently, because each Discipline's sections use different **metrics**:
-
-- **Strength** items use `setsReps` — tap set tiles to log weight × reps.
-- **Belly Dance** routines have four sections: warm-up and cool-down are **check** (done / not done), while conditioning and moves are **measure** (enter a duration or a rep count live). Warm-up and cool-down are **bookends** — they inherit Routine A's lists unless a routine overrides them.
+A session is written to local storage the moment it starts, so a crash never loses progress. The one shipped Discipline, **Strength**, logs its `exercises` section with the `setsReps` metric — tap set tiles to log weight × reps. (The Discipline model supports other section metrics, `measure` and `check`, for a future Discipline; Belly Dance used them before it was removed in v1.10.0 — [US-051](../features/v1.10.0/US-051-remove-belly-dance.md).)
 
 ### Logging a strength set
 
@@ -143,7 +142,7 @@ The **Activity log** records non-structured movement: a **type** (Run, Walk, Bik
 There is no separate History screen (removed in v1.10.0 — [US-047](../features/v1.10.0/US-047-retire-history.md)). The two jobs it did are split:
 
 - **Seeing the past** — Insights. Gaps and streaks show in the charts (All Habits heat chart, Showing Up, Weekly Volume).
-- **Changing the past** — pick the date in a tracker's page header, then log or edit there. A logged session shows **Edit** and **Delete** on `/workout` and `/practice/dance`.
+- **Changing the past** — pick the date in a tracker's page header, then log or edit there. A logged session shows **Edit** and **Delete** on `/workout/today`.
 
 ---
 
@@ -165,13 +164,13 @@ Off by default. Enable the toggle in Settings to reveal the **Health** screen an
 
 ---
 
-## Lift Plans (opt-in)
+## Plans with a Goal (opt-in)
 
-Off by default — same contract as health metrics. Enable **Goal progression plans** in Settings to reveal `/goals` and the create wizard at `/goals/new`.
+Off by default — the same `practiceEnabled` toggle that gates the whole Workout section (Settings → Workout). As of v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) a goal is just an option on a plan, set when the plan is created at `/workout/new` — there's no separate "Lift plans" toggle or route anymore.
 
-A lift plan is an isolated Strength stint toward one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Only one lift plan may be **active** at a time; while active it is the sole active Strength program. You can pause, complete, or repeat a block. Turning the toggle off hides the UI; plan data stays in IndexedDB.
+A plan with a goal is a Strength plan aimed at one **focus exercise** and a **goal** (weight × reps). The app generates multi-week **wave blocks** (build → build → peak → deload), scaffolds an A/B/C backing program, and hides that program from generic plan pickers. Since only one plan is ever active, a plan with a goal is automatically the sole active Strength plan while it runs. You can pause, complete, or repeat a block, and remove the goal later to keep the plan running as a plain plan. Turning the Workout toggle off hides the UI; plan data stays in IndexedDB.
 
-Vocabulary: [Glossary — Lift plan](../glossary.md#lift-plan) (older name: Goal progression plan). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md).
+Vocabulary: [Glossary — Lift plan](../glossary.md#lift-plan) (the UI now just says "plan" + "goal" — see [US-049](../features/v1.10.0/US-049-lift-plan-rename.md) and [US-052](../features/v1.10.0/US-052-one-workout-section.md)). Spec: [US-033](../features/v1.9.0/US-033-goal-progression-plans.md) (original wave generator) and [US-052](../features/v1.10.0/US-052-one-workout-section.md) (merge into Workout).
 
 ---
 
@@ -219,8 +218,8 @@ You can **export** a full JSON backup and **restore** it (replace-only) from Set
 
 ## Built-In Content
 
-- **12 programs** — 6 Strength + 6 Belly Dance course programs (Beginner / Intermediate 101–103).
-- **121 items** — 72 strength exercises + 39 belly dance moves + 10 warm-up/cool-down bookends.
+- **6 programs** — Strength course programs (Beginner / Intermediate 101–103). Belly Dance's 6 programs were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
+- **72 items** — strength exercises. Belly Dance's 39 moves + 10 warm-up/cool-down bookends were removed alongside it.
 - **6 trackable habits + Mood** (always on).
 
 Items and programs are upserted on every boot (built-in updates propagate; user records are untouched). Habits seed only on first run.

@@ -20,7 +20,7 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 | CSV export                    | Analytics-only; cannot round-trip                               | —                                                                 |
 | Automatic background backup   | File System Access API or scheduled export                      | —                                                                 |
 
-**Shipped:** per-session delete on `/workout` and `/practice/dance` ([US-047](../features/v1.10.0/US-047-retire-history.md)). JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md). Web Share on export (Save to Files / Mail / AirDrop when `canShare({ files })`) — [device-sync.md](device-sync.md#web-share-api-shipped).
+**Shipped:** per-session delete on `/workout/today` ([US-047](../features/v1.10.0/US-047-retire-history.md); route moved again under [US-052](../features/v1.10.0/US-052-one-workout-section.md)). JSON file export/import (replace-only restore) on Settings → Data — [US-028 Phase 1](../features/v1.7.0/US-028-data-export-backup.md). Web Share on export (Save to Files / Mail / AirDrop when `canShare({ files })`) — [device-sync.md](device-sync.md#web-share-api-shipped).
 
 ---
 
@@ -59,11 +59,11 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 | Item                           | Notes                                                                                                                       | Spec                                                                                               |
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Lift plans (goal progression)  | Wave-loading Strength plans — **shipped in v1.9.0** as “Goal progression plans”; UI name → **Lift plans**; follow-ons below | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
+| Lift plans (goal progression)  | Wave-loading Strength plans — **shipped in v1.9.0** as "Goal progression plans"; merged into the single Workout section in v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) — UI now just says **plan** with an optional **goal**, not "Lift plan"; follow-ons below | [v1.9.0](../features/v1.9.0/README.md) · [Glossary](../glossary.md#lift-plan)                      |
 | Plan comparison visualizations | Compare isolated plan instances (e.g. Bench Goal 01 vs 02) — data captured in v1.9.0, UI later                              | [US-033](../features/v1.9.0/US-033-goal-progression-plans.md)                                      |
 | Plan-switching handoff         | UX when starting a new lift plan while another exists                                                                       | [US-033 deferred](../features/v1.9.0/US-033-goal-progression-plans.md#deferred--out-of-scope-v190) |
 | Pro-authored goal templates    | Scaffold choices in v1.9.0; professional templates later                                                                    | [v1.9.0](../features/v1.9.0/README.md)                                                             |
-| Additional Disciplines         | Engine supports more; only strength + belly dance ship                                                                      | —                                                                                                  |
+| Additional Disciplines         | Engine supports more; only Strength ships today (Belly Dance removed in v1.10.0, [US-051](../features/v1.10.0/US-051-remove-belly-dance.md)) | —                                                                                                  |
 | Day-of-week scheduling         | Progression stays count-driven (`completedSessionCount % routineCount`)                                                     | —                                                                                                  |
 
 **Course programs (unchanged):** Strength Foundation etc. still use last-used prefill + manual adjustment — no auto periodization unless the user runs a lift plan.

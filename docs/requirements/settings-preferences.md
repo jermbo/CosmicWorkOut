@@ -15,10 +15,9 @@ User-configurable behavior and appearance.
 | Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                                                                                                                   |
 | Settings hub + sub-routes (`/settings`)      | Built     | One row per feature since v1.10.0 ([US-045](../features/v1.10.0/US-045-settings-feature-hub.md)); originally [US-030](../features/v1.7.0/US-030-settings-restructure.md)                       |
 | Health metrics master toggle                 | Built     | On `/settings/health` ([US-029](../features/v1.7.0/US-029-health-metrics.md), moved by US-045)                                                                                                 |
-| Lift plans master toggle                     | Built     | On `/settings/practice` ([US-033](../features/v1.9.0/US-033-goal-progression-plans.md)); UI name **Lift plans**                                                                                |
 | Baselines master toggle + Settings CRUD      | Built     | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                                                                                                         |
 | Habits / Activity log master toggles         | Built     | Both default off; every tracking feature is opt-in                                                                                                                                             |
-| Practice master toggle                       | Built     | Default off; Lift plans nest inside it                                                                                                                                                         |
+| Workout master toggle                        | Built     | On `/settings/workout` ([US-052](../features/v1.10.0/US-052-one-workout-section.md)); default off; covers plans and their optional goals (replaces the old separate Practice + Lift plans toggles) |
 | Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on Personalization (and `/settings/overview`); `src/lib/homeCards.ts`                                                                                                           |
 | Weight unit applied in display/input         | Built     | Default `lb`; a **label only** — switching does not convert stored readings                                                                                                                    |
 | Accent / density / roundness applied on boot | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25); roundness sets every `--radius-*` token except `--radius-full` (v1.10.0 fix — before, both only reached a few tokens)  |
@@ -40,10 +39,10 @@ Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.
 
 | Route                       | Contents                                                                                                               |
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `/settings`                 | **Hub** — Features: Habits · Baselines · Practice · Activity · Health. App: Insights · Personalization · Data & backup |
+| `/settings`                 | **Hub** — Features: Habits · Baselines · Workout · Activity · Health. App: Insights · Personalization · Data & backup |
 | `/settings/habits`          | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                 |
 | `/settings/baselines`       | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                    |
-| `/settings/practice`        | Practice switch; Lift plans switch; link to `/goals`                                                                   |
+| `/settings/workout`         | One **Workout** switch, covering plans and their optional goals ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) — replaces the old `/settings/practice` |
 | `/settings/activity`        | Activity log switch                                                                                                    |
 | `/settings/health`          | Health metrics switch                                                                                                  |
 | `/settings/insights`        | Show / hide each Insights chart                                                                                        |
@@ -56,20 +55,17 @@ flowchart LR
     Hub["/settings"]
     Hub --> Hab["/settings/habits"]
     Hub --> Base["/settings/baselines"]
-    Hub --> Prac["/settings/practice"]
+    Hub --> Work["/settings/workout"]
     Hub --> Act["/settings/activity"]
     Hub --> Hea["/settings/health"]
     Hub --> Ins["/settings/insights"]
     Hub --> Per["/settings/personalization"]
     Hub --> Data["/settings/data"]
-    Prac -->|nested toggle| Lift[Lift plans]
 
     classDef hub fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     classDef route fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
-    classDef toggle fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
     class Hub hub;
-    class Hab,Base,Prac,Act,Hea,Ins,Per,Data route;
-    class Lift toggle;
+    class Hab,Base,Work,Act,Hea,Ins,Per,Data route;
 ```
 
 Settings feature pages are never gated by their own flag — they hold the switch that turns the feature on. Destructive and infrequent actions live on **Data & backup**.
@@ -82,14 +78,13 @@ Every feature toggle defaults **off** and hides UI only — data always persists
 | ----------------------------- | ----------------------------------------------------------------------- |
 | `habitsEnabled`               | Habits **and mood** — daily check-in, CRUD, dots, charts                |
 | `activityLogEnabled`          | The activity log — runs, walks, yoga, and other one-off activities      |
-| `practiceEnabled`             | The whole Practice / session engine, plus its Insights marks            |
-| `goalProgressionPlansEnabled` | Lift plans — **nested under Practice**; only shown while Practice is on |
+| `practiceEnabled`             | The whole Workout section — plans and their optional goals, plus its Insights marks (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) folded the old separate `goalProgressionPlansEnabled` flag into this one) |
 | `healthMetricsEnabled`        | Weight and blood pressure                                               |
 | `baselinesEnabled`            | Daily baselines (1 to n metrics each)                                   |
 
 **Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page.
 
-Lift plans are nested because a plan can only be trained through `/workout`, which Practice owns. Code reads the derived `prefsStore.liftPlansEnabled` rather than and-ing the two flags.
+A goal is no longer a separate flag — it's just an option set when a plan is created at `/workout/new`, so the single `practiceEnabled` switch covers it.
 
 Mood has no toggle of its own — it is a protected habit, locked _inside_ Habits but hidden along with it.
 
@@ -112,14 +107,14 @@ flowchart LR
     Apply --> Data["data-theme / data-density / data-roundness"]
     Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight]
     Apply --> Health[healthMetricsEnabled → home / health / insights]
-    Apply --> Practice[practiceEnabled → nav / practice / workout / insights]
+    Apply --> Work[practiceEnabled → nav / workout / insights]
 
     classDef trigger fill:#9a6a1f,stroke:#5c3f12,color:#ffffff;
     classDef store fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
     classDef effect fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class Change trigger;
     class Store,LS,Apply store;
-    class CSS,Data,Unit,Health,Practice effect;
+    class CSS,Data,Unit,Health,Work effect;
 ```
 
 ---
