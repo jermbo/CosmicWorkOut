@@ -37,7 +37,6 @@
 		"@fontsource/inter": "5.2.8",
 		"@fontsource/jetbrains-mono": "5.2.8",
 		"@fontsource/space-grotesk": "5.2.10",
-		"@tanstack/charts": "0.18.0",
-		"chart.js": "4.5.1"
+		"@tanstack/charts": "0.18.0"
 	}
 }

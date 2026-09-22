@@ -24,7 +24,7 @@ User-configurable behavior and appearance.
 | Accent / density / roundness applied on boot | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25); roundness sets every `--radius-*` token except `--radius-full` (v1.10.0 fix — before, both only reached a few tokens)  |
 | Personalization page                         | Built     | `/settings/personalization` — accent, weight unit, density, roundness, card order ([US-046](../features/v1.10.0/US-046-personalization.md)). Restores the Appearance page dropped after US-030 |
 | Insights chart visibility (`hiddenCharts`)   | Built     | `/settings/insights` + ⋯ → Hide on each chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                                              |
-| Light mode (`theme`)                         | Built     | Dark / Light / Match device on Personalization; default Dark ([US-048](../features/v1.11.0/US-048-light-mode.md))                                                                              |
+| Light mode (`theme`)                         | Built     | Dark / Light / Match device on Personalization; default Dark ([US-048](../features/v1.10.0/US-048-light-mode.md))                                                                              |
 | Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                                                                 |
 | Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                                                                      |
 | Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                                                           |
@@ -192,7 +192,7 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 
 ## Out of Scope for v1
 
-Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications. Light mode shipped in v1.11.0 ([US-048](../features/v1.11.0/US-048-light-mode.md)); dark stays the default — see [Design Principles](../vision/principles.md#4-tactile-and-satisfying--dark-first).
+Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications. Light mode shipped in v1.10.0 ([US-048](../features/v1.10.0/US-048-light-mode.md)); dark stays the default — see [Design Principles](../vision/principles.md#4-tactile-and-satisfying--dark-first).
 
 ---
 

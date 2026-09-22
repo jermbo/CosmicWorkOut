@@ -1,10 +1,10 @@
-[Wiki](../../README.md) › [Features](../README.md) › [v1.11.0](README.md) › US-048
+[Wiki](../../README.md) › [Features](../README.md) › [v1.10.0](README.md) › US-048
 
 # US-048 — Light Mode
 
 > **As built:** New `theme` pref (`'dark' | 'light' | 'system'`, default `'dark'`) with `prefsStore.resolvedTheme` and `setTheme()`. The resolved theme is written to `<html data-theme>`, and the `theme-color` meta follows it. An inline script in `app.html` sets it before first paint so there's no dark flash. `app.css` has a `[data-theme='light']` token set. New tokens: `--color-accent-text` (accent used as text — darkened in light), `--color-mood-good` / `--color-mood-bad` plus `-text` variants. Every `color: var(--color-accent)` became `--color-accent-text`. Charts read `chartPalette()` / `chartGrid()` from `src/lib/charts/theme.ts` — SVG presentation attributes can't use CSS variables — and rebuild when the theme changes. The All Habits heat chart swaps its empty / neutral cell grays for the theme's. **Known gap:** the iOS home-screen status bar style (`black-translucent`) is fixed at install, so in light mode the status bar text is white on a light page.
 >
-> Decisions: [v1.11.0 — Topic 1](./README.md#topic-1--light-mode).
+> Decisions: [v1.10.0 — Topic 8](./README.md#topic-8--light-mode).
 
 As a **health-conscious user**, I want a light theme, or one that follows my phone,
 so that I can read the app comfortably in daylight.
@@ -43,6 +43,6 @@ so that I can read the app comfortably in daylight.
 
 ## Related Docs
 
-- [US-046 — Personalization](../v1.10.0/US-046-personalization.md)
+- [US-046 — Personalization](./US-046-personalization.md)
 - [Design Principles — 4](../../vision/principles.md#4-tactile-and-satisfying--dark-first)
 - [Settings & Preferences](../../requirements/settings-preferences.md)

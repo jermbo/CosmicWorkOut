@@ -46,12 +46,10 @@ Ideas that were deferred, cut, or only partially built live here — not scatter
 
 ### Activity & insights
 
-| Item                             | Notes                                                                                                                                |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Activity distance / pace fields  | Cardio stays on Activity path, not Discipline                                                                                        |
-| Chart drill-down / interactivity | Tap bar, zoom, filter series — **being decided in [v1.11.0 Topic 5](../features/v1.11.0/README.md#topics-4--7--insights-open)**      |
-| Per-discipline chart filtering   | Insights shows all sessions today — **being decided in [v1.11.0 Topic 6](../features/v1.11.0/README.md#topics-4--7--insights-open)** |
-| Nutrition tracking               | Out of product identity                                                                                                              |
+| Item                            | Notes                                         |
+| ------------------------------- | --------------------------------------------- |
+| Activity distance / pace fields | Cardio stays on Activity path, not Discipline |
+| Nutrition tracking              | Out of product identity                       |
 
 **Shipped:** Insights hub with date-range chips (45d, week, MTD, YTD, custom) — beyond original v1.5.0 read-only scope.
 

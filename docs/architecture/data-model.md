@@ -436,7 +436,7 @@ Stored in localStorage (`cwout:prefs`).
 ```typescript
 type UserPrefs = {
 	accentColor: string; // hex, default "#b2f042"
-	theme: 'dark' | 'light' | 'system'; // default "dark" (v1.11.0, US-048)
+	theme: 'dark' | 'light' | 'system'; // default "dark" (v1.10.0, US-048)
 	density: 'compact' | 'comfortable' | 'spacious';
 	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)

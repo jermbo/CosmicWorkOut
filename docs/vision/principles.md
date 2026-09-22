@@ -59,7 +59,7 @@ See [Program Management](../requirements/program-management.md) for requirements
 
 ## 4. Tactile and Satisfying — Dark First
 
-Dark is the default and the reference look; a light theme exists for daylight reading (v1.11.0, [US-048](../features/v1.11.0/US-048-light-mode.md)), and every screen must work in both. Interactions have physical weight — tapping a set tile should feel like checking something off a list. Animations use spring curves, not linear transitions. Completion moments (exercise done, session done) should feel earned.
+Dark is the default and the reference look; a light theme exists for daylight reading (v1.10.0, [US-048](../features/v1.10.0/US-048-light-mode.md)), and every screen must work in both. Interactions have physical weight — tapping a set tile should feel like checking something off a list. Animations use spring curves, not linear transitions. Completion moments (exercise done, session done) should feel earned.
 
 This is not decoration. Satisfying feedback is what makes people actually log their workouts consistently.
 

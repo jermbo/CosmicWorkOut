@@ -155,34 +155,28 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 
 ## v1.10.0 — Baselines & Insights Refresh
 
-| Feature                               | Status  | Notes                                                                                                                                                           |
-| ------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Flexible baseline metrics             | Built   | [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — 1 to n Duration / Distance / Count metrics, no direction; DB v11 drops v1.9.0 baseline data |
-| Baseline logging & neutral comparison | Built   | [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md) — logging = done; signed difference vs baseline                                             |
-| TanStack Charts                       | Built   | [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md) — every chart; `src/lib/charts/`. `chart.js` still installed until the user removes it        |
-| Scrolling charts                      | Built   | [US-040](../features/v1.10.0/US-040-scrolling-charts.md) — `ScrollChart.svelte`, 48 px columns, pinned value rails                                              |
-| All-habits heat chart (experimental)  | Built   | [US-041](../features/v1.10.0/US-041-all-habits-heat-chart.md) — strips + calendar grid                                                                          |
-| Habit colors                          | Built   | [US-042](../features/v1.10.0/US-042-habit-colors.md) — `Habit.color` / `negativeColor`, defaults on load                                                        |
-| Show / hide Insights charts           | Built   | [US-043](../features/v1.10.0/US-043-insights-chart-visibility.md) — `prefs.hiddenCharts`; `/settings/insights`                                                  |
-| Experimental Insights charts          | Built   | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
-| Settings feature hub                  | Built   | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
-| Personalization                       | Built   | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
-| Retire History (`/calendar`)          | Removed | [US-047](../features/v1.10.0/US-047-retire-history.md) — History tab gone; session Delete moved to `/workout` and `/practice/dance`                             |
+| Feature                                  | Status  | Notes                                                                                                                                                           |
+| ---------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Flexible baseline metrics                | Built   | [US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md) — 1 to n Duration / Distance / Count metrics, no direction; DB v11 drops v1.9.0 baseline data |
+| Baseline logging & neutral comparison    | Built   | [US-038](../features/v1.10.0/US-038-baseline-logging-comparison.md) — logging = done; signed difference vs baseline                                             |
+| TanStack Charts                          | Built   | [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md) — every chart; `src/lib/charts/`. `chart.js` still installed until the user removes it        |
+| Scrolling charts                         | Built   | [US-040](../features/v1.10.0/US-040-scrolling-charts.md) — `ScrollChart.svelte`, 48 px columns, pinned value rails                                              |
+| All-habits heat chart (experimental)     | Built   | [US-041](../features/v1.10.0/US-041-all-habits-heat-chart.md) — strips + calendar grid                                                                          |
+| Habit colors                             | Built   | [US-042](../features/v1.10.0/US-042-habit-colors.md) — `Habit.color` / `negativeColor`, defaults on load                                                        |
+| Show / hide Insights charts              | Built   | [US-043](../features/v1.10.0/US-043-insights-chart-visibility.md) — `prefs.hiddenCharts`; `/settings/insights`                                                  |
+| Experimental Insights charts             | Built   | [US-044](../features/v1.10.0/US-044-experimental-insights-charts.md) — growth + bests, showing up, week vs week, day of week, on days when, time of day         |
+| Settings feature hub                     | Built   | [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) — `/settings/{habits,baselines,practice,activity,health,insights}`                                 |
+| Personalization                          | Built   | [US-046](../features/v1.10.0/US-046-personalization.md) — `/settings/personalization`; light mode deferred                                                      |
+| Retire History (`/calendar`)             | Removed | [US-047](../features/v1.10.0/US-047-retire-history.md) — History tab gone; session Delete moved to `/workout` and `/practice/dance`                             |
+| Light mode (Dark / Light / Match device) | Built   | [US-048](../features/v1.10.0/US-048-light-mode.md) — default Dark; `data-theme` on `<html>`; charts follow theme                                                |
+| Lift plan wording in the UI              | Built   | [US-049](../features/v1.10.0/US-049-lift-plan-rename.md) — interim; US-052 retires "Lift plan"                                                                  |
+| Cheap hardening (audit Phase A)          | Built   | [US-050](../features/v1.10.0/US-050-cheap-hardening.md) — backup size cap, save-error resets, streak tests                                                      |
+| Remove Belly Dance                       | Planned | [US-051](../features/v1.10.0/US-051-remove-belly-dance.md)                                                                                                      |
+| One Workout section                      | Planned | [US-052](../features/v1.10.0/US-052-one-workout-section.md)                                                                                                     |
+| Personal records                         | Planned | [US-053](../features/v1.10.0/US-053-personal-records.md)                                                                                                        |
+| This month card                          | Planned | [US-054](../features/v1.10.0/US-054-this-month-card.md)                                                                                                         |
 
-Not yet verified in a browser — built and checked with type check, lint, unit tests, and a production build only.
-
----
-
-## v1.11.0 — Finish the Threads, Then Sharpen Insights
-
-| Feature                                  | Status | Doc reference                                                                                                    |
-| ---------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------- |
-| Light mode (Dark / Light / Match device) | Built  | [US-048](../features/v1.11.0/US-048-light-mode.md) — default Dark; `data-theme` on `<html>`; charts follow theme |
-| Lift plan wording in the UI              | Built  | [US-049](../features/v1.11.0/US-049-lift-plan-rename.md)                                                         |
-| Cheap hardening (audit Phase A)          | Built  | [US-050](../features/v1.11.0/US-050-cheap-hardening.md) — backup size cap, save-error resets, streak tests       |
-| Insights improvements                    | Open   | [v1.11.0 Topics 4 – 7](../features/v1.11.0/README.md#topics-4--7--insights-open) — not decided yet               |
-
-Checked with type check, lint, unit tests (109), a production build, and a light-mode browser pass at phone width.
+Built rows checked with type check, lint, unit tests and a production build; light mode also checked in a browser. Planned rows (US-051 – US-054) are decided, not built.
 
 ---
 
@@ -204,8 +198,7 @@ Checked with type check, lint, unit tests (109), a production build, and a light
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.11.0 Features](../features/v1.11.0/README.md) — Light mode, Lift plan wording, hardening; Insights next
-- [v1.10.0 Features](../features/v1.10.0/README.md) — Baselines & Insights refresh, Settings
+- [v1.10.0 Features](../features/v1.10.0/README.md) — Baselines & Insights refresh, Settings, light mode; one Workout section and records planned
 - [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans + Baselines
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)
 - [v1.4.0 Features](../features/v1.4.0/README.md) — Discipline model (shipped)

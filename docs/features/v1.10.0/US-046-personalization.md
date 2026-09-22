@@ -24,7 +24,7 @@ so that I can pick my accent color, units, spacing, and home layout without hunt
 | **Contents**        | Accent color · Weight unit (lb / kg) · Density (compact / comfortable / spacious) · Roundness (sharp / default / soft) · Overview layout.                                 |
 | **Already wired**   | The four appearance preferences are still stored and applied on app start; only the screen is missing.                                                                    |
 | **Overview layout** | Moved here from its own Settings row.                                                                                                                                     |
-| **Light mode**      | **Not in v1.10.0** — shipped in v1.11.0 ([US-048](../v1.11.0/US-048-light-mode.md)). App stays dark-only; light / dark / match-device is on the Roadmap for next version. |
+| **Light mode**      | **Not in v1.10.0** — added later in this release ([US-048](./US-048-light-mode.md)). App stays dark-only; light / dark / match-device is on the Roadmap for next version. |
 
 ---
 
