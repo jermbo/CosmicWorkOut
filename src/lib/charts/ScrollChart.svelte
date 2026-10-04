@@ -49,7 +49,17 @@
 
 	let contentWidth = $derived(Math.max(viewportWidth, columns * columnWidth));
 	let scrollable = $derived(contentWidth > viewportWidth + 1);
-	let built = $derived(viewportWidth > 0 ? definition(contentWidth) : null);
+	/**
+	 * A fingertip lands nowhere near a 2px line, and the default 48px focus radius
+	 * meant a tap only registered when it landed almost exactly on a point. Reaching
+	 * across the plot and one column either side makes any tap inside the chart pick
+	 * that column — which `focus: 'group-x'` then expands to every series in it.
+	 */
+	let tapRadius = $derived(Math.hypot(columnWidth, height));
+
+	let built = $derived(
+		viewportWidth > 0 ? { ...definition(contentWidth), maxFocusDistance: tapRadius } : null,
+	);
 	let plotHeight = $derived(height - PLOT_MARGIN.top - PLOT_MARGIN.bottom);
 
 	// Open on the newest column whenever the range (or the space) changes.

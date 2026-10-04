@@ -63,11 +63,12 @@ export interface TooltipRowSpec<TDatum> {
 
 /**
  * Tooltip config: portalled so it escapes the horizontal scroller, placed beside
- * the pointer, titled by a date, with one row per focused point.
+ * the pointer, titled by a date, with one row per focused point. `row` may return
+ * null to leave a point out — marker marks would otherwise repeat a line's value.
  */
 export function chartTooltip<TDatum>(
 	title: (datum: TDatum) => string,
-	row: (point: ChartPoint<TDatum>) => { label: string; value: string; color?: string },
+	row: (point: ChartPoint<TDatum>) => { label: string; value: string; color?: string } | null,
 ) {
 	return {
 		use: tooltip,
@@ -80,9 +81,10 @@ export function chartTooltip<TDatum>(
 			const first = points[0];
 			return {
 				title: first ? title(first.datum) : undefined,
-				rows: points.map((p) => {
+				rows: points.flatMap((p) => {
 					const r = row(p);
-					return { label: r.label, value: r.value, color: r.color ?? p.color };
+					if (!r) return [];
+					return [{ label: r.label, value: r.value, color: r.color ?? p.color }];
 				}),
 			};
 		},

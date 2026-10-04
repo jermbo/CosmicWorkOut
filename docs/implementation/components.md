@@ -190,6 +190,15 @@ TanStack Charts components + a shared range control. The page renders from `INSI
 
 Shared chart plumbing lives in `src/lib/charts/` — `ScrollChart` (fixed-spacing sideways scroll, pinned rails), `scale.ts`, `theme.ts`, `color.ts`.
 
+### Touch targets in multi-series charts
+
+Two rules keep a tap on a phone usable, both learned the hard way:
+
+- **Every series mark needs a distinct `z`.** `focus: 'group-x'` builds the focused column by de-duplicating points on their `group` value, which TanStack takes from the mark's `z` (or `color`) channel. Separate `lineY` marks with only a distinct `id` all report `group: null`, collapse into one entry, and the tooltip shows a single series no matter where you tap — the reason Blood Pressure only ever reported systolic.
+- **`ScrollChart` raises `maxFocusDistance`** to roughly one column plus the plot height. The 48px default meant a tap had to land almost exactly on a 2px line; now a tap anywhere inside the chart picks that column, and `group-x` expands it to every series.
+
+`chartTooltip`'s row callback may return `null` to drop a point — `BaselineChart` uses it so the best-day marker folds into its metric's row instead of repeating the value.
+
 ---
 
 ## Component hierarchy (key paths)

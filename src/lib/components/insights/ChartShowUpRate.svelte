@@ -79,6 +79,8 @@
 						id: s.item.id,
 						x: 'week',
 						y: 'pct',
+						// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+						z: () => s.item.id,
 						stroke: s.item.color,
 						strokeWidth: 2,
 						points: true,

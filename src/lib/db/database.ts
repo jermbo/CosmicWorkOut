@@ -297,6 +297,7 @@ export async function loadDebugSeedData(): Promise<void> {
 	await putAllRecords('baselineLogs', baselineLogs);
 
 	const goalSample = generateGoalPlanSampleData();
+	await pausePlansSupersededBySeed(goalSample.goalPlans);
 	await putAllRecords('goalPlans', goalSample.goalPlans);
 	await putAllRecords('programs', goalSample.programs);
 	await putAllRecords('sessions', goalSample.sessions);
@@ -305,17 +306,27 @@ export async function loadDebugSeedData(): Promise<void> {
 	location.reload();
 }
 
-/** Add a seeded program to the active list so it shows up on Practice/Workout. */
+/**
+ * The seed ships its own active plan, and exactly one plan is ever active (US-052),
+ * so park whatever was running first. Otherwise `goalPlanStore.activePlan` picks the
+ * first active record it finds while `activeProgramIds` points at the seeded program.
+ */
+async function pausePlansSupersededBySeed(seeded: GoalPlan[]): Promise<void> {
+	const seededIds = new Set(seeded.map((p) => p.id));
+	const existing = await getAll<GoalPlan>('goalPlans');
+	const running = existing.filter((p) => p.status === 'active' && !seededIds.has(p.id));
+	if (running.length === 0) return;
+
+	const pausedAt = new Date().toISOString();
+	await putAllRecords(
+		'goalPlans',
+		running.map((plan) => ({ ...plan, status: 'paused' as const, pausedAt })),
+	);
+}
+
+/** Make the seeded program the one active plan — exactly one is ever active (US-052). */
 function activateSeededProgram(programId: string): void {
-	try {
-		const raw = localStorage.getItem('cwout:activeProgramIds');
-		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
-		if (Array.isArray(ids) && !ids.includes(programId)) {
-			localStorage.setItem('cwout:activeProgramIds', JSON.stringify([...ids, programId]));
-		}
-	} catch {
-		localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
-	}
+	localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
 }
 
 export async function clearCustomExercises(): Promise<void> {

@@ -43,6 +43,9 @@
 						id: s.id,
 						x: 'date',
 						y: 'value',
+						// `group-x` dedupes the focused column by `z`; without it every mark
+						// groups as null and the tooltip collapses to a single series.
+						z: () => s.id,
 						stroke: s.color,
 						strokeWidth: 2,
 						points: true,

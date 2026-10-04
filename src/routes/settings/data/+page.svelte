@@ -58,6 +58,19 @@
 
 	let itemsInUse = $derived(programStore.customItemsInUse());
 
+	/** Seeded data writes regardless, but each tracker's UI is hidden while its toggle is off. */
+	let trackersOffForSeed = $derived(
+		[
+			{ label: 'Workout', on: prefsStore.practiceEnabled },
+			{ label: 'Activity log', on: prefsStore.activityLogEnabled },
+			{ label: 'Habits', on: prefsStore.habitsEnabled },
+			{ label: 'Health metrics', on: prefsStore.healthMetricsEnabled },
+			{ label: 'Baselines', on: prefsStore.baselinesEnabled },
+		]
+			.filter((t) => !t.on)
+			.map((t) => t.label),
+	);
+
 	let exporting = $state(false);
 	let fileInput = $state<HTMLInputElement>();
 	/** Raw file text — parse at confirm time so restore never touches a reactive tree. */
@@ -468,6 +481,15 @@
 	>
 		Adds ~6 months of randomized workout sessions, activities, habit logs, and health readings. Your
 		existing data is not removed. The page will reload when done.
+		{#if trackersOffForSeed.length > 0}
+			<br /><br /><strong>These trackers are off, so their seeded data stays hidden:</strong>
+			<ul class="confirm-list">
+				{#each trackersOffForSeed as label (label)}
+					<li>{label}</li>
+				{/each}
+			</ul>
+			The data is still written — turn a tracker on in Settings to see it.
+		{/if}
 	</ConfirmDialog>
 {/if}
 
