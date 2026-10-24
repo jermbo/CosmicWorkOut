@@ -553,6 +553,19 @@
 	.data-action__btn--primary {
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
+
+		&:active:not(:disabled) {
+			transform: translate(4px, 4px);
+			box-shadow: none;
+		}
 	}
 
 	.data-action__btn--danger {
@@ -563,7 +576,7 @@
 	.data-action__btn--secondary {
 		background: var(--color-surface-3);
 		color: var(--color-text-primary);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 	}
 
 	.data-action__file-input {
@@ -578,7 +591,7 @@
 		block-size: 40px;
 		background: transparent;
 		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		font-size: 0.875rem;
 	}
 </style>

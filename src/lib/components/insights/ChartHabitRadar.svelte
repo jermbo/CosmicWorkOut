@@ -5,8 +5,7 @@
 	import { scalePoint } from '@tanstack/charts/scales/point';
 	import { Chart } from '@tanstack/charts/svelte';
 	import { habitStore } from '$lib/stores/habits.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { chartGrid, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, chartTooltip, withAlpha, CHART_ACCENT } from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -32,7 +31,7 @@
 	});
 
 	let definition = $derived.by(() => {
-		const accent = prefsStore.accentColor;
+		const accent = CHART_ACCENT;
 		// Repeat the first spoke so the default linear path closes the shape.
 		const ring =
 			spokes.length > 0 ? [...spokes, { ...spokes[0], key: `${spokes[0].key}:close` }] : [];

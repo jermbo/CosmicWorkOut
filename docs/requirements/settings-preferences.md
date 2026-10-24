@@ -10,26 +10,27 @@ User-configurable behavior and appearance.
 
 ## Implementation Status
 
-| Story                                        | Status    | Notes                                                                                                                                                                                          |
-| -------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                                                                                                                   |
-| Settings hub + sub-routes (`/settings`)      | Built     | One row per feature since v1.10.0 ([US-045](../features/v1.10.0/US-045-settings-feature-hub.md)); originally [US-030](../features/v1.7.0/US-030-settings-restructure.md)                       |
-| Health metrics master toggle                 | Built     | On `/settings/health` ([US-029](../features/v1.7.0/US-029-health-metrics.md), moved by US-045)                                                                                                 |
-| Baselines master toggle + Settings CRUD      | Built     | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                                                                                                         |
-| Habits / Activity log master toggles         | Built     | Both default off; every tracking feature is opt-in                                                                                                                                             |
+| Story                                        | Status    | Notes                                                                                                                                                                                              |
+| -------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preferences store + localStorage persistence | Built     | `prefsStore` ↔ `cwout:prefs`                                                                                                                                                                       |
+| Settings hub + sub-routes (`/settings`)      | Built     | One row per feature since v1.10.0 ([US-045](../features/v1.10.0/US-045-settings-feature-hub.md)); originally [US-030](../features/v1.7.0/US-030-settings-restructure.md)                           |
+| Health metrics master toggle                 | Built     | On `/settings/health` ([US-029](../features/v1.7.0/US-029-health-metrics.md), moved by US-045)                                                                                                     |
+| Baselines master toggle + Settings CRUD      | Built     | [US-034](../features/v1.9.0/US-034-baselines-setup.md)                                                                                                                                             |
+| Habits / Activity log master toggles         | Built     | Both default off; every tracking feature is opt-in                                                                                                                                                 |
 | Workout master toggle                        | Built     | On `/settings/workout` ([US-052](../features/v1.10.0/US-052-one-workout-section.md)); default off; covers plans and their optional goals (replaces the old separate Practice + Lift plans toggles) |
-| Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on Personalization (and `/settings/overview`); `src/lib/homeCards.ts`                                                                                                           |
-| Weight unit applied in display/input         | Built     | Default `lb`; a **label only** — switching does not convert stored readings                                                                                                                    |
-| Accent / density / roundness applied on boot | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25); roundness sets every `--radius-*` token except `--radius-full` (v1.10.0 fix — before, both only reached a few tokens)  |
-| Personalization page                         | Built     | `/settings/personalization` — accent, weight unit, density, roundness, card order ([US-046](../features/v1.10.0/US-046-personalization.md)). Restores the Appearance page dropped after US-030 |
-| Insights chart visibility (`hiddenCharts`)   | Built     | `/settings/insights` + ⋯ → Hide on each chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                                              |
-| Light mode (`theme`)                         | Built     | Dark / Light / Match device on Personalization; default Dark ([US-048](../features/v1.10.0/US-048-light-mode.md))                                                                              |
-| Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                                                                 |
-| Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                                                                      |
-| Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                                                           |
-| Reset preferences to defaults                | Built     | `prefsStore.resetToDefaults()`                                                                                                                                                                 |
+| Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on Personalization (and `/settings/overview`); `src/lib/homeCards.ts`                                                                                                               |
+| Weight unit applied in display/input         | Built     | Default `lb`; a **label only** — switching does not convert stored readings                                                                                                                        |
+| Density applied on boot                      | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25)                                                                                                                             |
+| Accent color / roundness                     | Removed   | v1.12.0 ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md)) — fixed domain hues and square corners ([Design System](../architecture/design-system.md))                                 |
+| Personalization page                         | Built     | `/settings/personalization` — weight unit, density, card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)                                                       |
+| Insights chart visibility (`hiddenCharts`)   | Built     | `/settings/insights` + ⋯ → Hide on each chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                                                  |
+| Light mode (`theme`)                         | Removed   | Shipped in v1.10.0 ([US-048](../features/v1.10.0/US-048-light-mode.md)); removed in v1.12.0 — the app is dark only ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md))                 |
+| Completion feel toggle                       | Not built | No `completionFeel` pref; the completion confetti always plays                                                                                                                                     |
+| Per-item weight increment (2.5 / 5 / 10)     | Built     | Set on the item form, not in global prefs                                                                                                                                                          |
+| Clear workout data                           | Built     | On `/settings/data`; wipes IndexedDB + session state                                                                                                                                               |
+| Reset preferences to defaults                | Built     | `prefsStore.resetToDefaults()`                                                                                                                                                                     |
 
-> **Appearance UI note:** since v1.10.0, `accentColor`, `density`, `roundness`, and `weightUnit` are editable again on **Settings → Personalization** ([US-046](../features/v1.10.0/US-046-personalization.md)). The completion-feel story below still describes target UX only.
+> **Appearance UI note:** `density` and `weightUnit` are editable on **Settings → Personalization** ([US-046](../features/v1.10.0/US-046-personalization.md)). `theme`, `accentColor`, and `roundness` were removed in v1.12.0 ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md)); old stored values are ignored on load and dropped on the next save. The completion-feel story below still describes target UX only.
 
 ---
 
@@ -37,18 +38,18 @@ User-configurable behavior and appearance.
 
 Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.0): **one row per feature**, iPhone-Settings style. Each row shows On / Off and opens that feature's page, which holds its switch, its manage list, and its own options. (Originally [US-030](../features/v1.7.0/US-030-settings-restructure.md).)
 
-| Route                       | Contents                                                                                                               |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `/settings`                 | **Hub** — Features: Habits · Baselines · Workout · Activity · Health. App: Insights · Personalization · Data & backup |
-| `/settings/habits`          | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                 |
-| `/settings/baselines`       | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                    |
+| Route                       | Contents                                                                                                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/settings`                 | **Hub** — Features: Habits · Baselines · Workout · Activity · Health. App: Insights · Personalization · Data & backup                                                 |
+| `/settings/habits`          | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                                                                |
+| `/settings/baselines`       | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                                                                   |
 | `/settings/workout`         | One **Workout** switch, covering plans and their optional goals ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) — replaces the old `/settings/practice` |
-| `/settings/activity`        | Activity log switch                                                                                                    |
-| `/settings/health`          | Health metrics switch                                                                                                  |
-| `/settings/insights`        | Show / hide each Insights chart                                                                                        |
-| `/settings/personalization` | Appearance (theme), accent, weight unit, density, roundness, Overview card order                                       |
-| `/settings/overview`        | Overview card order (kept for old links)                                                                               |
-| `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                   |
+| `/settings/activity`        | Activity log switch                                                                                                                                                   |
+| `/settings/health`          | Health metrics switch                                                                                                                                                 |
+| `/settings/insights`        | Show / hide each Insights chart                                                                                                                                       |
+| `/settings/personalization` | Weight unit, density, Overview card order                                                                                                                             |
+| `/settings/overview`        | Overview card order (kept for old links)                                                                                                                              |
+| `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                                                                  |
 
 ```mermaid
 flowchart LR
@@ -74,13 +75,13 @@ Settings feature pages are never gated by their own flag — they hold the switc
 
 Every feature toggle defaults **off** and hides UI only — data always persists ([state.md](../implementation/state.md#feature-flags-hide-ui-data-always-persists)).
 
-| Toggle                        | Covers                                                                  |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `habitsEnabled`               | Habits **and mood** — daily check-in, CRUD, dots, charts                |
-| `activityLogEnabled`          | The activity log — runs, walks, yoga, and other one-off activities      |
-| `practiceEnabled`             | The whole Workout section — plans and their optional goals, plus its Insights marks (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) folded the old separate `goalProgressionPlansEnabled` flag into this one) |
-| `healthMetricsEnabled`        | Weight and blood pressure                                               |
-| `baselinesEnabled`            | Daily baselines (1 to n metrics each)                                   |
+| Toggle                 | Covers                                                                                                                                                                                                                              |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `habitsEnabled`        | Habits **and mood** — daily check-in, CRUD, dots, charts                                                                                                                                                                            |
+| `activityLogEnabled`   | The activity log — runs, walks, yoga, and other one-off activities                                                                                                                                                                  |
+| `practiceEnabled`      | The whole Workout section — plans and their optional goals, plus its Insights marks (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) folded the old separate `goalProgressionPlansEnabled` flag into this one) |
+| `healthMetricsEnabled` | Weight and blood pressure                                                                                                                                                                                                           |
+| `baselinesEnabled`     | Daily baselines (1 to n metrics each)                                                                                                                                                                                               |
 
 **Everything is opt-in**, so a fresh install tracks nothing. Overview shows a "choose what to track" empty state rather than a blank page.
 
@@ -103,8 +104,7 @@ flowchart LR
     Change[Pref change] --> Store[prefsStore]
     Store --> LS[("localStorage<br/>cwout:prefs")]
     Store --> Apply{Apply immediately}
-    Apply --> CSS["--color-accent on :root"]
-    Apply --> Data["data-theme / data-density / data-roundness"]
+    Apply --> Data["data-density on html"]
     Apply --> Unit[weightUnit → SetTile / LogSetSheet / body weight]
     Apply --> Health[healthMetricsEnabled → home / health / insights]
     Apply --> Work[practiceEnabled → nav / workout / insights]
@@ -114,23 +114,12 @@ flowchart LR
     classDef effect fill:#3b3f8c,stroke:#23264f,color:#ffffff;
     class Change trigger;
     class Store,LS,Apply store;
-    class CSS,Data,Unit,Health,Work effect;
+    class Data,Unit,Health,Work effect;
 ```
 
 ---
 
 ## User Stories
-
-### Choosing an Accent Color
-
-> As a user, I want to pick an accent color that feels like mine.
-
-- Color picker with a set of predefined options (at minimum: lime, lavender, red, blue, orange)
-- Custom hex input optional
-- When the accent is light (luminance > 140): text on accent surfaces uses dark ink (`#101010`). When dark: white ink (`#ffffff`).
-- Color applies immediately across all UI surfaces — buttons, completed set tiles, rings, etc.
-
----
 
 ### Choosing Weight Units
 
@@ -165,18 +154,6 @@ Three values in storage (applied via `data-density` on `<html>`):
 
 ---
 
-### Adjusting Roundness
-
-> As a user, I want the UI to match my aesthetic preference.
-
-Three values in storage (applied via `data-roundness` on `<html>`):
-
-- **default** — standard border radius
-- **sharp** — smaller radius everywhere
-- **soft** — larger, rounder corners
-
----
-
 ## Constraints
 
 - Preferences are stored in `localStorage` — synchronous reads, always available
@@ -187,7 +164,7 @@ Three values in storage (applied via `data-roundness` on `<html>`):
 
 ## Out of Scope for v1
 
-Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications. Light mode shipped in v1.10.0 ([US-048](../features/v1.10.0/US-048-light-mode.md)); dark stays the default — see [Design Principles](../vision/principles.md#4-tactile-and-satisfying--dark-first).
+Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, notifications. Light mode shipped in v1.10.0 ([US-048](../features/v1.10.0/US-048-light-mode.md)) and was removed in v1.12.0 — the app is dark only. See [Design Principles](../vision/principles.md#4-tactile-and-satisfying--dark-only).
 
 ---
 
@@ -195,5 +172,5 @@ Deferred items on [roadmap](../roadmap/README.md): per-exercise rest timer, noti
 
 - [Data Model — UserPrefs](../architecture/data-model.md)
 - [Session Logging](session-logging.md) — Where weight increment and completion feel are applied
-- [Design Principles](../vision/principles.md) — Why dark-first and small surface area
+- [Design Principles](../vision/principles.md) — Why dark only and small surface area
 - [US-030 — Settings Hub Restructure](../features/v1.7.0/US-030-settings-restructure.md)

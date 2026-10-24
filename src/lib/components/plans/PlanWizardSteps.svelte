@@ -44,8 +44,8 @@
 		padding-inline: var(--space-3);
 		block-size: 30px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		font-size: 0.75rem;
 		font-weight: 600;
 		color: var(--color-text-muted);

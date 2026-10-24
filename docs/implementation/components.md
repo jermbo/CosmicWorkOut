@@ -10,21 +10,21 @@ Inventory of the UI components in `src/lib/components/` (plus `components/insigh
 
 Reusable building blocks with no feature knowledge.
 
-| Component       | Purpose                                                                                                                             |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`        | Dialog/modal action button. `variant` primary \| ghost \| danger, plus `grow`, `bold`. Used by 4 callers.                           |
-| `Chip`          | Pill-shaped filter/choice button. `active`, `caps`, `small`, and `select` (toggle \| radio \| tab) for the right ARIA. 4 callers.   |
-| `FieldLabel`    | Form field label with optional muted `hint`. Renders `<label for>` or a `<span>` caption. Used by 11 callers.                       |
-| `DialogTitle`   | Heading at the top of a modal surface (`as` p \| h2). Used by 6 callers.                                                            |
-| `SheetBody`     | Flex-column wrapper inside `BottomSheet`. Used by 8 sheets.                                                                         |
-| `SheetHeader`   | Sheet title row: title, optional action buttons, close button. Used by 8 sheets.                                                    |
-| `BottomSheet`   | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 15 sheets.**                              |
-| `ConfirmDialog` | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 8 callers.                                              |
-| `ValueDialog`   | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`). Used by 3 callers.                                     |
-| `Icon`          | Single SVG icon component, keyed by name. Imported by 15 files — but **48 inline `<svg>` blocks still bypass it** (cleanup target). |
-| `ProgressRing`  | Circular SVG progress indicator (exercise cards, habit cards).                                                                      |
-| `PageHeader`    | Standard page title bar; embeds `WeekStrip`. Used by 11 routes.                                                                     |
-| `Toaster`       | Global toast notification host (mounted in layout).                                                                                 |
+| Component        | Purpose                                                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`         | Dialog/modal action button. `variant` primary \| ghost \| danger, plus `grow`, `bold`. Used by 4 callers.                           |
+| `Chip`           | Pill-shaped filter/choice button. `active`, `caps`, `small`, and `select` (toggle \| radio \| tab) for the right ARIA. 4 callers.   |
+| `FieldLabel`     | Form field label with optional muted `hint`. Renders `<label for>` or a `<span>` caption. Used by 11 callers.                       |
+| `DialogTitle`    | Heading at the top of a modal surface (`as` p \| h2). Used by 6 callers.                                                            |
+| `SheetBody`      | Flex-column wrapper inside `BottomSheet`. Used by 8 sheets.                                                                         |
+| `SheetHeader`    | Sheet title row: title, optional action buttons, close button. Used by 8 sheets.                                                    |
+| `BottomSheet`    | The slide-up `<dialog>` panel with backdrop; `showModal()` for focus trapping. **Base for 15 sheets.**                              |
+| `ConfirmDialog`  | Yes/no confirmation modal (abandon session, delete, copy-built-in). Used by 8 callers.                                              |
+| `ValueDialog`    | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`). Used by 3 callers.                                     |
+| `Icon`           | Single SVG icon component, keyed by name. Imported by 15 files — but **48 inline `<svg>` blocks still bypass it** (cleanup target). |
+| `ProgressBlocks` | Row of progress squares (`total`, `on`) in `currentColor` — Overview cards, habit tiles. v1.12.0                                    |
+| `PageHeader`     | Standard page title bar (date line + big caps title on a 3px rule); embeds `WeekStrip`. Used by 11 routes.                          |
+| `Toaster`        | Global toast notification host (mounted in layout).                                                                                 |
 
 The first six are the **UI primitive layer** the [June 2026 audit](../maintenance/audit-2026-06.md#3-css)
 called for — wrapper components rather than global utility classes, per Decision 4. A pattern
@@ -37,11 +37,11 @@ See [Styling](dev-guide.md#styling-tokens-and-primitive-components).
 
 Mounted in the root layout (`+layout.svelte`).
 
-| Component             | Purpose                                                                   |
-| --------------------- | ------------------------------------------------------------------------- |
-| `BottomNav`           | Fixed tab bar (collapses to a side rail ≥720px).                          |
-| `SessionOverlay`      | Full-screen active session: timer, progress, exercise list.               |
-| `SessionComplete`     | Post-session stats overlay with confetti celebration.                     |
+| Component         | Purpose                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| `BottomNav`       | Numbered block tabs (`01 OVERVIEW` …); current tab filled paper. Collapses to a side rail ≥720px. |
+| `SessionOverlay`  | Full-screen active session: timer, progress, exercise list.                                       |
+| `SessionComplete` | Post-session stats overlay with confetti celebration.                                             |
 
 ---
 
@@ -49,44 +49,44 @@ Mounted in the root layout (`+layout.svelte`).
 
 The home page is a dashboard of summary cards built on a shared `HomeCard` shell.
 
-| Component             | Purpose                                                                 |
-| --------------------- | ----------------------------------------------------------------------- |
-| `HomeCard`            | Base card shell (header, icon, body slot) the other home cards compose. |
-| `HomeActivityCard`    | Activity-log summary card.                                              |
-| `HomeHabitsCard`      | Habit-progress summary card.                                            |
-| `HomePracticeHubCard` | Workout entry card — file/prop names lag the "Workout" rename (v1.10.0, US-052). |
+| Component             | Purpose                                                                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `HomeCard`            | Base card shell the other home cards compose: a color field (`field` prop) with an index code (`code` prop, e.g. `[H] HABITS`), optional Live / Done badge, body slot. v1.12.0 |
+| `HomeActivityCard`    | Activity-log summary card.                                                                                                                                                     |
+| `HomeHabitsCard`      | Habit-progress summary card.                                                                                                                                                   |
+| `HomePracticeHubCard` | Workout entry card — file/prop names lag the "Workout" rename (v1.10.0, US-052).                                                                                               |
 
 ---
 
 ## Habits (`/habits`)
 
-| Component   | Purpose                                                         |
-| ----------- | --------------------------------------------------------------- |
-| `HabitCard` | A single habit with progress ring, +/− stepper, boolean toggle. |
-| `HabitRow`  | Compact habit row variant.                                      |
-| `HabitForm` | Create / edit a custom habit (Settings).                        |
+| Component   | Purpose                                                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `HabitCard` | A single habit as a color field in the habit's own color: big value, progress blocks, ruled +/− stepper or Mark done. Striped when nothing is logged. |
+| `HabitRow`  | Compact habit row variant.                                                                                                                            |
+| `HabitForm` | Create / edit a custom habit (Settings).                                                                                                              |
 
 ---
 
 ## Strength session flow
 
-| Component       | Purpose                                                             |
-| --------------- | ------------------------------------------------------------------- |
-| `WorkoutPicker` | Horizontal A/B/C routine tabs with a "suggested" indicator.         |
-| `TodayWorkout`  | Routine preview card (item list + Start button).                    |
-| `ExerciseCard`  | One exercise: header + set tiles + completion animation.            |
-| `SetTile`       | A single set button — "+" until logged, then weight × reps.         |
-| `LogSetSheet`   | Weight/reps stepper + first-time numpad; adapts to the item's unit. |
+| Component       | Purpose                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `WorkoutPicker` | Horizontal A/B/C routine tabs with a "suggested" indicator.                                                                          |
+| `TodayWorkout`  | Routine preview card (item list + Start button).                                                                                     |
+| `ExerciseCard`  | One exercise: `T1`-style count box, header, set tiles. `current` draws it as the Training field (the first exercise with sets left). |
+| `SetTile`       | A single set button — dashed "+" until logged, then a solid weight × reps block; `next` marks the set to log now (NOW).              |
+| `LogSetSheet`   | Weight/reps stepper + first-time numpad; adapts to the item's unit.                                                                  |
 
 ---
 
 ## Plan detail & routine editing (`/workout/plan/[id]`)
 
 | Component           | Purpose                                                                                                                                     |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WorkoutEditor`      | Full-screen routine editor (name, items, sets/reps); takes an explicit `programId` so it always edits the plan being viewed, active or not. |
-| `LibrarySheet`       | Browse/filter the exercise library.                                                                                                          |
-| `ExerciseFormSheet`  | Create or edit a custom strength item.                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WorkoutEditor`     | Full-screen routine editor (name, items, sets/reps); takes an explicit `programId` so it always edits the plan being viewed, active or not. |
+| `LibrarySheet`      | Browse/filter the exercise library.                                                                                                         |
+| `ExerciseFormSheet` | Create or edit a custom strength item.                                                                                                      |
 
 ### Configuring `LibrarySheet`
 
@@ -106,15 +106,15 @@ plan" generated). Storage stays two records; these components are where the two 
 as one thing. `components/plans/` holds the merge; `components/goals/` keeps only the
 wave-specific pieces a goal-bearing plan still needs.
 
-| Component          | Purpose                                                                                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `ActivePlanCard`    | Active plan **without** a goal: week X of Y, today's routine, Start, Pause, Run it again / New plan on finish. |
-| `PlanRow`           | A non-active plan in the "Other plans" list — works for a plain plan or a paused/completed goal.               |
-| `PlanWizardSteps`   | Step indicator for the New Plan wizard (`start → routines → goal → review`).                                   |
-| `PlanStartStep`     | Pick a built-in template (copied) or start from scratch; name + weeks.                                         |
-| `PlanRoutinesStep`  | Edit A/B/C exercise slots — no focus constraint, used with or without a goal.                                  |
-| `PlanGoalStep`      | "Working toward a specific lift?" No/Yes; if Yes, pick the focus (from the routines already built) and enter start/goal weight × reps. |
-| `PlanReviewStep`    | Plan name + summary; wave block preview only when a goal was set.                                              |
+| Component          | Purpose                                                                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `ActivePlanCard`   | Active plan **without** a goal: week X of Y, today's routine, Start, Pause, Run it again / New plan on finish.                         |
+| `PlanRow`          | A non-active plan in the "Other plans" list — works for a plain plan or a paused/completed goal.                                       |
+| `PlanWizardSteps`  | Step indicator for the New Plan wizard (`start → routines → goal → review`).                                                           |
+| `PlanStartStep`    | Pick a built-in template (copied) or start from scratch; name + weeks.                                                                 |
+| `PlanRoutinesStep` | Edit A/B/C exercise slots — no focus constraint, used with or without a goal.                                                          |
+| `PlanGoalStep`     | "Working toward a specific lift?" No/Yes; if Yes, pick the focus (from the routines already built) and enter start/goal weight × reps. |
+| `PlanReviewStep`   | Plan name + summary; wave block preview only when a goal was set.                                                                      |
 
 Wizard state lives in `$lib/plans/wizard.svelte.ts` (`PlanWizard`). Activating,
 pausing, and restarting a plan go through `$lib/plans/actions.ts`, which dispatches to
@@ -123,14 +123,13 @@ pausing, and restarting a plan go through `$lib/plans/actions.ts`, which dispatc
 
 Kept from the old lift-plan wizard, under `components/goals/`:
 
-| Component            | Purpose                                                            |
-| --------------------- | ------------------------------------------------------------------- |
-| `WeightRepsInputs`   | Shared weight × reps pair inputs — used by `PlanGoalStep`.          |
-| `ActiveGoalPlanCard` | Active plan **with** a goal: rename, now/finished state, actions.   |
+| Component            | Purpose                                                                      |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `WeightRepsInputs`   | Shared weight × reps pair inputs — used by `PlanGoalStep`.                   |
+| `ActiveGoalPlanCard` | Active plan **with** a goal: rename, now/finished state, actions.            |
 | `GoalBlockTimeline`  | Wave-block progress strip, in `ActiveGoalPlanCard` and the plan detail page. |
 
 ---
-
 
 ## Activity log (`/log`)
 
@@ -153,11 +152,10 @@ Kept from the old lift-plan wizard, under `components/goals/`:
 
 | Component              | Purpose                                                                                                     |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `AccentColorPicker`    | Accent-color swatch picker; writes `prefsStore.accentColor`.                                                |
 | `SettingsRow`          | Hub navigable row with label, detail, chevron ([US-030](../features/v1.7.0/US-030-settings-restructure.md)) |
 | `SettingsToggleRow`    | Hub row with inline switch (e.g. health metrics)                                                            |
 | `SettingsGroup`        | Section header + grouped rows on hub                                                                        |
-| `ColorSwatches`        | Preset color swatches (habit colors, accent color) — v1.10.0                                                |
+| `ColorSwatches`        | Preset color swatches (habit colors) — v1.10.0                                                              |
 | `SegmentedControl`     | Single-choice button row (Personalization) — v1.10.0                                                        |
 | `OverviewLayoutEditor` | Overview card order; on Personalization and `/settings/overview` — v1.10.0                                  |
 
@@ -223,7 +221,6 @@ flowchart TB
         EC[ExerciseCard]
         ST[SetTile]
         LS[LogSetSheet]
-        PR[ProgressRing]
     end
 
     subgraph editor ["Plan detail editing"]
@@ -241,7 +238,7 @@ flowchart TB
         WRI[WeightRepsInputs]
     end
 
-    SO --> EC --> PR & ST
+    SO --> EC --> ST
     SO --> LS
     WE --> LIB --> EFS
     AGPC --> GBT
@@ -256,7 +253,7 @@ flowchart TB
     classDef plans fill:#6b3a5c,stroke:#3d2235,color:#ffffff;
     class BN,SO,SC,TO layout;
     class BS,IC,CD,PH shared;
-    class EC,ST,LS,PR strength;
+    class EC,ST,LS strength;
     class WE,EFS editor;
     class APC,PR2,AGPC,GBT,PGS,WRI plans;
 ```

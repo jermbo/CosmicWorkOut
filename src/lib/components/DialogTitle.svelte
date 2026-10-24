@@ -23,8 +23,10 @@
 <style>
 	.dialog-title {
 		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 1.25rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
 		margin-block-end: var(--space-4);
 	}
 </style>

@@ -22,6 +22,7 @@ New stories follow the [User Story Standards](../standards/user-story-standards.
 | [v1.8.0](v1.8.0/README.md)   | Granular data clearing                                      | US-032                              |
 | [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                                      | US-033 – US-036                     |
 | [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings, one Workout section | US-037 – US-054 (051 – 054 planned) |
+| [v1.12.0](v1.12.0/README.md) | Color fields redesign (dark only)                           | US-055                              |
 
 ---
 

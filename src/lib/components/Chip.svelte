@@ -47,12 +47,13 @@
 		flex-shrink: 0;
 		padding-inline: var(--space-3);
 		block-size: 32px;
-		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 600;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
 		white-space: nowrap;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule-thin) solid var(--color-border);
 		color: var(--color-text-secondary);
 		transition:
 			background-color var(--duration-fast) var(--ease-out),
@@ -61,7 +62,7 @@
 	}
 
 	.chip--caps {
-		text-transform: capitalize;
+		text-transform: uppercase;
 	}
 
 	.chip--small {
@@ -70,8 +71,8 @@
 	}
 
 	.chip--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--color-paper);
+		border-color: var(--color-paper);
+		color: var(--color-ink);
 	}
 </style>

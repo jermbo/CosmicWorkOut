@@ -263,7 +263,19 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 0.875rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
+
+		&:active:not(:disabled) {
+			transform: translate(4px, 4px);
+			box-shadow: none;
+		}
 	}
 
 	.workout-hub__empty {
@@ -272,11 +284,12 @@
 		color: var(--color-text-secondary);
 		background: var(--color-surface-2);
 		border-radius: var(--r-xl);
-		border: 1px dashed var(--color-border-strong);
+		border: var(--rule) dashed var(--color-paper);
 	}
 
 	.workout-hub__empty-title {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.25rem;
 		font-weight: 700;
 		color: var(--color-text-primary);

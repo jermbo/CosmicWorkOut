@@ -91,13 +91,14 @@
 	.preview-summary {
 		padding: var(--space-4) var(--space-5);
 		background: var(--color-surface-2);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-xl);
 		margin-block-end: var(--space-5);
 	}
 
 	.preview-summary__name {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
 		font-weight: 700;
 		margin-block-end: var(--space-2);
@@ -124,6 +125,7 @@
 
 	.preview-block__title {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 0.9375rem;
 		font-weight: 700;
 		margin-block-end: var(--space-2);
@@ -141,8 +143,8 @@
 		align-items: center;
 		gap: 2px;
 		padding-block: var(--space-2);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--radius-md);
 	}
 

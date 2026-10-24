@@ -1,21 +1,23 @@
 <script lang="ts">
 	import { untrack, onDestroy } from 'svelte';
 	import type { ActiveItem, Item } from '$lib/db/types';
-	import ProgressRing from './ProgressRing.svelte';
 	import SetTile from './SetTile.svelte';
 
 	type Props = {
 		activeExercise: ActiveItem;
 		exercise: Item;
 		exerciseIndex: number;
+		/** The exercise being worked now — drawn as the Training field. */
+		current?: boolean;
 		onSetTap: (exerciseIndex: number, setIndex: number) => void;
 	};
 
-	let { activeExercise, exercise, exerciseIndex, onSetTap }: Props = $props();
+	let { activeExercise, exercise, exerciseIndex, current = false, onSetTap }: Props = $props();
 
 	let doneSets = $derived(activeExercise.sets.filter((s) => s.completed).length);
 	let totalSets = $derived(activeExercise.sets.length);
 	let allSetsCompleted = $derived(doneSets === totalSets && totalSets > 0);
+	let nextSetIndex = $derived(activeExercise.sets.findIndex((s) => !s.completed));
 	let justCompleted = $state(false);
 	let wasCompleted = $state(untrack(() => allSetsCompleted));
 	let completionTimer: ReturnType<typeof setTimeout> | null = null;
@@ -44,25 +46,18 @@
 
 <article
 	class="exercise-card"
+	class:exercise-card--current={current}
 	class:exercise-card--completed={allSetsCompleted}
 	class:exercise-card--just-completed={justCompleted}
 	aria-label={exercise.name}
 >
 	<header class="exercise-card__header">
 		<div
-			class="exercise-card__ring-wrap"
+			class="exercise-card__count"
 			aria-hidden="true"
 		>
-			<ProgressRing
-				done={doneSets}
-				total={totalSets}
-				complete={allSetsCompleted}
-			/>
-			{#if allSetsCompleted}
-				<span class="exercise-card__ring-check">✓</span>
-			{:else}
-				<span class="exercise-card__ring-fraction">{doneSets}/{totalSets}</span>
-			{/if}
+			<span class="exercise-card__code">T{exerciseIndex + 1}</span>
+			{#if allSetsCompleted}✓{:else}{doneSets}/{totalSets}{/if}
 		</div>
 		<div class="exercise-card__meta">
 			<div class="exercise-card__title-row">
@@ -109,6 +104,7 @@
 		{#each activeExercise.sets as set, setIndex (setIndex)}
 			<SetTile
 				{set}
+				next={current && setIndex === nextSetIndex}
 				onTap={() => onSetTap(exerciseIndex, setIndex)}
 			/>
 		{/each}
@@ -116,47 +112,37 @@
 </article>
 
 <style>
-	@keyframes ripple-out {
-		0% {
-			box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
-		}
-		100% {
-			box-shadow: 0 0 0 12px color-mix(in srgb, var(--color-accent) 0%, transparent);
-		}
-	}
-
-	@keyframes check-pop {
-		0% {
-			transform: scale(0);
-			opacity: 0;
-		}
-		60% {
-			transform: scale(1.2);
-			opacity: 1;
-		}
-		100% {
-			transform: scale(1);
-			opacity: 1;
-		}
-	}
-
+	/* Upcoming: ink block, thin rule. Current: the Training field with a hard shadow. */
 	.exercise-card {
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-4) var(--space-4);
-		transition:
-			border-color var(--duration-normal) var(--ease-out),
-			background-color var(--duration-normal) var(--ease-out);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-border);
+		padding: var(--space-3);
+	}
+
+	/* Text tokens re-pointed at ink so the SetTiles inside read on the field. */
+	.exercise-card--current {
+		--field: var(--field-train);
+		--color-text-primary: var(--color-ink);
+		--color-text-secondary: var(--color-ink);
+		--color-text-muted: color-mix(in srgb, var(--color-ink) 62%, var(--field));
+		background: var(--field);
+		color: var(--color-ink);
+		border-color: var(--color-ink);
+		box-shadow: var(--shadow-hard);
 	}
 
 	.exercise-card--completed {
-		border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
-		background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface-2));
+		border-color: var(--color-paper);
 	}
 
 	.exercise-card--just-completed {
-		animation: ripple-out 600ms var(--ease-out) forwards;
+		animation: done-flash 300ms steps(2, jump-none) 2;
+	}
+
+	@keyframes done-flash {
+		50% {
+			background: var(--color-paper);
+		}
 	}
 
 	.exercise-card__header {
@@ -166,27 +152,33 @@
 		margin-block-end: var(--space-3);
 	}
 
-	.exercise-card__ring-wrap {
-		position: relative;
-		flex-shrink: 0;
-	}
-
-	.exercise-card__ring-fraction,
-	.exercise-card__ring-check {
-		position: absolute;
-		inset: 0;
+	.exercise-card__count {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		font-family: var(--font-mono);
-		font-size: 0.625rem;
-		font-weight: 700;
-		color: var(--color-text-secondary);
+		flex-shrink: 0;
+		inline-size: 44px;
+		block-size: 44px;
+		border: var(--rule) solid currentColor;
+		font-family: var(--font-display);
+		font-size: 0.8125rem;
+		font-weight: 900;
+		line-height: 1;
+		color: var(--color-text-primary);
+
+		.exercise-card--completed & {
+			background: var(--color-paper);
+			border-color: var(--color-paper);
+			color: var(--color-ink);
+		}
 	}
 
-	.exercise-card__ring-check {
-		font-size: 0.75rem;
-		color: var(--color-accent-text);
+	.exercise-card__code {
+		font-family: var(--font-mono);
+		font-size: 0.5625rem;
+		font-weight: 700;
+		margin-block-end: 2px;
 	}
 
 	.exercise-card__meta {
@@ -203,9 +195,12 @@
 
 	.exercise-card__name {
 		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 700;
-		line-height: 1.2;
+		text-transform: uppercase;
+		font-size: 1.0625rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		line-height: 1;
+		overflow-wrap: anywhere;
 	}
 
 	.exercise-card__done-badge {
@@ -214,11 +209,9 @@
 		justify-content: center;
 		inline-size: 22px;
 		block-size: 22px;
-		border-radius: var(--radius-full);
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--color-paper);
+		color: var(--color-ink);
 		flex-shrink: 0;
-		animation: check-pop var(--duration-slow) var(--ease-spring) forwards;
 
 		svg {
 			inline-size: 11px;
@@ -227,8 +220,8 @@
 	}
 
 	.exercise-card__cue {
-		margin-block-start: 2px;
-		font-size: 0.75rem;
+		margin-block-start: var(--space-1);
+		font-size: 0.6875rem;
 		color: var(--color-text-secondary);
 		line-height: 1.4;
 	}
@@ -240,24 +233,24 @@
 
 	.exercise-card__target-value {
 		display: block;
-		font-family: var(--font-mono);
-		font-size: 0.875rem;
-		font-weight: 600;
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 900;
 		color: var(--color-text-primary);
 	}
 
 	.exercise-card__target-label {
 		display: block;
 		font-size: 0.625rem;
-		font-weight: 600;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.04em;
 		color: var(--color-text-muted);
 	}
 
 	.exercise-card__sets {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--card-gap);
+		gap: 6px;
 	}
 </style>

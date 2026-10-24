@@ -173,10 +173,13 @@
 		inline-size: 100%;
 	}
 
+	/* Room on the right and below for the cards' hard shadows. */
 	.home-cards {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--card-gap);
+		padding-inline-end: var(--press-offset);
+		padding-block-end: var(--press-offset);
 	}
 
 	.home-empty {
@@ -186,31 +189,38 @@
 		gap: var(--space-2);
 		padding: var(--space-8) var(--space-4);
 		text-align: center;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
+		background: var(--field-empty);
+		border: var(--rule) dashed var(--color-paper);
 	}
 
 	.home-empty__msg {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
-		font-weight: 700;
+		font-weight: 900;
+		background: var(--color-ink);
+		padding: 2px var(--space-2);
 	}
 
 	.home-empty__hint {
 		max-inline-size: 42ch;
-		font-size: 0.875rem;
+		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
+		background: var(--color-ink);
+		padding: var(--space-2);
 	}
 
 	.home-empty__link {
 		margin-block-start: var(--space-2);
 		padding: var(--space-3) var(--space-5);
-		border-radius: var(--radius-full);
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
-		font-size: 0.9375rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
 	}
 
 	@container page (inline-size >= 520px) {

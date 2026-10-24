@@ -2,8 +2,9 @@
 	import type { Habit } from '$lib/db/types';
 	import { formatCount, formatMinutes, minuteUnitLabel } from '$lib/format';
 	import { formatHabitBooleanValue } from '$lib/habits';
-	import ProgressRing from './ProgressRing.svelte';
+	import { habitColor } from '$lib/habitColors';
 	import Icon from './Icon.svelte';
+	import ProgressBlocks from './ProgressBlocks.svelte';
 
 	type Props = {
 		habit: Habit;
@@ -43,52 +44,56 @@
 		if (done) return formatHabitBooleanValue(1);
 		return formatHabitBooleanValue(0);
 	});
+
+	/*
+	 * Progress blocks (v1.12.0): one block per unit when the daily goal is small
+	 * enough to count, otherwise ten blocks for the percentage.
+	 */
+	let blocks = $derived.by(() => {
+		const goal = habit.dailyGoal ?? 0;
+		if (goal > 0 && goal <= 12 && Number.isInteger(goal)) {
+			return { total: goal, on: Math.min(goal, Math.floor(value)) };
+		}
+		return { total: 10, on: Math.min(10, Math.round(pct / 10)) };
+	});
+	let showBlocks = $derived(habit.type !== 'boolean' && (habit.dailyGoal ?? 0) > 0);
+	let empty = $derived(habit.type === 'boolean' ? !done : value === 0);
 </script>
 
 <div
 	class="habit-card"
+	class:habit-card--empty={empty}
 	class:habit-card--done={done}
+	style:--field={habitColor(habit)}
 >
-	<div class="habit-card__ring">
-		<ProgressRing
-			done={pct}
-			total={100}
-			complete={done}
-			size={120}
-			strokeWidth={7}
-			dimUntilComplete
-		>
-			{#if habit.type === 'boolean'}
-				<span
-					class="habit-card__value habit-card__value--bool"
-					class:habit-card__value--done={done}
-				>
-					{boolLabel}
-				</span>
-			{:else}
-				<button
-					class="habit-card__center-btn"
-					onclick={oneditexact}
-					disabled={readOnly}
-					aria-label="Enter exact value for {habit.name}"
-					title="Tap to enter exact value"
-				>
-					<span
-						class="habit-card__value"
-						class:habit-card__value--done={done}>{value}</span
-					>
-					{#if !done && habit.dailyGoal}
-						<span class="habit-card__goal">/ {habit.dailyGoal}</span>
-					{/if}
-					{#if unitLabel}
-						<span class="habit-card__unit">{unitLabel}</span>
-					{/if}
-				</button>
-			{/if}
-		</ProgressRing>
+	<div class="habit-card__head">
+		<p class="habit-card__name">
+			{habit.name}{#if unitLabel}<span class="habit-card__unit">&nbsp;/ {unitLabel}</span>{/if}
+		</p>
+		{#if habit.type === 'boolean'}
+			<span class="habit-card__value habit-card__value--bool">{boolLabel}</span>
+		{:else}
+			<button
+				class="habit-card__center-btn"
+				onclick={oneditexact}
+				disabled={readOnly}
+				aria-label="Enter exact value for {habit.name}"
+				title="Tap to enter exact value"
+			>
+				<span class="habit-card__value">{value}</span>
+				{#if habit.dailyGoal}
+					<span class="habit-card__goal">/{habit.dailyGoal}</span>
+				{/if}
+			</button>
+		{/if}
 	</div>
 
-	<p class="habit-card__name">{habit.name}</p>
+	{#if showBlocks}
+		<ProgressBlocks
+			total={blocks.total}
+			on={blocks.on}
+		/>
+	{/if}
 
 	<div class="habit-card__actions">
 		{#if habit.type === 'boolean'}
@@ -104,7 +109,7 @@
 					onchange={ontoggle}
 					aria-label={habit.name}
 				/>
-				{#if done}✓ Done{:else}Mark done{/if}
+				{#if done}✓ Done{:else}[ ] Mark done{/if}
 			</label>
 		{:else}
 			<div class="stepper">
@@ -116,8 +121,8 @@
 				>
 					<Icon
 						name="minus"
-						size={18}
-						stroke={2.5}
+						size={20}
+						stroke={3}
 					/>
 				</button>
 				<button
@@ -137,8 +142,8 @@
 				>
 					<Icon
 						name="plus"
-						size={18}
-						stroke={2.5}
+						size={20}
+						stroke={3}
 					/>
 				</button>
 			</div>
@@ -147,96 +152,96 @@
 </div>
 
 <style>
+	/*
+	 * A habit is a color field in its own hue (v1.12.0). Nothing logged yet:
+	 * hazard stripes. The +/- strip is one ruled ink bar at the bottom.
+	 */
 	.habit-card {
 		container-type: inline-size;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: var(--space-4);
-		padding: var(--space-5);
-		background: var(--color-surface-2);
-		border: 1.5px solid var(--color-border);
-		border-radius: var(--r-2xl);
-		transition:
-			border-color var(--duration-fast) var(--ease-out),
-			background var(--duration-fast) var(--ease-out);
+		gap: var(--space-3);
+		padding: var(--space-3);
+		background: var(--field);
+		color: var(--color-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard);
 	}
 
-	.habit-card--done {
-		border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
-		background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface-2));
+	.habit-card--empty {
+		background: var(--field-empty);
+		color: var(--color-paper);
+		border: var(--rule) dashed var(--color-paper);
 	}
 
-	.habit-card__ring {
+	.habit-card__head {
 		display: flex;
-		align-items: center;
-		justify-content: center;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-2);
+	}
+
+	/* Index code label. */
+	.habit-card__name {
+		min-inline-size: 0;
+		overflow-wrap: break-word;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+
+		.habit-card--empty & {
+			background: var(--color-ink);
+			padding: 1px 4px;
+		}
+	}
+
+	.habit-card__unit {
+		font-weight: 500;
 	}
 
 	.habit-card__center-btn {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1px;
-		padding: var(--space-2);
-		border-radius: var(--radius-full);
-		transition: background var(--duration-fast) var(--ease-out);
+		align-items: baseline;
+		gap: 2px;
+		color: inherit;
+		flex-shrink: 0;
 
-		&:not(:disabled):hover {
-			background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-		}
 		&:disabled {
 			cursor: default;
+		}
+
+		.habit-card--empty & {
+			background: var(--color-ink);
+			padding: 0 4px;
 		}
 	}
 
 	.habit-card__value {
 		font-family: var(--font-display);
-		font-size: 1.75rem;
-		font-weight: 800;
-		color: var(--color-text-primary);
+		font-size: clamp(1.75rem, 22cqi, 2.75rem);
+		font-weight: 900;
 		line-height: 1;
-		letter-spacing: -0.03em;
-		transition: color var(--duration-fast) var(--ease-out);
-	}
-
-	.habit-card__value--done {
-		color: var(--color-accent-text);
+		letter-spacing: -0.04em;
 	}
 
 	.habit-card__value--bool {
-		font-size: 1.25rem;
+		font-size: 1.125rem;
+		text-transform: uppercase;
+		flex-shrink: 0;
+
+		.habit-card--empty & {
+			background: var(--color-ink);
+			padding: 0 4px;
+		}
 	}
 
 	.habit-card__goal {
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
-		line-height: 1;
-	}
-
-	.habit-card__unit {
-		font-size: 0.625rem;
-		font-weight: 700;
-		color: var(--color-text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		line-height: 1;
-	}
-
-	.habit-card__name {
+		font-family: var(--font-display);
 		font-size: 1rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-		text-align: center;
-		letter-spacing: -0.01em;
-		line-height: 1.2;
-	}
-
-	.habit-card__actions {
-		inline-size: 100%;
-		padding-inline: var(--space-1);
-		box-sizing: border-box;
+		font-weight: 800;
+		line-height: 1;
 	}
 
 	.toggle-label {
@@ -244,31 +249,30 @@
 		align-items: center;
 		justify-content: center;
 		inline-size: 100%;
-		box-sizing: border-box;
+		block-size: 52px;
 		padding-inline: var(--space-2);
-		block-size: 48px;
-		border-radius: var(--radius-full);
-		border: 1.5px solid var(--color-border);
-		background: var(--color-surface-3);
-		font-size: 0.9375rem;
-		font-weight: 700;
-		color: var(--color-text-secondary);
-		letter-spacing: 0.01em;
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-ink);
+		color: var(--color-paper);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
 		cursor: pointer;
 		user-select: none;
-		transition:
-			background var(--duration-fast) var(--ease-out),
-			border-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
 
 		&.toggle-label--on {
-			background: var(--color-accent);
-			border-color: var(--color-accent);
-			color: var(--color-accent-ink);
+			background: transparent;
+			color: var(--color-ink);
+		}
+
+		&:active {
+			background: var(--color-paper);
+			color: var(--color-ink);
 		}
 
 		&:has(input:focus-visible) {
-			outline: 2px solid var(--color-accent);
+			outline: var(--rule) solid var(--color-paper);
 			outline-offset: 2px;
 		}
 
@@ -279,66 +283,48 @@
 	}
 
 	.stepper {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		padding-inline: var(--space-2);
-		box-sizing: border-box;
+		display: grid;
+		grid-template-columns: minmax(36px, 0.8fr) minmax(0, 1.6fr) minmax(36px, 0.8fr);
+		block-size: 52px;
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-ink);
 	}
 
 	.stepper__btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		inline-size: 48px;
-		block-size: 48px;
-		flex-shrink: 0;
-		border-radius: var(--radius-full);
-		border: 1.5px solid var(--color-border);
-		background: var(--color-surface-3);
-		color: var(--color-accent-text);
-		transition: background var(--duration-fast) var(--ease-out);
+		color: var(--color-paper);
 
 		&:not(:disabled):active {
-			background: color-mix(in srgb, var(--color-accent) 15%, var(--color-surface-3));
+			background: var(--color-paper);
+			color: var(--color-ink);
 		}
 		&:disabled {
-			opacity: 0.25;
+			opacity: 0.3;
 		}
 	}
 
 	.stepper__step-label {
-		flex: 1;
 		min-inline-size: 0;
-		block-size: 48px;
-		border-radius: var(--radius-lg);
-		background: color-mix(in srgb, var(--color-accent) 8%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
-		font-size: 0.75rem;
+		border-inline: var(--rule) solid var(--color-paper);
+		padding-inline: 2px;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
 		font-weight: 700;
-		color: var(--color-accent-text);
-		letter-spacing: 0.02em;
-		line-height: 1.2;
+		text-transform: uppercase;
+		color: var(--color-paper);
 		white-space: nowrap;
-		transition: background var(--duration-fast) var(--ease-out);
+		overflow: hidden;
+		text-overflow: ellipsis;
 
-		&:hover {
-			background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+		&:not(:disabled):active {
+			background: var(--color-paper);
+			color: var(--color-ink);
 		}
 		&:disabled {
 			opacity: 0.4;
 			cursor: default;
-		}
-	}
-
-	@container (inline-size < 220px) {
-		.stepper__btn {
-			inline-size: 42px;
-			block-size: 42px;
-		}
-
-		.stepper__step-label {
-			font-size: 0.6875rem;
 		}
 	}
 </style>

@@ -85,11 +85,9 @@ All application code in TypeScript. Types live in `src/lib/db/types.ts` and mirr
 
 Design tokens in `src/app.css` as CSS custom properties (colors, spacing, radius, timing, fonts). Component styles are scoped `<style>` blocks in each `.svelte` file.
 
-Between the two sits a small set of **primitive components** (`Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader`) that own recurring patterns. `app.css` holds no UI utility classes — shared patterns are components, not global classes. See [Styling](../implementation/dev-guide.md#styling-tokens-and-primitive-components).
+Between the two sits a small set of **primitive components** (`Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader`) that own recurring patterns. `app.css` holds no UI utility classes — shared patterns are components, not global classes (v1.12.0 patterns included: see [Design System](design-system.md#where-the-patterns-live)). See [Styling](../implementation/dev-guide.md#styling-tokens-and-primitive-components).
 
-Runtime theming via `data-density` and `data-roundness` attributes on `<html>`, plus `--color-accent` set by the prefs store.
-
-Reference tokens also exist in the [inspiration package](../_inspiration/packet/tokens.css).
+Dark only, one palette. The only runtime theming is `data-density` on `<html>`, set by the prefs store. The look itself is specified in [Design System](design-system.md); the source mockup is in [`_inspiration/design-02/`](../_inspiration/design-02/).
 
 **No CSS-in-JS** — keeps the bundle lean.
 
@@ -170,7 +168,7 @@ Pinned in `package.json` (kept here as a snapshot; `package.json` is authoritati
 CSS keyframes + transitions. Key properties:
 
 - `transform` and `opacity` only
-- `--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1)` for spring feel
+- Presses are mechanical, not springy: `--duration-press` (60ms, linear) to sink into the hard shadow
 - `prefers-reduced-motion` respected in component styles
 
 ---
@@ -185,9 +183,10 @@ CSS keyframes + transitions. Key properties:
 
 Self-hosted via `@fontsource/*` packages, imported in `src/app.css` (no external CDN request):
 
-- **Space Grotesk** (`@fontsource/space-grotesk`) — display headings
-- **Inter** (`@fontsource/inter`) — body text
-- **JetBrains Mono** (`@fontsource/jetbrains-mono`) — numbers (weight, reps)
+- **Unbounded** (`@fontsource/unbounded`, 700 / 800 / 900) — display: titles and big figures, uppercase
+- **JetBrains Mono** (`@fontsource/jetbrains-mono`, 400 / 500 / 700 / 800) — body, labels, codes, data
+
+Space Grotesk and Inter were removed in v1.12.0.
 
 ---
 

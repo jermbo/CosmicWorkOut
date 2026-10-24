@@ -78,10 +78,9 @@
 
 <style>
 	.insight-card {
-		background: var(--color-surface-1);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-5);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
+		padding: var(--space-4);
 		min-inline-size: 0;
 	}
 
@@ -109,28 +108,32 @@
 		align-items: center;
 		gap: var(--space-2);
 		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
+		text-transform: uppercase;
+		font-size: 1.125rem;
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: -0.03em;
 		color: var(--color-text-primary);
 	}
 
 	.insight-card__badge {
 		padding: 1px var(--space-2);
 		border-radius: var(--radius-full);
-		border: 1px solid var(--color-border-strong);
-		font-family: var(--font-body);
+		border: var(--rule) solid var(--color-border-strong);
+		font-family: var(--font-mono);
 		font-size: 0.625rem;
-		font-weight: 700;
+		font-weight: 800;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
-		color: var(--color-text-secondary);
+		background: var(--field-health);
+		border-color: var(--color-ink);
+		color: var(--color-ink);
 	}
 
 	.insight-card__desc {
 		margin-block-start: var(--space-1);
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
 	}
 
 	.insight-card__menu {
@@ -161,7 +164,7 @@
 		min-inline-size: 200px;
 		padding: var(--space-2);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border-strong);
+		border: var(--rule) solid var(--color-border-strong);
 		border-radius: var(--radius-md);
 		box-shadow: var(--shadow-md);
 	}

@@ -32,17 +32,22 @@
 	}
 
 	.settings-group__title {
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-secondary);
+		letter-spacing: 0.04em;
+		color: var(--color-text-muted);
 		margin-block-end: var(--space-3);
 	}
 
 	.settings-group__rows {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: 0;
+
+		/* Rows stack into one ruled block. */
+		& > :global(* + *) {
+			margin-block-start: calc(var(--rule) * -1);
+		}
 	}
 </style>

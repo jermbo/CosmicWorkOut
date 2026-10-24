@@ -20,8 +20,9 @@
 <HomeCard
 	href="/log"
 	title="Activity"
+	code="A"
 	{ariaLabel}
-	variant="log"
+	field="active"
 >
 	{#if activities.length === 0}
 		<p class="home-activity-card__empty">No activities yet.</p>
@@ -47,13 +48,16 @@
 <style>
 	.home-activity-card__empty {
 		font-size: 0.875rem;
-		color: var(--color-text-muted);
+		font-weight: 500;
 	}
 
 	.home-activity-card__summary {
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		text-transform: uppercase;
+		line-height: 1;
 		margin-block-end: var(--space-2);
 	}
 
@@ -65,20 +69,20 @@
 
 	.home-activity-card__chip {
 		padding-inline: var(--space-2);
-		block-size: 28px;
-		border-radius: var(--radius-full);
-		background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-3));
-		border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
+		block-size: 26px;
+		background: var(--color-ink);
+		color: var(--field);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		display: inline-flex;
 		align-items: center;
 		white-space: nowrap;
 	}
 
 	.home-activity-card__chip--more {
-		background: var(--color-surface-3);
-		border-color: var(--color-border);
+		background: transparent;
+		color: var(--color-ink);
+		border: var(--rule-thin) solid var(--color-ink);
 	}
 </style>

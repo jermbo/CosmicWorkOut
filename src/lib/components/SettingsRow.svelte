@@ -41,21 +41,23 @@
 		min-block-size: 56px;
 		padding-inline: var(--space-4);
 		padding-block: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		text-decoration: none;
 		color: inherit;
-		transition: border-color var(--duration-fast) var(--ease-out);
 
-		&:hover {
-			border-color: var(--color-accent);
+		&:active {
+			background: var(--color-paper);
+			--color-text-primary: var(--color-ink);
+			--color-text-secondary: var(--color-ink);
+			--color-text-muted: var(--color-ink);
 		}
 	}
 
 	.settings-row__label {
-		font-size: 0.9375rem;
-		font-weight: 600;
+		font-size: 0.875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		color: var(--color-text-primary);
 	}
 
@@ -67,8 +69,9 @@
 	}
 
 	.settings-row__detail {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;

@@ -2,6 +2,8 @@
 
 # US-046 — Personalization
 
+> **Changed in v1.12.0:** Accent color and Roundness were removed (and Appearance, from [US-048](./US-048-light-mode.md)) — the app moved to a dark-only design with fixed domain hues and square corners ([US-055](../v1.12.0/US-055-color-fields-redesign.md)). Personalization now holds Weight unit, Density and Overview layout.
+>
 > **As built:** `/settings/personalization` — accent swatches (8 presets via `ColorSwatches`), weight unit / density / roundness via a new `SegmentedControl`, and the Overview card-order editor (extracted to `OverviewLayoutEditor.svelte`, also rendered at `/settings/overview`). Everything writes through the existing `prefsStore` setters, so it applies immediately and persists. **Density and roundness now reach the whole app:** they override the base `--space-*` (compact ×0.75, spacious ×1.25) and `--radius-*` tokens (plus a new `--radius-sheet` for bottom sheets) in `app.css`, instead of the few `--r-*` / `--tile-h` tokens they touched before — which is why the old Appearance page seemed to do nothing but color. Charts read `prefsStore.accentColor`, so they recolor live. **Weight unit is a label only** — past readings are not converted; the page says so. The Health page links here for the unit.
 >
 > Restores the look-and-feel page removed after [US-030](../v1.7.0/US-030-settings-restructure.md) (removed as "single-user app" — no longer true). Light mode is **deferred** to the next version ([Roadmap](../../roadmap/README.md)). Decisions: [v1.10.0 — Topic 6](./README.md#topic-6--settings-page).

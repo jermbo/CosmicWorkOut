@@ -47,43 +47,49 @@
 	.workout-picker {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--space-2);
-		margin-block-end: var(--space-3);
+		gap: 6px;
+		margin-block-end: var(--space-4);
 		inline-size: 100%;
 	}
 
+	/* Ink cells; the selected routine is filled with its own color, ink on top. */
 	.workout-picker__option {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		gap: 2px;
+		align-items: flex-start;
+		text-align: start;
+		gap: 4px;
 		min-inline-size: 0;
-		padding: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		transition:
-			border-color var(--duration-fast) var(--ease-out),
-			background-color var(--duration-fast) var(--ease-out);
+		padding: var(--space-2);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-border);
+		color: var(--color-text-primary);
 	}
 
 	.workout-picker__option--selected {
-		border-color: var(--option-accent);
-		background: color-mix(in srgb, var(--option-accent) 10%, var(--color-surface-2));
+		background: var(--option-accent);
+		border-color: var(--color-ink);
+		color: var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
 	}
 
 	.workout-picker__letter {
 		font-family: var(--font-display);
-		font-size: 0.875rem;
-		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 1.5rem;
+		font-weight: 900;
+		line-height: 1;
 		color: var(--option-accent);
+
+		.workout-picker__option--selected & {
+			color: inherit;
+		}
 	}
 
 	.workout-picker__name {
-		font-size: 0.6875rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
+		font-size: 0.625rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		line-height: 1.25;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
@@ -94,10 +100,12 @@
 	}
 
 	.workout-picker__suggested {
-		font-size: 0.625rem;
-		font-weight: 600;
+		font-size: 0.5625rem;
+		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: var(--color-text-muted);
+		padding-inline: 3px;
+		background: var(--color-paper);
+		color: var(--color-ink);
 	}
 </style>

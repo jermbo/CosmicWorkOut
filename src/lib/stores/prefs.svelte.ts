@@ -1,16 +1,10 @@
-import type { UserPrefs, Density, Roundness, Theme } from '$lib/db/types';
+import type { UserPrefs, Density } from '$lib/db/types';
 import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 
-/** Browser chrome color per resolved theme — matches `--color-bg` in app.css. */
-const THEME_BG = { dark: '#101010', light: '#f1f1ee' } as const;
-
 const DEFAULTS: UserPrefs = {
-	accentColor: '#b2f042',
-	theme: 'dark',
 	density: 'comfortable',
-	roundness: 'default',
 	weightUnit: 'lb',
 	homeCardOrder: [...DEFAULT_HOME_CARD_ORDER],
 	habitsEnabled: false,
@@ -22,12 +16,7 @@ const DEFAULTS: UserPrefs = {
 };
 
 class PrefsStore {
-	accentColor = $state(DEFAULTS.accentColor);
-	theme = $state<Theme>(DEFAULTS.theme);
-	/** Tracks the device setting so `system` can follow it live. */
-	private systemPrefersLight = $state(false);
 	density = $state<Density>(DEFAULTS.density);
-	roundness = $state<Roundness>(DEFAULTS.roundness);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
 	homeCardOrder = $state<HomeCardId[]>([...DEFAULT_HOME_CARD_ORDER]);
 	habitsEnabled = $state(DEFAULTS.habitsEnabled);
@@ -36,11 +25,6 @@ class PrefsStore {
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 	hiddenCharts = $state<string[]>([]);
-
-	/** The theme actually on screen — `system` resolved against the device. */
-	resolvedTheme = $derived<'dark' | 'light'>(
-		this.theme === 'system' ? (this.systemPrefersLight ? 'light' : 'dark') : this.theme,
-	);
 
 	/**
 	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
@@ -59,10 +43,9 @@ class PrefsStore {
 			const stored = localStorage.getItem(PREFS_KEY);
 			if (stored) {
 				const parsed = JSON.parse(stored) as Partial<UserPrefs>;
-				this.accentColor = parsed.accentColor ?? DEFAULTS.accentColor;
-				this.theme = isTheme(parsed.theme) ? parsed.theme : DEFAULTS.theme;
+				// Older prefs may still carry theme / accentColor / roundness (removed in
+				// v1.12.0 — the app is dark only). They're ignored and dropped on next save.
 				this.density = parsed.density ?? DEFAULTS.density;
-				this.roundness = parsed.roundness ?? DEFAULTS.roundness;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
 				this.homeCardOrder = resolveHomeCardOrder(parsed.homeCardOrder);
 				this.habitsEnabled = parsed.habitsEnabled ?? DEFAULTS.habitsEnabled;
@@ -79,19 +62,12 @@ class PrefsStore {
 			console.error('Failed to load preferences, using defaults:', e);
 		}
 
-		this.watchSystemTheme();
-		this.applyTheme();
-		this.applyAccentColor();
 		this.applyDensity();
-		this.applyRoundness();
 	}
 
 	private save(): void {
 		const prefs: UserPrefs = {
-			accentColor: this.accentColor,
-			theme: this.theme,
 			density: this.density,
-			roundness: this.roundness,
 			weightUnit: this.weightUnit,
 			homeCardOrder: this.homeCardOrder,
 			habitsEnabled: this.habitsEnabled,
@@ -149,68 +125,13 @@ class PrefsStore {
 		this.save();
 	}
 
-	private watchSystemTheme(): void {
-		const query = window.matchMedia('(prefers-color-scheme: light)');
-		this.systemPrefersLight = query.matches;
-		query.addEventListener('change', (e) => {
-			this.systemPrefersLight = e.matches;
-			this.applyTheme();
-		});
-	}
-
-	/** Also set before first paint by the inline script in app.html, so there's no dark flash. */
-	private applyTheme(): void {
-		const theme = this.resolvedTheme;
-		document.documentElement.dataset.theme = theme;
-		document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_BG[theme]);
-	}
-
-	setTheme(theme: Theme): void {
-		this.theme = theme;
-		this.applyTheme();
-		this.save();
-	}
-
 	private applyDensity(): void {
 		document.documentElement.dataset.density = this.density;
-	}
-
-	private applyRoundness(): void {
-		document.documentElement.dataset.roundness = this.roundness;
-	}
-
-	private applyAccentColor(): void {
-		document.documentElement.style.setProperty('--color-accent', this.accentColor);
-
-		const hex = this.accentColor.replace('#', '');
-		const r = parseInt(hex.slice(0, 2), 16);
-		const g = parseInt(hex.slice(2, 4), 16);
-		const b = parseInt(hex.slice(4, 6), 16);
-		const luminance = (r * 299 + g * 587 + b * 114) / 1000;
-
-		let inkColor = '#ffffff';
-		if (luminance > 140) {
-			inkColor = '#101010';
-		}
-
-		document.documentElement.style.setProperty('--color-accent-ink', inkColor);
-	}
-
-	setAccentColor(color: string): void {
-		this.accentColor = color;
-		this.applyAccentColor();
-		this.save();
 	}
 
 	setDensity(density: Density): void {
 		this.density = density;
 		this.applyDensity();
-		this.save();
-	}
-
-	setRoundness(roundness: Roundness): void {
-		this.roundness = roundness;
-		this.applyRoundness();
 		this.save();
 	}
 
@@ -220,21 +141,11 @@ class PrefsStore {
 	}
 
 	resetToDefaults(): void {
-		this.accentColor = DEFAULTS.accentColor;
-		this.theme = DEFAULTS.theme;
 		this.density = DEFAULTS.density;
-		this.roundness = DEFAULTS.roundness;
 		this.weightUnit = DEFAULTS.weightUnit;
-		this.applyTheme();
-		this.applyAccentColor();
 		this.applyDensity();
-		this.applyRoundness();
 		this.save();
 	}
-}
-
-function isTheme(value: unknown): value is Theme {
-	return value === 'dark' || value === 'light' || value === 'system';
 }
 
 export const prefsStore = new PrefsStore();

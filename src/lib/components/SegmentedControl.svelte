@@ -38,24 +38,27 @@
 		display: grid;
 		grid-auto-columns: 1fr;
 		grid-auto-flow: column;
-		gap: 4px;
-		padding: 4px;
-		border-radius: var(--radius-lg);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 	}
 
+	/* Cells split by 3px rules; the selected cell is filled paper (like the nav). */
 	.segmented__btn {
-		block-size: 36px;
-		border-radius: var(--radius-md);
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
-		transition: background-color var(--duration-fast) var(--ease-out);
+		block-size: 44px;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-text-primary);
+
+		& + & {
+			border-inline-start: var(--rule) solid var(--color-paper);
+		}
 	}
 
 	.segmented__btn--on {
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--color-paper);
+		color: var(--color-ink);
 	}
 </style>

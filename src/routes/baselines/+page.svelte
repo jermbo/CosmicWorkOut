@@ -275,27 +275,36 @@
 	.baselines-list {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-4);
+		gap: var(--card-gap);
+		padding-inline-end: var(--press-offset);
 	}
 
 	.bl-card {
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-4);
-		transition: border-color var(--duration-fast) var(--ease-out);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
+		padding: var(--space-3);
+		box-shadow: var(--shadow-hard);
 	}
 
-	.bl-card--done {
-		border-color: color-mix(in srgb, var(--color-accent) 50%, var(--color-border));
-	}
-
+	/*
+	 * The head is the Baselines field: purple once logged today, hazard stripes
+	 * until then (v1.12.0).
+	 */
 	.bl-card__head {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: var(--space-3);
-		margin-block-end: var(--space-4);
+		margin: calc(var(--space-3) * -1) calc(var(--space-3) * -1) var(--space-3);
+		padding: var(--space-3);
+		background: var(--field-empty);
+		border-block-end: var(--rule) solid var(--color-paper);
+
+		.bl-card--done & {
+			--color-text-secondary: var(--color-ink);
+			background: var(--field-base);
+			color: var(--color-ink);
+		}
 	}
 
 	.bl-card__title-col {
@@ -304,26 +313,41 @@
 
 	.bl-card__name {
 		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
+		text-transform: uppercase;
+		font-size: 1.375rem;
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: -0.03em;
+
+		.bl-card:not(.bl-card--done) & {
+			background: var(--color-ink);
+			padding-inline: 4px;
+		}
 	}
 
 	.bl-card__status {
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		color: var(--color-text-secondary);
-		margin-block-start: 2px;
+		margin-block-start: var(--space-2);
+
+		.bl-card:not(.bl-card--done) & {
+			background: var(--color-ink);
+			padding-inline: 4px;
+			inline-size: fit-content;
+		}
 	}
 
 	.bl-card__badge {
 		padding: 1px var(--space-2);
-		border-radius: var(--radius-full);
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--color-ink);
+		color: var(--field-base);
 		font-size: 0.625rem;
+		font-weight: 800;
 		letter-spacing: 0.06em;
 	}
 
@@ -338,7 +362,19 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 0.8125rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
+
+		&:active:not(:disabled) {
+			transform: translate(4px, 4px);
+			box-shadow: none;
+		}
 	}
 
 	.bl-metrics {
@@ -356,7 +392,7 @@
 			'base base';
 		gap: 2px var(--space-2);
 		padding-block: var(--space-2);
-		border-block-end: 1px solid var(--color-border);
+		border-block-end: var(--rule-thin) solid var(--color-border);
 
 		&:last-child {
 			border-block-end: none;
@@ -365,8 +401,9 @@
 
 	.bl-metric__name {
 		grid-area: name;
-		font-size: 0.9375rem;
-		font-weight: 600;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
 	}
 
 	.bl-metric__value {
@@ -374,9 +411,11 @@
 		text-align: end;
 
 		strong {
-			font-family: var(--font-mono);
-			font-size: 1.125rem;
-			font-weight: 700;
+			font-family: var(--font-display);
+			font-size: 1.25rem;
+			font-weight: 900;
+			letter-spacing: -0.03em;
+			text-transform: uppercase;
 		}
 	}
 
@@ -400,8 +439,8 @@
 		font-weight: 600;
 		color: var(--color-text-primary);
 		padding: 0 var(--space-2);
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
+		background: var(--color-paper);
+		color: var(--color-ink);
 	}
 
 	.bl-metric__vs {
@@ -411,19 +450,19 @@
 	.bl-card__expand {
 		inline-size: 100%;
 		margin-block-start: var(--space-4);
-		padding-block: var(--space-2);
-		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
+		padding-block: var(--space-3);
+		background: transparent;
+		border: var(--rule) solid var(--color-paper);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: var(--color-text-primary);
 	}
 
 	.bl-details {
 		margin-block-start: var(--space-4);
 		padding-block-start: var(--space-4);
-		border-block-start: 1px solid var(--color-border);
+		border-block-start: var(--rule-thin) solid var(--color-border);
 	}
 
 	.bl-details__title {
@@ -480,8 +519,8 @@
 		inline-size: 28px;
 		block-size: 28px;
 		border-radius: var(--radius-sm);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		color: var(--color-text-muted);
 
 		&:hover {

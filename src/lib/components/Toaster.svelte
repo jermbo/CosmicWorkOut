@@ -52,23 +52,23 @@
 		align-items: center;
 		gap: var(--space-3);
 		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--radius-lg);
-		box-shadow: var(--shadow-md);
+		background: var(--color-paper);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: 4px 4px 0 var(--color-accent);
 		pointer-events: auto;
 		animation: slide-up var(--duration-normal) var(--ease-out) both;
 	}
 
 	.toast--error {
-		border-color: var(--color-red);
+		background: var(--color-red);
 	}
 
 	.toast__message {
 		flex: 1;
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-primary);
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: var(--color-ink);
 		line-height: 1.4;
 	}
 
@@ -79,11 +79,6 @@
 		inline-size: 28px;
 		block-size: 28px;
 		flex-shrink: 0;
-		border-radius: var(--radius-full);
-		color: var(--color-text-secondary);
-
-		&:hover {
-			color: var(--color-text-primary);
-		}
+		color: var(--color-ink);
 	}
 </style>

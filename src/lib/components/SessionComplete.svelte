@@ -185,6 +185,7 @@
 
 	.session-complete__title {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 2rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
@@ -200,8 +201,8 @@
 	.session-complete__stats {
 		display: flex;
 		align-items: center;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-xl);
 		padding-block: var(--space-4);
 		inline-size: 100%;
@@ -225,6 +226,7 @@
 
 	.session-complete__stat-value {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.5rem;
 		font-weight: 700;
 		color: var(--color-accent-text);
@@ -256,6 +258,7 @@
 		padding-block: var(--space-4);
 		border-radius: var(--radius-full);
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1rem;
 		font-weight: 700;
 		min-block-size: 56px;
@@ -269,6 +272,18 @@
 	.session-complete__btn--primary {
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
-		box-shadow: var(--shadow-lime);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
+
+		&:active:not(:disabled) {
+			transform: translate(4px, 4px);
+			box-shadow: none;
+		}
 	}
 </style>

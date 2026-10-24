@@ -26,15 +26,15 @@
 		display: flex;
 		align-items: center;
 		gap: 5px;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-full);
-		padding-inline: var(--space-3);
-		block-size: 32px;
-		font-size: 0.8125rem;
+		background: var(--color-ink);
+		border: var(--rule-thin) solid var(--color-paper);
+		padding-inline: var(--space-2);
+		block-size: 30px;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		color: var(--color-text-secondary);
 		flex-shrink: 0;
-		margin-block-start: var(--space-1);
 	}
 
 	.week-streak :global(.icon) {

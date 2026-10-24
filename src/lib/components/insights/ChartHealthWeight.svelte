@@ -8,7 +8,14 @@
 	import { isWeightReading } from '$lib/health/metrics';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
+	import {
+		chartGrid,
+		PLOT_MARGIN,
+		chartTooltip,
+		longDate,
+		shortDate,
+		CHART_ACCENT,
+	} from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -31,7 +38,7 @@
 	let axis = $derived(niceAxis(rows.map((r) => r.value)));
 
 	function build() {
-		const accent = prefsStore.accentColor;
+		const accent = CHART_ACCENT;
 		const [lo, hi] = axis.domain;
 		return defineChart({
 			marks: [

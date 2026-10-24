@@ -297,7 +297,7 @@
 		overflow-y: auto;
 		margin-inline: auto;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
+		border: var(--rule) solid var(--color-border-strong);
 		border-radius: var(--r-xl);
 		padding: var(--space-5);
 		z-index: 91;
@@ -321,7 +321,7 @@
 		block-size: 44px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-size: 0.9375rem;
@@ -340,7 +340,7 @@
 	.hf-type-locked {
 		padding: var(--space-3) var(--space-4);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font-size: 0.9375rem;
 		font-weight: 600;
@@ -358,8 +358,8 @@
 		flex-direction: column;
 		align-items: flex-start;
 		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		text-align: start;
 		transition: border-color var(--duration-fast) var(--ease-out);
@@ -403,8 +403,8 @@
 
 	.hf-preset-btn {
 		padding: var(--space-3);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		font-size: 0.875rem;
 		font-weight: 600;
@@ -423,9 +423,10 @@
 		inline-size: 100%;
 		padding-block: var(--space-3);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
+		background: transparent;
+		color: var(--color-text-primary);
 		font-size: 0.9375rem;
 		font-weight: 600;
+		border: var(--rule-thin) solid var(--color-paper);
 	}
 </style>

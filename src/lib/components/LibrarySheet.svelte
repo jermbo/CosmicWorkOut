@@ -351,8 +351,8 @@
 		padding-inline: var(--space-3);
 		block-size: 36px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: var(--color-accent-text);
@@ -371,7 +371,7 @@
 		margin-block-end: var(--space-3);
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-xl);
 		block-size: 44px;
 	}
@@ -429,7 +429,7 @@
 
 	.lib-row {
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 	}
@@ -541,7 +541,7 @@
 	.lib-row__detail {
 		padding-inline: var(--space-3);
 		padding-block: var(--space-2) var(--space-3);
-		border-block-start: 1px solid var(--color-border);
+		border-block-start: var(--rule-thin) solid var(--color-border);
 		background: var(--color-surface-2);
 	}
 
@@ -569,8 +569,20 @@
 		color: var(--color-accent-ink);
 		border-radius: var(--radius-md);
 		font-size: 0.875rem;
-		font-weight: 700;
 		justify-content: center;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
+
+		&:active:not(:disabled) {
+			transform: translate(4px, 4px);
+			box-shadow: none;
+		}
 
 		svg {
 			inline-size: 16px;
@@ -586,9 +598,9 @@
 		inline-size: 40px;
 		block-size: 36px;
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
+		color: var(--color-text-primary);
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 

@@ -117,7 +117,7 @@
 	.wvw th,
 	.wvw td {
 		padding: var(--space-2) var(--space-1);
-		border-block-end: 1px solid var(--color-border);
+		border-block-end: var(--rule-thin) solid var(--color-border);
 		text-align: end;
 		white-space: nowrap;
 	}

@@ -290,9 +290,9 @@
 		inline-size: 32px;
 		block-size: 32px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
+		color: var(--color-text-primary);
 		flex-shrink: 0;
 
 		svg {
@@ -306,7 +306,8 @@
 		}
 
 		&:not(:disabled):active {
-			transform: scale(0.93);
+			background: var(--color-paper);
+			color: var(--color-ink);
 		}
 	}
 
@@ -340,7 +341,7 @@
 	.week-strip__days {
 		display: grid;
 		grid-template-columns: repeat(7, minmax(0, 1fr));
-		gap: var(--space-1);
+		gap: 3px;
 	}
 
 	.week-day {
@@ -350,27 +351,27 @@
 		gap: 4px;
 		padding-block: var(--space-2);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		transition: background-color var(--duration-fast) var(--ease-out);
+		background: var(--color-ink);
+		border: var(--rule-thin) solid var(--color-border);
 	}
 
 	.week-day--tappable:not(:disabled):active {
-		transform: scale(0.95);
+		border-color: var(--color-paper);
 	}
 
 	.week-day:disabled {
 		cursor: default;
 	}
 
+	/* Selected day is filled paper, like the active nav tab. */
 	.week-day--selected {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		--color-accent-ink: var(--color-ink);
+		background: var(--color-paper);
+		border-color: var(--color-paper);
 	}
 
 	.week-day--actual-today:not(.week-day--selected) {
-		border-color: var(--color-accent);
-		box-shadow: inset 0 0 0 1px var(--color-accent);
+		border-color: var(--color-paper);
 	}
 
 	.week-day__dow {
@@ -386,14 +387,15 @@
 		}
 
 		.week-day--actual-today:not(.week-day--selected) & {
-			color: var(--color-accent-text);
+			color: var(--color-text-primary);
 		}
 	}
 
 	.week-day__date {
 		font-family: var(--font-display);
-		font-size: 0.875rem;
-		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 0.9375rem;
+		font-weight: 900;
 		line-height: 1;
 		color: var(--color-text-primary);
 
@@ -448,26 +450,25 @@
 		border-radius: var(--radius-full);
 	}
 
+	/* One square per domain, in that domain's field hue. */
 	.week-day__indicator-dot--habits {
-		background: color-mix(in srgb, var(--color-accent) 30%, transparent);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 50%, transparent);
+		background: var(--field-habit);
 	}
 
 	.week-day__indicator-dot--strength {
-		background: var(--color-accent);
+		background: var(--field-train);
 	}
 
 	.week-day__indicator-dot--activity {
-		background: var(--color-lavender);
+		background: var(--field-active);
 	}
 
 	.week-day__indicator-dot--health {
-		background: var(--color-red);
+		background: var(--field-health);
 	}
 
 	.week-day--selected .week-day__indicator-dot {
-		opacity: 0.8;
-		outline: 1px solid color-mix(in srgb, var(--color-accent-ink) 25%, transparent);
+		outline: 1px solid var(--color-ink);
 	}
 
 	.week-strip__footer {
@@ -503,20 +504,19 @@
 			inline-size: 10px;
 			block-size: 10px;
 			border-radius: var(--radius-sm);
-			border: 1px solid var(--color-border);
+			border: var(--rule-thin) solid var(--color-border);
 		}
 	}
 
 	.week-strip__legend-item--selected::before {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		background: var(--color-paper);
+		border-color: var(--color-paper);
 	}
 
 	.week-strip__legend-item--today::before,
 	.week-strip__legend-item--current-week::before {
 		background: transparent;
-		border-color: var(--color-accent);
-		box-shadow: inset 0 0 0 1px var(--color-accent);
+		border-color: var(--color-paper);
 	}
 
 	.week-day__indicator--mood-pos {

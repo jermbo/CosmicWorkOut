@@ -51,16 +51,11 @@
 		block-size: 32px;
 		border-radius: var(--radius-full);
 		background: var(--swatch);
-		border: 2px solid transparent;
-		box-shadow: inset 0 0 0 2px var(--color-surface-2);
-		transition: transform var(--duration-fast) var(--ease-out);
-
-		&:hover {
-			transform: scale(1.08);
-		}
+		border: var(--rule) solid var(--color-ink);
 	}
 
 	.swatches__btn--selected {
-		border-color: var(--color-text-primary);
+		outline: var(--rule) solid var(--color-paper);
+		outline-offset: 0;
 	}
 </style>

@@ -98,11 +98,12 @@
 		flex-shrink: 0;
 		padding: var(--space-1) var(--space-3);
 		border-radius: var(--radius-full);
-		font-size: 0.8125rem;
-		font-weight: 500;
-		color: var(--color-text-secondary);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: var(--color-text-primary);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		transition:
 			color var(--duration-fast) var(--ease-out),
 			background var(--duration-fast) var(--ease-out),
@@ -111,9 +112,9 @@
 	}
 
 	.range-chip--active {
-		color: var(--color-accent-ink);
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		color: var(--color-ink);
+		background: var(--color-paper);
+		border-color: var(--color-paper);
 	}
 
 	.range-custom {
@@ -133,8 +134,8 @@
 	}
 
 	.range-custom__input {
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--radius-md);
 		color: var(--color-text-primary);
 		padding: var(--space-2) var(--space-3);

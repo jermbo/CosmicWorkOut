@@ -113,7 +113,7 @@
 		gap: var(--space-1);
 		padding: var(--space-4) var(--space-5);
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--r-xl);
 		text-align: start;
 		transition: border-color var(--duration-fast) var(--ease-out);
@@ -129,6 +129,7 @@
 
 	.template-card__name {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.0625rem;
 		font-weight: 700;
 	}
@@ -156,7 +157,7 @@
 		block-size: 48px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-size: 1rem;
@@ -174,7 +175,7 @@
 		display: flex;
 		align-items: center;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		block-size: 52px;

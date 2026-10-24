@@ -81,22 +81,25 @@
 <style>
 	.settings-hub__header {
 		margin-block-end: var(--space-6);
+		padding-block-end: var(--space-2);
+		border-block-end: var(--rule) solid var(--color-paper);
 	}
 
 	.settings-hub__eyebrow {
-		font-size: 0.75rem;
-		font-weight: 700;
+		font-size: 0.6875rem;
+		font-weight: 500;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--color-text-secondary);
+		letter-spacing: 0.06em;
+		color: var(--color-text-muted);
 		margin-block-end: var(--space-1);
 	}
 
 	.settings-hub__title {
 		font-family: var(--font-display);
-		font-size: 1.75rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.2;
+		text-transform: uppercase;
+		font-size: 2.5rem;
+		font-weight: 900;
+		letter-spacing: -0.04em;
+		line-height: 0.9;
 	}
 </style>

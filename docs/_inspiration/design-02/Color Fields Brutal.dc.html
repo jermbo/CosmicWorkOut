@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#1C1C1B;-webkit-font-smoothing:antialiased}a{color:#F2F0EA}a:hover{color:#fff}*{box-sizing:border-box}</style>
+</helmet>
+<section style="padding:72px 72px 120px;font-family:'JetBrains Mono',monospace;color:#F2F0EA">
+<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:48px;max-width:980px">
+<div style="font:500 13px 'JetBrains Mono';letter-spacing:.06em;color:#8E8C86">[ COLOR FIELDS / BRUTAL ] — DARK ONLY — R4</div>
+<h1 style="margin:0;font:900 52px/1 Unbounded;letter-spacing:-.04em;text-transform:uppercase">The machine<br>logbook</h1>
+<p style="margin:0;font:400 16px/1.6 'JetBrains Mono';color:#BDBAB2;max-width:760px;text-wrap:pretty">The concept: the app is a piece of gym equipment. You can see its structure: a 24px grid behind everything, index codes on every field, hard white offset shadows instead of soft depth. Anything with a shadow can be pressed. It sinks into the grid when you tap it, so you can tell it registered without looking twice.</p>
+</div>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:64px;align-items:stretch">
+<div style="border:3px solid #F2F0EA;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:300px">
+<span style="font:700 12px 'JetBrains Mono';color:#8E8C86">[S1] PRESS STATE — TRY IT</span>
+<div style="display:flex;gap:20px;align-items:center">
+<div style="height:64px;padding:0 24px;background:oklch(0.76 0.13 235);color:#0A0A0A;border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;display:flex;align-items:center;font:800 16px Unbounded;text-transform:uppercase;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #F2F0EA">Log set ▸</div>
+<div style="height:64px;padding:0 24px;background:oklch(0.76 0.13 235);color:#0A0A0A;border:3px solid #0A0A0A;transform:translate(6px,6px);display:flex;align-items:center;font:800 16px Unbounded;text-transform:uppercase">Pressed</div>
+</div>
+</div>
+<div style="border:3px solid #F2F0EA;padding:18px;display:flex;flex-direction:column;gap:14px">
+<span style="font:700 12px 'JetBrains Mono';color:#8E8C86">[S2] FIELDS — ONE HUE PER DOMAIN</span>
+<div style="display:flex;gap:6px;font:700 11px 'JetBrains Mono';color:#0A0A0A">
+<span style="width:84px;height:64px;padding:8px;background:oklch(0.76 0.13 235);display:flex;align-items:flex-end">TRAIN</span>
+<span style="width:84px;height:64px;padding:8px;background:oklch(0.76 0.13 30);display:flex;align-items:flex-end">HABIT</span>
+<span style="width:84px;height:64px;padding:8px;background:oklch(0.76 0.13 300);display:flex;align-items:flex-end">BASE</span>
+<span style="width:84px;height:64px;padding:8px;background:oklch(0.86 0.14 95);display:flex;align-items:flex-end">HEALTH</span>
+<span style="width:84px;height:64px;padding:8px;background:oklch(0.76 0.13 160);display:flex;align-items:flex-end">ACTIVE</span>
+<span style="width:84px;height:64px;padding:8px;background:repeating-linear-gradient(135deg,#F2F0EA 0 3px,#0A0A0A 3px 11px);border:3px solid #F2F0EA;display:flex;align-items:flex-end;color:#F2F0EA"><span style="background:#0A0A0A;padding:1px 3px">EMPTY</span></span>
+</div>
+</div>
+<div style="border:3px solid #F2F0EA;padding:18px;display:flex;flex-direction:column;gap:8px">
+<span style="font:700 12px 'JetBrains Mono';color:#8E8C86">[S3] TYPE</span>
+<span style="font:900 40px/1 Unbounded;letter-spacing:-.04em">175</span>
+<span style="font:800 15px Unbounded;text-transform:uppercase">Unbounded — figures, titles</span>
+<span style="font:500 13px 'JetBrains Mono'">JetBrains Mono — labels, codes, data</span>
+</div>
+</div>
+
+<div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start">
+
+<div id="01" data-screen-label="01 Today" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="padding:52px 16px 0;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>MON 2026.10.05</span><span>WK41 · D1/7</span></div>
+<div style="padding:6px 16px 0;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #F2F0EA;padding-bottom:10px">
+<span style="font:900 44px/.9 Unbounded;letter-spacing:-.04em">TODAY</span>
+<div style="display:flex;gap:3px;padding-bottom:4px"><span style="width:12px;height:26px;background:#F2F0EA"></span><span style="width:12px;height:26px;border:2px solid #444"></span><span style="width:12px;height:26px;border:2px solid #444"></span><span style="width:12px;height:26px;border:2px solid #444"></span><span style="width:12px;height:26px;border:2px solid #444"></span><span style="width:12px;height:26px;border:2px solid #444"></span><span style="width:12px;height:26px;border:2px solid #444"></span></div>
+</div>
+<div style="padding:16px 22px 0 16px;display:flex;flex-direction:column;gap:14px;color:#0A0A0A">
+<div style="background:oklch(0.76 0.13 235);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:10px" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #F2F0EA">
+<div style="display:flex;justify-content:space-between;font:700 11px 'JetBrains Mono'"><span>[T] TRAINING / SESSION A</span><span>~50M</span></div>
+<span style="font:900 26px/.95 Unbounded;letter-spacing:-.03em;text-transform:uppercase">Bench Press<br>Heavy</span>
+<div style="height:52px;background:#0A0A0A;color:oklch(0.76 0.13 235);display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:800 15px Unbounded"><span>START</span><span>▸</span></div>
+</div>
+<div style="background:oklch(0.76 0.13 30);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 11px 'JetBrains Mono'">[H] HABITS</span><span style="font:900 28px/1 Unbounded;letter-spacing:-.03em">3/4</span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px"><span style="height:14px;background:#0A0A0A"></span><span style="height:14px;background:#0A0A0A"></span><span style="height:14px;background:#0A0A0A"></span><span style="height:14px;border:2px solid #0A0A0A"></span></div>
+</div>
+<div style="background:oklch(0.76 0.13 300);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 11px 'JetBrains Mono'">[B] BASELINES</span><span style="font:900 28px/1 Unbounded;letter-spacing:-.03em">1/2</span></div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px"><span style="height:14px;background:#0A0A0A"></span><span style="height:14px;border:2px solid #0A0A0A"></span></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div style="background:oklch(0.76 0.13 160);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:8px"><span style="font:700 11px 'JetBrains Mono'">[A] CARDIO</span><span style="font:900 28px/1 Unbounded;letter-spacing:-.03em">42<span style="font:700 12px 'JetBrains Mono'">MIN</span></span></div>
+<div style="background:oklch(0.86 0.14 95);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:8px"><span style="font:700 11px 'JetBrains Mono'">[P] BP</span><span style="font:900 24px/1.15 Unbounded;letter-spacing:-.04em">122/88</span></div>
+</div>
+</div>
+<div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);border-top:3px solid #F2F0EA;font:700 11px 'JetBrains Mono'">
+<span style="padding:12px 10px 30px;background:#F2F0EA;color:#0A0A0A;display:flex;flex-direction:column;gap:2px"><span style="opacity:.6">01</span>TODAY</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">02</span>TRAIN</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">03</span>TREND</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">04</span>SETUP</span>
+</div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">01 · TODAY</span>
+</div>
+
+<div id="02" data-screen-label="02 Active set" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="padding:52px 16px 0;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>SESSION A · BENCH HEAVY</span><span style="color:#F2F0EA">T+24:13</span></div>
+<div style="margin:10px 16px 0;display:grid;grid-template-columns:repeat(13,1fr);border:2px solid #F2F0EA"><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:oklch(0.76 0.13 235);border-right:2px solid #0A0A0A"></span><span style="height:12px;background:#F2F0EA"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<div style="margin:6px 16px 0;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>06/13 SETS</span><span>EX 1/4</span></div>
+<div style="margin:16px 22px 0 16px;background:oklch(0.76 0.13 235);color:#0A0A0A;border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;display:flex;flex-direction:column">
+<div style="padding:10px 12px;display:flex;justify-content:space-between;font:700 11px 'JetBrains Mono';border-bottom:3px solid #0A0A0A"><span>[T1] BARBELL BENCH PRESS</span><span>SET 3/4</span></div>
+<div style="display:grid;grid-template-columns:1fr 92px">
+<div style="padding:10px 12px;border-right:3px solid #0A0A0A;display:flex;flex-direction:column"><span style="font:700 11px 'JetBrains Mono'">LOAD / LB</span><span style="font:900 76px/.95 Unbounded;letter-spacing:-.06em">175</span></div>
+<div style="display:flex;flex-direction:column"><span style="flex:1;display:flex;align-items:center;justify-content:center;font:800 26px Unbounded;border-bottom:3px solid #0A0A0A">+</span><span style="flex:1;display:flex;align-items:center;justify-content:center;font:800 26px Unbounded">−</span></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 92px;border-top:3px solid #0A0A0A">
+<div style="padding:10px 12px;border-right:3px solid #0A0A0A;display:flex;flex-direction:column"><span style="font:700 11px 'JetBrains Mono'">REPS</span><span style="font:900 52px/.95 Unbounded;letter-spacing:-.05em">10</span></div>
+<div style="display:flex;flex-direction:column"><span style="flex:1;display:flex;align-items:center;justify-content:center;font:800 22px Unbounded;border-bottom:3px solid #0A0A0A">+</span><span style="flex:1;display:flex;align-items:center;justify-content:center;font:800 22px Unbounded">−</span></div>
+</div>
+</div>
+<div style="margin:20px 16px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font:700 11px 'JetBrains Mono';text-align:center">
+<span style="padding:8px 0;background:#F2F0EA;color:#0A0A0A">175×10</span><span style="padding:8px 0;background:#F2F0EA;color:#0A0A0A">175×10</span><span style="padding:8px 0;border:2px solid oklch(0.76 0.13 235);color:oklch(0.76 0.13 235)">NOW</span><span style="padding:8px 0;border:2px dashed #555;color:#777">SET 4</span>
+</div>
+<div style="margin:auto 22px 0 16px;padding-bottom:40px;display:flex;flex-direction:column;gap:10px">
+<span style="font:500 11px 'JetBrains Mono';color:#8E8C86">NEXT ▸ INCLINE DB BENCH / 75 LB</span>
+<div style="height:120px;background:#F2F0EA;color:#0A0A0A;border:3px solid #F2F0EA;box-shadow:6px 6px 0 oklch(0.76 0.13 235);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #000">
+<span style="font:700 11px 'JetBrains Mono'">[ TAP ANYWHERE ]</span>
+<div style="display:flex;justify-content:space-between;align-items:flex-end"><span style="font:900 34px/.9 Unbounded;letter-spacing:-.03em">LOG<br>SET 03</span><span style="font:900 34px Unbounded">▸</span></div>
+</div>
+</div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">02 · ACTIVE SET (LOG BUTTON IS PRESSABLE)</span>
+</div>
+
+<div id="03" data-screen-label="03 Rest" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;position:relative;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="position:absolute;left:0;right:56px;bottom:0;height:400px;background:oklch(0.76 0.13 235);border-top:3px solid #F2F0EA"></div>
+<div style="position:absolute;right:0;top:0;bottom:0;width:56px;border-left:3px solid #F2F0EA;font:500 10px 'JetBrains Mono';color:#8E8C86">
+<span style="position:absolute;left:0;right:0;bottom:640px;transform:translateY(50%);text-align:center">2:00</span>
+<span style="position:absolute;left:0;right:0;bottom:490px;transform:translateY(50%);text-align:center">1:30</span>
+<span style="position:absolute;left:-3px;right:0;bottom:400px;transform:translateY(50%);text-align:center;color:#0A0A0A;background:#F2F0EA;padding:3px 0;font-weight:700">1:12</span>
+<span style="position:absolute;left:0;right:0;bottom:340px;transform:translateY(50%);text-align:center">1:00</span>
+<span style="position:absolute;left:0;right:0;bottom:190px;transform:translateY(50%);text-align:center">0:30</span>
+<span style="position:absolute;left:0;right:0;bottom:40px;transform:translateY(50%);text-align:center">0:00</span>
+</div>
+<div style="position:relative;padding:52px 72px 0 16px;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>[T1] SET 03 LOGGED</span><span>175×10</span></div>
+<div style="position:relative;padding:20px 72px 0 16px;display:flex;flex-direction:column;gap:4px"><span style="font:700 12px 'JetBrains Mono'">REST REMAINING</span><span style="font:900 104px/.85 Unbounded;letter-spacing:-.07em">1:12</span></div>
+<div style="position:relative;margin:auto 80px 0 16px;padding-bottom:40px;display:flex;flex-direction:column;gap:14px;color:#0A0A0A">
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font:700 11px 'JetBrains Mono'">UP NEXT ▸ SET 04/04</span><span style="font:900 22px/1 Unbounded;letter-spacing:-.03em">175 LB × 10</span></div>
+<div style="height:64px;background:#0A0A0A;color:#F2F0EA;border:3px solid #0A0A0A;box-shadow:5px 5px 0 #F2F0EA;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:800 15px Unbounded;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(5px,5px);box-shadow:0 0 0 #000"><span>SKIP</span><span>▸▸</span></div>
+<div style="height:56px;border:3px solid #0A0A0A;display:flex;align-items:center;justify-content:center;font:800 14px Unbounded">+30 SEC</div>
+</div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">03 · REST (FIELD DRAINS AGAINST A RULER)</span>
+</div>
+
+<div id="04" data-screen-label="04 Habits" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="padding:52px 16px 0;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>MON 2026.10.05</span><span>TAP = +1 · HOLD = EDIT</span></div>
+<div style="padding:6px 16px 10px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #F2F0EA">
+<span style="font:900 44px/.9 Unbounded;letter-spacing:-.04em">HABITS</span><span style="font:900 26px/1 Unbounded;color:oklch(0.76 0.13 30)">3/4</span>
+</div>
+<div style="padding:16px 22px 0 16px;display:flex;flex-direction:column;gap:14px;color:#0A0A0A">
+<div style="background:oklch(0.76 0.13 235);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:10px;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #000">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 11px 'JetBrains Mono'">[H1] WATER / GLASSES</span><span style="font:900 28px/1 Unbounded;letter-spacing:-.03em">6/8</span></div>
+<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px"><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;background:#0A0A0A"></span><span style="height:22px;border:2px solid #0A0A0A"></span><span style="height:22px;border:2px solid #0A0A0A"></span></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div style="background:oklch(0.76 0.13 70);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;height:104px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #000"><span style="font:700 11px 'JetBrains Mono'">[H2] COFFEE</span><span style="font:900 44px/1 Unbounded;letter-spacing:-.04em">2</span></div>
+<div style="background:oklch(0.76 0.13 340);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;height:104px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #000"><span style="font:700 11px 'JetBrains Mono'">[H3] READING</span><span style="font:900 44px/1 Unbounded;letter-spacing:-.04em">25<span style="font:700 12px 'JetBrains Mono'">MIN</span></span></div>
+</div>
+<div style="background:oklch(0.76 0.13 160);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;padding:12px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font:700 11px 'JetBrains Mono'">[H4] MOOD / −5…+5</span><span style="font:900 24px/1 Unbounded">+2</span></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);border:3px solid #0A0A0A;font:800 13px Unbounded;text-align:center"><span style="padding:12px 0;border-right:3px solid #0A0A0A">−5</span><span style="padding:12px 0;border-right:3px solid #0A0A0A">−2</span><span style="padding:12px 0;border-right:3px solid #0A0A0A">0</span><span style="padding:12px 0;border-right:3px solid #0A0A0A;background:#0A0A0A;color:oklch(0.76 0.13 160)">+2</span><span style="padding:12px 0">+5</span></div>
+</div>
+<div style="height:76px;background:repeating-linear-gradient(135deg,#2A2A2A 0 3px,#0A0A0A 3px 11px);border:3px dashed #F2F0EA;padding:12px;display:flex;justify-content:space-between;align-items:center;color:#F2F0EA"><span style="font:700 11px 'JetBrains Mono';background:#0A0A0A;padding:2px 4px">[H5] NO ALCOHOL</span><span style="font:800 13px Unbounded;background:#0A0A0A;padding:2px 4px">[ ] MARK</span></div>
+</div>
+<div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);border-top:3px solid #F2F0EA;font:700 11px 'JetBrains Mono'">
+<span style="padding:12px 10px 30px;background:#F2F0EA;color:#0A0A0A;display:flex;flex-direction:column;gap:2px"><span style="opacity:.6">01</span>TODAY</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">02</span>TRAIN</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">03</span>TREND</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">04</span>SETUP</span>
+</div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">04 · HABITS (EVERY TILE IS PRESSABLE)</span>
+</div>
+
+<div id="05" data-screen-label="05 Blood pressure" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="padding:52px 16px 0;display:flex;justify-content:space-between;align-items:center;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>[P] HEALTH · 07:42</span><span style="width:40px;height:40px;border:3px solid #F2F0EA;color:#F2F0EA;display:flex;align-items:center;justify-content:center;font:800 16px Unbounded">×</span></div>
+<div style="padding:6px 16px 10px;border-bottom:3px solid #F2F0EA"><span style="font:900 36px/.95 Unbounded;letter-spacing:-.04em">BLOOD<br>PRESSURE</span></div>
+<div style="padding:18px 22px 0 16px;display:flex;flex-direction:column;gap:14px;color:#0A0A0A">
+<div style="background:oklch(0.86 0.14 95);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;display:grid;grid-template-columns:64px 1fr 64px;height:112px"><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-right:3px solid #0A0A0A">−</span><div style="padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between"><span style="font:700 11px 'JetBrains Mono'">SYS / mmHg</span><span style="font:900 52px/.9 Unbounded;letter-spacing:-.05em">122</span></div><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-left:3px solid #0A0A0A">+</span></div>
+<div style="background:oklch(0.86 0.14 95);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;display:grid;grid-template-columns:64px 1fr 64px;height:112px"><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-right:3px solid #0A0A0A">−</span><div style="padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between"><span style="font:700 11px 'JetBrains Mono'">DIA / mmHg</span><span style="font:900 52px/.9 Unbounded;letter-spacing:-.05em">88</span></div><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-left:3px solid #0A0A0A">+</span></div>
+<div style="background:oklch(0.86 0.14 95);border:3px solid #0A0A0A;box-shadow:6px 6px 0 #F2F0EA;display:grid;grid-template-columns:64px 1fr 64px;height:112px"><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-right:3px solid #0A0A0A">−</span><div style="padding:8px 12px;display:flex;flex-direction:column;justify-content:space-between"><span style="font:700 11px 'JetBrains Mono'">PULSE / bpm</span><span style="font:900 52px/.9 Unbounded;letter-spacing:-.05em">72</span></div><span style="display:flex;align-items:center;justify-content:center;font:800 28px Unbounded;border-left:3px solid #0A0A0A">+</span></div>
+</div>
+<div style="padding:14px 16px 0;font:500 11px/1.5 'JetBrains Mono';color:#8E8C86">PREFILLED FROM LAST READING (10.04). DRAG A FIGURE TO SCRUB.</div>
+<div style="margin:auto 22px 0 16px;padding-bottom:40px"><div style="height:80px;background:#F2F0EA;color:#0A0A0A;border:3px solid #F2F0EA;box-shadow:6px 6px 0 oklch(0.86 0.14 95);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:900 22px Unbounded;cursor:pointer;user-select:none;transition:transform 60ms,box-shadow 60ms" style-active="transform:translate(6px,6px);box-shadow:0 0 0 #000"><span>SAVE</span><span>✓</span></div></div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">05 · LOG BLOOD PRESSURE</span>
+</div>
+
+<div id="06" data-screen-label="06 Trends" style="display:flex;flex-direction:column;gap:14px">
+<div style="width:360px;height:760px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;background-color:#0A0A0A;background-image:linear-gradient(#171717 1px,transparent 1px),linear-gradient(90deg,#171717 1px,transparent 1px);background-size:24px 24px;color:#F2F0EA;font-family:'JetBrains Mono',monospace;box-shadow:0 40px 80px -30px rgba(0,0,0,.8)">
+<div style="padding:52px 16px 0;display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono';color:#8E8C86"><span>09.28 → 10.04</span><span>N=7 DAYS</span></div>
+<div style="padding:6px 16px 10px;border-bottom:3px solid #F2F0EA"><span style="font:900 44px/.9 Unbounded;letter-spacing:-.04em">TRENDS</span></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:3px solid #F2F0EA;font:700 11px 'JetBrains Mono';text-align:center">
+<span style="padding:14px 0">WK</span><span style="padding:14px 0;background:#F2F0EA;color:#0A0A0A">7D</span><span style="padding:14px 0;border-left:3px solid #F2F0EA">MTD</span><span style="padding:14px 0;border-left:3px solid #F2F0EA">YTD</span>
+</div>
+<div style="padding:14px 16px 8px;display:flex;justify-content:space-between;font:700 11px 'JetBrains Mono'"><span>[03.1] ALL HABITS</span><span style="color:#8E8C86">■ = MORE</span></div>
+<div style="padding:0 16px;display:flex;flex-direction:column;gap:3px">
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;height:30px"><span style="font:700 11px 'JetBrains Mono';align-self:center">WATER</span><span style="background:oklch(0.76 0.13 235);opacity:.4"></span><span style="background:oklch(0.76 0.13 235);opacity:.7"></span><span style="background:oklch(0.76 0.13 235)"></span><span style="background:oklch(0.76 0.13 235);opacity:.3"></span><span style="background:oklch(0.76 0.13 235);opacity:.8"></span><span style="background:oklch(0.76 0.13 235);opacity:.6"></span><span style="background:oklch(0.76 0.13 235);opacity:.75"></span></div>
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;height:30px"><span style="font:700 11px 'JetBrains Mono';align-self:center">COFFEE</span><span style="border:2px solid #333"></span><span style="border:2px solid #333"></span><span style="background:oklch(0.76 0.13 70)"></span><span style="background:oklch(0.76 0.13 70);opacity:.5"></span><span style="background:oklch(0.76 0.13 70);opacity:.5"></span><span style="background:oklch(0.76 0.13 70);opacity:.7"></span><span style="background:oklch(0.76 0.13 70);opacity:.7"></span></div>
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;height:30px"><span style="font:700 11px 'JetBrains Mono';align-self:center">READ</span><span style="background:oklch(0.76 0.13 340);opacity:.5"></span><span style="background:oklch(0.76 0.13 340)"></span><span style="background:oklch(0.76 0.13 340);opacity:.6"></span><span style="background:oklch(0.76 0.13 340);opacity:.9"></span><span style="background:oklch(0.76 0.13 340);opacity:.8"></span><span style="background:oklch(0.76 0.13 340)"></span><span style="background:oklch(0.76 0.13 340);opacity:.7"></span></div>
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;height:30px"><span style="font:700 11px 'JetBrains Mono';align-self:center">MOOD</span><span style="background:oklch(0.76 0.13 160);opacity:.4"></span><span style="background:oklch(0.76 0.13 160);opacity:.9"></span><span style="background:oklch(0.76 0.13 160);opacity:.5"></span><span style="background:oklch(0.76 0.13 160);opacity:.5"></span><span style="background:oklch(0.76 0.13 160);opacity:.3"></span><span style="background:oklch(0.76 0.13 160);opacity:.4"></span><span style="background:oklch(0.76 0.13 160);opacity:.7"></span></div>
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;height:30px"><span style="font:700 11px 'JetBrains Mono';align-self:center">NO ALC</span><span style="background:oklch(0.76 0.13 30)"></span><span style="background:oklch(0.76 0.13 30)"></span><span style="background:oklch(0.76 0.13 30)"></span><span style="border:2px solid #333"></span><span style="border:2px solid #333"></span><span style="border:2px solid #333"></span><span style="background:oklch(0.76 0.13 30)"></span></div>
+<div style="display:grid;grid-template-columns:64px repeat(7,1fr);gap:3px;font:500 10px 'JetBrains Mono';color:#8E8C86;text-align:center;padding-top:2px"><span></span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+</div>
+<div style="padding:16px 16px 8px;display:flex;justify-content:space-between;font:700 11px 'JetBrains Mono';border-top:3px solid #F2F0EA;margin-top:14px"><span>[03.2] BP / mmHg</span><span style="color:#8E8C86">AVG 128/87</span></div>
+<div style="padding:0 16px;display:grid;grid-template-columns:32px repeat(7,1fr);gap:4px;height:140px">
+<div style="display:flex;flex-direction:column;justify-content:space-between;font:500 10px 'JetBrains Mono';color:#8E8C86"><span>140</span><span>100</span><span>60</span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:10%;height:52%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:4%;height:58%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:14%;height:46%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:22%;height:56%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:26%;height:44%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:28%;height:38%;background:oklch(0.86 0.14 95);border:2px solid #0A0A0A"></span></div>
+<div style="position:relative"><span style="position:absolute;left:0;right:0;top:27%;height:41%;background:#F2F0EA;border:2px solid #0A0A0A"></span></div>
+</div>
+<div style="padding:6px 16px 0;font:500 10px 'JetBrains Mono';color:#8E8C86">BAR = SYS (TOP) TO DIA (BOTTOM). WHITE = TODAY.</div>
+<div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);border-top:3px solid #F2F0EA;font:700 11px 'JetBrains Mono'">
+<span style="padding:12px 10px 30px;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">01</span>TODAY</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">02</span>TRAIN</span><span style="padding:12px 10px 30px;background:#F2F0EA;color:#0A0A0A;display:flex;flex-direction:column;gap:2px"><span style="opacity:.6">03</span>TREND</span><span style="padding:12px 10px 30px;border-left:3px solid #F2F0EA;display:flex;flex-direction:column;gap:2px"><span style="color:#8E8C86">04</span>SETUP</span>
+</div>
+</div>
+<span style="font:500 12px 'JetBrains Mono';color:#8E8C86">06 · TRENDS</span>
+</div>
+
+</div>
+</section>
+</x-dc>
+</body>
+</html>

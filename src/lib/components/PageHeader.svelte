@@ -126,26 +126,36 @@
 {/if}
 
 <style>
+	/* Big caps title on a 3px paper rule (v1.12.0). */
 	.page-header {
 		margin-block-end: var(--space-4);
+		padding-block-end: var(--space-2);
+		border-block-end: var(--rule) solid var(--color-paper);
 	}
 
+	/* Date line + trailing on top, full-width title below. */
 	.page-header__row {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: var(--space-3);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		column-gap: var(--space-3);
 	}
 
 	.page-header__text {
-		min-inline-size: 0;
+		display: contents;
 	}
 
 	.page-header__eyebrow-row {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.page-header__eyebrow-row {
+		justify-self: start;
 		display: inline-flex;
 		align-items: center;
 		gap: 2px;
-		color: var(--color-accent-text);
+		color: var(--color-text-muted);
 	}
 
 	.page-header__back {
@@ -163,8 +173,9 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 4px;
-		font-size: 0.8125rem;
-		font-weight: 600;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		font-weight: 500;
 		color: inherit;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
@@ -186,13 +197,19 @@
 
 	.page-header__title {
 		font-family: var(--font-display);
-		font-size: 2.25rem;
-		font-weight: 700;
-		line-height: 1;
-		letter-spacing: -0.02em;
+		text-transform: uppercase;
+		grid-column: 1 / -1;
+		grid-row: 2;
+		margin-block-start: var(--space-2);
+		font-size: clamp(1.75rem, 11cqi, 2.75rem);
+		font-weight: 900;
+		line-height: 0.9;
+		letter-spacing: -0.04em;
+		overflow-wrap: anywhere;
 	}
 
 	.page-header__trailing {
-		flex-shrink: 0;
+		grid-column: 2;
+		grid-row: 1;
 	}
 </style>

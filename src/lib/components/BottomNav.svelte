@@ -36,7 +36,7 @@
 		class="bottom-nav__list"
 		role="list"
 	>
-		{#each navItems as item (item.href)}
+		{#each navItems as item, i (item.href)}
 			<li class="bottom-nav__item">
 				<a
 					href={resolve(item.href)}
@@ -44,83 +44,10 @@
 					class:bottom-nav__link--active={isActive(item)}
 					aria-current={ariaCurrentFor(item)}
 				>
-					{#if item.label === 'Overview'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-						</svg>
-					{:else if item.label === 'Workout'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M6 4v6M18 4v6M3 7h4M17 7h4M6 14v6M18 14v6M3 17h4M17 17h4M8 10h8v4H8z" />
-						</svg>
-					{:else if item.label === 'Insights'}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<line
-								x1="18"
-								y1="20"
-								x2="18"
-								y2="10"
-							/>
-							<line
-								x1="12"
-								y1="20"
-								x2="12"
-								y2="4"
-							/>
-							<line
-								x1="6"
-								y1="20"
-								x2="6"
-								y2="14"
-							/>
-						</svg>
-					{:else}
-						<svg
-							class="bottom-nav__icon"
-							aria-hidden="true"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<circle
-								cx="12"
-								cy="12"
-								r="3"
-							/>
-							<path
-								d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-							/>
-						</svg>
-					{/if}
+					<span
+						class="bottom-nav__index"
+						aria-hidden="true">{String(i + 1).padStart(2, '0')}</span
+					>
 					<span class="bottom-nav__label">{item.label}</span>
 				</a>
 			</li>
@@ -129,15 +56,70 @@
 </nav>
 
 <style>
+	/* Numbered blocks split by 3px rules; the current tab is filled paper. */
 	.bottom-nav {
 		position: fixed;
 		inset-block-end: 0;
 		inset-inline: 0;
 		block-size: calc(var(--nav-height) + var(--safe-bottom));
-		padding-block-end: var(--safe-bottom);
-		background: var(--color-surface-1);
-		border-block-start: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border-block-start: var(--rule) solid var(--color-paper);
 		z-index: 50;
+	}
+
+	.bottom-nav__list {
+		display: flex;
+		block-size: 100%;
+		inline-size: 100%;
+	}
+
+	.bottom-nav__item {
+		flex: 1;
+		min-inline-size: 0;
+
+		& + & {
+			border-inline-start: var(--rule) solid var(--color-paper);
+		}
+	}
+
+	.bottom-nav__link {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		gap: 2px;
+		block-size: 100%;
+		padding: var(--space-3) var(--space-2) calc(var(--safe-bottom) + var(--space-2));
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-text-primary);
+	}
+
+	.bottom-nav__index {
+		color: var(--color-text-muted);
+	}
+
+	.bottom-nav__label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.bottom-nav__link--active {
+		background: var(--color-paper);
+		color: var(--color-ink);
+
+		.bottom-nav__index {
+			color: inherit;
+			opacity: 0.6;
+		}
+
+		&:focus-visible {
+			outline-color: var(--color-accent);
+			outline-offset: -3px;
+		}
 	}
 
 	@container app (inline-size >= 720px) {
@@ -146,93 +128,29 @@
 			inset-inline-end: auto;
 			inline-size: var(--side-nav-width);
 			block-size: 100%;
-			max-inline-size: none;
-			padding-block-end: 0;
 			padding-block-start: var(--safe-top);
 			border-block-start: none;
-			border-inline-end: 1px solid var(--color-border);
-			display: flex;
-			flex-direction: column;
+			border-inline-end: var(--rule) solid var(--color-paper);
 		}
 
 		.bottom-nav__list {
 			flex-direction: column;
 			block-size: auto;
-			padding: var(--space-6) var(--space-3);
-			gap: var(--space-1);
+			border-block-end: var(--rule) solid var(--color-paper);
 		}
 
 		.bottom-nav__item {
 			flex: 0;
+
+			& + & {
+				border-inline-start: none;
+				border-block-start: var(--rule) solid var(--color-paper);
+			}
 		}
 
 		.bottom-nav__link {
-			flex-direction: row;
-			justify-content: flex-start;
-			padding: var(--space-3);
-			border-radius: var(--radius-lg);
-			gap: var(--space-3);
-			block-size: auto;
+			padding: var(--space-4);
+			font-size: 0.8125rem;
 		}
-
-		.bottom-nav__link--active {
-			background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-		}
-
-		.bottom-nav__icon {
-			flex-shrink: 0;
-		}
-
-		.bottom-nav__label {
-			font-size: 0.9375rem;
-			letter-spacing: -0.01em;
-			text-transform: none;
-			font-weight: 600;
-		}
-	}
-
-	.bottom-nav__list {
-		display: flex;
-		block-size: var(--nav-height);
-		inline-size: 100%;
-		max-inline-size: var(--max-width);
-		margin-inline: auto;
-		padding-inline-start: max(var(--page-gutter), env(safe-area-inset-left, 0px));
-		padding-inline-end: max(var(--page-gutter), env(safe-area-inset-right, 0px));
-	}
-
-	.bottom-nav__item {
-		flex: 1;
-	}
-
-	.bottom-nav__link {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: var(--space-1);
-		block-size: 100%;
-		color: var(--color-text-tertiary);
-		transition: color var(--duration-fast) var(--ease-out);
-	}
-
-	.bottom-nav__link--active {
-		color: var(--color-accent-text);
-
-		&:focus-visible {
-			outline-offset: -3px;
-		}
-	}
-
-	.bottom-nav__icon {
-		inline-size: 22px;
-		block-size: 22px;
-	}
-
-	.bottom-nav__label {
-		font-size: 0.6875rem;
-		font-weight: 600;
-		letter-spacing: 0.02em;
-		text-transform: uppercase;
 	}
 </style>

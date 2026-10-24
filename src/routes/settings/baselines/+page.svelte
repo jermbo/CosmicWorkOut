@@ -190,8 +190,8 @@
 		padding-inline: var(--space-3);
 		block-size: 32px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: var(--color-accent-text);

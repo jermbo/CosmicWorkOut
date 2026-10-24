@@ -4,7 +4,6 @@
 	import { scaleBand } from '@tanstack/charts/scales/band';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { getMondayOf } from '$lib/chart-utils';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
@@ -15,6 +14,7 @@
 		longDate,
 		shortDate,
 		withAlpha,
+		CHART_ACCENT,
 	} from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
@@ -46,7 +46,7 @@
 	);
 
 	function build() {
-		const accent = prefsStore.accentColor;
+		const accent = CHART_ACCENT;
 		return defineChart({
 			marks: [
 				ruleY(axis.ticks, { stroke: chartGrid() }),

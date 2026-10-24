@@ -85,7 +85,7 @@
 	.confirm-backdrop {
 		position: fixed;
 		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
+		background: rgba(10, 10, 10, 0.8);
 		z-index: 90;
 	}
 
@@ -96,19 +96,21 @@
 		transform: translateY(-50%);
 		max-inline-size: 400px;
 		margin-inline: auto;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
-		border-radius: var(--r-xl);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		padding: var(--space-5);
 		z-index: 91;
-		box-shadow: var(--shadow-lg);
+		box-shadow: var(--shadow-hard);
 	}
 
 	.confirm__title {
 		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
-		margin-block-end: var(--space-2);
+		text-transform: uppercase;
+		font-size: 1.25rem;
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: -0.03em;
+		margin-block-end: var(--space-3);
 	}
 
 	.confirm__body {

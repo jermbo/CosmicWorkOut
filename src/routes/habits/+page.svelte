@@ -209,15 +209,16 @@
 
 	.habit-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-		gap: var(--space-4);
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+		gap: var(--card-gap);
+		padding-inline-end: var(--press-offset);
+		padding-block-end: var(--press-offset);
 	}
 
 	.mood-section {
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
-		padding: var(--space-3) var(--space-4);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
+		padding: var(--space-3);
 		margin-block-end: var(--space-5);
 	}
 
@@ -229,10 +230,10 @@
 	}
 
 	.mood-section__title {
-		font-size: 0.8125rem;
+		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.07em;
+		letter-spacing: 0.04em;
 		color: var(--color-text-muted);
 	}
 
@@ -240,8 +241,10 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		font-size: 0.9375rem;
-		font-weight: 700;
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 900;
+		text-transform: uppercase;
 		color: var(--color-text-primary);
 	}
 
@@ -262,54 +265,47 @@
 	.mood-section__empty {
 		font-size: 0.8125rem;
 		color: var(--color-text-muted);
-		font-style: italic;
 	}
 
+	/* One ruled strip; the chosen value is filled ink-on-hue. */
 	.mood-scale {
 		display: flex;
-		gap: 3px;
 		min-inline-size: 0;
-		border: none;
+		border: var(--rule) solid var(--color-paper);
 		padding: 0;
 		margin: 0;
 	}
 
 	.mood-scale__item {
 		flex: 1;
-		block-size: 44px;
+		block-size: 48px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border-radius: var(--radius-md);
-		border: 1px solid var(--color-border);
-		background: var(--color-surface-3);
+		background: transparent;
 		font-family: var(--font-mono);
 		font-size: 0.6875rem;
 		font-weight: 700;
 		color: var(--color-text-muted);
 		cursor: pointer;
 		user-select: none;
-		transition:
-			background var(--duration-fast) var(--ease-out),
-			border-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out),
-			transform var(--duration-fast) var(--ease-out);
+
+		& + & {
+			border-inline-start: var(--rule-thin) solid var(--color-border);
+		}
 
 		&.mood-scale__item--pos {
-			color: color-mix(in srgb, var(--color-mood-good-text) 80%, var(--color-text-muted));
-			border-color: color-mix(in srgb, var(--color-mood-good) 20%, var(--color-border));
+			color: var(--color-mood-good-text);
 		}
 
 		&.mood-scale__item--neg {
-			color: color-mix(in srgb, var(--color-mood-bad-text) 80%, var(--color-text-muted));
-			border-color: color-mix(in srgb, var(--color-mood-bad) 20%, var(--color-border));
+			color: var(--color-mood-bad-text);
 		}
 
 		&.mood-scale__item--selected {
-			transform: scaleY(1.12);
-			border-color: transparent;
-			color: #000;
-			font-size: 0.75rem;
+			color: var(--color-ink);
+			font-size: 0.8125rem;
+			font-weight: 800;
 		}
 
 		&.mood-scale__item--pos.mood-scale__item--selected {
@@ -327,8 +323,9 @@
 			outline-offset: 2px;
 		}
 
-		&:hover {
-			filter: brightness(1.2);
+		&:active {
+			background: var(--color-paper);
+			color: var(--color-ink);
 		}
 	}
 </style>

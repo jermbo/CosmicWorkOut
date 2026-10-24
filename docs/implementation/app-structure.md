@@ -27,7 +27,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/activity`        | `routes/settings/activity/+page.svelte`        | Activity log toggle                                                                                                                                  |
 | `/settings/health`          | `routes/settings/health/+page.svelte`          | Health metrics toggle                                                                                                                                |
 | `/settings/insights`        | `routes/settings/insights/+page.svelte`        | Show / hide each Insights chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                  |
-| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Appearance (theme), accent, weight unit, density, roundness, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md))           |
+| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Weight unit, density, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)                              |
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. plan goals and Baselines), debug seed                                                                              |
 
@@ -103,7 +103,7 @@ sequenceDiagram
 ```
 
 1. `initDB()` — open IndexedDB (version 9), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
-2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
+2. `prefsStore.load()` — read localStorage, apply density to the DOM
 3. `programStore.load()` — load programs, items, sessions; pick active program per Discipline
 4. `goalPlanStore.load()` — load lift plans _(US-033)_
 5. `habitStore.load()` — load habits and all habit logs
