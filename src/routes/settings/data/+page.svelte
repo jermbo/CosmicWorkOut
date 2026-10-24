@@ -18,6 +18,7 @@
 		assertBackupSize,
 		BackupValidationError,
 	} from '$lib/db/backup';
+	import { onMount } from 'svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -26,6 +27,9 @@
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
+	import SettingsRow from '$lib/components/SettingsRow.svelte';
+	import { lastQrBackupDate } from '$lib/qrBackup/sendPrefs';
+	import { formatShortDate } from '$lib/date';
 
 	type ClearAction =
 		| 'exercises'
@@ -70,6 +74,16 @@
 			.filter((t) => !t.on)
 			.map((t) => t.label),
 	);
+
+	const lastQrSent = lastQrBackupDate();
+
+	// Receive by QR reloads into this page after writing; say it worked (US-058).
+	onMount(() => {
+		if (sessionStorage.getItem('cwout:qrReceived')) {
+			sessionStorage.removeItem('cwout:qrReceived');
+			toastStore.show('Backup received.');
+		}
+	});
 
 	let exporting = $state(false);
 	let fileInput = $state<HTMLInputElement>();
@@ -214,6 +228,23 @@
 			/>
 		</div>
 	</section>
+
+	<SettingsGroup title="Back up by QR">
+		<SettingsRow
+			href="/settings/data/send"
+			label="Send by QR"
+			detail={lastQrSent ? `Last ${formatShortDate(lastQrSent)}` : 'Show codes'}
+		/>
+		<SettingsRow
+			href="/settings/data/receive"
+			label="Receive by QR"
+			detail="Use camera"
+		/>
+	</SettingsGroup>
+	<p class="data-qr-note">
+		Move data between your devices by pointing one's camera at the other's screen — no file, no
+		network. The sending device is the source of truth for the dates it sends.
+	</p>
 
 	<SettingsGroup title="Clear">
 		{#if prefsStore.practiceEnabled}
@@ -497,6 +528,14 @@
 	.confirm-list {
 		margin-block: var(--space-2);
 		padding-inline-start: var(--space-4);
+	}
+
+	/* Sits under the QR group: pull up into the group's bottom margin. */
+	.data-qr-note {
+		margin-block: calc(var(--space-6) * -1 + var(--space-2)) var(--space-6);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
 	}
 
 	.settings-section {

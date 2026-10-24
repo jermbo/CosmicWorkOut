@@ -68,6 +68,7 @@ flowchart TB
 | `src/app.css`                 | Design tokens and global styles                |
 | `src/lib/itemLibrary.ts`      | Per-Discipline `LibrarySheet` config           |
 | `src/lib/db/backupPayload.ts` | Backup envelope, validation, restore preflight |
+| `src/lib/qrBackup/frames.ts`  | QR backup frame format, compression, checksum  |
 
 ---
 
@@ -76,7 +77,7 @@ flowchart TB
 `npm test` runs Node's built-in test runner over `*.test.ts` files with type
 stripping — no framework, no browser, no new dependencies. Covered today:
 goal-plan generation, baseline aggregation and duration parsing, Overview card
-ordering, the backup/restore payload path, chart axis math (`charts.test.ts`),
+ordering, the backup/restore payload path, QR backup frames (`qrBackup/frames.test.ts`, including a round trip through real QR codes), chart axis math (`charts.test.ts`),
 Insights aggregation and heat shading (`insights.test.ts`), and habit color
 defaults (`habitColors.test.ts`).
 

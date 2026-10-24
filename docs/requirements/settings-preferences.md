@@ -39,18 +39,19 @@ User-configurable behavior and appearance.
 
 Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.0): **one row per feature**, iPhone-Settings style. Each row shows On / Off and opens that feature's page, which holds its switch, its manage list, and its own options. (Originally [US-030](../features/v1.7.0/US-030-settings-restructure.md).)
 
-| Route                       | Contents                                                                                                                                                              |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/settings`                 | **Hub** — Features: Habits · Baselines · Workout · Activity · Health. App: Insights · Personalization · Data & backup                                                 |
-| `/settings/habits`          | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                                                                |
-| `/settings/baselines`       | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                                                                   |
-| `/settings/workout`         | One **Workout** switch, covering plans and their optional goals ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) — replaces the old `/settings/practice` |
-| `/settings/activity`        | Activity log switch                                                                                                                                                   |
-| `/settings/health`          | Health metrics switch                                                                                                                                                 |
-| `/settings/insights`        | Show / hide each Insights chart                                                                                                                                       |
-| `/settings/personalization` | Weight unit, density, haptics, sound, Overview card order                                                                                                             |
-| `/settings/overview`        | Overview card order (kept for old links)                                                                                                                              |
-| `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                                                                  |
+| Route                              | Contents                                                                                                                                                              |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/settings`                        | **Hub** — Features: Habits · Baselines · Workout · Activity · Health. App: Insights · Personalization · Data & backup                                                 |
+| `/settings/habits`                 | Habits switch; habit CRUD, reorder, active toggle, colors; Mood colors                                                                                                |
+| `/settings/baselines`              | Baselines switch; baseline CRUD ([US-037](../features/v1.10.0/US-037-flexible-baseline-metrics.md))                                                                   |
+| `/settings/workout`                | One **Workout** switch, covering plans and their optional goals ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) — replaces the old `/settings/practice` |
+| `/settings/activity`               | Activity log switch                                                                                                                                                   |
+| `/settings/health`                 | Health metrics switch                                                                                                                                                 |
+| `/settings/insights`               | Show / hide each Insights chart                                                                                                                                       |
+| `/settings/personalization`        | Weight unit, density, haptics, sound, Overview card order                                                                                                             |
+| `/settings/overview`               | Overview card order (kept for old links)                                                                                                                              |
+| `/settings/data`                   | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), Send / Receive by QR, clear data, debug seed                                            |
+| `/settings/data/send` · `/receive` | QR backup ([US-057](../features/v1.12.0/US-057-send-backup-by-qr.md), [US-058](../features/v1.12.0/US-058-receive-backup-by-qr.md))                                   |
 
 ```mermaid
 flowchart LR

@@ -49,10 +49,18 @@ export interface BackupDb {
 	baselineLogs?: BaselineLog[];
 }
 
+/**
+ * What a backup covers. File backups are always `full` (and carry no `scope` field).
+ * A QR backup (US-057) may be a `window`: only records dated `from`–`to`, inclusive.
+ */
+export type BackupScope = { kind: 'full' } | { kind: 'window'; from: string; to: string };
+
 export interface BackupEnvelope {
 	format: typeof BACKUP_FORMAT;
 	version: number;
 	exportedAt: string;
+	/** Absent on file backups, which are always full. */
+	scope?: BackupScope;
 	db: BackupDb;
 	localStorage: Record<string, unknown>;
 }
@@ -194,4 +202,107 @@ export function dropLegacyBaselines(plain: BackupEnvelope): boolean {
 	plain.db.baselines = [];
 	plain.db.baselineLogs = [];
 	return true;
+}
+
+// --- QR backup scopes (US-057 / US-058) ---------------------------------------
+
+/** Stores whose records carry a `date` (and a `by_date` index). A window replaces these by date. */
+export const DATED_STORES = [
+	'sessions',
+	'habitLogs',
+	'activities',
+	'healthReadings',
+	'baselineLogs',
+] as const satisfies readonly (keyof BackupDb)[];
+export type DatedStore = (typeof DATED_STORES)[number];
+
+/** Stores a window backup adds to or updates, and never deletes from. */
+export const UPSERT_STORES = [
+	'items',
+	'programs',
+	'habits',
+	'goalPlans',
+	'baselines',
+	'itemLastUsed',
+] as const satisfies readonly (keyof BackupDb)[];
+
+/** localStorage keys a window backup applies. Prefs stay per-device. */
+export const WINDOW_LOCAL_KEYS = ['cwout:activeProgramIds', 'cwout:lastActivityType'] as const;
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function inWindow(date: unknown, from: string, to: string): boolean {
+	return typeof date === 'string' && date >= from && date <= to;
+}
+
+/**
+ * Cut a full export down to what a QR backup sends. Built-in items and programs are
+ * always dropped — every device rebuilds them on boot (`initDB`). A window keeps only
+ * records dated inside it, plus every definition, and leaves prefs out.
+ */
+export function scopeEnvelope(full: BackupEnvelope, scope: BackupScope): BackupEnvelope {
+	const db: BackupDb = {
+		...full.db,
+		items: full.db.items.filter((item) => !item.isBuiltIn),
+		programs: full.db.programs.filter((program) => !program.isBuiltIn),
+	};
+	let local = full.localStorage;
+
+	if (scope.kind === 'window') {
+		const dated = db as unknown as Record<DatedStore, { date?: unknown }[] | undefined>;
+		for (const store of DATED_STORES) {
+			dated[store] = (dated[store] ?? []).filter((r) => inWindow(r.date, scope.from, scope.to));
+		}
+		local = {};
+		for (const key of WINDOW_LOCAL_KEYS) {
+			if (key in full.localStorage) local[key] = full.localStorage[key];
+		}
+	}
+
+	return { ...full, scope, db, localStorage: local };
+}
+
+/** The envelope's scope — `full` when absent. Throws BackupValidationError when malformed. */
+export function scopeOf(env: BackupEnvelope): BackupScope {
+	const scope: unknown = env.scope;
+	if (scope === undefined) return { kind: 'full' };
+	if (typeof scope === 'object' && scope !== null) {
+		const s = scope as Record<string, unknown>;
+		if (s.kind === 'full') return { kind: 'full' };
+		if (
+			s.kind === 'window' &&
+			typeof s.from === 'string' &&
+			typeof s.to === 'string' &&
+			ISO_DATE.test(s.from) &&
+			ISO_DATE.test(s.to) &&
+			s.from <= s.to
+		) {
+			return { kind: 'window', from: s.from, to: s.to };
+		}
+	}
+	throw new BackupValidationError('This backup has an unknown scope and cannot be restored.');
+}
+
+/**
+ * Every dated record in a window backup must fall inside the window. One that doesn't
+ * would be written without the matching record on this device ever being cleared.
+ */
+export function assertWindowRecords(plain: BackupEnvelope, from: string, to: string): void {
+	for (const store of DATED_STORES) {
+		const records = (plain.db[store] ?? []) as { date?: unknown }[];
+		for (const record of records) {
+			if (typeof record !== 'object' || record === null || !inWindow(record.date, from, to)) {
+				throw new BackupValidationError(
+					`This backup has "${store}" records outside its date range and cannot be restored.`,
+				);
+			}
+		}
+	}
+}
+
+/** Number of records per dated store in a backup. */
+export function datedCounts(plain: BackupEnvelope): Record<DatedStore, number> {
+	const counts = {} as Record<DatedStore, number>;
+	for (const store of DATED_STORES) counts[store] = plain.db[store]?.length ?? 0;
+	return counts;
 }

@@ -520,14 +520,16 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 
 ## localStorage keys
 
-| Key                      | Contents                                                                    |
-| ------------------------ | --------------------------------------------------------------------------- |
-| `cwout:prefs`            | UserPrefs JSON                                                              |
-| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                         |
-| `cwout:activeProgramIds` | Active program id per Discipline                                            |
-| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset)          |
-| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)                       |
-| `cwout:habitDay`         | Written to today's date on habit-store load; not currently read (vestigial) |
+| Key                      | Contents                                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `cwout:prefs`            | UserPrefs JSON                                                                                                            |
+| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                                                                       |
+| `cwout:activeProgramIds` | Active program id per Discipline                                                                                          |
+| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset)                                                        |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)                                                                     |
+| `cwout:lastQrBackupAt`   | Local date this device last sent a QR backup ([US-057](../features/v1.12.0/US-057-send-backup-by-qr.md)); never backed up |
+| `cwout:qrSendOptions`    | QR send density and speed for this device; never backed up                                                                |
+| `cwout:habitDay`         | Written to today's date on habit-store load; not currently read (vestigial)                                               |
 
 ---
 

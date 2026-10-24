@@ -30,6 +30,8 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Weight unit, density, haptics, sound, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)              |
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. plan goals and Baselines), debug seed                                                                              |
+| `/settings/data/send`       | `routes/settings/data/send/+page.svelte`       | Send by QR ([US-057](../features/v1.12.0/US-057-send-backup-by-qr.md))                                                                               |
+| `/settings/data/receive`    | `routes/settings/data/receive/+page.svelte`    | Receive by QR ([US-058](../features/v1.12.0/US-058-receive-backup-by-qr.md))                                                                         |
 
 Navigation via `BottomNav` (Overview · Workout · Insights · Settings). The History tab and `/calendar` were removed in v1.10.0 ([US-047](../features/v1.10.0/US-047-retire-history.md)). Practice, Dance and the standalone Lift plans area were removed in the same release ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md), [US-052](../features/v1.10.0/US-052-one-workout-section.md)) — `/practice*`, `/goals*` and `/program` are gone, with no redirects. Log, Habits, Health, and Baselines are reached from their summary cards.
 

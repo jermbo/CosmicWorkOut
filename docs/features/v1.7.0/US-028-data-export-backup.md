@@ -4,7 +4,7 @@
 
 > **Status: Shipped (Phase 1) — v1.7.0**
 >
-> Offline-first data portability via JSON file export/import. Device-to-device sync (Phase 2) is on the [roadmap](../../roadmap/device-sync.md).
+> Offline-first data portability via JSON file export/import. Phase 2 shipped as [QR backup](../../roadmap/qr-backup.md) in v1.12.0.
 >
 > **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. The envelope shape, `parseBackup()`, count verification and the pre-wipe preflight live in `src/lib/db/backupPayload.ts` — kept free of IndexedDB so they can be unit-tested (`backupPayload.test.ts`, 21 tests); `backup.ts` keeps the transaction plumbing. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
 
@@ -74,7 +74,7 @@ Versioned JSON envelope — one file, human-readable, diffable in git if the use
 ```
 
 - **`version`** — schema version for forward-compatible import migrations.
-- **`exportedAt`** — ISO timestamp; used in merge (Phase 2) when record-level timestamps are absent.
+- **`exportedAt`** — ISO timestamp of the export.
 - Reject imports where `format` is missing or `version` is newer than the app supports.
 
 ---
@@ -90,6 +90,8 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 3. Build envelope → verify JSON round-trip counts → `File` (`cosmic-workout-backup-YYYY-MM-DD.json`).
 4. If the browser can share files, open the **share sheet** (`navigator.share`); user cancel is not an error. Otherwise trigger a normal download.
 5. Typical size after months of use is around **1&nbsp;MB** — fine as an email attachment when Save to Files / AirDrop aren’t convenient.
+
+**Web Share notes:** Export passes **files only** to `navigator.share({ files })` — no title or text, which breaks some Android browsers. If `canShare` throws or `share` rejects (common on Brave desktop and Android), Export falls back to download. A user dismiss (`AbortError`) is a cancel, not a failure. Still fully offline.
 
 ### Restore
 
@@ -116,7 +118,7 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 | --------------------- | --------------------------------------------------------------------------- |
 | **Replace** (default) | Wipe local workout data, import file wholesale. Simplest and safest for v1. |
 
-Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time file restore is intentionally all-or-nothing.
+Merge-on-import is not planned. A file restore is intentionally all-or-nothing; partial updates belong to [QR backup](../../roadmap/qr-backup.md), which replaces a date window. File restore refuses a QR window backup.
 
 ### Requirements (Phase 1)
 
@@ -154,13 +156,13 @@ Merge-on-import is on the [roadmap](../../roadmap/device-sync.md). A one-time fi
 
 ## Phase 2 — Device sync
 
-Moved to the [roadmap](../../roadmap/device-sync.md): QR pairing, LAN/WebRTC transfer, merge engine, and optional conflict UI.
+Shipped in v1.12.0 as [QR backup](../../roadmap/qr-backup.md) ([US-057](../v1.12.0/US-057-send-backup-by-qr.md), [US-058](../v1.12.0/US-058-receive-backup-by-qr.md)): a one-way animated-QR transfer from one device to another. The earlier plan (QR pairing, LAN or WebRTC transfer, two-way merge engine) was dropped 2026-10-24.
 
 ---
 
 ## Related Docs
 
-- [Roadmap — device sync](../../roadmap/device-sync.md)
+- [QR Backup — design](../../roadmap/qr-backup.md)
 - [v1.7.0 README](./README.md)
 - [Offline Strategy](../../architecture/offline-strategy.md) — Storage map
 - [Data Model](../../architecture/data-model.md) — Entities and stores

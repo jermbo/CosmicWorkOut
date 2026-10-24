@@ -108,15 +108,15 @@ See [v1.6.0 feature README](../features/v1.6.0/README.md).
 
 ## v1.7.0 — Full Strength Catalog & PWA
 
-| Feature                        | Status | Notes                                                                                                                                                                                     |
-| ------------------------------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Full gym exercise catalog      | Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                                                                       |
-| Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                                                    |
-| Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                                                |
-| Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON export (share sheet or download) + staged restore on `settings/data`. Device sync → [roadmap](../roadmap/device-sync.md) |
-| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights; DB v8                                                                                           |
-| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults)                     |
-| Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                                               |
+| Feature                        | Status | Notes                                                                                                                                                                                       |
+| ------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full gym exercise catalog      | Built  | 72 exercises (`strength-exercises.ts`); body-part categories; DB v7                                                                                                                         |
+| Six strength "course" programs | Built  | `strength-programs.ts`                                                                                                                                                                      |
+| Service worker / PWA           | Built  | `src/service-worker.ts`; static adapter + PWA capabilities                                                                                                                                  |
+| Data export / backup           | Built  | [US-028](../features/v1.7.0/US-028-data-export-backup.md) — JSON export (share sheet or download) + staged restore on `settings/data`. QR backup → [v1.12.0](../features/v1.12.0/README.md) |
+| Health metrics (weight, BP)    | Built  | [US-029](../features/v1.7.0/US-029-health-metrics.md) — `/health` + home card + Insights; DB v8                                                                                             |
+| Settings hub restructure       | Built  | [US-030](../features/v1.7.0/US-030-settings-restructure.md) — hub + `/settings/habits`, `/settings/data` (Appearance sub-route later removed; prefs stay at defaults)                       |
+| Default habits tweak           | Built  | [US-031](../features/v1.7.0/US-031-default-habits-tweak.md)                                                                                                                                 |
 
 ---
 
@@ -178,6 +178,8 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 
 | Color fields redesign | Built | [US-055](../features/v1.12.0/US-055-color-fields-redesign.md) — v1.12.0; [Design System](../architecture/design-system.md). Visual only |
 | Tap feel: motion, haptics, sound | Built | [US-056](../features/v1.12.0/US-056-tap-feel.md) — `src/lib/feedback/`; haptics need an Android device to feel |
+| Send a backup by QR | Built | [US-057](../features/v1.12.0/US-057-send-backup-by-qr.md) — `/settings/data/send`; `src/lib/qrBackup/` |
+| Receive a backup by QR | Built | [US-058](../features/v1.12.0/US-058-receive-backup-by-qr.md) — `/settings/data/receive`; not yet tried with a real phone and webcam |
 
 Built rows checked with type check, lint, unit tests and a production build; US-048, US-051 and US-052 also checked with a browser click-through. Planned rows (US-053 – US-054) are decided, not built.
 
@@ -201,7 +203,7 @@ Built rows checked with type check, lint, unit tests and a production build; US-
 - [Data Model](../architecture/data-model.md) — Entities, stores, DB version
 - [App Structure](app-structure.md) — Routes and layout
 - [State Management](state.md) — Store details
-- [v1.12.0 Features](../features/v1.12.0/README.md) — Color fields redesign (dark only)
+- [v1.12.0 Features](../features/v1.12.0/README.md) — Color fields redesign (dark only), tap feel, QR backup
 - [v1.10.0 Features](../features/v1.10.0/README.md) — Baselines & Insights refresh, Settings, light mode; one Workout section and records planned
 - [v1.9.0 Features](../features/v1.9.0/README.md) — Lift plans + Baselines
 - [v1.5.0 Features](../features/v1.5.0/README.md) — Insights hub (shipped)

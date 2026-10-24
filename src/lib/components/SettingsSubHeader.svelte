@@ -1,15 +1,23 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/navigation';
 
-	let { title }: { title: string } = $props();
+	type Props = {
+		title: string;
+		/** Where the back button goes — Settings unless the page sits deeper. */
+		backHref?: string;
+		backLabel?: string;
+	};
+
+	let { title, backHref = '/settings', backLabel = 'Settings' }: Props = $props();
 </script>
 
 <header class="settings-sub-header">
 	<button
 		class="settings-sub-header__back"
-		onclick={() => goto(resolve('/settings'))}
-		aria-label="Back to Settings"
+		onclick={() => goto(resolveHref(backHref))}
+		aria-label="Back to {backLabel}"
 	>
 		<svg
 			viewBox="0 0 24 24"
@@ -21,7 +29,7 @@
 		>
 			<polyline points="15 18 9 12 15 6" />
 		</svg>
-		Settings
+		{backLabel}
 	</button>
 	<h1 class="settings-sub-header__title">{title}</h1>
 </header>
