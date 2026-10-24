@@ -520,6 +520,8 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 
 ## localStorage keys
 
+Which keys travel in a backup is decided in `backupPayload.ts`: `BACKUP_LOCAL_KEYS` are backed up, `DEVICE_ONLY_KEYS` never are. A test fails on any `cwout:` key in neither list.
+
 | Key                      | Contents                                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `cwout:prefs`            | UserPrefs JSON                                                                                                            |

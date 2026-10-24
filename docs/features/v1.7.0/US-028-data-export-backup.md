@@ -97,7 +97,7 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 
 1. Hidden `<input type="file" accept=".json,application/json">`.
 2. Parse and validate envelope (format, version, each store is an array).
-3. Show confirm dialog — restore **replaces** all workout data on this device.
+3. Show confirm dialog — restore **replaces** all workout data on this device. When the file can't restore something, the dialog says so in bold (`restoreWarnings()`, 2026-10-24): a store the file doesn't have at all (made by an older version) ends up **empty**, and pre-v1.10.0 baselines are skipped. Example: a file exported on 2026-09-19, hours before v1.9.0 merged, has plan goals but no `baselines` or `baselineLogs` — restoring it would remove every baseline on the device.
 4. **Stage then commit** (safe for device transfer — months of history must not be wiped on a failed write):
    1. JSON-flatten the payload (avoids Svelte `$state` Proxy → `DataCloneError`).
    2. Write every store into a temporary IndexedDB (`cosmic-workout-restore`) and verify record counts.
@@ -149,6 +149,8 @@ Merge-on-import is not planned. A file restore is intentionally all-or-nothing; 
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
 - Pure payload logic split into `src/lib/db/backupPayload.ts` (2026-09-19) so the restore path is testable without a browser.
+- **Coverage guard** (2026-10-24): `backupCoverage.test.ts` fails when `database.ts` creates a store that isn't in `DB_STORES`, or the code uses a `cwout:` key that is in neither `BACKUP_LOCAL_KEYS` nor `DEVICE_ONLY_KEYS`. Every new store or key needs a backup decision.
+- **Verified 2026-10-24** in the browser against the debug seed plus a custom exercise and a last activity type: file export → restore, QR Everything, and a QR 90-day window applied to a device with that window and several definitions deleted all came back record-for-record identical. The only differences were the built-in programs' `createdAt` (rebuilt on every boot) and `cwout:habitDay` (transient).
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.
 - UI: export / restore on `/settings/data` ([US-030](./US-030-settings-restructure.md)); not on the hub.
 

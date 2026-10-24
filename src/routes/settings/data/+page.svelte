@@ -29,6 +29,7 @@
 	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
 	import SettingsRow from '$lib/components/SettingsRow.svelte';
 	import { lastQrBackupDate } from '$lib/qrBackup/sendPrefs';
+	import { restoreWarnings } from '$lib/db/backupPayload';
 	import { formatShortDate } from '$lib/date';
 
 	type ClearAction =
@@ -90,6 +91,8 @@
 	/** Raw file text — parse at confirm time so restore never touches a reactive tree. */
 	let pendingBackupText = $state.raw<string | null>(null);
 	let pendingExportedAt = $state.raw<string | null>(null);
+	/** What the backup can't restore — shown in the confirm so nothing goes missing silently. */
+	let pendingWarnings = $state.raw<string[]>([]);
 	let restoring = $state(false);
 	let restoreError = $state<string | null>(null);
 
@@ -126,6 +129,7 @@
 			const parsed = parseBackup(text);
 			pendingBackupText = text;
 			pendingExportedAt = parsed.exportedAt;
+			pendingWarnings = restoreWarnings(parsed);
 		} catch (err) {
 			pendingBackupText = null;
 			pendingExportedAt = null;
@@ -354,6 +358,9 @@
 		{new Date(pendingExportedAt).toLocaleDateString()}. Existing data is not touched until the
 		backup has been fully staged and verified. Keep your backup file until you confirm everything
 		looks right after reload. This cannot be undone.
+		{#each pendingWarnings as warning (warning)}
+			<br /><br /><strong>{warning}</strong>
+		{/each}
 	</ConfirmDialog>
 {/if}
 

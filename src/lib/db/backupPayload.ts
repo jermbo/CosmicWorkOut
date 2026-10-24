@@ -32,6 +32,19 @@ export const BACKUP_LOCAL_KEYS = [
 	'cwout:lastActivityType',
 ] as const;
 
+/**
+ * Storage keys deliberately left out of every backup. A test fails when the app uses a
+ * `cwout:` key that is in neither list, so a new key can't be forgotten silently.
+ */
+export const DEVICE_ONLY_KEYS = [
+	'cwout:activeSession', // in-progress workout — crash recovery for this device only
+	'cwout:habitDay', // vestigial; rewritten on load
+	'cwout:activeProgramId', // legacy single active program, replaced by activeProgramIds
+	'cwout:lastQrBackupAt', // when this device last sent a QR backup
+	'cwout:qrSendOptions', // this device's QR density and speed
+	'cwout:qrReceived', // sessionStorage flag for one toast after reload
+] as const;
+
 export interface BackupDb {
 	items: Item[];
 	programs: Program[];
@@ -197,11 +210,60 @@ export function localEntriesOf(plain: BackupEnvelope): Record<string, unknown> {
  * Returns true when baselines were dropped.
  */
 export function dropLegacyBaselines(plain: BackupEnvelope): boolean {
-	const defs = plain.db.baselines;
-	if (!Array.isArray(defs) || !defs.some(isLegacyBaseline)) return false;
+	if (!hasLegacyBaselines(plain)) return false;
 	plain.db.baselines = [];
 	plain.db.baselineLogs = [];
 	return true;
+}
+
+/** True when the backup's baselines use the pre-v1.10.0 shape and will be skipped on restore. */
+export function hasLegacyBaselines(plain: BackupEnvelope): boolean {
+	const defs = plain.db.baselines;
+	return Array.isArray(defs) && defs.some(isLegacyBaseline);
+}
+
+/** What each store holds, in words, for restore warnings. */
+export const STORE_LABELS: Record<keyof BackupDb, string> = {
+	items: 'custom exercises',
+	programs: 'programs',
+	sessions: 'workout sessions',
+	itemLastUsed: 'weight memory',
+	activities: 'activities',
+	habits: 'habits',
+	habitLogs: 'habit logs',
+	healthReadings: 'health readings',
+	goalPlans: 'plan goals',
+	baselines: 'baselines',
+	baselineLogs: 'baseline entries',
+};
+
+/**
+ * Stores a backup doesn't carry at all — it was made before they existed (a v1.8.0 file
+ * has no plan goals or baselines). Restore replaces everything, so these end up empty.
+ */
+export function missingStores(plain: BackupEnvelope): (keyof BackupDb)[] {
+	return DB_STORES.filter((store) => plain.db[store] === undefined);
+}
+
+/**
+ * Plain-language warnings for the restore confirm: data on this device the backup can't
+ * replace and will therefore remove. Empty when the backup covers everything.
+ */
+export function restoreWarnings(plain: BackupEnvelope): string[] {
+	const warnings: string[] = [];
+	const missing = missingStores(plain);
+	if (missing.length > 0) {
+		const list = missing.map((store) => STORE_LABELS[store]).join(', ');
+		warnings.push(
+			`This backup was made by an older version and has no ${list}. Restoring removes any on this device.`,
+		);
+	}
+	if (hasLegacyBaselines(plain)) {
+		warnings.push(
+			'Its baselines use the pre-v1.10.0 format and are skipped, along with their entries.',
+		);
+	}
+	return warnings;
 }
 
 // --- QR backup scopes (US-057 / US-058) ---------------------------------------
