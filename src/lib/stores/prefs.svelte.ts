@@ -6,6 +6,8 @@ const PREFS_KEY = 'cwout:prefs';
 const DEFAULTS: UserPrefs = {
 	density: 'comfortable',
 	weightUnit: 'lb',
+	hapticsEnabled: true,
+	soundEnabled: false,
 	homeCardOrder: [...DEFAULT_HOME_CARD_ORDER],
 	habitsEnabled: false,
 	activityLogEnabled: false,
@@ -18,6 +20,8 @@ const DEFAULTS: UserPrefs = {
 class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
 	weightUnit = $state<'lb' | 'kg'>(DEFAULTS.weightUnit);
+	hapticsEnabled = $state(DEFAULTS.hapticsEnabled);
+	soundEnabled = $state(DEFAULTS.soundEnabled);
 	homeCardOrder = $state<HomeCardId[]>([...DEFAULT_HOME_CARD_ORDER]);
 	habitsEnabled = $state(DEFAULTS.habitsEnabled);
 	activityLogEnabled = $state(DEFAULTS.activityLogEnabled);
@@ -47,6 +51,8 @@ class PrefsStore {
 				// v1.12.0 — the app is dark only). They're ignored and dropped on next save.
 				this.density = parsed.density ?? DEFAULTS.density;
 				this.weightUnit = parsed.weightUnit ?? DEFAULTS.weightUnit;
+				this.hapticsEnabled = parsed.hapticsEnabled ?? DEFAULTS.hapticsEnabled;
+				this.soundEnabled = parsed.soundEnabled ?? DEFAULTS.soundEnabled;
 				this.homeCardOrder = resolveHomeCardOrder(parsed.homeCardOrder);
 				this.habitsEnabled = parsed.habitsEnabled ?? DEFAULTS.habitsEnabled;
 				this.activityLogEnabled = parsed.activityLogEnabled ?? DEFAULTS.activityLogEnabled;
@@ -69,6 +75,8 @@ class PrefsStore {
 		const prefs: UserPrefs = {
 			density: this.density,
 			weightUnit: this.weightUnit,
+			hapticsEnabled: this.hapticsEnabled,
+			soundEnabled: this.soundEnabled,
 			homeCardOrder: this.homeCardOrder,
 			habitsEnabled: this.habitsEnabled,
 			activityLogEnabled: this.activityLogEnabled,
@@ -140,9 +148,21 @@ class PrefsStore {
 		this.save();
 	}
 
+	setHapticsEnabled(enabled: boolean): void {
+		this.hapticsEnabled = enabled;
+		this.save();
+	}
+
+	setSoundEnabled(enabled: boolean): void {
+		this.soundEnabled = enabled;
+		this.save();
+	}
+
 	resetToDefaults(): void {
 		this.density = DEFAULTS.density;
 		this.weightUnit = DEFAULTS.weightUnit;
+		this.hapticsEnabled = DEFAULTS.hapticsEnabled;
+		this.soundEnabled = DEFAULTS.soundEnabled;
 		this.applyDensity();
 		this.save();
 	}

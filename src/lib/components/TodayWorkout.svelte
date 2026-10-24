@@ -371,7 +371,8 @@
 		text-transform: uppercase;
 		font-size: 1rem;
 		font-weight: 800;
-		transition: transform var(--duration-press) linear;
+		outline: var(--rule) solid transparent;
+		animation: ready 1.8s ease-in-out infinite;
 
 		svg {
 			order: 2;
@@ -379,13 +380,22 @@
 			block-size: 18px;
 		}
 
-		&:not(:disabled):active {
-			transform: translate(3px, 3px);
-		}
-
 		&:disabled {
 			opacity: 0.7;
 			cursor: not-allowed;
+		}
+	}
+
+	/* "Your turn" — a slow outline pulse on the start bar. */
+	@keyframes ready {
+		0%,
+		100% {
+			outline-color: transparent;
+			outline-offset: 0;
+		}
+		50% {
+			outline-color: var(--color-ink);
+			outline-offset: 4px;
 		}
 	}
 

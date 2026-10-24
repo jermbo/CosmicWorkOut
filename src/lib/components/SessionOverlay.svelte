@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import RollingNumber from './RollingNumber.svelte';
+	import { onMount, onDestroy, tick, untrack } from 'svelte';
 	import { formatElapsed, formatCountWithWord } from '$lib/format';
 	import type { ActiveItem, ActiveSet } from '$lib/db/types';
 	import { sessionStore } from '$lib/stores/session.svelte';
@@ -8,6 +9,17 @@
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
+	import { feedback, prefersReducedMotion } from '$lib/feedback';
+	import {
+		PLATE_DELAY_MS,
+		PLATE_LIFT,
+		PLATE_MS,
+		PLATE_SCROLL_MS,
+		PLATE_SWAP_AT,
+		handoffScrollTop,
+		plateKeyframes,
+		type Box,
+	} from '$lib/feedback/plate';
 
 	let showAbandonConfirm = $state(false);
 	let elapsed = $state(0);
@@ -22,6 +34,8 @@
 
 	onDestroy(() => {
 		clearInterval(timerInterval);
+		clearTimeout(plateSwapTimer);
+		plateAnim?.cancel();
 	});
 
 	let elapsedFormatted = $derived(formatElapsed(elapsed));
@@ -44,6 +58,130 @@
 	/** The first exercise with a set still to log — drawn as the live Training field. */
 	let currentIndex = $derived(activeItems.findIndex((ex) => ex.sets.some((s) => !s.completed)));
 	let isEditing = $derived(sessionStore.active?.isEditing === true);
+
+	/*
+	 * The blue plate (v1.12.0): one Training-blue block behind the live exercise.
+	 * `liveIndex` is the exercise the cards draw as live; it follows `currentIndex`
+	 * mid-handoff, at the moment the stretched plate covers both cards.
+	 */
+	let listEl: HTMLElement | undefined = $state();
+	let plateEl: HTMLElement | undefined = $state();
+	let liveIndex = $state(untrack(() => currentIndex));
+	let plateAnim: Animation | null = null;
+	let plateSwapTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function cardBox(index: number): Box | null {
+		const card = listEl?.querySelector<HTMLElement>(`[data-exercise="${index}"]`);
+		return card ? { top: card.offsetTop, height: card.offsetHeight } : null;
+	}
+
+	function placePlate(index: number): void {
+		if (!plateEl || plateAnim) return;
+		const box = cardBox(index);
+		plateEl.hidden = !box;
+		if (box) {
+			plateEl.style.top = `${box.top}px`;
+			plateEl.style.height = `${box.height}px`;
+		}
+	}
+
+	/** Scroll so both cards (or at least the next one) are on screen. True if it scrolled. */
+	function revealHandoff(a: Box, b: Box): boolean {
+		if (!listEl) return false;
+		const top = handoffScrollTop(a, b, {
+			scrollTop: listEl.scrollTop,
+			height: listEl.clientHeight,
+		});
+		if (top === null) return false;
+		listEl.scrollTo({ top, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+		return true;
+	}
+
+	function handOff(from: number, to: number): void {
+		clearTimeout(plateSwapTimer);
+		plateAnim?.cancel();
+		plateAnim = null;
+		const a = cardBox(from);
+		const b = cardBox(to);
+		if (!plateEl || !a || !b || prefersReducedMotion()) {
+			if (a && b) revealHandoff(a, b);
+			liveIndex = to;
+			void tick().then(() => placePlate(to));
+			return;
+		}
+		// Bring the handoff on screen first, while the DONE stamp lands — on a
+		// phone the next exercise is often below the fold.
+		const delay = revealHandoff(a, b) ? PLATE_DELAY_MS + PLATE_SCROLL_MS : PLATE_DELAY_MS;
+		const paper = getComputedStyle(document.documentElement).getPropertyValue('--color-paper');
+		const rest = getComputedStyle(plateEl).boxShadow;
+		const lifted = `${6 + PLATE_LIFT * 1.5}px ${6 + PLATE_LIFT * 1.5}px 0 ${paper}`;
+		const anim = plateEl.animate(plateKeyframes(a, b, { rest, lifted }), {
+			duration: PLATE_MS,
+			delay,
+			easing: 'cubic-bezier(0.45, 0, 0.25, 1)',
+			fill: 'both',
+		});
+		plateAnim = anim;
+		plateSwapTimer = setTimeout(() => (liveIndex = to), delay + PLATE_MS * PLATE_SWAP_AT);
+		anim.onfinish = () => {
+			if (plateAnim !== anim) return;
+			plateAnim = null;
+			placePlate(to);
+			anim.cancel();
+			feedback('select');
+		};
+	}
+
+	// Last exercise done: nothing to hand to, so the plate presses into the page and fades.
+	function settlePlate(): void {
+		if (!plateEl) return;
+		clearTimeout(plateSwapTimer);
+		plateAnim?.cancel();
+		const anim = plateEl.animate([{}, { translate: '6px 6px', boxShadow: 'none', opacity: 0 }], {
+			duration: 420,
+			delay: PLATE_DELAY_MS,
+			easing: 'ease-in',
+			fill: 'both',
+		});
+		plateAnim = anim;
+		// Hand the card back its own colors while the plate is half faded.
+		plateSwapTimer = setTimeout(() => (liveIndex = -1), PLATE_DELAY_MS + 210);
+		anim.onfinish = () => {
+			if (plateAnim !== anim) return;
+			plateAnim = null;
+			placePlate(-1);
+			anim.cancel();
+		};
+	}
+
+	// Hand the plate over whenever the live exercise changes.
+	$effect(() => {
+		const next = currentIndex;
+		untrack(() => {
+			if (next === liveIndex && !plateAnim) return;
+			if (next < 0 && liveIndex >= 0 && plateEl && !prefersReducedMotion()) {
+				settlePlate();
+				return;
+			}
+			if (next < 0 || liveIndex < 0) {
+				clearTimeout(plateSwapTimer);
+				plateAnim?.cancel();
+				plateAnim = null;
+				liveIndex = next;
+				void tick().then(() => placePlate(next));
+				return;
+			}
+			handOff(liveIndex, next);
+		});
+	});
+
+	// First placement, and keep the plate on its card when the layout shifts.
+	onMount(() => {
+		void tick().then(() => placePlate(liveIndex));
+		const ro = new ResizeObserver(() => placePlate(liveIndex));
+		if (listEl) ro.observe(listEl);
+		return () => ro.disconnect();
+	});
 
 	let finishing = $state(false);
 
@@ -89,6 +227,7 @@
 
 			if (hasWeight) {
 				sessionStore.completeSet(exerciseIndex, setIndex);
+				feedback('success');
 			} else {
 				sheetTarget = { exerciseIndex, setIndex };
 			}
@@ -100,6 +239,7 @@
 			return;
 		}
 		sessionStore.logSet(sheetTarget.exerciseIndex, sheetTarget.setIndex, weight, reps);
+		feedback('success');
 		sheetTarget = null;
 	}
 
@@ -166,7 +306,7 @@
 						{#if isEditing}
 							Editing · {formatCountWithWord(doneSets, 'set')} logged
 						{:else}
-							{doneSets}/{totalSets} sets
+							<RollingNumber value={doneSets} />/{totalSets} sets
 						{/if}
 					</p>
 				</div>
@@ -198,7 +338,16 @@
 			</div>
 		</header>
 
-		<div class="session-overlay__exercises">
+		<div
+			class="session-overlay__exercises"
+			bind:this={listEl}
+		>
+			<div
+				class="session-overlay__plate"
+				bind:this={plateEl}
+				aria-hidden="true"
+				hidden
+			></div>
 			{#if sessionStore.active}
 				{#each activeItems as activeExercise, exerciseIndex (activeExercise.itemId)}
 					{@const exercise = programStore.getItemById(activeExercise.itemId)}
@@ -207,7 +356,7 @@
 							{activeExercise}
 							{exercise}
 							{exerciseIndex}
-							current={exerciseIndex === currentIndex}
+							current={exerciseIndex === liveIndex}
 							onSetTap={handleSetTap}
 						/>
 					{/if}
@@ -383,11 +532,25 @@
 		}
 	}
 
+	/* A segment fills with a white flash that cools to the Training hue. */
 	.session-overlay__progress-seg--on {
 		background: var(--field-train);
+		animation: seg-fill 420ms var(--ease-out);
+	}
+
+	@keyframes seg-fill {
+		0% {
+			background: var(--color-paper);
+			transform: scaleY(1.8);
+		}
+		100% {
+			background: var(--field-train);
+			transform: none;
+		}
 	}
 
 	.session-overlay__exercises {
+		position: relative;
 		flex: 1;
 		overflow-y: auto;
 		padding: var(--space-4) calc(var(--space-4) + var(--press-offset)) var(--space-4) var(--space-4);
@@ -397,6 +560,21 @@
 		overscroll-behavior: contain;
 		inline-size: min(100%, var(--max-width));
 		margin-inline: auto;
+	}
+
+	/* Sits under the live card; the cards are transparent so it shows through. */
+	.session-overlay__plate {
+		position: absolute;
+		inset-inline: var(--space-4) calc(var(--space-4) + var(--press-offset));
+		z-index: 0;
+		background: var(--field-train);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard);
+		pointer-events: none;
+	}
+
+	.session-overlay__plate[hidden] {
+		display: none;
 	}
 
 	.session-overlay__footer {
@@ -447,10 +625,5 @@
 		font-size: 1.25rem;
 		font-weight: 900;
 		box-shadow: var(--press-offset) var(--press-offset) 0 var(--field-train);
-
-		&:active:not(:disabled) {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 	}
 </style>

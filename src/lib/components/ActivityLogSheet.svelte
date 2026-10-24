@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
 	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 	import { activityStore } from '$lib/stores/activities.svelte';
@@ -154,11 +155,13 @@
 				>
 					<button
 						onclick={() => adjustDuration(-5)}
+						use:holdRepeat={() => adjustDuration(-5)}
 						aria-label="Decrease 5 minutes">−</button
 					>
 					<span class="act-stepper__val">{formatMinutes(durationMinutes)}</span>
 					<button
 						onclick={() => adjustDuration(5)}
+						use:holdRepeat={() => adjustDuration(5)}
 						aria-label="Increase 5 minutes">+</button
 					>
 				</div>
@@ -187,6 +190,7 @@
 		<div class="act-sheet__footer">
 			<button
 				class="act-sheet__save-btn"
+				data-feedback="success"
 				onclick={handleSave}
 				disabled={saving}
 				aria-busy={saving}
@@ -196,6 +200,7 @@
 			{#if editing}
 				<button
 					class="act-sheet__delete-btn"
+					data-feedback="warn"
 					class:act-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
 					aria-label={deleteAriaLabel}
@@ -359,11 +364,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active:not(:disabled) {
-			transform: translate(4px, 4px);
-			box-shadow: none;
-		}
 
 		&:disabled {
 			opacity: 0.6;

@@ -27,7 +27,7 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/activity`        | `routes/settings/activity/+page.svelte`        | Activity log toggle                                                                                                                                  |
 | `/settings/health`          | `routes/settings/health/+page.svelte`          | Health metrics toggle                                                                                                                                |
 | `/settings/insights`        | `routes/settings/insights/+page.svelte`        | Show / hide each Insights chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                  |
-| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Weight unit, density, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)                              |
+| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Weight unit, density, haptics, sound, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)              |
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. plan goals and Baselines), debug seed                                                                              |
 
@@ -163,6 +163,7 @@ src/
     │   ├── loggingContext.svelte.ts
     │   └── toast.svelte.ts
     ├── charts/                    (v1.10.0 — TanStack Charts: ScrollChart, scale, theme, color)
+    ├── feedback/                  (v1.12.0 — feedback(), press handler, holdRepeat, patterns)
     ├── insights/                  (v1.10.0 — chart list, pure aggregation, heat shading)
     ├── baselines/logic.ts
     ├── habitColors.ts

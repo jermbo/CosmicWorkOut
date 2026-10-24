@@ -65,6 +65,7 @@
 		background: var(--color-ink);
 		border-block-start: var(--rule) solid var(--color-paper);
 		z-index: 50;
+		view-transition-name: nav;
 	}
 
 	.bottom-nav__list {

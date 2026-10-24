@@ -23,6 +23,8 @@ Reusable building blocks with no feature knowledge.
 | `ValueDialog`    | Numeric exact-value entry modal (`title`, `unit`, `initialValue`, `onsave`). Used by 3 callers.                                     |
 | `Icon`           | Single SVG icon component, keyed by name. Imported by 15 files — but **48 inline `<svg>` blocks still bypass it** (cleanup target). |
 | `ProgressBlocks` | Row of progress squares (`total`, `on`) in `currentColor` — Overview cards, habit tiles. v1.12.0                                    |
+| `RollingNumber`  | A figure that rolls up / down when it changes (weights, reps, habit counts). v1.12.0                                                |
+| `CountUp`        | Counts a whole number up from 0 on mount (session-complete stats). v1.12.0                                                          |
 | `PageHeader`     | Standard page title bar (date line + big caps title on a 3px rule); embeds `WeekStrip`. Used by 11 routes.                          |
 | `Toaster`        | Global toast notification host (mounted in layout).                                                                                 |
 
@@ -37,11 +39,11 @@ See [Styling](dev-guide.md#styling-tokens-and-primitive-components).
 
 Mounted in the root layout (`+layout.svelte`).
 
-| Component         | Purpose                                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------------- |
-| `BottomNav`       | Numbered block tabs (`01 OVERVIEW` …); current tab filled paper. Collapses to a side rail ≥720px. |
-| `SessionOverlay`  | Full-screen active session: timer, progress, exercise list.                                       |
-| `SessionComplete` | Post-session stats overlay with confetti celebration.                                             |
+| Component         | Purpose                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `BottomNav`       | Numbered block tabs (`01 OVERVIEW` …); current tab filled paper. Collapses to a side rail ≥720px.                                    |
+| `SessionOverlay`  | Full-screen active session: timer, segmented progress, exercise list, and the blue plate that slides to the live exercise (v1.12.0). |
+| `SessionComplete` | Post-session stats overlay with confetti celebration.                                                                                |
 
 ---
 
@@ -70,13 +72,13 @@ The home page is a dashboard of summary cards built on a shared `HomeCard` shell
 
 ## Strength session flow
 
-| Component       | Purpose                                                                                                                              |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `WorkoutPicker` | Horizontal A/B/C routine tabs with a "suggested" indicator.                                                                          |
-| `TodayWorkout`  | Routine preview card (item list + Start button).                                                                                     |
-| `ExerciseCard`  | One exercise: `T1`-style count box, header, set tiles. `current` draws it as the Training field (the first exercise with sets left). |
-| `SetTile`       | A single set button — dashed "+" until logged, then a solid weight × reps block; `next` marks the set to log now (NOW).              |
-| `LogSetSheet`   | Weight/reps stepper + first-time numpad; adapts to the item's unit.                                                                  |
+| Component       | Purpose                                                                                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WorkoutPicker` | Horizontal A/B/C routine tabs with a "suggested" indicator.                                                                                                             |
+| `TodayWorkout`  | Routine preview card (item list + Start button).                                                                                                                        |
+| `ExerciseCard`  | One exercise as a transparent frame: `T1`-style count box, header, set tiles, DONE stamp. `current` re-points its text to ink; the blue comes from the plate behind it. |
+| `SetTile`       | A single set button — dashed "+" until logged, then a solid weight × reps block; `next` marks the set to log now (NOW).                                                 |
+| `LogSetSheet`   | Weight/reps stepper + first-time numpad; adapts to the item's unit.                                                                                                     |
 
 ---
 

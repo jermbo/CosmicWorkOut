@@ -120,31 +120,46 @@
 		touch-action: manipulation;
 		user-select: none;
 		transition: transform var(--duration-press) linear;
-
-		&:not(:disabled):active {
-			transform: translate(2px, 2px);
-		}
 	}
 
 	.set-tile--next {
 		border: var(--rule) solid var(--color-text-primary);
+		outline: var(--rule-thin) solid transparent;
+		animation: ready 1.6s ease-in-out infinite;
 	}
 
-	.set-tile--animating {
-		animation: tile-flash 240ms steps(2, jump-none);
-	}
-
-	@keyframes tile-flash {
-		50% {
-			background: var(--color-text-primary);
-		}
-	}
-
+	/* Logging stamps the block down: big, then a hard squash, then settle. */
 	.set-tile--completed {
 		background: var(--color-text-primary);
 		border: var(--rule-thin) solid var(--color-text-primary);
 		color: var(--field, var(--color-ink));
 		cursor: pointer;
+		animation: tile-stamp 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+	}
+
+	@keyframes tile-stamp {
+		0% {
+			transform: scale(1.18) rotate(-2deg);
+		}
+		45% {
+			transform: scale(0.92);
+		}
+		100% {
+			transform: none;
+		}
+	}
+
+	/* "Your turn" — a slow outline pulse on the thing to press next. */
+	@keyframes ready {
+		0%,
+		100% {
+			outline-color: transparent;
+			outline-offset: 0;
+		}
+		50% {
+			outline-color: var(--ready-color, currentColor);
+			outline-offset: 4px;
+		}
 	}
 
 	.set-tile__plus {

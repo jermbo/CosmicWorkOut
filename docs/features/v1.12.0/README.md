@@ -2,7 +2,7 @@
 
 # v1.12.0 — Color Fields Redesign
 
-> **Status:** In progress. **Built:** US-055 — checked with type check, unit tests and a production build, and clicked through in the browser at phone and desktop width. Waiting on hands-on testing.
+> **Status:** In progress. **Built:** US-055, US-056 — checked with type check, unit tests and a production build, and clicked through in the browser at phone and desktop width. Waiting on hands-on testing.
 
 User feedback on the v1.10.0 look: good, but it doesn't feel premium. We showed users two directions ([`_inspiration/design-01/`](../../_inspiration/design-01/), the current look, and [`_inspiration/design-02/`](../../_inspiration/design-02/)) and chose to build design 2.
 
@@ -25,6 +25,7 @@ The full spec lives in [Design System](../../architecture/design-system.md).
 | Story                                       | Title                 | Status |
 | ------------------------------------------- | --------------------- | ------ |
 | [US-055](./US-055-color-fields-redesign.md) | Color Fields Redesign | Built  |
+| [US-056](./US-056-tap-feel.md)              | Tap Feel              | Built  |
 
 ---
 
@@ -39,4 +40,5 @@ The full spec lives in [Design System](../../architecture/design-system.md).
 | **Fonts from Fontsource**          | Unbounded (display) and JetBrains Mono (everything else), self-hosted via `@fontsource` — never Google Fonts, so the app stays offline. Inter and Space Grotesk were removed.                                                                             |
 | **Nav keeps its four tabs**        | Overview · Workout · Insights · Settings already matched the mockup's four; only the look changed (numbered blocks, current tab filled).                                                                                                                  |
 | **Design-only extras left out**    | The mockup shows a rest timer, hold-to-edit habit tiles, and drag-to-scrub numbers. Those are new features, not a re-skin — not built.                                                                                                                    |
+| **Tap feel, web standards only**   | Feedback after the redesign: good to look at, flat to tap. US-056 adds press motion, haptics (Vibration API), optional sound (Web Audio) and page transitions (View Transitions API). No iOS haptic workarounds — the user asked for web standards.       |
 | **Tokens global, patterns scoped** | `app.css` gets only tokens. Color fields, press shadows and labels are scoped per component; progress squares are a new `ProgressBlocks` component — per audit Decision 4 ([Design System](../../architecture/design-system.md#where-the-patterns-live)). |

@@ -20,6 +20,7 @@
 		<span
 			class="blocks__cell"
 			class:blocks__cell--on={i < on}
+			style:--i={i}
 		></span>
 	{/each}
 </div>
@@ -37,7 +38,17 @@
 		border: var(--rule-thin) solid currentColor;
 	}
 
+	/* Filled cells clunk in one after another. */
 	.blocks__cell--on {
 		background: currentColor;
+		animation: cell-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+		animation-delay: calc(var(--i) * 45ms);
+	}
+
+	@keyframes cell-in {
+		from {
+			transform: scaleY(0.2);
+			opacity: 0;
+		}
 	}
 </style>

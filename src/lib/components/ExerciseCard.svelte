@@ -2,6 +2,7 @@
 	import { untrack, onDestroy } from 'svelte';
 	import type { ActiveItem, Item } from '$lib/db/types';
 	import SetTile from './SetTile.svelte';
+	import { feedback } from '$lib/feedback';
 
 	type Props = {
 		activeExercise: ActiveItem;
@@ -30,25 +31,20 @@
 		if (allSetsCompleted && !wasCompleted) {
 			wasCompleted = true;
 			justCompleted = true;
-
-			try {
-				navigator.vibrate([12, 40, 18]);
-			} catch {
-				justCompleted = true;
-			}
+			feedback('win');
 
 			completionTimer = setTimeout(() => {
 				justCompleted = false;
-			}, 700);
+			}, 900);
 		}
 	});
 </script>
 
 <article
+	data-exercise={exerciseIndex}
 	class="exercise-card"
 	class:exercise-card--current={current}
 	class:exercise-card--completed={allSetsCompleted}
-	class:exercise-card--just-completed={justCompleted}
 	aria-label={exercise.name}
 >
 	<header class="exercise-card__header">
@@ -96,6 +92,13 @@
 		</div>
 	</header>
 
+	{#if justCompleted}
+		<span
+			class="exercise-card__stamp"
+			aria-hidden="true">Done</span
+		>
+	{/if}
+
 	<div
 		class="exercise-card__sets"
 		role="group"
@@ -112,36 +115,69 @@
 </article>
 
 <style>
-	/* Upcoming: ink block, thin rule. Current: the Training field with a hard shadow. */
+	/*
+	 * Cards are transparent frames over the grid. The live one gets its blue,
+	 * ink border and shadow from the plate behind it (SessionOverlay), which
+	 * slides from card to card — so it never paints its own field.
+	 */
 	.exercise-card {
-		background: var(--color-ink);
+		position: relative;
+		z-index: 1;
+		background: transparent;
 		border: var(--rule) solid var(--color-border);
 		padding: var(--space-3);
-	}
-
-	/* Text tokens re-pointed at ink so the SetTiles inside read on the field. */
-	.exercise-card--current {
-		--field: var(--field-train);
-		--color-text-primary: var(--color-ink);
-		--color-text-secondary: var(--color-ink);
-		--color-text-muted: color-mix(in srgb, var(--color-ink) 62%, var(--field));
-		background: var(--field);
-		color: var(--color-ink);
-		border-color: var(--color-ink);
-		box-shadow: var(--shadow-hard);
 	}
 
 	.exercise-card--completed {
 		border-color: var(--color-paper);
 	}
 
-	.exercise-card--just-completed {
-		animation: done-flash 300ms steps(2, jump-none) 2;
+	/* Text tokens re-pointed at ink so the SetTiles inside read on the plate. */
+	.exercise-card--current {
+		--field: var(--field-train);
+		--color-text-primary: var(--color-ink);
+		--color-text-secondary: var(--color-ink);
+		--color-text-muted: color-mix(in srgb, var(--color-ink) 62%, var(--field));
+		color: var(--color-ink);
+		border-color: transparent;
 	}
 
-	@keyframes done-flash {
-		50% {
-			background: var(--color-paper);
+	/* A rubber-stamp DONE that slams down over the finished card. */
+	.exercise-card__stamp {
+		position: absolute;
+		inset-block-start: 50%;
+		inset-inline-start: 50%;
+		padding: var(--space-1) var(--space-4);
+		border: var(--rule) solid var(--color-paper);
+		background: var(--color-ink);
+		color: var(--color-paper);
+		font-family: var(--font-display);
+		font-size: 2rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		text-transform: uppercase;
+		pointer-events: none;
+		transform: translate(-50%, -50%) rotate(-6deg);
+		animation: stamp 900ms cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+	}
+
+	@keyframes stamp {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, -50%) rotate(-6deg) scale(2.2);
+		}
+		25% {
+			opacity: 1;
+			transform: translate(-50%, -50%) rotate(-6deg) scale(0.92);
+		}
+		35%,
+		75% {
+			opacity: 1;
+			transform: translate(-50%, -50%) rotate(-6deg) scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: translate(-50%, -50%) rotate(-6deg) scale(1);
 		}
 	}
 

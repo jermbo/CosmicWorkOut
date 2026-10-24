@@ -66,6 +66,7 @@
 </dialog>
 
 <style>
+	/* Slides up, overshoots a touch, and lands. */
 	@keyframes sheet-slide-up {
 		from {
 			transform: translateY(100%);
@@ -118,7 +119,7 @@
 		padding-block-end: calc(var(--safe-bottom) + var(--space-5));
 		overflow-y: auto;
 		overscroll-behavior: contain;
-		animation: sheet-slide-up 180ms var(--ease-out) both;
+		animation: sheet-slide-up 300ms cubic-bezier(0.2, 0.9, 0.3, 1.12) both;
 	}
 
 	@container app (inline-size >= 720px) {

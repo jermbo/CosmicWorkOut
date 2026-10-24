@@ -53,10 +53,11 @@
 	.settings-sub-header__title {
 		font-family: var(--font-display);
 		text-transform: uppercase;
-		font-size: 2rem;
+		/* Scales down so long titles (PERSONALIZATION) fit on one line. */
+		font-size: clamp(1.25rem, 7.5cqi, 2rem);
 		font-weight: 900;
 		letter-spacing: -0.04em;
 		line-height: 0.95;
-		overflow-wrap: anywhere;
+		overflow-wrap: break-word;
 	}
 </style>

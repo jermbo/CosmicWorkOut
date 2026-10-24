@@ -184,11 +184,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 	}
 
 	.weight-card__value,

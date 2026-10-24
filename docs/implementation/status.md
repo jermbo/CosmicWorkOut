@@ -177,6 +177,7 @@ See [v1.9.0 feature README](../features/v1.9.0/README.md) and [Roadmap — Basel
 | This month card                          | Planned | [US-054](../features/v1.10.0/US-054-this-month-card.md)                                                                                                                       |
 
 | Color fields redesign | Built | [US-055](../features/v1.12.0/US-055-color-fields-redesign.md) — v1.12.0; [Design System](../architecture/design-system.md). Visual only |
+| Tap feel: motion, haptics, sound | Built | [US-056](../features/v1.12.0/US-056-tap-feel.md) — `src/lib/feedback/`; haptics need an Android device to feel |
 
 Built rows checked with type check, lint, unit tests and a production build; US-048, US-051 and US-052 also checked with a browser click-through. Planned rows (US-053 – US-054) are decided, not built.
 

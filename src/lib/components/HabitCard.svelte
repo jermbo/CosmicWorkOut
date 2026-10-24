@@ -1,8 +1,12 @@
 <script lang="ts">
+	import RollingNumber from './RollingNumber.svelte';
+	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import type { Habit } from '$lib/db/types';
 	import { formatCount, formatMinutes, minuteUnitLabel } from '$lib/format';
 	import { formatHabitBooleanValue } from '$lib/habits';
+	import { untrack } from 'svelte';
 	import { habitColor } from '$lib/habitColors';
+	import { feedback } from '$lib/feedback';
 	import Icon from './Icon.svelte';
 	import ProgressBlocks from './ProgressBlocks.svelte';
 
@@ -58,12 +62,27 @@
 	});
 	let showBlocks = $derived(habit.type !== 'boolean' && (habit.dailyGoal ?? 0) > 0);
 	let empty = $derived(habit.type === 'boolean' ? !done : value === 0);
+
+	// Hitting the goal is a moment: buzz and stamp the tile (not on first render).
+	let wasDone = untrack(() => done);
+	let justDone = $state(false);
+	$effect(() => {
+		if (done && !wasDone) {
+			justDone = true;
+			feedback('success');
+			const t = setTimeout(() => (justDone = false), 600);
+			wasDone = done;
+			return () => clearTimeout(t);
+		}
+		wasDone = done;
+	});
 </script>
 
 <div
 	class="habit-card"
 	class:habit-card--empty={empty}
 	class:habit-card--done={done}
+	class:habit-card--just-done={justDone}
 	style:--field={habitColor(habit)}
 >
 	<div class="habit-card__head">
@@ -80,7 +99,7 @@
 				aria-label="Enter exact value for {habit.name}"
 				title="Tap to enter exact value"
 			>
-				<span class="habit-card__value">{value}</span>
+				<span class="habit-card__value"><RollingNumber {value} /></span>
 				{#if habit.dailyGoal}
 					<span class="habit-card__goal">/{habit.dailyGoal}</span>
 				{/if}
@@ -116,6 +135,7 @@
 				<button
 					class="stepper__btn"
 					onclick={onsubtract}
+					use:holdRepeat={onsubtract}
 					disabled={readOnly || value < step}
 					aria-label="Subtract {step} from {habit.name}"
 				>
@@ -137,6 +157,7 @@
 				<button
 					class="stepper__btn"
 					onclick={onadd}
+					use:holdRepeat={onadd}
 					disabled={readOnly}
 					aria-label="Add {step} to {habit.name}"
 				>
@@ -166,6 +187,29 @@
 		color: var(--color-ink);
 		border: var(--rule) solid var(--color-ink);
 		box-shadow: var(--shadow-hard);
+	}
+
+	/* Goal hit: the tile jolts and flashes paper once. */
+	.habit-card--just-done {
+		animation: goal-hit 520ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+	}
+
+	@keyframes goal-hit {
+		0% {
+			transform: scale(1);
+		}
+		20% {
+			transform: scale(1.06) rotate(-1deg);
+			box-shadow:
+				var(--press-offset) var(--press-offset) 0 var(--color-paper),
+				0 0 0 var(--rule) var(--color-paper);
+		}
+		55% {
+			transform: scale(0.98);
+		}
+		100% {
+			transform: none;
+		}
 	}
 
 	.habit-card--empty {

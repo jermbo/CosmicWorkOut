@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RollingNumber from './RollingNumber.svelte';
 	import HomeCard from './HomeCard.svelte';
 	import ProgressBlocks from './ProgressBlocks.svelte';
 
@@ -27,7 +28,7 @@
 		<p class="home-baselines-card__empty">Set your first baseline in Settings.</p>
 	{:else}
 		<div class="home-baselines-card__summary">
-			<span class="home-baselines-card__count">{done}/{total}</span>
+			<span class="home-baselines-card__count"><RollingNumber value={done} />/{total}</span>
 			<span class="home-baselines-card__label">
 				{#if done === total}You showed up for all of them.{:else}done{/if}
 			</span>

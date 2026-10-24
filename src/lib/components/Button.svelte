@@ -31,6 +31,7 @@
 	{type}
 	{onclick}
 	{disabled}
+	data-feedback={variant === 'danger' ? 'warn' : undefined}
 >
 	{@render children()}
 </button>
@@ -69,11 +70,6 @@
 	.btn--danger {
 		border-color: var(--color-ink);
 		box-shadow: var(--shadow-hard-sm);
-
-		&:active:not(:disabled) {
-			transform: translate(4px, 4px);
-			box-shadow: 0 0 0 var(--color-paper);
-		}
 	}
 
 	.btn--primary {

@@ -177,6 +177,10 @@ export interface ItemLastUsed {
 export interface UserPrefs {
 	density: Density;
 	weightUnit: 'lb' | 'kg';
+	/** Vibration on taps and milestones (v1.12.0). Default on; no-op where unsupported. */
+	hapticsEnabled: boolean;
+	/** Synthesized click / clunk sounds (v1.12.0). Default off. */
+	soundEnabled: boolean;
 	/** Overview card order, by card id. Partial or stale values are repaired on read. */
 	homeCardOrder: string[];
 	habitsEnabled: boolean;

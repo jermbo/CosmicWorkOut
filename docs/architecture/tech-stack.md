@@ -165,17 +165,19 @@ Pinned in `package.json` (kept here as a snapshot; `package.json` is authoritati
 
 ## Animations
 
-CSS keyframes + transitions. Key properties:
+Web standards only — no animation library. See [Design System — Motion & feedback](design-system.md#motion--feedback).
 
-- `transform` and `opacity` only
-- Presses are mechanical, not springy: `--duration-press` (60ms, linear) to sink into the hard shadow
-- `prefers-reduced-motion` respected in component styles
+- **Presses:** one delegated Pointer Events handler (`src/lib/feedback/press.ts`) animates every tappable element with the Web Animations API on the individual `translate` / `scale` properties: sink into the hard shadow on finger-down, spring back with a small overshoot on release. CSS `:active` isn't used for this — it's unreliable on touch.
+- **Page changes:** the View Transitions API, started from `onNavigate` in the root layout.
+- **Everything else:** CSS keyframes in each component, plus Svelte transitions (`RollingNumber`).
+- `transform`, `translate`, `scale`, `opacity` and `box-shadow` only.
+- `prefers-reduced-motion`: the global rule in `app.css` shortens every CSS animation; the press handler, view transitions and `CountUp` skip motion.
 
 ---
 
 ## Haptics
 
-`navigator.vibrate()` on set completion and exercise completion. Wrapped in `try/catch` — silent failure on unsupported devices.
+`feedback(kind)` in `src/lib/feedback/` — the Vibration API (`navigator.vibrate`), gated by `prefs.hapticsEnabled`. Works in Android browsers; elsewhere it's absent and the call does nothing. No iOS workarounds — web standard only. The same call plays an optional synthesized Web Audio tone when `prefs.soundEnabled` is on (off by default).
 
 ---
 

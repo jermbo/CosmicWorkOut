@@ -121,6 +121,7 @@
 		<div class="bp-sheet__footer">
 			<button
 				class="bp-sheet__save-btn"
+				data-feedback="success"
 				onclick={handleSave}
 				disabled={saving || !canSave}
 				aria-busy={saving}
@@ -130,6 +131,7 @@
 			{#if editing}
 				<button
 					class="bp-sheet__delete-btn"
+					data-feedback="warn"
 					class:bp-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
 				>
@@ -247,11 +249,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active:not(:disabled) {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 
 		&:disabled {
 			opacity: 0.5;

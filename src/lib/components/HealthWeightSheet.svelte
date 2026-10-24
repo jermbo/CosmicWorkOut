@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
 	import type { HealthReading, WeightValues } from '$lib/db/types';
 	import { healthStore } from '$lib/stores/health.svelte';
@@ -70,6 +71,7 @@
 			>
 				<button
 					onclick={() => adjust(-0.5)}
+					use:holdRepeat={() => adjust(-0.5)}
 					aria-label="Decrease half {unit}">−</button
 				>
 				<div class="wt-stepper__val">
@@ -87,6 +89,7 @@
 				</div>
 				<button
 					onclick={() => adjust(0.5)}
+					use:holdRepeat={() => adjust(0.5)}
 					aria-label="Increase half {unit}">+</button
 				>
 			</div>
@@ -95,6 +98,7 @@
 		<div class="wt-sheet__footer">
 			<button
 				class="wt-sheet__save-btn"
+				data-feedback="success"
 				onclick={handleSave}
 				disabled={saving || !canSave}
 				aria-busy={saving}
@@ -104,6 +108,7 @@
 			{#if editing}
 				<button
 					class="wt-sheet__delete-btn"
+					data-feedback="warn"
 					class:wt-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
 				>
@@ -218,11 +223,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active:not(:disabled) {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 
 		&:disabled {
 			opacity: 0.5;

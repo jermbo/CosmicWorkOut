@@ -20,6 +20,7 @@ User-configurable behavior and appearance.
 | Workout master toggle                        | Built     | On `/settings/workout` ([US-052](../features/v1.10.0/US-052-one-workout-section.md)); default off; covers plans and their optional goals (replaces the old separate Practice + Lift plans toggles) |
 | Overview card order (`homeCardOrder`)        | Built     | Drag or arrows on Personalization (and `/settings/overview`); `src/lib/homeCards.ts`                                                                                                               |
 | Weight unit applied in display/input         | Built     | Default `lb`; a **label only** — switching does not convert stored readings                                                                                                                        |
+| Haptics / sound                              | Built     | On Personalization → Feedback. `hapticsEnabled` default on (switch hidden where the browser can't vibrate); `soundEnabled` default off ([US-056](../features/v1.12.0/US-056-tap-feel.md))          |
 | Density applied on boot                      | Built     | Density scales every `--space-*` token (compact ×0.75, spacious ×1.25)                                                                                                                             |
 | Accent color / roundness                     | Removed   | v1.12.0 ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md)) — fixed domain hues and square corners ([Design System](../architecture/design-system.md))                                 |
 | Personalization page                         | Built     | `/settings/personalization` — weight unit, density, card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)                                                       |
@@ -47,7 +48,7 @@ Reshaped in [US-045](../features/v1.10.0/US-045-settings-feature-hub.md) (v1.10.
 | `/settings/activity`        | Activity log switch                                                                                                                                                   |
 | `/settings/health`          | Health metrics switch                                                                                                                                                 |
 | `/settings/insights`        | Show / hide each Insights chart                                                                                                                                       |
-| `/settings/personalization` | Weight unit, density, Overview card order                                                                                                                             |
+| `/settings/personalization` | Weight unit, density, haptics, sound, Overview card order                                                                                                             |
 | `/settings/overview`        | Overview card order (kept for old links)                                                                                                                              |
 | `/settings/data`            | Export / restore ([US-028](../features/v1.7.0/US-028-data-export-backup.md)), clear data, debug seed                                                                  |
 

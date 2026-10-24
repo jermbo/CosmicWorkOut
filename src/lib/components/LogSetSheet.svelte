@@ -1,4 +1,6 @@
 <script lang="ts">
+	import RollingNumber from './RollingNumber.svelte';
+	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import { onMount, tick, untrack } from 'svelte';
 	import type { Item, ActiveSet } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -209,6 +211,7 @@
 							<button
 								class="stepper__btn"
 								onclick={() => bumpWeight(-1)}
+								use:holdRepeat={() => bumpWeight(-1)}
 								aria-label="Decrease {weightOrBandNoun}"
 							>
 								<svg
@@ -228,12 +231,13 @@
 								</svg>
 							</button>
 							<div class="stepper__val">
-								<span class="stepper__n">{stepperValue}</span>
+								<span class="stepper__n"><RollingNumber value={stepperValue} /></span>
 								<span class="stepper__u">{stepperUnitLabel}</span>
 							</div>
 							<button
 								class="stepper__btn"
 								onclick={() => bumpWeight(1)}
+								use:holdRepeat={() => bumpWeight(1)}
 								aria-label="Increase {weightOrBandNoun}"
 							>
 								<svg
@@ -268,6 +272,7 @@
 					<button
 						class="stepper__btn"
 						onclick={() => bumpReps(-1)}
+						use:holdRepeat={() => bumpReps(-1)}
 						aria-label="Decrease reps"
 					>
 						<svg
@@ -287,12 +292,13 @@
 						</svg>
 					</button>
 					<div class="stepper__val">
-						<span class="stepper__n">{stepReps}</span>
+						<span class="stepper__n"><RollingNumber value={stepReps} /></span>
 						<span class="stepper__u">{repUnitLabel}</span>
 					</div>
 					<button
 						class="stepper__btn"
 						onclick={() => bumpReps(1)}
+						use:holdRepeat={() => bumpReps(1)}
 						aria-label="Increase reps"
 					>
 						<svg
@@ -540,11 +546,6 @@
 			order: 2;
 			inline-size: 28px;
 			block-size: 28px;
-		}
-
-		&:active {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
 		}
 	}
 </style>

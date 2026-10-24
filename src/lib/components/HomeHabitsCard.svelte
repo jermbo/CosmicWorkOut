@@ -1,4 +1,5 @@
 <script lang="ts">
+	import RollingNumber from './RollingNumber.svelte';
 	import HomeCard from './HomeCard.svelte';
 	import ProgressBlocks from './ProgressBlocks.svelte';
 
@@ -26,7 +27,7 @@
 		<p class="home-habits-card__empty">Add habits in Settings to get started.</p>
 	{:else}
 		<div class="home-habits-card__summary">
-			<span class="home-habits-card__count">{logged}/{total}</span>
+			<span class="home-habits-card__count"><RollingNumber value={logged} />/{total}</span>
 			<span class="home-habits-card__label">
 				{#if logged === total}All done today!{:else}habits logged{/if}
 			</span>

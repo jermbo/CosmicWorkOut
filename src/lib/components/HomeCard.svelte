@@ -51,11 +51,6 @@
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
 		-webkit-tap-highlight-color: transparent;
-
-		&:active {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 	}
 
 	.home-card__header {

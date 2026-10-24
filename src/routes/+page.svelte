@@ -182,6 +182,40 @@
 		padding-block-end: var(--press-offset);
 	}
 
+	/* Cards drop in one after another (up to 8 staggered steps). */
+	.home-cards > :global(*) {
+		animation: card-drop 340ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+	}
+
+	.home-cards > :global(:nth-child(2)) {
+		animation-delay: 50ms;
+	}
+	.home-cards > :global(:nth-child(3)) {
+		animation-delay: 100ms;
+	}
+	.home-cards > :global(:nth-child(4)) {
+		animation-delay: 150ms;
+	}
+	.home-cards > :global(:nth-child(5)) {
+		animation-delay: 200ms;
+	}
+	.home-cards > :global(:nth-child(6)) {
+		animation-delay: 250ms;
+	}
+	.home-cards > :global(:nth-child(7)) {
+		animation-delay: 300ms;
+	}
+	.home-cards > :global(:nth-child(n + 8)) {
+		animation-delay: 350ms;
+	}
+
+	@keyframes card-drop {
+		from {
+			opacity: 0;
+			transform: translateY(-16px);
+		}
+	}
+
 	.home-empty {
 		display: flex;
 		flex-direction: column;

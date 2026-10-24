@@ -322,11 +322,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active:not(:disabled) {
-			transform: translate(4px, 4px);
-			box-shadow: none;
-		}
 	}
 
 	.plan-card__action {

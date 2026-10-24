@@ -26,6 +26,18 @@ const fmtMinutes = new Intl.NumberFormat(undefined, {
 	unit: 'minute',
 	unitDisplay: 'short',
 });
+// Under a minute, durations show seconds. DurationFormat prints an all-zero
+// duration as "", so these use plain unit formatting instead.
+const fmtSecondsShort = new Intl.NumberFormat(undefined, {
+	style: 'unit',
+	unit: 'second',
+	unitDisplay: 'short',
+});
+const fmtSecondsNarrow = new Intl.NumberFormat(undefined, {
+	style: 'unit',
+	unit: 'second',
+	unitDisplay: 'narrow',
+});
 const fmtRelativeWeeks = new Intl.RelativeTimeFormat(undefined, {
 	style: 'long',
 });
@@ -51,6 +63,10 @@ export function minuteUnitLabel(): string {
 }
 
 export function formatDuration(seconds: number, compact = false): string {
+	if (seconds < 60) {
+		const whole = Math.max(0, Math.round(seconds));
+		return compact ? fmtSecondsNarrow.format(whole) : fmtSecondsShort.format(whole);
+	}
 	const minutes = Math.round(seconds / 60);
 	if (compact && fmtDurationNarrow) {
 		return fmtDurationNarrow.format({ minutes });

@@ -149,10 +149,6 @@
 			inline-size: 18px;
 			block-size: 18px;
 		}
-		&:active {
-			transform: translate(4px, 4px);
-			box-shadow: none;
-		}
 	}
 
 	.log-page__empty {
@@ -187,11 +183,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active {
-			transform: translate(var(--press-offset), var(--press-offset));
-			box-shadow: none;
-		}
 	}
 
 	.activity-item__info {

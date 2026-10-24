@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { onNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { installPress } from '$lib/feedback/press';
+	import { prefersReducedMotion } from '$lib/feedback';
 	import '../app.css';
 	import { initDB } from '$lib/db/database';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -21,6 +24,21 @@
 	let appReady = $state(false);
 	let loadError = $state(false);
 	let hasRecoverableSession = $state(false);
+
+	onMount(() => installPress());
+
+	// Page changes slide through the View Transitions API where the browser has it
+	// (v1.12.0). The nav keeps its own view-transition-name, so it stays put.
+	onNavigate((navigation) => {
+		if (!document.startViewTransition || prefersReducedMotion()) return;
+		if (navigation.from?.url.pathname === navigation.to?.url.pathname) return;
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 
 	onMount(async () => {
 		try {

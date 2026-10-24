@@ -66,6 +66,7 @@
 	<div class="value-dialog__actions">
 		<button
 			class="value-dialog__save"
+			data-feedback="success"
 			onclick={save}>Save</button
 		>
 		<button
@@ -176,11 +177,6 @@
 		transition:
 			transform var(--duration-press) linear,
 			box-shadow var(--duration-press) linear;
-
-		&:active {
-			transform: translate(4px, 4px);
-			box-shadow: none;
-		}
 	}
 
 	.value-dialog__cancel {

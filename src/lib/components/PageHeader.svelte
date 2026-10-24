@@ -206,6 +206,15 @@
 		line-height: 0.9;
 		letter-spacing: -0.04em;
 		overflow-wrap: anywhere;
+		animation: title-in 320ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+	}
+
+	/* The title slides in from the left as the page arrives. */
+	@keyframes title-in {
+		from {
+			opacity: 0;
+			transform: translateX(-24px);
+		}
 	}
 
 	.page-header__trailing {
