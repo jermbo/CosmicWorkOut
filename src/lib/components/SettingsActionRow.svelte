@@ -34,9 +34,8 @@
 		min-block-size: 56px;
 		padding-inline: var(--space-4);
 		padding-block: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 	}
 
 	.settings-action-row__text {
@@ -47,8 +46,9 @@
 	}
 
 	.settings-action-row__label {
-		font-size: 0.9375rem;
-		font-weight: 600;
+		font-size: 0.875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 		color: var(--color-text-primary);
 	}
 
@@ -62,12 +62,12 @@
 		flex-shrink: 0;
 		padding-inline: var(--space-3);
 		padding-block: var(--space-2);
-		border-radius: var(--radius-md);
-		font-size: 0.8125rem;
-		font-weight: 700;
-		background: var(--color-surface-3);
+		font-size: 0.75rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		background: transparent;
 		color: var(--color-text-primary);
-		border: 1px solid var(--color-border);
+		border: var(--rule) solid var(--color-paper);
 	}
 
 	.settings-action-row__btn--danger {

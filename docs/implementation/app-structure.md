@@ -27,9 +27,11 @@ How the SvelteKit app is organized — routes, layout, and boot sequence.
 | `/settings/activity`        | `routes/settings/activity/+page.svelte`        | Activity log toggle                                                                                                                                  |
 | `/settings/health`          | `routes/settings/health/+page.svelte`          | Health metrics toggle                                                                                                                                |
 | `/settings/insights`        | `routes/settings/insights/+page.svelte`        | Show / hide each Insights chart ([US-043](../features/v1.10.0/US-043-insights-chart-visibility.md))                                                  |
-| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Appearance (theme), accent, weight unit, density, roundness, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md))           |
+| `/settings/personalization` | `routes/settings/personalization/+page.svelte` | Weight unit, density, haptics, sound, Overview card order ([US-046](../features/v1.10.0/US-046-personalization.md); trimmed in v1.12.0)              |
 | `/settings/overview`        | `routes/settings/overview/+page.svelte`        | Overview card order — kept for old links; same editor as Personalization                                                                             |
 | `/settings/data`            | `routes/settings/data/+page.svelte`            | Backup/restore, clear data (incl. plan goals and Baselines), debug seed                                                                              |
+| `/settings/data/send`       | `routes/settings/data/send/+page.svelte`       | Send by QR ([US-057](../features/v1.12.0/US-057-send-backup-by-qr.md))                                                                               |
+| `/settings/data/receive`    | `routes/settings/data/receive/+page.svelte`    | Receive by QR ([US-058](../features/v1.12.0/US-058-receive-backup-by-qr.md))                                                                         |
 
 Navigation via `BottomNav` (Overview · Workout · Insights · Settings). The History tab and `/calendar` were removed in v1.10.0 ([US-047](../features/v1.10.0/US-047-retire-history.md)). Practice, Dance and the standalone Lift plans area were removed in the same release ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md), [US-052](../features/v1.10.0/US-052-one-workout-section.md)) — `/practice*`, `/goals*` and `/program` are gone, with no redirects. Log, Habits, Health, and Baselines are reached from their summary cards.
 
@@ -103,7 +105,7 @@ sequenceDiagram
 ```
 
 1. `initDB()` — open IndexedDB (version 9), upsert built-in items + programs, seed habits if empty, apply any pending migrations (e.g. patch dailyGoal onto existing built-in habits)
-2. `prefsStore.load()` — read localStorage, apply accent/density/roundness to DOM
+2. `prefsStore.load()` — read localStorage, apply density to the DOM
 3. `programStore.load()` — load programs, items, sessions; pick active program per Discipline
 4. `goalPlanStore.load()` — load lift plans _(US-033)_
 5. `habitStore.load()` — load habits and all habit logs
@@ -163,6 +165,7 @@ src/
     │   ├── loggingContext.svelte.ts
     │   └── toast.svelte.ts
     ├── charts/                    (v1.10.0 — TanStack Charts: ScrollChart, scale, theme, color)
+    ├── feedback/                  (v1.12.0 — feedback(), press handler, holdRepeat, patterns)
     ├── insights/                  (v1.10.0 — chart list, pure aggregation, heat shading)
     ├── baselines/logic.ts
     ├── habitColors.ts

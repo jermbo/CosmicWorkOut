@@ -11,9 +11,9 @@ import { habitColor, moodBadColor } from '../habitColors.ts';
  */
 
 /** Painted when a day has nothing logged — distinct from the lightest 10% step. */
-export const HEAT_EMPTY = '#232323';
+export const HEAT_EMPTY = '#1c1c1b';
 /** Mood logged as exactly 0 — "logged, neutral". */
-export const HEAT_NEUTRAL = '#3a3a3a';
+export const HEAT_NEUTRAL = '#3a3936';
 
 export type HeatKind = 'empty' | 'level' | 'neutral' | 'positive' | 'negative';
 

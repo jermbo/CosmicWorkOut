@@ -62,6 +62,11 @@
 
 	let byId = $derived(new Map(metrics.map(({ metric }) => [metric.id, metric])));
 
+	/** Metric → its best date, so the grouped tooltip can label that row instead of adding one. */
+	let bestDates = $derived(
+		new Map(series.flatMap((s) => (s.best ? [[s.metric.id, s.best.date]] : []))),
+	);
+
 	function build() {
 		return defineChart({
 			marks: [
@@ -78,6 +83,8 @@
 						id: s.metric.id,
 						x: 'date',
 						y: 'value',
+						// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+						z: () => s.metric.id,
 						stroke: s.color,
 						strokeWidth: 2,
 						points: true,
@@ -113,8 +120,9 @@
 			tooltip: chartTooltip<Row>(
 				(d) => longDate(d.date),
 				(p) => {
+					if (p.markId.startsWith('best-')) return null;
 					const metric = byId.get(p.datum.metricId);
-					const isBest = p.markId.startsWith('best-');
+					const isBest = showBests && bestDates.get(p.datum.metricId) === p.datum.date;
 					return {
 						label: `${metric?.name ?? ''}${isBest ? ' — best' : ''}`,
 						value: metric ? formatValue(metric, p.datum.value) : String(p.datum.value),

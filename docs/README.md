@@ -137,6 +137,7 @@ flowchart TB
 - [System Overview](architecture/overview.md) — How the pieces fit together
 - [Data Model](architecture/data-model.md) — Entities, relationships, storage
 - [Tech Stack](architecture/tech-stack.md) — SvelteKit, IndexedDB, CSS tokens
+- [Design System](architecture/design-system.md) — Color fields, hard shadows, dark only (v1.12.0)
 - [Offline Strategy](architecture/offline-strategy.md) — Local-first persistence
 
 ---
@@ -202,4 +203,4 @@ See [Implementation Status](implementation/status.md) for the current built-vs-d
 
 ## Inspiration
 
-The original design reference lives in [\_inspiration/](_inspiration/). It's a high-fidelity pickleball-specific prototype — useful for UI and UX patterns, not taken literally as the product spec.
+Design references live in [\_inspiration/](_inspiration/). `design-01/` is the original high-fidelity pickleball prototype (the look up to v1.10.0). `design-02/` is the "color fields / brutal" mockup the app follows since v1.12.0 — see [Design System](architecture/design-system.md). Both are references for UI and UX patterns, not the product spec.

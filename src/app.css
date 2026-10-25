@@ -1,61 +1,92 @@
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
 @import '@fontsource/jetbrains-mono/400.css';
-@import '@fontsource/jetbrains-mono/600.css';
-@import '@fontsource/space-grotesk/700.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/jetbrains-mono/800.css';
+@import '@fontsource/unbounded/700.css';
+@import '@fontsource/unbounded/800.css';
+@import '@fontsource/unbounded/900.css';
 
 /* ============================================================
-   Design Tokens
+   Design Tokens — "color fields / brutal" (v1.12.0)
+   Dark only. Near-black page on a faint 24px grid, off-white ink,
+   one solid hue per domain, 3px rules, hard offset shadows, square
+   corners. Anything with a shadow can be pressed: it sinks into it.
+   Tokens only — patterns live in components (audit Decision 4).
+   See docs/architecture/design-system.md.
    ============================================================ */
 :root {
-	--color-bg: #101010;
-	--color-surface-1: #181818;
-	--color-surface-2: #1e1e1e;
-	--color-surface-3: #252525;
-	--color-border: #333333;
-	--color-border-strong: #444444;
+	color-scheme: dark;
 
-	--color-accent: #b2f042;
-	--color-accent-ink: #101010;
-	/* Accent used as text or a thin line. Same as the accent in dark; darkened in light. */
+	/* Ink & paper */
+	--color-ink: #0a0a0a;
+	--color-paper: #f2f0ea;
+	--color-grid: #171717;
+
+	--color-bg: #0a0a0a;
+	--color-surface-1: #0f0f0f;
+	--color-surface-2: #121212;
+	--color-surface-3: #1c1c1b;
+	--color-border: #3a3936;
+	--color-border-strong: var(--color-paper);
+
+	/* Domain fields — one hue per area. Ink (#0a0a0a) always sits on top. */
+	--field-train: oklch(0.76 0.13 235);
+	--field-habit: oklch(0.76 0.13 30);
+	--field-base: oklch(0.76 0.13 300);
+	--field-health: oklch(0.86 0.14 95);
+	--field-active: oklch(0.76 0.13 160);
+	--field-ink: var(--color-ink);
+	/* Empty / not done yet: diagonal hazard stripes. */
+	--field-empty: repeating-linear-gradient(135deg, #2a2a2a 0 3px, var(--color-ink) 3px 11px);
+
+	/* The accent is the Training field — primary actions, focus, selection. */
+	--color-accent: var(--field-train);
+	--color-accent-ink: var(--color-ink);
 	--color-accent-text: var(--color-accent);
 
-	--color-lime: #b2f042;
-	--color-lavender: #b286fd;
-	--color-sky: #60c6ff;
-	--color-red: #e55733;
-	--color-success: #4ade80;
+	--color-lime: var(--field-active);
+	--color-lavender: var(--field-base);
+	--color-sky: var(--field-train);
+	--color-red: oklch(0.7 0.19 28);
+	--color-success: var(--field-active);
 
-	/* Mood good / bad. Fills stay bright; the -text pair darkens in light mode. */
-	--color-mood-good: #4ade80;
-	--color-mood-bad: #f87171;
+	--color-mood-good: var(--field-active);
+	--color-mood-bad: oklch(0.7 0.19 28);
 	--color-mood-good-text: var(--color-mood-good);
 	--color-mood-bad-text: var(--color-mood-bad);
 
-	--color-text-primary: #ffffff;
-	--color-text-secondary: #888888;
-	--color-text-muted: #555555;
-	--color-text-tertiary: #555555;
+	--color-text-primary: var(--color-paper);
+	--color-text-secondary: #bdbab2;
+	--color-text-muted: #8e8c86;
+	--color-text-tertiary: #8e8c86;
 
-	--font-display: 'Space Grotesk', sans-serif;
-	--font-body: 'Inter', sans-serif;
+	--font-display: 'Unbounded', sans-serif;
+	--font-body: 'JetBrains Mono', monospace;
 	--font-mono: 'JetBrains Mono', monospace;
 
-	--radius-sm: 6px;
-	--radius-md: 10px;
-	--radius-lg: 12px;
-	--radius-xl: 16px;
-	--radius-2xl: 20px;
-	--radius-tile: 14px;
-	--radius-sheet: 26px;
-	--radius-full: 9999px;
+	/* Rules */
+	--rule: 3px;
+	--rule-thin: 2px;
 
-	--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-	--shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-	--shadow-lime: 0 6px 22px rgba(178, 240, 66, 0.3);
-	--shadow-lavender: 0 6px 22px rgba(178, 134, 253, 0.3);
+	/* Square corners everywhere. Kept as tokens so components stay consistent. */
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
+	--radius-xl: 0;
+	--radius-2xl: 0;
+	--radius-tile: 0;
+	--radius-sheet: 0;
+	--radius-full: 0;
+
+	/* Hard offset shadows. A shadow means "pressable". */
+	--press-offset: 6px;
+	--shadow-hard: var(--press-offset) var(--press-offset) 0 var(--color-paper);
+	--shadow-hard-sm: 4px 4px 0 var(--color-paper);
+	--shadow-sm: var(--shadow-hard-sm);
+	--shadow-md: var(--shadow-hard);
+	--shadow-lg: var(--shadow-hard);
+	--shadow-lime: var(--shadow-hard);
+	--shadow-lavender: var(--shadow-hard);
 
 	--space-1: 4px;
 	--space-2: 8px;
@@ -67,77 +98,34 @@
 	--space-10: 40px;
 	--space-12: 48px;
 
-	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--ease-spring: cubic-bezier(0.2, 0, 0, 1);
 	--ease-out: cubic-bezier(0.2, 0, 0, 1);
 	--ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+	--duration-press: 60ms;
 	--duration-fast: 120ms;
-	--duration-normal: 220ms;
-	--duration-slow: 380ms;
+	--duration-normal: 200ms;
+	--duration-slow: 320ms;
 
 	--safe-top: env(safe-area-inset-top, 0px);
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 
-	--nav-height: 68px;
+	--nav-height: 64px;
 	--max-width: 460px;
 	--side-nav-width: 220px;
 	--page-gutter: var(--space-4);
 
 	/* Density defaults (comfortable) */
 	--tile-h: 68px;
-	--card-gap: 12px;
+	--card-gap: 14px;
 
-	/* Older roundness names — aliases so every corner follows the setting. */
 	--r-tile: var(--radius-tile);
 	--r-xl: var(--radius-xl);
 	--r-2xl: var(--radius-2xl);
 }
 
 /*
- * ── Light theme (Settings → Personalization, v1.11.0) ──
- * Set on <html> by the inline script in app.html and prefsStore.applyTheme().
- * Cards are white on a warm light-gray page; surface-3 is the recessed layer
- * (inputs, secondary buttons). The accent itself stays as chosen — it is a fill
- * with --color-accent-ink on top — but accent *text* is darkened to stay readable.
- * The named hues are darker so they hold up as text on white.
- */
-[data-theme='light'] {
-	color-scheme: light;
-
-	--color-bg: #f1f1ee;
-	--color-surface-1: #fafaf8;
-	--color-surface-2: #ffffff;
-	--color-surface-3: #ecece8;
-	--color-border: #dcdcd7;
-	--color-border-strong: #c6c6c0;
-
-	--color-accent-text: color-mix(in srgb, var(--color-accent) 50%, #000000);
-
-	--color-lime: #5f9a0c;
-	--color-lavender: #7c4ddb;
-	--color-sky: #0a7fc2;
-	--color-red: #d2431c;
-	--color-success: #16a34a;
-	--color-mood-good-text: #15803d;
-	--color-mood-bad-text: #c62828;
-
-	--color-text-primary: #141414;
-	--color-text-secondary: #5c5c58;
-	--color-text-muted: #8c8c86;
-	--color-text-tertiary: #8c8c86;
-
-	--shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
-	--shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-	--shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
-	--shadow-lime: 0 6px 18px color-mix(in srgb, var(--color-accent) 35%, transparent);
-	--shadow-lavender: 0 6px 18px rgba(124, 77, 219, 0.25);
-}
-
-/*
- * ── Density & roundness (Settings → Personalization, US-046) ──
- * These override the base tokens themselves, so every component that uses
- * --space-* or --radius-* follows the setting. (Before v1.10.0 they only changed
- * a handful of --r-* / --tile-h tokens, which is why the old page seemed to do
- * nothing.) --radius-full stays: pills and circles are round at any setting.
+ * ── Density (Settings → Personalization, US-046) ──
+ * Overrides the base spacing tokens, so every component follows the setting.
  */
 [data-density='compact'] {
 	--space-1: 3px;
@@ -150,7 +138,7 @@
 	--space-10: 30px;
 	--space-12: 36px;
 	--tile-h: 60px;
-	--card-gap: 9px;
+	--card-gap: 10px;
 }
 
 [data-density='spacious'] {
@@ -164,27 +152,7 @@
 	--space-10: 50px;
 	--space-12: 60px;
 	--tile-h: 78px;
-	--card-gap: 16px;
-}
-
-[data-roundness='sharp'] {
-	--radius-sm: 2px;
-	--radius-md: 4px;
-	--radius-lg: 5px;
-	--radius-xl: 6px;
-	--radius-2xl: 8px;
-	--radius-tile: 5px;
-	--radius-sheet: 10px;
-}
-
-[data-roundness='soft'] {
-	--radius-sm: 9px;
-	--radius-md: 14px;
-	--radius-lg: 18px;
-	--radius-xl: 22px;
-	--radius-2xl: 26px;
-	--radius-tile: 20px;
-	--radius-sheet: 32px;
+	--card-gap: 18px;
 }
 
 /* ============================================================
@@ -199,16 +167,20 @@
 }
 
 html {
-	color-scheme: dark;
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;
 }
 
 body {
 	background-color: var(--color-bg);
+	background-image:
+		linear-gradient(var(--color-grid) 1px, transparent 1px),
+		linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+	background-size: 24px 24px;
+	background-attachment: fixed;
 	color: var(--color-text-primary);
 	font-family: var(--font-body);
-	font-size: 16px;
+	font-size: 15px;
 	line-height: 1.5;
 	min-height: 100dvh;
 	overflow-x: hidden;
@@ -258,9 +230,8 @@ a {
    Focus styles
    ============================================================ */
 :focus-visible {
-	outline: 2px solid var(--color-accent);
+	outline: var(--rule) solid var(--color-accent);
 	outline-offset: 3px;
-	border-radius: 4px;
 }
 
 /* ============================================================
@@ -341,9 +312,8 @@ a {
 .app-loading__spinner {
 	inline-size: 32px;
 	block-size: 32px;
-	border: 3px solid var(--color-border);
+	border: var(--rule) solid var(--color-border);
 	border-top-color: var(--color-accent);
-	border-radius: var(--radius-full);
 	animation: spin 700ms linear infinite;
 }
 
@@ -355,6 +325,8 @@ a {
 
 .app-error__title {
 	font-family: var(--font-display);
+	font-weight: 800;
+	text-transform: uppercase;
 	font-size: 1.125rem;
 	margin-block-end: var(--space-2);
 }
@@ -368,9 +340,11 @@ a {
 	padding: var(--space-2) var(--space-5);
 	background: var(--color-accent);
 	color: var(--color-accent-ink);
-	border: none;
-	border-radius: var(--radius-full);
-	font-weight: 600;
+	border: var(--rule) solid var(--color-ink);
+	box-shadow: var(--shadow-hard-sm);
+	font-family: var(--font-display);
+	font-weight: 800;
+	text-transform: uppercase;
 	cursor: pointer;
 }
 
@@ -385,16 +359,16 @@ a {
 	max-inline-size: var(--max-width);
 	margin-inline: auto;
 	z-index: 100;
-	background: var(--color-surface-2);
-	border: 1px solid var(--color-border-strong);
-	border-radius: var(--radius-2xl);
-	padding: var(--space-4) var(--space-5);
-	z-index: 100;
-	box-shadow: var(--shadow-lg);
+	background: var(--color-ink);
+	border: var(--rule) solid var(--color-paper);
+	padding: var(--space-4);
+	box-shadow: 6px 6px 0 var(--color-accent);
 }
 
 .recovery-banner__title {
 	font-family: var(--font-display);
+	font-weight: 800;
+	text-transform: uppercase;
 	font-size: 1rem;
 	margin-block-end: var(--space-1);
 }
@@ -413,20 +387,23 @@ a {
 .recovery-banner__btn {
 	flex: 1;
 	padding-block: var(--space-2);
-	border-radius: var(--radius-md);
-	font-size: 0.875rem;
-	font-weight: 600;
-	min-block-size: 44px;
+	border: var(--rule) solid var(--color-paper);
+	font-family: var(--font-display);
+	font-size: 0.8125rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	min-block-size: 48px;
 }
 
 .recovery-banner__btn--resume {
 	background: var(--color-accent);
 	color: var(--color-accent-ink);
+	border-color: var(--color-ink);
 }
 
 .recovery-banner__btn--discard {
-	background: var(--color-surface-3);
-	color: var(--color-text-secondary);
+	background: transparent;
+	color: var(--color-text-primary);
 }
 
 /* ============================================================
@@ -459,6 +436,33 @@ a {
 }
 
 /* ============================================================
+   Page transitions (View Transitions API, started in +layout)
+   The old page drops away fast; the new one rises in. The nav
+   has its own name, so it holds still.
+   ============================================================ */
+::view-transition-old(root) {
+	animation: vt-out 110ms var(--ease-out) both;
+}
+
+::view-transition-new(root) {
+	animation: vt-in 220ms var(--ease-out) both;
+}
+
+@keyframes vt-out {
+	to {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+}
+
+@keyframes vt-in {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+}
+
+/* ============================================================
    Reduced motion
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -475,12 +479,12 @@ a {
    Charts (TanStack Charts — see src/lib/charts/)
    ============================================================ */
 :root {
-	--ts-chart-tooltip-background: var(--color-surface-3);
+	--ts-chart-tooltip-background: var(--color-ink);
 	--ts-chart-tooltip-color: var(--color-text-primary);
-	--ts-chart-tooltip-border: 1px solid var(--color-border-strong);
-	--ts-chart-tooltip-border-radius: var(--radius-md);
-	--ts-chart-tooltip-shadow: var(--shadow-md);
-	--ts-chart-tooltip-font: 500 0.8125rem/1.4 var(--font-body);
+	--ts-chart-tooltip-border: var(--rule-thin) solid var(--color-paper);
+	--ts-chart-tooltip-border-radius: 0;
+	--ts-chart-tooltip-shadow: var(--shadow-hard-sm);
+	--ts-chart-tooltip-font: 500 0.75rem/1.4 var(--font-mono);
 }
 
 /* Series key under multi-line charts. Decorative — the tooltip carries the data. */
@@ -490,7 +494,9 @@ a {
 	flex-wrap: wrap;
 	gap: var(--space-2) var(--space-4);
 	margin-block-start: var(--space-3);
-	font-size: 0.75rem;
+	font-size: 0.6875rem;
+	font-weight: 700;
+	text-transform: uppercase;
 	color: var(--color-text-secondary);
 }
 
@@ -503,7 +509,6 @@ a {
 .chart-legend span {
 	inline-size: 10px;
 	block-size: 10px;
-	border-radius: 2px;
 }
 
 /* Insights card helpers (empty states, footnotes, pickers). */
@@ -534,9 +539,8 @@ a {
 	max-inline-size: 220px;
 	block-size: 34px;
 	padding-inline: var(--space-2);
-	border-radius: var(--radius-md);
-	border: 1px solid var(--color-border);
-	background: var(--color-surface-2);
+	border: var(--rule-thin) solid var(--color-paper);
+	background: var(--color-ink);
 	color: var(--color-text-primary);
 	font: inherit;
 	font-size: 0.8125rem;

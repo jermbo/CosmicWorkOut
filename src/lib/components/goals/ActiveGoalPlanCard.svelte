@@ -165,7 +165,7 @@
 <style>
 	.plan-card {
 		background: var(--color-surface-2);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-2xl);
 		padding: var(--space-5);
 		margin-block-end: var(--space-6);
@@ -180,6 +180,7 @@
 
 	.plan-card__name {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.375rem;
 		font-weight: 700;
 		letter-spacing: -0.02em;
@@ -207,7 +208,7 @@
 		block-size: 40px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		color: var(--color-text-primary);
@@ -313,18 +314,25 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 0.875rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.plan-card__action {
 		padding-inline: var(--space-4);
 		block-size: 40px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.875rem;
 		font-weight: 600;
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 
 		&:hover {
 			color: var(--color-text-primary);

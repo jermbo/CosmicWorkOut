@@ -22,10 +22,9 @@
 <HomeCard
 	href="/workout"
 	title="Workout"
+	code="T"
 	{ariaLabel}
-	variant="workout"
-	done={completedCount > 0}
-	active={live}
+	field="train"
 	{badge}
 >
 	<p class="home-practice-card__headline">{headline}</p>
@@ -34,15 +33,19 @@
 
 <style>
 	.home-practice-card__headline {
-		font-size: 1.125rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-		line-height: 1.2;
+		font-family: var(--font-display);
+		font-size: 1.5rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		text-transform: uppercase;
+		line-height: 0.95;
+		overflow-wrap: anywhere;
 	}
 
 	.home-practice-card__detail {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		margin-block-start: var(--space-1);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		margin-block-start: var(--space-2);
 	}
 </style>

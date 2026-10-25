@@ -35,10 +35,10 @@
 
 <style>
 	.field-label {
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.04em;
 		color: var(--color-text-secondary);
 	}
 

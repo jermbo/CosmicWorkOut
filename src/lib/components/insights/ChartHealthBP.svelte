@@ -6,16 +6,23 @@
 	import { bloodPressureDailyAverages } from '$lib/health/metrics';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
+	import {
+		chartGrid,
+		FIELD,
+		PLOT_MARGIN,
+		chartTooltip,
+		longDate,
+		shortDate,
+	} from '$lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
 	type Row = { date: string; value: number };
 
 	const SERIES = [
-		{ id: 'systolic', label: 'Systolic', color: '#e55733' },
-		{ id: 'diastolic', label: 'Diastolic', color: '#60c6ff' },
-		{ id: 'pulse', label: 'Pulse', color: '#b286fd' },
+		{ id: 'systolic', label: 'Systolic', color: FIELD.red },
+		{ id: 'diastolic', label: 'Diastolic', color: FIELD.train },
+		{ id: 'pulse', label: 'Pulse', color: FIELD.health },
 	] as const;
 
 	let series = $derived.by(() => {
@@ -43,6 +50,9 @@
 						id: s.id,
 						x: 'date',
 						y: 'value',
+						// `group-x` dedupes the focused column by `z`; without it every mark
+						// groups as null and the tooltip collapses to a single series.
+						z: () => s.id,
 						stroke: s.color,
 						strokeWidth: 2,
 						points: true,

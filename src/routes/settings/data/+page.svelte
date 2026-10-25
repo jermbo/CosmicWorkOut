@@ -18,6 +18,7 @@
 		assertBackupSize,
 		BackupValidationError,
 	} from '$lib/db/backup';
+	import { onMount } from 'svelte';
 	import { sessionStore } from '$lib/stores/session.svelte';
 	import { programStore } from '$lib/stores/program.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
@@ -26,6 +27,10 @@
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
 	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
 	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
+	import SettingsRow from '$lib/components/SettingsRow.svelte';
+	import { lastQrBackupDate } from '$lib/qrBackup/sendPrefs';
+	import { restoreWarnings } from '$lib/db/backupPayload';
+	import { formatShortDate } from '$lib/date';
 
 	type ClearAction =
 		| 'exercises'
@@ -58,11 +63,36 @@
 
 	let itemsInUse = $derived(programStore.customItemsInUse());
 
+	/** Seeded data writes regardless, but each tracker's UI is hidden while its toggle is off. */
+	let trackersOffForSeed = $derived(
+		[
+			{ label: 'Workout', on: prefsStore.practiceEnabled },
+			{ label: 'Activity log', on: prefsStore.activityLogEnabled },
+			{ label: 'Habits', on: prefsStore.habitsEnabled },
+			{ label: 'Health metrics', on: prefsStore.healthMetricsEnabled },
+			{ label: 'Baselines', on: prefsStore.baselinesEnabled },
+		]
+			.filter((t) => !t.on)
+			.map((t) => t.label),
+	);
+
+	const lastQrSent = lastQrBackupDate();
+
+	// Receive by QR reloads into this page after writing; say it worked (US-058).
+	onMount(() => {
+		if (sessionStorage.getItem('cwout:qrReceived')) {
+			sessionStorage.removeItem('cwout:qrReceived');
+			toastStore.show('Backup received.');
+		}
+	});
+
 	let exporting = $state(false);
 	let fileInput = $state<HTMLInputElement>();
 	/** Raw file text — parse at confirm time so restore never touches a reactive tree. */
 	let pendingBackupText = $state.raw<string | null>(null);
 	let pendingExportedAt = $state.raw<string | null>(null);
+	/** What the backup can't restore — shown in the confirm so nothing goes missing silently. */
+	let pendingWarnings = $state.raw<string[]>([]);
 	let restoring = $state(false);
 	let restoreError = $state<string | null>(null);
 
@@ -99,6 +129,7 @@
 			const parsed = parseBackup(text);
 			pendingBackupText = text;
 			pendingExportedAt = parsed.exportedAt;
+			pendingWarnings = restoreWarnings(parsed);
 		} catch (err) {
 			pendingBackupText = null;
 			pendingExportedAt = null;
@@ -201,6 +232,23 @@
 			/>
 		</div>
 	</section>
+
+	<SettingsGroup title="Back up by QR">
+		<SettingsRow
+			href="/settings/data/send"
+			label="Send by QR"
+			detail={lastQrSent ? `Last ${formatShortDate(lastQrSent)}` : 'Show codes'}
+		/>
+		<SettingsRow
+			href="/settings/data/receive"
+			label="Receive by QR"
+			detail="Use camera"
+		/>
+	</SettingsGroup>
+	<p class="data-qr-note">
+		Move data between your devices by pointing one's camera at the other's screen — no file, no
+		network. The sending device is the source of truth for the dates it sends.
+	</p>
 
 	<SettingsGroup title="Clear">
 		{#if prefsStore.practiceEnabled}
@@ -310,6 +358,9 @@
 		{new Date(pendingExportedAt).toLocaleDateString()}. Existing data is not touched until the
 		backup has been fully staged and verified. Keep your backup file until you confirm everything
 		looks right after reload. This cannot be undone.
+		{#each pendingWarnings as warning (warning)}
+			<br /><br /><strong>{warning}</strong>
+		{/each}
 	</ConfirmDialog>
 {/if}
 
@@ -468,6 +519,15 @@
 	>
 		Adds ~6 months of randomized workout sessions, activities, habit logs, and health readings. Your
 		existing data is not removed. The page will reload when done.
+		{#if trackersOffForSeed.length > 0}
+			<br /><br /><strong>These trackers are off, so their seeded data stays hidden:</strong>
+			<ul class="confirm-list">
+				{#each trackersOffForSeed as label (label)}
+					<li>{label}</li>
+				{/each}
+			</ul>
+			The data is still written — turn a tracker on in Settings to see it.
+		{/if}
 	</ConfirmDialog>
 {/if}
 
@@ -475,6 +535,14 @@
 	.confirm-list {
 		margin-block: var(--space-2);
 		padding-inline-start: var(--space-4);
+	}
+
+	/* Sits under the QR group: pull up into the group's bottom margin. */
+	.data-qr-note {
+		margin-block: calc(var(--space-6) * -1 + var(--space-2)) var(--space-6);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
 	}
 
 	.settings-section {
@@ -531,6 +599,14 @@
 	.data-action__btn--primary {
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.data-action__btn--danger {
@@ -541,7 +617,7 @@
 	.data-action__btn--secondary {
 		background: var(--color-surface-3);
 		color: var(--color-text-primary);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 	}
 
 	.data-action__file-input {
@@ -556,7 +632,7 @@
 		block-size: 40px;
 		background: transparent;
 		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		font-size: 0.875rem;
 	}
 </style>

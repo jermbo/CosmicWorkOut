@@ -66,6 +66,7 @@
 	<div class="value-dialog__actions">
 		<button
 			class="value-dialog__save"
+			data-feedback="success"
 			onclick={save}>Save</button
 		>
 		<button
@@ -87,22 +88,24 @@
 		max-inline-size: 360px;
 		inline-size: 100%;
 		margin-inline: auto;
-		background: var(--color-surface-2);
-		border-radius: var(--r-2xl);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		padding: var(--space-5);
-		box-shadow: var(--shadow-lg);
+		box-shadow: var(--shadow-hard);
 		outline: none;
 	}
 
 	dialog.value-dialog::backdrop {
-		background: rgba(0, 0, 0, 0.65);
+		background: rgba(10, 10, 10, 0.8);
 	}
 
 	.value-dialog__title {
 		display: block;
 		font-family: var(--font-display);
-		font-size: 1.125rem;
-		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 1.25rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
 		margin-block-end: var(--space-4);
 		cursor: default;
 	}
@@ -119,12 +122,13 @@
 		inline-size: 100%;
 		block-size: 80px;
 		padding-inline: var(--space-3);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		font-family: var(--font-display);
-		font-size: 2.5rem;
-		font-weight: 800;
+		text-transform: uppercase;
+		font-size: 2.75rem;
+		font-weight: 900;
+		letter-spacing: -0.05em;
 		color: var(--color-text-primary);
 		text-align: center;
 		outline: none;
@@ -138,7 +142,6 @@
 		}
 		&:focus {
 			border-color: var(--color-accent);
-			box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent);
 		}
 		&::placeholder {
 			color: var(--color-text-muted);
@@ -162,20 +165,28 @@
 	}
 
 	.value-dialog__save {
-		block-size: 52px;
-		border-radius: var(--radius-lg);
+		block-size: 56px;
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
 		font-size: 1rem;
-		font-weight: 700;
+		font-weight: 900;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.value-dialog__cancel {
-		block-size: 46px;
-		border-radius: var(--radius-lg);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-		font-size: 0.9375rem;
-		font-weight: 600;
+		block-size: 48px;
+		background: transparent;
+		border: var(--rule) solid var(--color-paper);
+		color: var(--color-text-primary);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
 	}
 </style>

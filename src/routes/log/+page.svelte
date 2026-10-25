@@ -131,25 +131,23 @@
 		align-items: center;
 		gap: var(--space-2);
 		padding-inline: var(--space-4);
-		block-size: 48px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		color: var(--color-text-secondary);
+		block-size: 52px;
+		background: var(--field-active);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		color: var(--color-ink);
 		margin-block-end: var(--space-5);
 		transition:
-			border-color var(--duration-fast) var(--ease-out),
-			color var(--duration-fast) var(--ease-out);
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		svg {
 			inline-size: 18px;
 			block-size: 18px;
-		}
-		&:hover {
-			border-color: var(--color-accent);
-			color: var(--color-accent-text);
 		}
 	}
 
@@ -163,9 +161,9 @@
 	.activity-list {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: var(--card-gap);
 		list-style: none;
-		padding: 0;
+		padding: 0 var(--press-offset) 0 0;
 		margin: 0;
 
 		li {
@@ -177,16 +175,14 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-3);
-		padding: var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-xl);
+		padding: var(--space-3);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--field-active);
+		box-shadow: var(--press-offset) var(--press-offset) 0 var(--field-active);
 		text-align: start;
-		transition: border-color var(--duration-fast) var(--ease-out);
-
-		&:hover {
-			border-color: var(--color-accent);
-		}
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.activity-item__info {
@@ -196,16 +192,21 @@
 
 	.activity-item__name {
 		display: block;
-		font-size: 1rem;
-		font-weight: 600;
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		text-transform: uppercase;
 		color: var(--color-text-primary);
 	}
 
 	.activity-item__meta {
 		display: block;
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
-		margin-block-start: 2px;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		color: var(--field-active);
+		margin-block-start: var(--space-1);
 	}
 
 	.activity-item__chevron {

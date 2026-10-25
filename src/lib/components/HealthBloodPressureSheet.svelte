@@ -121,6 +121,7 @@
 		<div class="bp-sheet__footer">
 			<button
 				class="bp-sheet__save-btn"
+				data-feedback="success"
 				onclick={handleSave}
 				disabled={saving || !canSave}
 				aria-busy={saving}
@@ -130,6 +131,7 @@
 			{#if editing}
 				<button
 					class="bp-sheet__delete-btn"
+					data-feedback="warn"
 					class:bp-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
 				>
@@ -142,71 +144,70 @@
 
 <style>
 	.bp-sheet__body {
-		padding-inline: var(--space-5);
+		padding-inline: var(--space-4) calc(var(--space-4) + var(--press-offset));
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-5);
+		gap: var(--card-gap);
 	}
 
+	/* Each reading is its own Health field row: label top-left, huge figure. */
 	.bp-row {
 		display: flex;
-		align-items: flex-end;
-		gap: var(--space-3);
+		flex-direction: column;
+		gap: var(--card-gap);
 	}
 
 	.bp-row__sep {
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--color-text-muted);
-		padding-block-end: var(--space-3);
+		display: none;
 	}
 
 	.bp-field {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-2);
-		flex: 1;
-		min-inline-size: 0;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: end;
+		gap: var(--space-1) var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		background: var(--field-health);
+		color: var(--color-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard);
 	}
 
 	.bp-field__label {
-		font-size: 0.75rem;
+		grid-column: 1 / -1;
+		font-size: 0.6875rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		color: var(--color-text-secondary);
+		letter-spacing: 0.04em;
 	}
 
 	.bp-field__optional {
-		text-transform: none;
-		letter-spacing: 0;
-		font-weight: 600;
-		color: var(--color-text-muted);
+		font-weight: 500;
 	}
 
 	.bp-field__input {
-		block-size: 56px;
 		inline-size: 100%;
-		padding-inline: var(--space-3);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-md);
-		font-family: var(--font-mono);
-		font-size: 1.5rem;
-		font-weight: 700;
-		text-align: center;
-		color: var(--color-text-primary);
+		min-inline-size: 0;
+		block-size: 64px;
+		padding: 0;
+		background: transparent;
+		border: none;
+		border-block-end: var(--rule) solid transparent;
+		font-family: var(--font-display);
+		font-size: 3.25rem;
+		font-weight: 900;
+		letter-spacing: -0.05em;
+		line-height: 1;
+		color: var(--color-ink);
 		outline: none;
 		-moz-appearance: textfield;
 		appearance: textfield;
-		transition: border-color var(--duration-fast) var(--ease-out);
 
 		&:focus {
-			border-color: var(--color-accent);
+			border-block-end-color: var(--color-ink);
 		}
 		&::placeholder {
-			color: var(--color-text-muted);
+			color: color-mix(in srgb, var(--color-ink) 35%, var(--field-health));
 		}
 
 		&::-webkit-inner-spin-button,
@@ -217,56 +218,58 @@
 	}
 
 	.bp-field__unit {
+		padding-block-end: var(--space-2);
 		font-size: 0.6875rem;
-		font-weight: 600;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-text-muted);
-		text-align: center;
+		letter-spacing: 0.04em;
 	}
 
 	.bp-sheet__footer {
-		padding: var(--space-4) var(--space-5);
+		padding: var(--space-4) calc(var(--space-4) + var(--press-offset)) var(--space-4) var(--space-4);
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
-		border-block-start: 1px solid var(--color-border);
-		margin-block-start: var(--space-4);
+		margin-block-start: var(--space-2);
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-2);
+		gap: var(--space-3);
 	}
 
+	/* Big paper SAVE block with a Health-hued shadow. */
 	.bp-sheet__save-btn {
 		inline-size: 100%;
-		block-size: 52px;
-		border-radius: var(--radius-full);
-		background: var(--color-accent);
-		color: var(--color-accent-ink);
-		font-size: 1rem;
-		font-weight: 700;
-		transition: opacity var(--duration-fast) var(--ease-out);
+		block-size: 72px;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
+		box-shadow: var(--press-offset) var(--press-offset) 0 var(--field-health);
+		font-family: var(--font-display);
+		font-size: 1.375rem;
+		font-weight: 900;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
-			opacity: 0.6;
+			opacity: 0.5;
 			cursor: default;
 		}
 	}
 
 	.bp-sheet__delete-btn {
 		inline-size: 100%;
-		block-size: 44px;
-		border-radius: var(--radius-full);
+		block-size: 48px;
 		background: transparent;
-		border: 1px solid color-mix(in srgb, #ef4444 40%, transparent);
-		color: #ef4444;
-		font-size: 0.9375rem;
-		font-weight: 600;
-		transition:
-			background-color var(--duration-fast) var(--ease-out),
-			border-color var(--duration-fast) var(--ease-out);
+		border: var(--rule) solid var(--color-red);
+		color: var(--color-red);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
 	}
 
 	.bp-sheet__delete-btn--confirm {
-		background: color-mix(in srgb, #ef4444 12%, transparent);
-		border-color: #ef4444;
+		background: var(--color-red);
+		color: var(--color-ink);
 	}
 </style>

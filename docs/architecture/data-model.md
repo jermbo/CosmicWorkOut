@@ -37,14 +37,14 @@ type Discipline = {
 The one shipped Discipline (`src/lib/discipline.ts`):
 
 | Discipline | id         | Sections    | Section metrics |
-| ---------- | ---------- | ----------- | ---------------- |
-| Strength   | `strength` | `exercises` | `setsReps`       |
+| ---------- | ---------- | ----------- | --------------- |
+| Strength   | `strength` | `exercises` | `setsReps`      |
 
 `isBookend` sections (routines other than A inherit Routine A's bookend items unless they set `overridesBookends`) exist in the model for a future Discipline that needs them — Strength's single section doesn't use it.
 
 ### Exactly one active plan
 
-Only one program is ever active, full stop (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) — the point is staying focused, not juggling plans). `activeProgramIds` holds at most one id; `setActiveProgram(id)` replaces it outright rather than appending. This also resolves what used to be a correctness gap: with two Disciplines able to run concurrently, `setActiveProgram()` appended without deactivating another program of the *same* Discipline, so a second same-Discipline activation could silently coexist (tracked in the [hardening audit](../maintenance/audit-2026-07-hardening.md#correctness-deferred)). With one Discipline and exactly one active plan, that gap is closed by construction. All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive from the active program; "one session per program per day" is unchanged. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
+Only one program is ever active, full stop (v1.10.0, [US-052](../features/v1.10.0/US-052-one-workout-section.md) — the point is staying focused, not juggling plans). `activeProgramIds` holds at most one id; `setActiveProgram(id)` replaces it outright rather than appending. This also resolves what used to be a correctness gap: with two Disciplines able to run concurrently, `setActiveProgram()` appended without deactivating another program of the _same_ Discipline, so a second same-Discipline activation could silently coexist (tracked in the [hardening audit](../maintenance/audit-2026-07-hardening.md#correctness-deferred)). With one Discipline and exactly one active plan, that gap is closed by construction. All progression values (`todaysRoutine`, `weekStreak`, `currentWeek`, `isComplete`) derive from the active program; "one session per program per day" is unchanged. Progression is **count-driven**: the next routine is `completedSessionCount % routineCount`. See [Program Progression](../implementation/program-progression.md).
 
 ---
 
@@ -57,7 +57,6 @@ Built-in **Items are derived from catalog seeds**, not hand-written one by one:
 `src/lib/db/seed.ts` composes `builtInItems = [...strengthItems]` (**72 built-in items**) and `builtInPrograms = [...strengthPrograms]` (**6 programs**) — Belly Dance's catalog and course programs were removed in v1.10.0 ([US-051](../features/v1.10.0/US-051-remove-belly-dance.md)).
 
 ---
-
 
 ## Entities
 
@@ -432,11 +431,10 @@ Stored in localStorage (`cwout:prefs`).
 
 ```typescript
 type UserPrefs = {
-	accentColor: string; // hex, default "#b2f042"
-	theme: 'dark' | 'light' | 'system'; // default "dark" (v1.10.0, US-048)
 	density: 'compact' | 'comfortable' | 'spacious';
-	roundness: 'sharp' | 'default' | 'soft';
 	weightUnit: 'lb' | 'kg'; // lifting and body weight (US-029)
+	hapticsEnabled: boolean; // default true — Vibration API, no-op where unsupported (v1.12.0, US-056)
+	soundEnabled: boolean; // default false — synthesized Web Audio clicks (v1.12.0, US-056)
 	homeCardOrder: string[]; // Overview card order; repaired on read via resolveHomeCardOrder()
 	habitsEnabled: boolean; // default false — gates Habits, including mood
 	activityLogEnabled: boolean; // default false — gates the Activity log
@@ -446,6 +444,8 @@ type UserPrefs = {
 	hiddenCharts: string[]; // Insights chart ids hidden by the user — US-043
 };
 ```
+
+`accentColor`, `theme` and `roundness` were removed in v1.12.0 ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md)); old stored values are ignored on load and dropped on the next save.
 
 ---
 
@@ -520,14 +520,18 @@ Built-in items and programs are **upserted on every boot** (`initDB()` → `upse
 
 ## localStorage keys
 
-| Key                      | Contents                                                                    |
-| ------------------------ | --------------------------------------------------------------------------- |
-| `cwout:prefs`            | UserPrefs JSON                                                              |
-| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                         |
-| `cwout:activeProgramIds` | Active program id per Discipline                                            |
-| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset)          |
-| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)                       |
-| `cwout:habitDay`         | Written to today's date on habit-store load; not currently read (vestigial) |
+Which keys travel in a backup is decided in `backupPayload.ts`: `BACKUP_LOCAL_KEYS` are backed up, `DEVICE_ONLY_KEYS` never are. A test fails on any `cwout:` key in neither list.
+
+| Key                      | Contents                                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `cwout:prefs`            | UserPrefs JSON                                                                                                            |
+| `cwout:activeSession`    | ActiveSession JSON (crash recovery)                                                                                       |
+| `cwout:activeProgramIds` | Active program id per Discipline                                                                                          |
+| `cwout:activeProgramId`  | Legacy single active-program id (pre-Discipline; cleared on reset)                                                        |
+| `cwout:lastActivityType` | Last used ActivityType (pre-fills new activity sheet)                                                                     |
+| `cwout:lastQrBackupAt`   | Local date this device last sent a QR backup ([US-057](../features/v1.12.0/US-057-send-backup-by-qr.md)); never backed up |
+| `cwout:qrSendOptions`    | QR send density and speed for this device; never backed up                                                                |
+| `cwout:habitDay`         | Written to today's date on habit-store load; not currently read (vestigial)                                               |
 
 ---
 

@@ -179,8 +179,16 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
 			opacity: 0.5;
@@ -191,8 +199,8 @@
 	.plan-new__btn--ghost {
 		flex: 0 0 auto;
 		padding-inline: var(--space-5);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		color: var(--color-text-primary);
+		border: var(--rule-thin) solid var(--color-paper);
 	}
 </style>

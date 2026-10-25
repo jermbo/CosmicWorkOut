@@ -129,8 +129,8 @@
 		align-items: center;
 		gap: var(--space-3);
 		padding: var(--space-3) var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		transition:
 			border-color var(--duration-fast) var(--ease-out),
@@ -184,33 +184,32 @@
 		flex-shrink: 0;
 	}
 
+	/* Square brutal switch, same as SettingsToggleRow. */
 	.baseline-row__toggle {
 		position: relative;
-		inline-size: 40px;
-		block-size: 24px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		transition: background-color var(--duration-fast) var(--ease-out);
+		inline-size: 52px;
+		block-size: 28px;
+		background: var(--field-empty);
+		border: var(--rule) solid var(--color-paper);
 	}
 
 	.baseline-row__toggle--active {
 		background: var(--color-accent);
-		border-color: var(--color-accent);
 	}
 
 	.baseline-row__toggle-thumb {
 		position: absolute;
-		inset-block: 2px;
-		inset-inline-start: 2px;
-		inline-size: 18px;
-		block-size: 18px;
-		border-radius: var(--radius-full);
-		background: white;
-		transition: transform var(--duration-fast) var(--ease-out);
+		inset-block: 0;
+		inset-inline-start: 0;
+		inline-size: 22px;
+		background: var(--color-paper);
+		border-inline-end: var(--rule) solid var(--color-ink);
+		transition: transform var(--duration-press) linear;
 
 		.baseline-row__toggle--active & {
-			transform: translateX(16px);
+			transform: translateX(24px);
+			border-inline-end: none;
+			border-inline-start: var(--rule) solid var(--color-ink);
 		}
 	}
 
@@ -221,8 +220,8 @@
 		inline-size: 32px;
 		block-size: 32px;
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		color: var(--color-text-muted);
 		transition: color var(--duration-fast) var(--ease-out);
 

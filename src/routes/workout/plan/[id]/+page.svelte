@@ -501,7 +501,7 @@
 	.goal-panel {
 		padding: var(--space-5);
 		background: var(--color-surface-2);
-		border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-2xl);
 	}
 
@@ -522,7 +522,7 @@
 		block-size: 40px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		color: var(--color-text-primary);
@@ -580,11 +580,11 @@
 		padding-inline: var(--space-4);
 		block-size: 40px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.875rem;
 		font-weight: 600;
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 
 		&:hover {
 			color: var(--color-text-primary);
@@ -640,15 +640,22 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 0.8125rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.plan-page__pause-btn {
 		padding-inline: var(--space-4);
 		block-size: 36px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: var(--color-text-muted);
@@ -718,9 +725,9 @@
 		inline-size: 36px;
 		block-size: 36px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
+		color: var(--color-text-primary);
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
@@ -776,8 +783,8 @@
 	}
 
 	.workout-card {
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-xl);
 		padding: var(--space-4);
 	}
@@ -804,6 +811,7 @@
 		background: var(--waccent);
 		color: #101010;
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
 		font-weight: 700;
 		flex-shrink: 0;
@@ -863,11 +871,11 @@
 		padding-inline: var(--space-2);
 		block-size: 30px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.75rem;
 		font-weight: 600;
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
 
@@ -883,8 +891,8 @@
 		inline-size: 30px;
 		block-size: 30px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		color: var(--color-text-muted);
 		flex-shrink: 0;
 		transition: color var(--duration-fast) var(--ease-out);
@@ -905,7 +913,7 @@
 		block-size: 22px;
 		border-radius: var(--radius-full);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		font-size: 0.6875rem;
 		font-weight: 500;
 		color: var(--color-text-secondary);

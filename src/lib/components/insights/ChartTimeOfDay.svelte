@@ -4,11 +4,10 @@
 	import { scaleBand } from '@tanstack/charts/scales/band';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
 	import { hourHistogram, hourLabel } from '$lib/insights/logic';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
-	import { chartGrid, PLOT_MARGIN, chartTooltip, withAlpha } from '$lib/charts/theme';
+	import { chartGrid, PLOT_MARGIN, chartTooltip, withAlpha, CHART_ACCENT } from '$lib/charts/theme';
 	import ChipPicker from './ChipPicker.svelte';
 
 	let { dates }: { dates: string[] } = $props();
@@ -41,7 +40,7 @@
 	);
 
 	function build() {
-		const accent = prefsStore.accentColor;
+		const accent = CHART_ACCENT;
 		return defineChart({
 			marks: [
 				ruleY(axis.ticks, { stroke: chartGrid() }),

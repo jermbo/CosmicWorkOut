@@ -216,6 +216,83 @@ export async function countRecords(storeName: string): Promise<number> {
 	});
 }
 
+/** Count records dated `from`–`to` (inclusive) in each store, via its `by_date` index. */
+export async function countByDateRange(
+	storeNames: readonly string[],
+	from: string,
+	to: string,
+): Promise<Record<string, number>> {
+	const db = await openDB();
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction([...storeNames], 'readonly');
+		const range = IDBKeyRange.bound(from, to);
+		const counts: Record<string, number> = {};
+		for (const name of storeNames) {
+			const request = tx.objectStore(name).index('by_date').count(range);
+			request.onsuccess = () => {
+				counts[name] = request.result;
+			};
+		}
+		tx.oncomplete = () => resolve(counts);
+		tx.onerror = () => reject(tx.error);
+	});
+}
+
+/**
+ * Apply a QR window backup (US-058) in one transaction: in each `replace` store, delete
+ * every record dated `from`–`to` and write the given records; in each `upsert` store,
+ * put the given records. If any write fails the transaction aborts and nothing changes.
+ */
+export async function replaceDateRange(
+	from: string,
+	to: string,
+	replace: Record<string, unknown[]>,
+	upsert: Record<string, unknown[]>,
+): Promise<void> {
+	const db = await openDB();
+	const storeNames = [...new Set([...Object.keys(replace), ...Object.keys(upsert)])];
+	return new Promise((resolve, reject) => {
+		const tx = db.transaction(storeNames, 'readwrite');
+		const range = IDBKeyRange.bound(from, to);
+		let failed = false;
+		const fail = (err: unknown) => {
+			if (failed) return;
+			failed = true;
+			try {
+				tx.abort();
+			} catch {
+				/* already aborting */
+			}
+			console.error('[qr-receive] window write failed:', err);
+			reject(err instanceof Error ? err : new Error('Could not write the backup.'));
+		};
+		tx.oncomplete = () => resolve();
+		tx.onerror = () => fail(tx.error);
+		tx.onabort = () => fail(tx.error ?? new Error('The write was aborted.'));
+
+		for (const [name, records] of Object.entries(replace)) {
+			const store = tx.objectStore(name);
+			const keys = store.index('by_date').getAllKeys(range);
+			keys.onsuccess = () => {
+				try {
+					for (const key of keys.result) store.delete(key);
+					for (const record of records) store.put(record);
+				} catch (err) {
+					fail(err);
+				}
+			};
+		}
+		try {
+			for (const [name, records] of Object.entries(upsert)) {
+				const store = tx.objectStore(name);
+				for (const record of records) store.put(record);
+			}
+		} catch (err) {
+			fail(err);
+		}
+	});
+}
+
 async function removeRecord(storeName: string, key: string): Promise<void> {
 	const db = await openDB();
 	return new Promise((resolve, reject) => {
@@ -297,6 +374,7 @@ export async function loadDebugSeedData(): Promise<void> {
 	await putAllRecords('baselineLogs', baselineLogs);
 
 	const goalSample = generateGoalPlanSampleData();
+	await pausePlansSupersededBySeed(goalSample.goalPlans);
 	await putAllRecords('goalPlans', goalSample.goalPlans);
 	await putAllRecords('programs', goalSample.programs);
 	await putAllRecords('sessions', goalSample.sessions);
@@ -305,17 +383,27 @@ export async function loadDebugSeedData(): Promise<void> {
 	location.reload();
 }
 
-/** Add a seeded program to the active list so it shows up on Practice/Workout. */
+/**
+ * The seed ships its own active plan, and exactly one plan is ever active (US-052),
+ * so park whatever was running first. Otherwise `goalPlanStore.activePlan` picks the
+ * first active record it finds while `activeProgramIds` points at the seeded program.
+ */
+async function pausePlansSupersededBySeed(seeded: GoalPlan[]): Promise<void> {
+	const seededIds = new Set(seeded.map((p) => p.id));
+	const existing = await getAll<GoalPlan>('goalPlans');
+	const running = existing.filter((p) => p.status === 'active' && !seededIds.has(p.id));
+	if (running.length === 0) return;
+
+	const pausedAt = new Date().toISOString();
+	await putAllRecords(
+		'goalPlans',
+		running.map((plan) => ({ ...plan, status: 'paused' as const, pausedAt })),
+	);
+}
+
+/** Make the seeded program the one active plan — exactly one is ever active (US-052). */
 function activateSeededProgram(programId: string): void {
-	try {
-		const raw = localStorage.getItem('cwout:activeProgramIds');
-		const ids: string[] = raw ? (JSON.parse(raw) as string[]) : [];
-		if (Array.isArray(ids) && !ids.includes(programId)) {
-			localStorage.setItem('cwout:activeProgramIds', JSON.stringify([...ids, programId]));
-		}
-	} catch {
-		localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
-	}
+	localStorage.setItem('cwout:activeProgramIds', JSON.stringify([programId]));
 }
 
 export async function clearCustomExercises(): Promise<void> {

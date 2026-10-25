@@ -173,10 +173,47 @@
 		inline-size: 100%;
 	}
 
+	/* Room on the right and below for the cards' hard shadows. */
 	.home-cards {
 		display: flex;
 		flex-direction: column;
-		gap: var(--space-3);
+		gap: var(--card-gap);
+		padding-inline-end: var(--press-offset);
+		padding-block-end: var(--press-offset);
+	}
+
+	/* Cards drop in one after another (up to 8 staggered steps). */
+	.home-cards > :global(*) {
+		animation: card-drop 340ms cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+	}
+
+	.home-cards > :global(:nth-child(2)) {
+		animation-delay: 50ms;
+	}
+	.home-cards > :global(:nth-child(3)) {
+		animation-delay: 100ms;
+	}
+	.home-cards > :global(:nth-child(4)) {
+		animation-delay: 150ms;
+	}
+	.home-cards > :global(:nth-child(5)) {
+		animation-delay: 200ms;
+	}
+	.home-cards > :global(:nth-child(6)) {
+		animation-delay: 250ms;
+	}
+	.home-cards > :global(:nth-child(7)) {
+		animation-delay: 300ms;
+	}
+	.home-cards > :global(:nth-child(n + 8)) {
+		animation-delay: 350ms;
+	}
+
+	@keyframes card-drop {
+		from {
+			opacity: 0;
+			transform: translateY(-16px);
+		}
 	}
 
 	.home-empty {
@@ -186,31 +223,38 @@
 		gap: var(--space-2);
 		padding: var(--space-8) var(--space-4);
 		text-align: center;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
-		border-radius: var(--r-xl);
+		background: var(--field-empty);
+		border: var(--rule) dashed var(--color-paper);
 	}
 
 	.home-empty__msg {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
-		font-weight: 700;
+		font-weight: 900;
+		background: var(--color-ink);
+		padding: 2px var(--space-2);
 	}
 
 	.home-empty__hint {
 		max-inline-size: 42ch;
-		font-size: 0.875rem;
+		font-size: 0.8125rem;
 		color: var(--color-text-secondary);
+		background: var(--color-ink);
+		padding: var(--space-2);
 	}
 
 	.home-empty__link {
 		margin-block-start: var(--space-2);
 		padding: var(--space-3) var(--space-5);
-		border-radius: var(--radius-full);
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
-		font-size: 0.9375rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		text-transform: uppercase;
 	}
 
 	@container page (inline-size >= 520px) {

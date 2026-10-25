@@ -57,9 +57,9 @@ See [Program Management](../requirements/program-management.md) for requirements
 
 ---
 
-## 4. Tactile and Satisfying — Dark First
+## 4. Tactile and Satisfying — Dark Only
 
-Dark is the default and the reference look; a light theme exists for daylight reading (v1.10.0, [US-048](../features/v1.10.0/US-048-light-mode.md)), and every screen must work in both. Interactions have physical weight — tapping a set tile should feel like checking something off a list. Animations use spring curves, not linear transitions. Completion moments (exercise done, session done) should feel earned.
+The app is dark only and looks like a piece of gym equipment: a visible grid, solid color fields, 3px rules, hard shadows ([Design System](../architecture/design-system.md), v1.12.0). Light mode existed from v1.10.0 to v1.12.0 and was removed with that redesign. Interactions have physical weight — anything with a shadow can be pressed, and it sinks into its shadow when tapped, so a set feels checked off. Completion moments (exercise done, session done) should feel earned.
 
 This is not decoration. Satisfying feedback is what makes people actually log their workouts consistently.
 

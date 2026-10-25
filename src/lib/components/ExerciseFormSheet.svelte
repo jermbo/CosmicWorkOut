@@ -291,7 +291,7 @@
 		block-size: 44px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-size: 0.9375rem;
@@ -330,7 +330,7 @@
 	.seg-control {
 		display: flex;
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		padding: 3px;
 		gap: 3px;
@@ -357,7 +357,7 @@
 		display: flex;
 		align-items: center;
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		block-size: 44px;
@@ -388,9 +388,15 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 1rem;
-		font-weight: 700;
 		margin-block-start: var(--space-2);
-		transition: opacity var(--duration-fast) var(--ease-out);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
 			opacity: 0.6;

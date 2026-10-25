@@ -455,7 +455,7 @@
 
 	.workout-editor__top {
 		flex-shrink: 0;
-		border-block-end: 1px solid var(--color-border);
+		border-block-end: var(--rule-thin) solid var(--color-border);
 		padding-block-start: calc(var(--safe-top) + var(--space-3));
 		padding-block-end: var(--space-3);
 	}
@@ -474,9 +474,10 @@
 		inline-size: 44px;
 		block-size: 44px;
 		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
+		background: transparent;
+		color: var(--color-text-primary);
 		flex-shrink: 0;
+		border: var(--rule-thin) solid var(--color-paper);
 
 		svg {
 			inline-size: 20px;
@@ -495,10 +496,11 @@
 		border: none;
 		outline: none;
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
 		font-weight: 700;
 		color: var(--color-text-primary);
-		border-block-end: 1px solid var(--color-accent);
+		border-block-end: var(--rule-thin) solid var(--color-accent);
 	}
 
 	.workout-editor__title-btn {
@@ -519,6 +521,7 @@
 
 	.workout-editor__title-text {
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1.125rem;
 		font-weight: 700;
 		color: var(--color-text-primary);
@@ -537,9 +540,15 @@
 		background: var(--color-accent);
 		color: var(--color-accent-ink);
 		font-size: 0.875rem;
-		font-weight: 700;
 		flex-shrink: 0;
-		transition: opacity var(--duration-fast) var(--ease-out);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
 			opacity: 0.6;
@@ -570,8 +579,8 @@
 		display: flex;
 		align-items: center;
 		gap: var(--space-2);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		padding: var(--space-3);
 	}
@@ -643,8 +652,8 @@
 		display: flex;
 		align-items: center;
 		gap: 4px;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		border-radius: var(--radius-md);
 		padding-inline: var(--space-2);
 		block-size: 32px;
@@ -685,8 +694,8 @@
 	}
 
 	.inline-editor {
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		padding: var(--space-4);
 		margin-block-start: calc(var(--space-2) * -1);
@@ -725,7 +734,7 @@
 		display: flex;
 		align-items: center;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		overflow: hidden;
 
@@ -755,7 +764,7 @@
 		inline-size: 100%;
 		block-size: 40px;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		padding-inline: var(--space-3);
 		font: inherit;
@@ -776,7 +785,14 @@
 		color: var(--color-accent-ink);
 		border-radius: var(--radius-md);
 		font-size: 0.9375rem;
-		font-weight: 700;
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 
 	.workout-editor__divider {

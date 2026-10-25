@@ -49,12 +49,12 @@ This is a **map of content**, not a spec. It cuts across altitudes so you can en
 
 ## Where in the code
 
-| Layer              | Where                                                                     |
-| ------------------ | ------------------------------------------------------------------------- |
-| Routes and layout  | `src/routes/` — see [App Structure](implementation/app-structure.md)      |
-| UI primitives      | `Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader` |
-| Feature components | [Components](implementation/components.md)                                |
-| Design tokens      | `src/app.css` — global-only; no UI utility classes                        |
+| Layer              | Where                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| Routes and layout  | `src/routes/` — see [App Structure](implementation/app-structure.md)                                |
+| UI primitives      | `Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader`                           |
+| Feature components | [Components](implementation/components.md)                                                          |
+| Design tokens      | `src/app.css` — global-only; no UI utility classes ([Design System](architecture/design-system.md)) |
 
 > Shared UI patterns are **wrapper components, not global CSS classes**
 > ([Decision 4](maintenance/audit-2026-06.md#decisions-locked-2026-06-22)). A parent cannot

@@ -31,21 +31,29 @@
 	{type}
 	{onclick}
 	{disabled}
+	data-feedback={variant === 'danger' ? 'warn' : undefined}
 >
 	{@render children()}
 </button>
 
 <style>
+	/* Chunky block buttons. Primary carries a hard shadow and sinks on press. */
 	.btn {
-		min-block-size: 48px;
+		min-block-size: 52px;
 		padding-block: var(--space-3);
-		border-radius: var(--radius-md);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		transition: opacity var(--duration-fast) var(--ease-out);
+		padding-inline: var(--space-4);
+		border: var(--rule) solid var(--color-paper);
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		letter-spacing: -0.01em;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
-			opacity: 0.6;
+			opacity: 0.5;
 			cursor: not-allowed;
 		}
 	}
@@ -55,7 +63,13 @@
 	}
 
 	.btn--bold {
-		font-weight: 700;
+		font-weight: 900;
+	}
+
+	.btn--primary,
+	.btn--danger {
+		border-color: var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
 	}
 
 	.btn--primary {
@@ -64,12 +78,17 @@
 	}
 
 	.btn--ghost {
-		background: var(--color-surface-3);
+		background: transparent;
 		color: var(--color-text-primary);
+
+		&:active:not(:disabled) {
+			background: var(--color-paper);
+			color: var(--color-ink);
+		}
 	}
 
 	.btn--danger {
 		background: var(--color-red);
-		color: #ffffff;
+		color: var(--color-ink);
 	}
 </style>

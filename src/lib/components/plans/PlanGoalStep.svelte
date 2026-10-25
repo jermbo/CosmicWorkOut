@@ -142,12 +142,13 @@
 		flex: 1;
 		block-size: 52px;
 		border-radius: var(--radius-lg);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-family: var(--font-display);
+		text-transform: uppercase;
 		font-size: 1rem;
 		font-weight: 700;
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 		transition: border-color var(--duration-fast) var(--ease-out);
 
 		&:hover {
@@ -179,7 +180,7 @@
 		gap: 2px;
 		padding: var(--space-3) var(--space-4);
 		background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-2));
-		border: 1px solid var(--color-accent);
+		border: var(--rule-thin) solid var(--color-accent);
 		border-radius: var(--radius-lg);
 	}
 
@@ -206,7 +207,7 @@
 		gap: var(--space-3);
 		padding: var(--space-3) var(--space-4);
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-lg);
 		text-align: start;
 		transition: border-color var(--duration-fast) var(--ease-out);

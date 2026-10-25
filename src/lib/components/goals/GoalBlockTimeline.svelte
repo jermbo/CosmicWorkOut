@@ -75,7 +75,7 @@
 		block-size: 18px;
 		border-radius: 4px;
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 	}
 
 	.timeline-week--deload {

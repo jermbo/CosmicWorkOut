@@ -1,9 +1,6 @@
 export type WeightUnit = 'lb' | 'kg' | 'band' | 'bodyweight';
 export type RoutineColor = 'lime' | 'lavender' | 'red';
 export type Density = 'compact' | 'comfortable' | 'spacious';
-export type Roundness = 'sharp' | 'default' | 'soft';
-/** `system` follows the device's light / dark setting (v1.11.0). */
-export type Theme = 'dark' | 'light' | 'system';
 export const STRENGTH_CATS = [
 	'Chest',
 	'Back',
@@ -178,11 +175,12 @@ export interface ItemLastUsed {
 }
 
 export interface UserPrefs {
-	accentColor: string;
-	theme: Theme;
 	density: Density;
-	roundness: Roundness;
 	weightUnit: 'lb' | 'kg';
+	/** Vibration on taps and milestones (v1.12.0). Default on; no-op where unsupported. */
+	hapticsEnabled: boolean;
+	/** Synthesized click / clunk sounds (v1.12.0). Default off. */
+	soundEnabled: boolean;
 	/** Overview card order, by card id. Partial or stale values are repaired on read. */
 	homeCardOrder: string[];
 	habitsEnabled: boolean;

@@ -1,7 +1,6 @@
 import { tooltip } from '@tanstack/charts/tooltip';
 import { portal } from '@tanstack/charts/tooltip/portal';
 import type { ChartPoint, ChartTooltipContent } from '@tanstack/charts';
-import { prefsStore } from '$lib/stores/prefs.svelte';
 
 export { withAlpha } from './color';
 
@@ -13,32 +12,47 @@ export const PLOT_MARGIN = { top: 12, bottom: 28, left: 0, right: 0 } as const;
 
 /**
  * Chart colors that can't be CSS variables — SVG presentation attributes don't resolve
- * `var()`. Reading `prefsStore.resolvedTheme` inside a chart's definition makes it
- * rebuild when the theme changes. Axis text uses `currentColor`, so it needs nothing here.
+ * `var()`. The app is dark only (v1.12.0), so there is one palette. These hex values
+ * match the `--field-*` tokens in app.css. Axis text uses `currentColor`.
  */
-const PALETTES = {
-	dark: { grid: '#2a2a2a', outline: '#3a3a3a', heatEmpty: '#232323', heatNeutral: '#3a3a3a' },
-	light: { grid: '#e4e4df', outline: '#cfcfc9', heatEmpty: '#ebebe6', heatNeutral: '#c9c9c3' },
+export const FIELD = {
+	train: '#4ebdf7',
+	habit: '#f8907f',
+	base: '#be9df7',
+	health: '#eed059',
+	active: '#5aca94',
+	red: '#ff6557',
+	paper: '#f2f0ea',
+} as const;
+
+/** The accent (Training field) as a hex, for charts. */
+export const CHART_ACCENT = FIELD.train;
+
+const PALETTE = {
+	grid: '#262625',
+	outline: '#0a0a0a',
+	heatEmpty: '#1c1c1b',
+	heatNeutral: '#3a3936',
 } as const;
 
 export function chartPalette() {
-	return PALETTES[prefsStore.resolvedTheme];
+	return PALETTE;
 }
 
 export function chartGrid(): string {
-	return chartPalette().grid;
+	return PALETTE.grid;
 }
 
 /** Series colors used across Insights when nothing more specific applies. */
 export const SERIES_COLORS = [
-	'#b2f042',
-	'#60c6ff',
-	'#f472b6',
-	'#f59e0b',
-	'#b286fd',
-	'#34d399',
-	'#e55733',
-	'#818cf8',
+	FIELD.train,
+	FIELD.health,
+	FIELD.habit,
+	FIELD.active,
+	FIELD.base,
+	'#e5a14b',
+	'#e88fcb',
+	FIELD.paper,
 ];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -63,11 +77,12 @@ export interface TooltipRowSpec<TDatum> {
 
 /**
  * Tooltip config: portalled so it escapes the horizontal scroller, placed beside
- * the pointer, titled by a date, with one row per focused point.
+ * the pointer, titled by a date, with one row per focused point. `row` may return
+ * null to leave a point out — marker marks would otherwise repeat a line's value.
  */
 export function chartTooltip<TDatum>(
 	title: (datum: TDatum) => string,
-	row: (point: ChartPoint<TDatum>) => { label: string; value: string; color?: string },
+	row: (point: ChartPoint<TDatum>) => { label: string; value: string; color?: string } | null,
 ) {
 	return {
 		use: tooltip,
@@ -80,9 +95,10 @@ export function chartTooltip<TDatum>(
 			const first = points[0];
 			return {
 				title: first ? title(first.datum) : undefined,
-				rows: points.map((p) => {
+				rows: points.flatMap((p) => {
 					const r = row(p);
-					return { label: r.label, value: r.value, color: r.color ?? p.color };
+					if (!r) return [];
+					return [{ label: r.label, value: r.value, color: r.color ?? p.color }];
 				}),
 			};
 		},

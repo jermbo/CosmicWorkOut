@@ -55,8 +55,8 @@
 		align-items: center;
 		gap: var(--space-3);
 		padding: var(--space-4);
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		border-radius: var(--r-xl);
 		margin-block-end: var(--space-2);
 	}
@@ -91,9 +91,15 @@
 		block-size: 34px;
 		border-radius: var(--radius-full);
 		background: var(--color-accent);
-		border: 1px solid var(--color-accent);
 		font-size: 0.8125rem;
-		font-weight: 600;
 		color: var(--color-accent-ink);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 	}
 </style>

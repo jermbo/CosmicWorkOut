@@ -66,6 +66,7 @@
 </dialog>
 
 <style>
+	/* Slides up, overshoots a touch, and lands. */
 	@keyframes sheet-slide-up {
 		from {
 			transform: translateY(100%);
@@ -98,7 +99,7 @@
 		overflow: visible;
 
 		&::backdrop {
-			background: rgba(0, 0, 0, 0.6);
+			background: rgba(10, 10, 10, 0.8);
 			animation: backdrop-fade-in 120ms var(--ease-out) both;
 		}
 	}
@@ -109,13 +110,16 @@
 		inset-block-end: 0;
 		max-inline-size: var(--max-width);
 		margin-inline: auto;
-		background: var(--color-surface-2);
-		border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
-		border-block-start: 1px solid var(--color-border);
+		background-color: var(--color-ink);
+		background-image:
+			linear-gradient(var(--color-grid) 1px, transparent 1px),
+			linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+		background-size: 24px 24px;
+		border-block-start: var(--rule) solid var(--color-paper);
 		padding-block-end: calc(var(--safe-bottom) + var(--space-5));
 		overflow-y: auto;
 		overscroll-behavior: contain;
-		animation: sheet-slide-up 220ms var(--ease-out) both;
+		animation: sheet-slide-up 300ms cubic-bezier(0.2, 0.9, 0.3, 1.12) both;
 	}
 
 	@container app (inline-size >= 720px) {
@@ -132,10 +136,9 @@
 	}
 
 	.bottom-sheet__grab {
-		inline-size: 38px;
+		inline-size: 48px;
 		block-size: 4px;
-		background: var(--color-border-strong);
-		border-radius: var(--radius-full);
+		background: var(--color-paper);
 		margin: var(--space-3) auto var(--space-1);
 		flex-shrink: 0;
 	}

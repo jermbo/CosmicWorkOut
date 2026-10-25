@@ -1,15 +1,23 @@
 <script lang="ts">
+	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
+	import { resolveHref } from '$lib/navigation';
 
-	let { title }: { title: string } = $props();
+	type Props = {
+		title: string;
+		/** Where the back button goes — Settings unless the page sits deeper. */
+		backHref?: string;
+		backLabel?: string;
+	};
+
+	let { title, backHref = '/settings', backLabel = 'Settings' }: Props = $props();
 </script>
 
 <header class="settings-sub-header">
 	<button
 		class="settings-sub-header__back"
-		onclick={() => goto(resolve('/settings'))}
-		aria-label="Back to Settings"
+		onclick={() => goto(resolveHref(backHref))}
+		aria-label="Back to {backLabel}"
 	>
 		<svg
 			viewBox="0 0 24 24"
@@ -21,7 +29,7 @@
 		>
 			<polyline points="15 18 9 12 15 6" />
 		</svg>
-		Settings
+		{backLabel}
 	</button>
 	<h1 class="settings-sub-header__title">{title}</h1>
 </header>
@@ -29,15 +37,17 @@
 <style>
 	.settings-sub-header {
 		margin-block-end: var(--space-6);
+		padding-block-end: var(--space-2);
+		border-block-end: var(--rule) solid var(--color-paper);
 	}
 
 	.settings-sub-header__back {
 		display: inline-flex;
 		align-items: center;
 		gap: 2px;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: var(--color-accent-text);
+		font-size: 0.6875rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		margin-block-end: var(--space-1);
@@ -50,9 +60,12 @@
 
 	.settings-sub-header__title {
 		font-family: var(--font-display);
-		font-size: 1.75rem;
-		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.2;
+		text-transform: uppercase;
+		/* Scales down so long titles (PERSONALIZATION) fit on one line. */
+		font-size: clamp(1.25rem, 7.5cqi, 2rem);
+		font-weight: 900;
+		letter-spacing: -0.04em;
+		line-height: 0.95;
+		overflow-wrap: break-word;
 	}
 </style>

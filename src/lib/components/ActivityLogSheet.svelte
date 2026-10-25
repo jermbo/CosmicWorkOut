@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
 	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
 	import { activityStore } from '$lib/stores/activities.svelte';
@@ -154,11 +155,13 @@
 				>
 					<button
 						onclick={() => adjustDuration(-5)}
+						use:holdRepeat={() => adjustDuration(-5)}
 						aria-label="Decrease 5 minutes">−</button
 					>
 					<span class="act-stepper__val">{formatMinutes(durationMinutes)}</span>
 					<button
 						onclick={() => adjustDuration(5)}
+						use:holdRepeat={() => adjustDuration(5)}
 						aria-label="Increase 5 minutes">+</button
 					>
 				</div>
@@ -187,6 +190,7 @@
 		<div class="act-sheet__footer">
 			<button
 				class="act-sheet__save-btn"
+				data-feedback="success"
 				onclick={handleSave}
 				disabled={saving}
 				aria-busy={saving}
@@ -196,6 +200,7 @@
 			{#if editing}
 				<button
 					class="act-sheet__delete-btn"
+					data-feedback="warn"
 					class:act-sheet__delete-btn--confirm={confirming}
 					onclick={handleDelete}
 					aria-label={deleteAriaLabel}
@@ -242,25 +247,25 @@
 		border-radius: var(--radius-full);
 		font-size: 0.875rem;
 		font-weight: 600;
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
+		color: var(--color-text-primary);
 		transition:
 			background-color var(--duration-fast) var(--ease-out),
 			color var(--duration-fast) var(--ease-out);
 	}
 
 	.act-type-btn--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--field-active);
+		border-color: var(--color-ink);
+		color: var(--color-ink);
 	}
 
 	.act-custom-input {
 		block-size: 44px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-size: 0.9375rem;
@@ -280,7 +285,7 @@
 		display: flex;
 		align-items: center;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		overflow: hidden;
 		block-size: 56px;
@@ -320,8 +325,8 @@
 		border-radius: var(--radius-md);
 		font-size: 0.875rem;
 		font-weight: 600;
-		background: var(--color-surface-2);
-		border: 1px solid var(--color-border);
+		background: var(--color-ink);
+		border: var(--rule) solid var(--color-paper);
 		color: var(--color-text-secondary);
 		transition:
 			background-color var(--duration-fast) var(--ease-out),
@@ -329,15 +334,15 @@
 	}
 
 	.act-intensity-btn--active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: var(--color-accent-ink);
+		background: var(--field-active);
+		border-color: var(--color-ink);
+		color: var(--color-ink);
 	}
 
 	.act-sheet__footer {
 		padding: var(--space-4) var(--space-5);
 		padding-block-end: max(var(--space-4), env(safe-area-inset-bottom));
-		border-block-start: 1px solid var(--color-border);
+		border-block-start: var(--rule-thin) solid var(--color-border);
 		margin-block-start: var(--space-4);
 		display: flex;
 		flex-direction: column;
@@ -348,11 +353,17 @@
 		inline-size: 100%;
 		block-size: 52px;
 		border-radius: var(--radius-full);
-		background: var(--color-accent);
+		background: var(--field-active);
 		color: var(--color-accent-ink);
 		font-size: 1rem;
-		font-weight: 700;
-		transition: opacity var(--duration-fast) var(--ease-out);
+		border: var(--rule) solid var(--color-ink);
+		box-shadow: var(--shadow-hard-sm);
+		font-family: var(--font-display);
+		font-weight: 800;
+		text-transform: uppercase;
+		transition:
+			transform var(--duration-press) linear,
+			box-shadow var(--duration-press) linear;
 
 		&:disabled {
 			opacity: 0.6;
@@ -365,7 +376,7 @@
 		block-size: 44px;
 		border-radius: var(--radius-full);
 		background: transparent;
-		border: 1px solid color-mix(in srgb, #ef4444 40%, transparent);
+		border: var(--rule-thin) solid var(--color-red);
 		color: #ef4444;
 		font-size: 0.9375rem;
 		font-weight: 600;

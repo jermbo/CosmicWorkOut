@@ -66,9 +66,11 @@
 
 	.sheet-header__title {
 		font-family: var(--font-display);
-		font-size: 1.25rem;
-		font-weight: 700;
-		letter-spacing: -0.01em;
+		text-transform: uppercase;
+		font-size: 1.375rem;
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: -0.03em;
 	}
 
 	.sheet-header__actions {
@@ -81,11 +83,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		inline-size: 36px;
-		block-size: 36px;
-		border-radius: var(--radius-full);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
+		inline-size: 40px;
+		block-size: 40px;
+		background: transparent;
+		border: var(--rule) solid var(--color-paper);
+		color: var(--color-text-primary);
 		flex-shrink: 0;
 
 		svg {

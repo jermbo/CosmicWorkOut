@@ -20,8 +20,9 @@
 <HomeCard
 	href="/health"
 	title="Health"
+	code="P"
 	{ariaLabel}
-	variant="log"
+	field="health"
 >
 	{#if !hasAny}
 		<p class="home-health-card__empty">Not logged</p>
@@ -51,36 +52,40 @@
 <style>
 	.home-health-card__empty {
 		font-size: 0.875rem;
-		color: var(--color-text-muted);
+		font-weight: 500;
 	}
 
 	.home-health-card__stats {
 		display: flex;
-		gap: var(--space-6);
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-6);
 	}
 
 	.home-health-card__stat {
 		display: flex;
-		flex-direction: column;
+		flex-direction: column-reverse;
 		gap: 2px;
 	}
 
 	.home-health-card__num {
-		font-family: var(--font-mono);
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
+		font-family: var(--font-display);
+		font-size: 1.5rem;
+		font-weight: 900;
+		letter-spacing: -0.04em;
+		line-height: 1.1;
 	}
 
 	.home-health-card__unit {
+		font-family: var(--font-mono);
 		font-size: 0.75rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
+		font-weight: 700;
+		text-transform: uppercase;
 		margin-inline-start: 3px;
 	}
 
 	.home-health-card__label {
-		font-size: 0.75rem;
-		color: var(--color-text-secondary);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		text-transform: uppercase;
 	}
 </style>

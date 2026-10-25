@@ -178,7 +178,7 @@
 		overflow-y: auto;
 		margin-inline: auto;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
+		border: var(--rule) solid var(--color-border-strong);
 		border-radius: var(--r-xl);
 		padding: var(--space-5);
 		z-index: 91;
@@ -202,7 +202,7 @@
 		block-size: 52px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-family: var(--font-mono);

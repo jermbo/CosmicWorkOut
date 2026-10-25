@@ -73,19 +73,20 @@ Every set write calls `persist()` → `localStorage:cwout:activeSession`.
 
 User preferences. Loaded once at boot, saved on every change.
 
-| Pref                          | Default       | Applied via                                                                                        |
-| ----------------------------- | ------------- | -------------------------------------------------------------------------------------------------- |
-| `accentColor`                 | `#b2f042`     | `--color-accent` CSS var + ink color                                                               |
-| `theme`                       | `dark`        | `data-theme` on `<html>` (resolved: `system` follows the device; also set pre-paint in `app.html`) |
-| `density`                     | `comfortable` | `data-density` on `<html>`                                                                         |
-| `roundness`                   | `default`     | `data-roundness` on `<html>`                                                                       |
-| `weightUnit`                  | `lb`          | Display in SetTile, LogSetSheet                                                                    |
-| `homeCardOrder`               | see below     | Order of the Overview summary cards                                                                |
-| `habitsEnabled`               | `false`       | Gates `/habits`, mood, and related UI                                                              |
-| `activityLogEnabled`          | `false`       | Gates `/log` and related UI                                                                        |
-| `practiceEnabled`             | `false`       | Gates the whole Workout section (below) — code name lags the "Workout" rename (v1.10.0, US-052)   |
-| `healthMetricsEnabled`        | `false`       | Gates `/health` and related UI                                                                     |
-| `baselinesEnabled`            | `false`       | Gates `/baselines` and related UI                                                                  |
+| Pref                   | Default       | Applied via                                                                                     |
+| ---------------------- | ------------- | ----------------------------------------------------------------------------------------------- |
+| `density`              | `comfortable` | `data-density` on `<html>`                                                                      |
+| `weightUnit`           | `lb`          | Display in SetTile, LogSetSheet                                                                 |
+| `hapticsEnabled`       | `true`        | `feedback()` in `src/lib/feedback/` — Vibration API (v1.12.0)                                   |
+| `soundEnabled`         | `false`       | `feedback()` — synthesized Web Audio tones (v1.12.0)                                            |
+| `homeCardOrder`        | see below     | Order of the Overview summary cards                                                             |
+| `habitsEnabled`        | `false`       | Gates `/habits`, mood, and related UI                                                           |
+| `activityLogEnabled`   | `false`       | Gates `/log` and related UI                                                                     |
+| `practiceEnabled`      | `false`       | Gates the whole Workout section (below) — code name lags the "Workout" rename (v1.10.0, US-052) |
+| `healthMetricsEnabled` | `false`       | Gates `/health` and related UI                                                                  |
+| `baselinesEnabled`     | `false`       | Gates `/baselines` and related UI                                                               |
+
+`accentColor`, `theme` and `roundness` were removed in v1.12.0 ([US-055](../features/v1.12.0/US-055-color-fields-redesign.md)).
 
 All settings are editable via `/settings` and sub-routes ([US-030](../features/v1.7.0/US-030-settings-restructure.md)).
 

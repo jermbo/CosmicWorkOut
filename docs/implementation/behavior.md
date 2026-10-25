@@ -214,6 +214,10 @@ flowchart TB
 
 You can **export** a full JSON backup and **restore** it (replace-only) from Settings → Data. A service worker precaches the app shell, so the app works offline and installs as a PWA on a secure context (HTTPS or `localhost`).
 
+**Debug data and tracker toggles.** Settings → Data → "Load debug data" writes ~6 months of sessions, activities, habit logs, health readings, and baselines straight to IndexedDB. It deliberately does **not** flip any tracker toggle — Workout, Activity log, Habits, Health metrics, and Baselines all default to off, and each one gates its own routes, home cards, and insights charts. On a fresh profile the seed therefore appears to do nothing: the data is there, but every surface that would render it is hidden. The confirm dialog lists whichever trackers are currently off so this is visible before loading.
+
+The seed does take over the **active plan**, because it ships one: its mid-plan goal becomes the single active program and any plan that was already running is paused first, keeping the one-active-plan invariant from [US-052](../features/v1.10.0/US-052-one-workout-section.md). The seed's other ~6 months of sessions are history only — they belong to the built-in `st-beginner-101` program, which is not activated.
+
 ---
 
 ## Built-In Content

@@ -12,14 +12,14 @@ Defining, selecting, and editing fitness programs.
 
 > **See [Implementation Status](../implementation/status.md)** for the full checklist. Summary below.
 
-| Area                         | Status |
+| Area | Status |
 | ---------------------------- | ------ | ------------------------------------------------------------------------------ |
-| Program picker / switching   | Built  |                                                                                |
-| Create program from scratch  | Built  |                                                                                |
-| Copy built-in before editing | Built  |                                                                                |
-| Custom item CRUD             | Built  |                                                                                |
-| Browse all program weeks     | Built  |                                                                                |
-| Multi-plan activation        | Removed | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) let more than one plan run at once; v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) made exactly one plan active, always |
+| Program picker / switching | Built | |
+| Create program from scratch | Built | |
+| Copy built-in before editing | Built | |
+| Custom item CRUD | Built | |
+| Browse all program weeks | Built | |
+| Multi-plan activation | Removed | Practice groups ([US-021](../features/v1.4.0/US-021-practice-groups-plans.md)) let more than one plan run at once; v1.10.0 ([US-052](../features/v1.10.0/US-052-one-workout-section.md)) made exactly one plan active, always |
 
 **Roadmap:** week-by-week schedule preview in program picker — [roadmap](../roadmap/README.md#ux-polish).
 

@@ -11,16 +11,23 @@ import {
 	BACKUP_LOCAL_KEYS,
 	BACKUP_VERSION,
 	BackupValidationError,
+	DATED_STORES,
 	DB_STORES,
 	MAX_BACKUP_BYTES,
 	STORE_KEY_PATH,
+	UPSERT_STORES,
+	WINDOW_LOCAL_KEYS,
 	assertBackupSize,
 	assertCountsMatch,
 	assertStoresAreArrays,
+	assertWindowRecords,
+	datedCounts,
 	dropLegacyBaselines,
 	expectedCounts,
 	localEntriesOf,
 	parseBackup,
+	scopeEnvelope,
+	scopeOf,
 	toPlainEnvelope,
 } from './backupPayload.ts';
 import type { BackupEnvelope } from './backupPayload.ts';
@@ -333,4 +340,115 @@ test('assertBackupSize accepts files up to the cap and rejects anything larger',
 	assert.doesNotThrow(() => assertBackupSize(0));
 	assert.doesNotThrow(() => assertBackupSize(MAX_BACKUP_BYTES));
 	assert.throws(() => assertBackupSize(MAX_BACKUP_BYTES + 1), BackupValidationError);
+});
+
+// ── QR backup scopes (US-057 / US-058) ────────────────────────────────
+
+const customItem: Item = { ...item, id: 'ex-custom', name: 'My Press', isBuiltIn: false };
+
+function sessionOn(date: string): Session {
+	return { ...session, id: `s-${date}`, date };
+}
+
+function windowFixture(): BackupEnvelope {
+	const env = envelope();
+	env.db.items = [item, customItem];
+	env.db.sessions = [sessionOn('2026-07-01'), sessionOn('2026-08-12'), sessionOn('2026-09-01')];
+	env.db.habitLogs = [
+		{ id: 'h-water:2026-08-11', habitId: 'h-water', date: '2026-08-11', value: 3 },
+		{ id: 'h-water:2026-08-20', habitId: 'h-water', date: '2026-08-20', value: 6 },
+	];
+	return env;
+}
+
+test('scopeEnvelope drops built-in items and programs for every scope', () => {
+	const full = scopeEnvelope(windowFixture(), { kind: 'full' });
+	assert.deepEqual(
+		full.db.items.map((i) => i.id),
+		['ex-custom'],
+	);
+	assert.equal(full.db.sessions.length, 3, 'full keeps every dated record');
+	assert.deepEqual(full.scope, { kind: 'full' });
+	assert.ok('cwout:prefs' in full.localStorage, 'full keeps prefs');
+});
+
+test('scopeEnvelope keeps only dated records inside the window, inclusive', () => {
+	const scope = { kind: 'window', from: '2026-08-12', to: '2026-09-01' } as const;
+	const win = scopeEnvelope(windowFixture(), scope);
+	assert.deepEqual(
+		win.db.sessions.map((s) => s.date),
+		['2026-08-12', '2026-09-01'],
+	);
+	assert.deepEqual(
+		win.db.habitLogs.map((l) => l.date),
+		['2026-08-20'],
+	);
+	assert.deepEqual(win.db.habits, [habit], 'definitions always go');
+	assert.equal(win.db.itemLastUsed.length, 1, 'weight memory always goes');
+	assert.deepEqual(win.scope, scope);
+});
+
+test('scopeEnvelope leaves prefs out of a window and keeps the active plan', () => {
+	const win = scopeEnvelope(windowFixture(), {
+		kind: 'window',
+		from: '2026-08-12',
+		to: '2026-09-01',
+	});
+	assert.ok(!('cwout:prefs' in win.localStorage));
+	assert.deepEqual(win.localStorage['cwout:activeProgramIds'], ['p-1']);
+	for (const key of Object.keys(win.localStorage)) {
+		assert.ok((WINDOW_LOCAL_KEYS as readonly string[]).includes(key));
+	}
+});
+
+test('scopeOf treats a missing scope as full (every file backup)', () => {
+	assert.deepEqual(scopeOf(envelope()), { kind: 'full' });
+});
+
+test('scopeOf accepts a well-formed window', () => {
+	const env = envelope({ scope: { kind: 'window', from: '2026-08-12', to: '2026-10-24' } });
+	assert.deepEqual(scopeOf(env), { kind: 'window', from: '2026-08-12', to: '2026-10-24' });
+});
+
+test('scopeOf rejects malformed or backwards windows', () => {
+	for (const scope of [
+		{ kind: 'window', from: '2026-10-24', to: '2026-08-12' },
+		{ kind: 'window', from: 'yesterday', to: '2026-08-12' },
+		{ kind: 'window', from: '2026-08-12' },
+		{ kind: 'partial' },
+		'window',
+	]) {
+		assert.throws(
+			() => scopeOf(asEnvelope({ ...envelope(), scope })),
+			BackupValidationError,
+			JSON.stringify(scope),
+		);
+	}
+});
+
+test('assertWindowRecords rejects a dated record outside the window', () => {
+	const env = windowFixture();
+	assert.throws(() => assertWindowRecords(env, '2026-08-12', '2026-09-01'), BackupValidationError);
+	const win = scopeEnvelope(env, { kind: 'window', from: '2026-08-12', to: '2026-09-01' });
+	assert.doesNotThrow(() => assertWindowRecords(win, '2026-08-12', '2026-09-01'));
+});
+
+test('assertWindowRecords rejects a dated record with no date', () => {
+	const env = asEnvelope({
+		...envelope(),
+		db: { ...envelope().db, sessions: [{ ...session, date: undefined }] },
+	});
+	assert.throws(() => assertWindowRecords(env, '2026-01-01', '2026-12-31'), BackupValidationError);
+});
+
+test('dated stores and upsert stores cover every backed-up store exactly once', () => {
+	const all = [...DATED_STORES, ...UPSERT_STORES].sort();
+	assert.deepEqual(all, [...DB_STORES].sort());
+});
+
+test('datedCounts counts each dated store', () => {
+	const counts = datedCounts(windowFixture());
+	assert.equal(counts.sessions, 3);
+	assert.equal(counts.habitLogs, 2);
+	assert.equal(counts.baselineLogs, 0);
 });

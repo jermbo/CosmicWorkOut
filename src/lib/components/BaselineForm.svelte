@@ -321,7 +321,7 @@
 		overflow-y: auto;
 		margin-inline: auto;
 		background: var(--color-surface-2);
-		border: 1px solid var(--color-border-strong);
+		border: var(--rule) solid var(--color-border-strong);
 		border-radius: var(--r-xl);
 		padding: var(--space-5);
 		z-index: 91;
@@ -345,7 +345,7 @@
 		block-size: 44px;
 		padding-inline: var(--space-3);
 		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-md);
 		font: inherit;
 		font-size: 0.9375rem;
@@ -373,7 +373,7 @@
 		flex-direction: column;
 		gap: var(--space-2);
 		padding: var(--space-3);
-		border: 1px solid var(--color-border);
+		border: var(--rule-thin) solid var(--color-border);
 		border-radius: var(--radius-lg);
 		background: var(--color-surface-1);
 	}
@@ -399,9 +399,9 @@
 		inline-size: 32px;
 		block-size: 32px;
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
-		color: var(--color-text-secondary);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
+		color: var(--color-text-primary);
 		font-size: 0.9375rem;
 		line-height: 1;
 
@@ -423,11 +423,11 @@
 	.bf-measure-btn {
 		block-size: 34px;
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-text-secondary);
+		color: var(--color-text-primary);
 		transition: border-color var(--duration-fast) var(--ease-out);
 
 		&:disabled {
@@ -467,8 +467,8 @@
 		align-self: flex-start;
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: var(--color-accent-text);
@@ -487,8 +487,8 @@
 
 	.bf-preset-btn {
 		padding: var(--space-3);
-		background: var(--color-surface-3);
-		border: 1px solid var(--color-border);
+		background: transparent;
+		border: var(--rule-thin) solid var(--color-paper);
 		border-radius: var(--radius-lg);
 		font-size: 0.875rem;
 		font-weight: 600;
@@ -507,9 +507,10 @@
 		inline-size: 100%;
 		padding-block: var(--space-3);
 		border-radius: var(--radius-md);
-		background: var(--color-surface-3);
-		color: var(--color-text-secondary);
+		background: transparent;
+		color: var(--color-text-primary);
 		font-size: 0.9375rem;
 		font-weight: 600;
+		border: var(--rule-thin) solid var(--color-paper);
 	}
 </style>

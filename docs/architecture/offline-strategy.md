@@ -2,7 +2,7 @@
 
 # Offline Strategy
 
-Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers how local-first persistence and offline caching work today. Deferred portability work (device-to-device sync) lives on the [roadmap](../roadmap/device-sync.md).
+Offline-first is a hard constraint — see [Design Principles](../vision/principles.md). This document covers how local-first persistence and offline caching work today. Moving data between devices works offline too: file export and restore, and [QR backup](../roadmap/qr-backup.md) (v1.12.0), which needs no network at all.
 
 ---
 
@@ -124,7 +124,7 @@ Nothing special. No sync to trigger. Network awareness will only matter for serv
 
 JSON file export and replace-only restore on Settings → Data. See [US-028](../features/v1.7.0/US-028-data-export-backup.md).
 
-Device-to-device sync (QR + LAN merge) is on the [roadmap](../roadmap/device-sync.md).
+QR backup between devices ([QR Backup](../roadmap/qr-backup.md), v1.12.0) needs no network: the data travels as an animated QR code. The bundled QR reader is a normal build chunk, so it is precached like the rest of the app.
 
 ---
 

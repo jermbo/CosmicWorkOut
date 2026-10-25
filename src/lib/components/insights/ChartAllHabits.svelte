@@ -309,8 +309,8 @@
 		flex: none;
 		padding: 4px var(--space-3);
 		border-radius: var(--radius-full);
-		border: 1px solid var(--color-border);
-		background: var(--color-surface-2);
+		border: var(--rule) solid var(--color-paper);
+		background: var(--color-ink);
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: var(--color-text-secondary);
@@ -349,7 +349,7 @@
 	}
 
 	.heat-legend__cell--out {
-		border: 1px solid var(--color-border-strong);
+		border: var(--rule) solid var(--color-border-strong);
 		vertical-align: middle;
 	}
 

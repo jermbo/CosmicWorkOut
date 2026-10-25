@@ -1,4 +1,12 @@
-import { db, clearWorkoutData, putAllRecords, countRecords, initDB } from './database';
+import {
+	db,
+	clearWorkoutData,
+	putAllRecords,
+	countRecords,
+	countByDateRange,
+	replaceDateRange,
+	initDB,
+} from './database';
 import {
 	BACKUP_FORMAT,
 	BACKUP_VERSION,
@@ -6,17 +14,23 @@ import {
 	DB_STORES,
 	STORE_KEY_PATH,
 	BackupValidationError,
+	DATED_STORES,
+	UPSERT_STORES,
+	WINDOW_LOCAL_KEYS,
 	assertCountsMatch,
 	assertStoresAreArrays,
+	assertWindowRecords,
 	dropLegacyBaselines,
 	expectedCounts,
 	localEntriesOf,
+	scopeEnvelope,
+	scopeOf,
 	toPlainEnvelope,
 } from './backupPayload';
-import type { BackupEnvelope, StoreCounts } from './backupPayload';
+import type { BackupEnvelope, BackupScope, DatedStore, StoreCounts } from './backupPayload';
 
 export { BackupValidationError, assertBackupSize, parseBackup } from './backupPayload';
-export type { BackupEnvelope } from './backupPayload';
+export type { BackupEnvelope, BackupScope } from './backupPayload';
 
 /** Temporary IndexedDB used to prove a backup is writable before touching live data. */
 const STAGING_DB_NAME = 'cosmic-workout-restore';
@@ -297,6 +311,12 @@ async function commitLiveFromPlain(plain: BackupEnvelope, expected: StoreCounts)
  */
 export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 	const plain = toPlainEnvelope(envelope);
+	if (scopeOf(plain).kind === 'window') {
+		// Replacing everything with a date window would wipe every day outside it.
+		throw new BackupValidationError(
+			'This is a partial backup from Send by QR. Receive it with Receive by QR instead.',
+		);
+	}
 	if (dropLegacyBaselines(plain)) {
 		console.info('[backup-restore] dropped pre-v1.10.0 baselines from the backup');
 	}
@@ -368,4 +388,65 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 
 	await initDB();
 	console.info('[backup-restore] complete');
+}
+
+// --- QR backup (US-057 / US-058) ----------------------------------------------
+
+/** Build the envelope a QR backup sends for the chosen scope. */
+export async function exportQrBackup(scope: BackupScope): Promise<BackupEnvelope> {
+	return scopeEnvelope(await exportBackup(), scope);
+}
+
+/** How many of this device's records a window backup would replace, per dated store. */
+export async function countWindowOnDevice(
+	from: string,
+	to: string,
+): Promise<Record<DatedStore, number>> {
+	return (await countByDateRange(DATED_STORES, from, to)) as Record<DatedStore, number>;
+}
+
+/**
+ * Apply a QR window backup: this device's records dated inside the window are replaced
+ * by the backup's; definitions and weight memory are upserted, never deleted; prefs and
+ * any in-progress session stay. One transaction — a failure leaves the device unchanged.
+ * Does not reload — the caller decides when to refresh.
+ */
+export async function importWindowBackup(envelope: BackupEnvelope): Promise<void> {
+	const plain = toPlainEnvelope(envelope);
+	const scope = scopeOf(plain);
+	if (scope.kind !== 'window') {
+		throw new BackupValidationError('This backup is not a date-range backup.');
+	}
+	assertStoresAreArrays(plain);
+	assertWindowRecords(plain, scope.from, scope.to);
+
+	try {
+		structuredClone(plain.db);
+	} catch (err) {
+		console.error('[qr-receive] preflight structuredClone failed', err);
+		throw new BackupValidationError(
+			'This backup contains data that cannot be stored in IndexedDB.',
+		);
+	}
+
+	// A store missing from the payload is left alone rather than cleared.
+	const replace: Record<string, unknown[]> = {};
+	for (const store of DATED_STORES) {
+		const records = plain.db[store];
+		if (Array.isArray(records)) replace[store] = records;
+	}
+	const upsert: Record<string, unknown[]> = {};
+	for (const store of UPSERT_STORES) {
+		const records = plain.db[store];
+		if (Array.isArray(records) && records.length > 0) upsert[store] = records;
+	}
+
+	console.info('[qr-receive] applying window', scope, expectedCounts(plain));
+	await replaceDateRange(scope.from, scope.to, replace, upsert);
+
+	const localEntries = localEntriesOf(plain);
+	for (const key of WINDOW_LOCAL_KEYS) {
+		if (key in localEntries) writeLocal(key, localEntries[key]);
+	}
+	console.info('[qr-receive] window applied');
 }

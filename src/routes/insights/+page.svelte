@@ -241,14 +241,18 @@
 	}
 
 	.insights-page__header {
-		padding: 0 var(--page-gutter) var(--space-2);
+		margin-inline: var(--page-gutter);
+		padding-block-end: var(--space-2);
+		border-block-end: var(--rule) solid var(--color-paper);
 	}
 
 	.insights-page__title {
 		font-family: var(--font-display);
-		font-size: 1.75rem;
-		font-weight: 700;
-		letter-spacing: -0.03em;
+		text-transform: uppercase;
+		font-size: 2.5rem;
+		font-weight: 900;
+		line-height: 0.9;
+		letter-spacing: -0.04em;
 		color: var(--color-text-primary);
 		margin: 0;
 	}

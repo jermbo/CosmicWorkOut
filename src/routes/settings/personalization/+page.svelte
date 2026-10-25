@@ -1,32 +1,20 @@
 <!--
-	Settings → Personalization (US-046): appearance (light / dark / match device, v1.11.0),
-	accent color, weight unit, density, roundness, and Overview card order.
+	Settings → Personalization (US-046): weight unit, density, haptics and sound (v1.12.0),
+	and Overview card order.
+	Appearance, accent color, and roundness were removed in v1.12.0 — the app is dark only
+	with fixed per-domain colors (docs/architecture/design-system.md).
 -->
 <script lang="ts">
-	import type { Density, Roundness, Theme } from '$lib/db/types';
+	import type { Density } from '$lib/db/types';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import ColorSwatches from '$lib/components/ColorSwatches.svelte';
 	import OverviewLayoutEditor from '$lib/components/OverviewLayoutEditor.svelte';
 	import SegmentedControl from '$lib/components/SegmentedControl.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
+	import { canVibrate, feedback } from '$lib/feedback';
 
-	const ACCENTS = [
-		{ name: 'Lime', value: '#b2f042' },
-		{ name: 'Lavender', value: '#b286fd' },
-		{ name: 'Sky', value: '#60c6ff' },
-		{ name: 'Red', value: '#e55733' },
-		{ name: 'Orange', value: '#f97316' },
-		{ name: 'Teal', value: '#2dd4bf' },
-		{ name: 'Pink', value: '#f472b6' },
-		{ name: 'Yellow', value: '#facc15' },
-	];
-	const ACCENT_NAMES = Object.fromEntries(ACCENTS.map((a) => [a.value, a.name]));
-
-	const THEMES: { value: Theme; label: string }[] = [
-		{ value: 'dark', label: 'Dark' },
-		{ value: 'light', label: 'Light' },
-		{ value: 'system', label: 'Match device' },
-	];
+	// Only offer haptics where the browser can actually vibrate.
+	const vibrationSupported = canVibrate();
 
 	const WEIGHT_UNITS = [
 		{ value: 'lb', label: 'lb' },
@@ -38,12 +26,6 @@
 		{ value: 'comfortable', label: 'Comfortable' },
 		{ value: 'spacious', label: 'Spacious' },
 	];
-
-	const ROUNDNESS: { value: Roundness; label: string }[] = [
-		{ value: 'sharp', label: 'Sharp' },
-		{ value: 'default', label: 'Default' },
-		{ value: 'soft', label: 'Soft' },
-	];
 </script>
 
 <svelte:head>
@@ -52,43 +34,6 @@
 
 <div class="page page--wide personalization">
 	<SettingsSubHeader title="Personalization" />
-
-	<section
-		class="p-section"
-		aria-labelledby="p-theme"
-	>
-		<h2
-			class="p-section__title"
-			id="p-theme"
-		>
-			Appearance
-		</h2>
-		<SegmentedControl
-			options={THEMES}
-			value={prefsStore.theme}
-			label="Appearance"
-			onchange={(t) => prefsStore.setTheme(t)}
-		/>
-	</section>
-
-	<section
-		class="p-section"
-		aria-labelledby="p-accent"
-	>
-		<h2
-			class="p-section__title"
-			id="p-accent"
-		>
-			Accent color
-		</h2>
-		<ColorSwatches
-			value={prefsStore.accentColor}
-			colors={ACCENTS.map((a) => a.value)}
-			names={ACCENT_NAMES}
-			label="Accent color"
-			onchange={(c) => prefsStore.setAccentColor(c)}
-		/>
-	</section>
 
 	<section
 		class="p-section"
@@ -129,20 +74,36 @@
 
 	<section
 		class="p-section"
-		aria-labelledby="p-roundness"
+		aria-labelledby="p-feedback"
 	>
 		<h2
 			class="p-section__title"
-			id="p-roundness"
+			id="p-feedback"
 		>
-			Roundness
+			Feedback
 		</h2>
-		<SegmentedControl
-			options={ROUNDNESS}
-			value={prefsStore.roundness}
-			label="Roundness"
-			onchange={(r) => prefsStore.setRoundness(r)}
-		/>
+		<div class="p-section__rows">
+			{#if vibrationSupported}
+				<SettingsToggleRow
+					label="Haptics"
+					description="A short buzz when you tap, log a set, or finish."
+					checked={prefsStore.hapticsEnabled}
+					onchange={(on) => {
+						prefsStore.setHapticsEnabled(on);
+						if (on) feedback('success');
+					}}
+				/>
+			{/if}
+			<SettingsToggleRow
+				label="Sound"
+				description="Mechanical clicks and clunks. Off by default."
+				checked={prefsStore.soundEnabled}
+				onchange={(on) => {
+					prefsStore.setSoundEnabled(on);
+					if (on) feedback('success');
+				}}
+			/>
+		</div>
 	</section>
 
 	<div
@@ -165,6 +126,11 @@
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
 		color: var(--color-text-secondary);
+	}
+
+	/* Rows stack into one ruled block, like Settings groups. */
+	.p-section__rows > :global(* + *) {
+		margin-block-start: calc(var(--rule) * -1);
 	}
 
 	.p-section__hint {
