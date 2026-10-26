@@ -15,9 +15,16 @@
 		parseBackup,
 	} from '$lib/db/backup';
 	import type { BackupScope } from '$lib/db/backup';
-	import { DATED_STORES, assertWindowRecords, datedCounts, scopeOf } from '$lib/db/backupPayload';
+	import {
+		DATED_STORES,
+		assertWindowRecords,
+		datedCounts,
+		restoreWarnings,
+		scopeOf,
+	} from '$lib/db/backupPayload';
 	import type { DatedStore } from '$lib/db/backupPayload';
 	import { formatShortDate } from '$lib/date';
+	import { requestPersistentStorage } from '$lib/db/persistence';
 	import { feedback } from '$lib/feedback';
 	import {
 		cameraErrorMessage,
@@ -49,6 +56,8 @@
 		counts: Record<DatedStore, number>;
 		/** This device's records in the window that will be replaced (window scope only). */
 		replacing: Record<DatedStore, number> | null;
+		/** What an Everything backup can't restore and will therefore remove — same as file restore. */
+		warnings: string[];
 	}
 
 	let phase = $state<Phase>('idle');
@@ -83,6 +92,7 @@
 	async function startCamera(deviceId?: string) {
 		error = cameraUnavailableReason();
 		if (error || !video) return;
+		void requestPersistentStorage();
 		phase = 'starting';
 		stopScanning();
 		try {
@@ -160,6 +170,7 @@
 				exportedAt: envelope.exportedAt,
 				counts: datedCounts(envelope),
 				replacing,
+				warnings: scope.kind === 'full' ? restoreWarnings(envelope) : [],
 			};
 			phase = 'ready';
 			feedback('success');
@@ -366,6 +377,9 @@
 			{#if sessionStore.isActive}
 				<br /><br />You have a session in progress — it will be discarded.
 			{/if}
+			{#each pending.warnings as warning (warning)}
+				<br /><br /><strong>{warning}</strong>
+			{/each}
 		{/if}
 	</ConfirmDialog>
 {/if}

@@ -30,6 +30,7 @@
 	import SettingsRow from '$lib/components/SettingsRow.svelte';
 	import { lastQrBackupDate } from '$lib/qrBackup/sendPrefs';
 	import { restoreWarnings } from '$lib/db/backupPayload';
+	import { requestPersistentStorage } from '$lib/db/persistence';
 	import { formatShortDate } from '$lib/date';
 
 	type ClearAction =
@@ -99,6 +100,7 @@
 	async function handleExport() {
 		if (exporting) return;
 		exporting = true;
+		void requestPersistentStorage();
 		try {
 			const { method } = await downloadBackup();
 			if (method === 'share') toastStore.show('Backup shared.', 'info');
@@ -114,6 +116,7 @@
 
 	function openFilePicker() {
 		restoreError = null;
+		void requestPersistentStorage();
 		fileInput?.click();
 	}
 

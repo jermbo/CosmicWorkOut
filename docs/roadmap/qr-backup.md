@@ -112,7 +112,7 @@ sequenceDiagram
 
 1. Keep distinct frames for the current transfer; a frame with a new id, or the same id with a different total (the sender changed density), starts over. Show progress (`41 / 64`) and a square per frame.
 2. When every frame is in: recompute the CRC-32, inflate, parse, and run the Phase 1 checks in `backupPayload.ts`, plus a check that every dated record falls inside the window. **Nothing is written before this passes.**
-3. Show a summary before writing — for example _"Aug 12 – Oct 24: 24 sessions, 365 habit logs, 18 activities. Replaces 20 sessions on this device."_
+3. Show a summary before writing — for example _"Aug 12 – Oct 24: 24 sessions, 365 habit logs, 18 activities. Replaces 20 sessions on this device."_ An Everything backup also shows the file-restore warnings (`restoreWarnings()`) when it is missing whole stores.
 4. On confirm, write (one transaction for Recent; staged restore for Everything), then reload.
 
 **Measured size** (the debug seed — about six months of sessions, habits, activities, health and baselines — at medium density and normal speed, 2026-10-24):

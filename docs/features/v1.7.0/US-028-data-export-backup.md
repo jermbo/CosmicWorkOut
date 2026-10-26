@@ -149,6 +149,7 @@ Merge-on-import is not planned. A file restore is intentionally all-or-nothing; 
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
 - Pure payload logic split into `src/lib/db/backupPayload.ts` (2026-09-19) so the restore path is testable without a browser.
+- **Keep the data** (2026-10-25): Export and Restore call `requestPersistentStorage()` so the browser is less likely to clear the app's data — see [Offline Strategy](../../architecture/offline-strategy.md#keeping-data-from-being-cleared-2026-10-25).
 - **Coverage guard** (2026-10-24): `backupCoverage.test.ts` fails when `database.ts` creates a store that isn't in `DB_STORES`, or the code uses a `cwout:` key that is in neither `BACKUP_LOCAL_KEYS` nor `DEVICE_ONLY_KEYS`. Every new store or key needs a backup decision.
 - **Verified 2026-10-24** in the browser against the debug seed plus a custom exercise and a last activity type: file export → restore, QR Everything, and a QR 90-day window applied to a device with that window and several definitions deleted all came back record-for-record identical. The only differences were the built-in programs' `createdAt` (rebuilt on every boot) and `cwout:habitDay` (transient).
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.

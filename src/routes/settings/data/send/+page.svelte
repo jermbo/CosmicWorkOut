@@ -26,6 +26,7 @@
 		saveSendOptions,
 	} from '$lib/qrBackup/sendPrefs';
 	import { describeCounts } from '$lib/qrBackup/summary';
+	import { requestPersistentStorage } from '$lib/db/persistence';
 	import { toastStore } from '$lib/stores/toast.svelte';
 	import AnimatedQr from '$lib/components/AnimatedQr.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -158,6 +159,11 @@
 		};
 	});
 
+	function startSending() {
+		sending = true;
+		void requestPersistentStorage();
+	}
+
 	function handleDone() {
 		saveLastQrBackupDate(today);
 		toastStore.show(`Backup sent. Next time defaults to since ${formatShortDate(today)}.`);
@@ -265,7 +271,7 @@
 				<p class="qr-send__estimate">{estimate}</p>
 			{/if}
 			<Button
-				onclick={() => (sending = true)}
+				onclick={startSending}
 				disabled={!packed}
 			>
 				Start

@@ -102,6 +102,16 @@ Implemented in `sessionStore.checkForRecovery()` and the recovery banner in `+la
 
 ---
 
+## Keeping Data From Being Cleared (2026-10-25)
+
+Browsers may delete a site's IndexedDB and localStorage: when the disk runs low, when the user clears browsing data, and — in Safari — after about 7 days without a visit, unless the site was added to the Home Screen. That matters most on the device holding a backup.
+
+`requestPersistentStorage()` (`src/lib/db/persistence.ts`) calls `navigator.storage.persist()`, which asks the browser to keep the data. It runs when the user starts a backup action — **Export**, **Restore**, **Start** on Send by QR, **Start camera** on Receive by QR — not on app start, because Firefox may answer with a permission prompt, and a prompt makes sense next to a backup, not on first launch. Chromium decides silently, based on how the site is used (installed apps are usually granted). Safari's best protection is still Add to Home Screen. The call never throws and nothing waits on it; the result is only logged.
+
+This lowers the risk; it doesn't remove it. The file export is still the off-device archive.
+
+---
+
 ## What Happens When Back Online
 
 Nothing special. No sync to trigger. Network awareness will only matter for service worker cache refresh (when built).
