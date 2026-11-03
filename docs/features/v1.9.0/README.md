@@ -79,7 +79,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ### What This Is
 
-**Baselines** — opt-in daily floors/ceilings, multi-entry logging, and growth-over-time charts. Separate from Habits and from Lift plans. Discovery: [Backlog](../../initiatives/baselines/README.md).
+**Baselines** — opt-in daily floors/ceilings, multi-entry logging, and growth-over-time charts. Separate from Habits and from Lift plans. Discovery: [Baselines discovery](../../initiatives/baselines/README.md).
 
 ### What's Shipping (Baselines)
 
@@ -134,7 +134,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 - [US-034 — Baselines Setup](./US-034-baselines-setup.md)
 - [US-035 — Baselines Daily Logging](./US-035-baselines-logging.md)
 - [US-036 — Baselines Progress Charts](./US-036-baselines-charts.md)
-- [Backlog](../../initiatives/baselines/README.md)
+- [Baselines discovery](../../initiatives/baselines/README.md)
 - [US-029 — Health Metrics](../v1.7.0/US-029-health-metrics.md) — toggle pattern
 - [Next routine](../../architecture/next-routine.md)
 - [Glossary](../../glossary.md)

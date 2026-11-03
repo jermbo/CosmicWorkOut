@@ -22,7 +22,7 @@ People come to the app for different things. One person wants only the strength 
 
 A toggle changes only what you see. When it is off, the app hides the screens, the cards, the charts, and the clear rows of that tracker. The records stay in the database, and the store still loads them on each start. When you turn the toggle on again, the tracker comes back with all of its history.
 
-The reason is trust. A switch that deletes data would make every person afraid to touch it. Deletion has its own place, with a confirmation, in [data clearing](data-clearing.md).
+So you can turn a tracker off without fear of loss. Deletion has its own place, with a confirmation, in [data clearing](data-clearing.md).
 
 ## How a hidden screen stays hidden
 

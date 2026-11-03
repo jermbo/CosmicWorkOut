@@ -32,7 +32,7 @@ Each clear row deletes one kind of data and keeps the rest. This page is the con
 
 - A row shows only while its tracker is on, so you cannot clear data that you cannot see. Health data is the one exception: it always shows.
 - **Custom programs** skips each plan with a goal, so a goal never points to a plan that is gone. Use **Plan goals** to delete those.
-- **Plan goals** deletes the plans that the goals made, because a goal's plan without its goal is a half record. The sessions of those plans stay, as history.
+- **Plan goals** also deletes the plans that the goals made. The sessions of those plans stay, as history.
 - No row deletes your settings. To reset them, you change each option in Personalization.
 
 ### Example

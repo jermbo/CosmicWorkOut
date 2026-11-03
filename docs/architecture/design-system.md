@@ -42,7 +42,7 @@ A gym machine shows its frame, its labels, and its plates. The app does the same
 | Health    | Yellow | `[P]` |
 | Activity  | Green  | `[A]` |
 
-The colour tells you where you are without a word. Blue is also the accent of the app. Charts use the same colours, so a habit chart is coral like the Habits card. A habit tile uses the colour of its own habit.
+The colour tells you where you are without a word. Blue is also the accent of the app. Charts use the same colours: a workout chart is blue and a health chart is yellow. A habit is different: its tile and its charts use the colour of that habit, which you set in Settings → Habits.
 
 ## Type
 

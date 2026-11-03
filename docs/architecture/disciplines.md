@@ -37,7 +37,7 @@ Strength declares one section, the exercise list, with the metric sets × reps �
 | Measure     | A duration or a number of reps | No                   |
 | Check       | Done or not done               | No                   |
 
-Strength uses only the first. The other two are in the engine, and a session can already log them.
+Strength uses only the first. The data model and the session store still handle the other two, but the session screen draws only sets × reps. A Discipline that uses measure or check needs those screen parts built again.
 
 ## Bookends
 
@@ -49,7 +49,7 @@ Ask: do you want to be guided through a routine that repeats? If yes, it is a Di
 
 ### Example
 
-A second Discipline, Mobility, could declare three sections: warm-up as check, flow as measure, and cool-down as check, marked as bookends. Its items would be stretches. The session overlay, the next-routine count, and the plan list would work with no change.
+A second Discipline, Mobility, could declare three sections: warm-up as check, flow as measure, and cool-down as check, marked as bookends. Its items would be stretches. The next-routine count, the plan list, and the stored records would work with no change; the session screen would need its check and measure parts.
 
 ## What is not general yet
 

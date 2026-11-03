@@ -41,11 +41,11 @@ Seven charts carry an "Experimental" label: All Habits, Baseline Growth, Showing
 
 ## Hide a chart
 
-Each chart has a menu, ⋯, with **Hide**. Settings → Insights has a switch for each chart, to bring it back. A new chart is visible by default. If you hide every chart, the page says so and links to Settings, so it never looks empty by mistake.
+Each chart has a menu, ⋯, with **Hide chart**. Settings → Insights has a switch for each chart, to bring it back. A new chart is visible by default. If you hide every chart, the page says so and links to Settings, so it never looks empty by mistake.
 
 ## Colours
 
-Each chart uses the colour of its part from the [design system](design-system.md), and a habit uses its own colour. So the coral of Habits on the Overview is the coral of the habit charts.
+Each chart uses the colour of its part from the [design system](design-system.md): Weekly Volume is blue, the health charts are yellow. A habit chart uses the colour of each habit, and Mood uses its good and bad colours.
 
 ### Example
 

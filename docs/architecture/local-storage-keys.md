@@ -16,16 +16,16 @@ The app keeps a few small values in localStorage, because it must read them befo
 
 ## The keys
 
-| Key                      | What it holds                                                  | In a backup |
-| ------------------------ | -------------------------------------------------------------- | ----------- |
-| `cwout:prefs`            | Your settings and the five feature toggles, as one JSON object | Yes         |
-| `cwout:activeProgramIds` | The id of the active plan, in a list of at most one            | Yes         |
-| `cwout:lastActivityType` | The last activity type that you logged, to fill the next entry | Yes         |
-| `cwout:activeSession`    | The session in progress, for crash recovery                    | No          |
-| `cwout:lastQrBackupAt`   | The date on which this device last sent a QR backup            | No          |
-| `cwout:qrSendOptions`    | The QR size and speed that this device uses to send            | No          |
-| `cwout:activeProgramId`  | An old form of the active plan. The app clears it              | No          |
-| `cwout:habitDay`         | Today's date, written when habits load. Nothing reads it       | No          |
+| Key                      | What it holds                                                   | In a backup |
+| ------------------------ | --------------------------------------------------------------- | ----------- |
+| `cwout:prefs`            | Your settings and the five feature toggles, as one JSON object  | Yes         |
+| `cwout:activeProgramIds` | The id of the active plan, in a list of at most one             | Yes         |
+| `cwout:lastActivityType` | The last activity type that you logged, to fill the next entry  | Yes         |
+| `cwout:activeSession`    | The session in progress, for crash recovery                     | No          |
+| `cwout:lastQrBackupAt`   | The date on which this device last sent a QR backup             | No          |
+| `cwout:qrSendOptions`    | The QR size and speed that this device uses to send             | No          |
+| `cwout:activeProgramId`  | An old form of the active plan. A restore or a clear removes it | No          |
+| `cwout:habitDay`         | Today's date, written when habits load. Nothing reads it        | No          |
 
 One more key, `cwout:qrReceived`, is in sessionStorage. It shows one message after the reload that follows a QR restore.
 

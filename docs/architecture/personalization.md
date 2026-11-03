@@ -16,9 +16,7 @@ Personalization changes how the app feels, not what it tracks. It has five optio
 
 ## Weight unit
 
-You select `lb` or `kg`. The app uses it for each lift and for your body weight. The unit is a label only: the app stores the number that you typed and shows it with the unit that you selected. It does not convert. So if you switch from lb to kg, a stored 135 shows as 135 kg. Select the unit once, at the start.
-
-The reason is safety. A conversion would round each number, and a back-and-forth switch would slowly change your history. A label never changes a stored value.
+You select `lb` or `kg`. The app uses it for each lift and for your body weight. The unit is a label only: the app stores the number that you typed and shows it with the unit that you selected. It does not convert. So if you switch from lb to kg, a stored 135 shows as 135 kg. Select the unit once, at the start. The Personalization page says this next to the option.
 
 ## Density
 
@@ -30,7 +28,7 @@ Haptics are on by default. The switch shows only where the browser can vibrate, 
 
 ## Sound
 
-Sound is off by default, because many people train with music or in a quiet room. When it is on, each tap gives a short click that the app makes at run time.
+Sound is off by default. When it is on, each tap gives a short mechanical click or clunk that the app makes at run time, so there are no audio files.
 
 ## Overview card order
 

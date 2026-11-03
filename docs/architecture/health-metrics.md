@@ -16,17 +16,17 @@ Some people train to change a number on a scale, or to bring down their blood pr
 
 ## Two metrics with different rules
 
-**Weight** has at most one reading for each date. Your weight changes slowly, and two readings on one day add noise, not information. So when you log a weight on a date that already has one, the new value replaces the old one. The reading uses your weight unit from Personalization; the unit is a label, and the app does not convert a stored number.
+**Weight** has at most one reading for each date. When you log a weight on a date that already has one, the new value replaces the old one. The reading uses your weight unit from Personalization; the unit is a label, and the app does not convert a stored number.
 
-**Blood pressure** can have many readings on one date. A doctor often asks for a reading in the morning and one in the evening, and one high reading means little alone. Each reading has a systolic and a diastolic value, an optional pulse, and the time that you logged it. The time puts the readings of a day in order.
+**Blood pressure** can have many readings on one date, such as one in the morning and one in the evening. Each reading has a systolic and a diastolic value, an optional pulse, and the time that you logged it. The time puts the readings of a day in order.
 
 ## How you log
 
 You open the Health screen for the logging date. The Weight block shows the weight of that date or "Not logged"; you tap **Log weight**, set the value, and save. The Blood Pressure block lists the readings of that date; you add one, or you tap **Edit** on one to change it. To fix a past day, you pick the date in the header, as the [logging date](logging-date.md) page tells.
 
-## Why you cannot add a metric
+## The metrics are fixed
 
-The app defines the metrics in its code. Each one needs its own rules — one a day or many, which fields, which chart — and a form for any metric would be large and hard to use. A new metric comes with an update. A daily number that you define yourself fits in [Baselines](baselines.md).
+The app defines the metrics in its code, and you cannot add one. Each has its own rules — one a day or many, which fields, which chart. A new metric comes with an update of the app. A daily number that you define yourself fits in [Baselines](baselines.md).
 
 ## Where readings show
 

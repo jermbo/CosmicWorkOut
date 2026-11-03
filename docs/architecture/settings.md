@@ -23,7 +23,7 @@ The Settings tab opens a hub, like the Settings app of a phone. It has two group
 
 ## Why each feature has its own page
 
-An early Settings had one long page with every switch and every list. You had to scroll past the habit list to reach the health switch. With one row for each feature, each page is short, and the hub shows at a glance what is on.
+The design rule is "one row per feature; everything about it, one tap away". Each page stays short, and the hub shows at a glance what is on and what is off.
 
 ## Rare and risky actions live apart
 

@@ -15,7 +15,7 @@
 
 1. **The wiki is genuinely stale.** It stops describing reality at **v1.4.0**. It claims a Journal page and speech input are built (they don't exist in the code), and that the service worker / PWA is _not_ built (it is). v1.5 (Insights) and the v1.6/v1.7 strength + belly-dance work are undocumented. → [Documentation](#1-documentation)
 2. **CSS is well-architected but enormous.** A clean 52-token design system in `app.css` (358 lines), but **~8,170 lines of scoped CSS** live inside components — much of it re-deriving the same button/input/stepper/sheet patterns. The tokens are good; the reuse layer above them is missing. → [CSS](#3-css)
-3. **Icons are half-componentized.** `Icon.svelte` exists and is used by 12 files, but there are **61 inline `<svg>` blocks across 24 files** — the same plus/minus/check paths pasted repeatedly (4× in `LogSetSheet` alone). → [Design system](#2-components)
+3. **Icons are half-componentized.** `Icon.svelte` exists and is used by 12 files, but there are **61 inline `<svg>` blocks across 24 files** — the same plus/minus/check paths pasted repeatedly (4× in `LogSetSheet` alone). → [Components](#2-components)
 4. **~178 ternaries and ~273 comment lines** to remove per your rules. Concentrated, not scattered — the top 10 files hold most of them. → [Ternaries](#4-ternaries) · [Comments](#5-comments)
 5. **A handful of files do too much.** `program/+page.svelte` (917 lines), `WorkoutEditor` (755), `calendar/+page.svelte` (623). These are the files future-you will dread reopening. → [Big files](#big-files)
 

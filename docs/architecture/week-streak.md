@@ -16,7 +16,7 @@ A streak rewards you for coming back. The badge in the Overview header shows how
 
 ## What counts as a week
 
-A week is an ISO week: Monday to Sunday. A week counts when it has at least one session of any plan. The number of sessions that a plan asks for does not matter here. A busy week with one session still keeps the streak, because the point is to keep the habit alive, not to punish a short week.
+A week is an ISO week: Monday to Sunday. A week counts when it has at least one session of any plan. The number of sessions that a plan asks for does not matter here. So a week with one session keeps the streak.
 
 ## How the count runs
 

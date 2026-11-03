@@ -16,7 +16,7 @@ The app has few tabs and many cards. This page tells how you reach each screen, 
 
 ## Four tabs at the bottom
 
-The bottom bar has four tabs: **Overview**, **Workout**, **Insights**, and **Settings**. The Workout tab shows only while Workout is on. A tab is for a place that you visit many times a day. The trackers that you only log in — Habits, Activity log, Health, and Baselines — have no tab, because their card on the Overview is a faster way in.
+The bottom bar has four tabs: **Overview**, **Workout**, **Insights**, and **Settings**. The Workout tab shows only while Workout is on. The bar keeps few permanent places on purpose. Habits, Activity log, Health, and Baselines have no tab; you reach each one from its card on the Overview.
 
 ## Cards open the trackers
 

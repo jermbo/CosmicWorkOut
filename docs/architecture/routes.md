@@ -16,18 +16,18 @@ This page is the contract for each address in the app. A screen that needs a tog
 
 ## Tracker and main screens
 
-| Address              | Screen                                                                      | Needs                  |
-| -------------------- | --------------------------------------------------------------------------- | ---------------------- |
-| `/`                  | Overview — the cards for the logging date                                   | —                      |
-| `/workout`           | Plan list — the active plan on top, the others below, New plan              | `practiceEnabled`      |
-| `/workout/today`     | Today's routine — start, edit, or delete the session of the date            | `practiceEnabled`      |
-| `/workout/new`       | New plan — start from, routines, optional goal, review                      | `practiceEnabled`      |
-| `/workout/plan/[id]` | One plan — weeks, routines, activate, pause, delete, and its goal           | `practiceEnabled`      |
-| `/habits`            | Habit log — rings, steppers, toggles, the mood strip                        | `habitsEnabled`        |
-| `/log`               | Activity log — list, add, edit, delete                                      | `activityLogEnabled`   |
-| `/health`            | Health — weight and blood pressure                                          | `healthMetricsEnabled` |
-| `/baselines`         | Baselines — entries and a chart for each baseline. Shows a message when off | `baselinesEnabled`     |
-| `/insights`          | Insights — the charts of every tracker that is on                           | —                      |
+| Address              | Screen                                                                             | Needs                  |
+| -------------------- | ---------------------------------------------------------------------------------- | ---------------------- |
+| `/`                  | Overview — the cards for the logging date                                          | —                      |
+| `/workout`           | Plan list — the active plan on top, the others below, New plan                     | `practiceEnabled`      |
+| `/workout/today`     | Today's routine — start, edit, or delete the session of the date                   | `practiceEnabled`      |
+| `/workout/new`       | New plan — start from, routines, optional goal, review                             | `practiceEnabled`      |
+| `/workout/plan/[id]` | One plan — weeks, routines, activate, pause, delete, and its goal                  | `practiceEnabled`      |
+| `/habits`            | Habit log — tiles with progress blocks, steppers, Yes / No buttons, the mood scale | `habitsEnabled`        |
+| `/log`               | Activity log — list, add, edit, delete                                             | `activityLogEnabled`   |
+| `/health`            | Health — weight and blood pressure                                                 | `healthMetricsEnabled` |
+| `/baselines`         | Baselines — entries and a chart for each baseline. Shows a message when off        | `baselinesEnabled`     |
+| `/insights`          | Insights — the charts of every tracker that is on                                  | —                      |
 
 ## Settings screens
 

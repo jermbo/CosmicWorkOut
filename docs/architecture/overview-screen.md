@@ -16,19 +16,19 @@ The Overview is the first tab and the first screen. It answers one question: how
 
 ## The day at the top
 
-The header holds the date and a week strip of seven days, Monday to Sunday. Each day of the strip has small marks for what you logged on it: a session, an activity, a habit, a health reading. You tap a past day, and the whole app moves to that day. You cannot tap a day in the future. The [logging date](logging-date.md) page tells how one date drives every tracker.
+The header holds the date and a week strip of seven days, Monday to Sunday. The same header is on each tracker screen. Each day of the strip has small marks for what you logged on it: a session, an activity, a habit, a health reading. You tap a past day, and the whole app moves to that day; on a tracker screen, you stay on that screen. You cannot tap a day in the future. The [logging date](logging-date.md) page tells how one date drives every tracker.
 
 While Workout is on, a badge in the header shows your week streak. The [week streak](week-streak.md) page tells how it counts.
 
 ## One card for each tracker
 
-| Card         | What it shows for the date                                                 |
-| ------------ | -------------------------------------------------------------------------- |
-| Habits       | How many habits you logged, out of the active ones                         |
-| Workout      | The next routine of the active plan, a live session, or "Logged for today" |
-| Activity log | Each activity that you logged                                              |
-| Baselines    | Which baselines are done                                                   |
-| Health       | Your weight and blood pressure, or "Not logged"                            |
+| Card         | What it shows for the date                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| Habits       | How many habits are done, out of the active ones, with progress blocks. Mood does not count |
+| Workout      | The next routine of the active plan, a live session, or "Logged for today"                  |
+| Activity log | Each activity that you logged                                                               |
+| Baselines    | How many baselines are done, such as `2/3`. When all are, "You showed up for all of them."  |
+| Health       | Your weight and blood pressure, or "Not logged"                                             |
 
 A card shows only while its tracker is on. Each card is a door: tap it, and the screen of that tracker opens for the same date. Each card has the colour of its part, from the [design system](design-system.md).
 
@@ -42,7 +42,7 @@ On a new device every tracker is off, so there are no cards. The Overview then s
 
 ### Example
 
-You turn on Habits and Workout, with Workout first. On Tuesday the Overview shows the Workout card with the name of your next routine, above the Habits card with "3/5". You tap Monday in the week strip. The cards now show Monday: the Workout card says "Logged for today", and Habits shows "5/5".
+You turn on Habits and Workout, with Workout first. On Tuesday the Overview shows the Workout card with the name of your next routine, above the Habits card with "3/5". You tap Monday in the week strip. The cards now show Monday: the Workout card says "Logged for today", and Habits shows "5/5" — all five habits reached their goal.
 
 ## Further reading
 

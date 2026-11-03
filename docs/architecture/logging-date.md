@@ -18,7 +18,7 @@ You forgot to log yesterday's run, or you logged the wrong weight last week. Thi
 
 The app holds one logging date. The Overview, Habits, Activity log, Health, Baselines, and today's routine all read it, and each new record gets it. It starts as today. When you reload the app, it is today again, so you never log today's water on last Tuesday by accident.
 
-You change the date in two ways. You tap the date in the header of a tracker and pick a day, or you tap a past day in the week strip of the Overview. A future day cannot be selected.
+You change the date in two ways. Each tracker screen and the Overview have the same header. You tap its date and pick a day, or you tap a past day in its week strip. A future day cannot be selected.
 
 ## How to fix a past day
 

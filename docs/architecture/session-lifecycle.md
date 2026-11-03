@@ -38,7 +38,7 @@ Each set that you log is written to the session in localStorage at once, with no
 
 ## Finish
 
-The footer button says **Finish session** when every set is done, and **Finish early · 9/12 sets** when some are not. It asks no question, because a finish is almost always what you want. The app stores only the completed sets, with the duration, the total sets, and the volume — the sum of weight × reps. Then it removes the copy in progress and shows the result screen.
+The footer button says **Finish session** when every set is done, and **Finish early · 9/12 sets** when some are not. It asks no question. The app stores only the completed sets, with the duration, the total sets, and the volume — the sum of weight × reps. Then it removes the copy in progress and shows the result screen.
 
 ## End without saving
 

@@ -22,7 +22,7 @@ You open the Activity log for the logging date and tap to add. A sheet asks thre
 2. **Duration.** It starts at 30 minutes. Plus and minus move it by 5, and you can hold them. It stays between 1 and 300 minutes.
 3. **Intensity.** Easy, Moderate, or Hard.
 
-You save, and the entry shows in the list for that date. The next time that you add an entry, the sheet starts on the type that you used last, because most people repeat the same activity.
+You save, and the entry shows in the list for that date. The next time that you add an entry, the sheet starts on the type that you used last.
 
 ## Edit and delete
 

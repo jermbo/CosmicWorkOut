@@ -6,7 +6,7 @@
 >
 > **Deviation from plan:** this story specified folding the stores into the existing v9 bump. That only works on a fresh database — `onupgradeneeded` runs only when the version increases, so any install already at v9 would silently lack the two stores and every read would fail. Shipped as **v10** instead, which upgrades existing installs without a wipe.
 >
-> Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Backlog](../../initiatives/baselines/README.md).
+> Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Baselines discovery](../../initiatives/baselines/README.md).
 
 As a **health-conscious user**, I want to define small daily baselines (floors or ceilings) for the things I care about — walking, writing, phone time, tiny workouts —
 so that I can set an embarrassingly low bar once in Settings and use it day to day without rebuilding the Habit or Lift-plan systems.

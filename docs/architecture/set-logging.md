@@ -34,7 +34,7 @@ The weight is known when the item uses a band or bodyweight, or when the set alr
 
 ## The sheet
 
-The sheet has a field for the weight and one for the reps. It rounds the weight to the weight step of the item — 2.5, 5, or 10 — so 47 with a step of 5 becomes 45. The weight step is set on the item, because a dumbbell moves in steps that a barbell does not.
+The sheet has a field for the weight and one for the reps. It rounds the weight to the weight step of the item — 2.5, 5, or 10 — so 47 with a step of 5 becomes 45. The weight step is set on each item.
 
 ## A new weight moves forward
 

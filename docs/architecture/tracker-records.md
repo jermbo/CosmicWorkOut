@@ -17,14 +17,14 @@ This page is the contract for the records of the four daily trackers. Each date 
 
 ## Habit and habit log
 
-| Field       | Rule                                                                          |
-| ----------- | ----------------------------------------------------------------------------- |
-| `type`      | `times`, `minutes`, `count`, `boolean`, or `mood`                             |
-| `unit`      | A label only, such as `cups` or `words`. It can be empty                      |
-| `dailyGoal` | The target for the progress ring. None for `boolean` and `mood`               |
-| `active`    | A habit that is not active hides from the daily screen. Mood is always active |
-| `sortOrder` | The place of the habit in the list                                            |
-| `color`     | The colour in charts. Mood also has `negativeColor` for a bad day             |
+| Field       | Rule                                                                             |
+| ----------- | -------------------------------------------------------------------------------- |
+| `type`      | `times`, `minutes`, `count`, `boolean`, or `mood`                                |
+| `unit`      | A label only, such as `cups` or `words`. It can be empty                         |
+| `dailyGoal` | The target for "done" and for the progress blocks. None for `boolean` and `mood` |
+| `active`    | A habit that is not active hides from the daily screen. Mood is always active    |
+| `sortOrder` | The place of the habit in the list                                               |
+| `color`     | The colour in charts. Mood also has `negativeColor` for a bad day                |
 
 A habit log has the key `<habitId>:<date>`, the `habitId`, the `date`, and one `value`: 0 or 1 for `boolean`, −5 to +5 for `mood`, and a count for the rest.
 

@@ -22,7 +22,7 @@ You cannot edit a built-in item, because the next start would write over your ch
 
 ## Categories by body part
 
-Each strength item has one category: Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, or Full Body. When you add an exercise to a routine, the library opens as a sheet with a chip for each category, so you find a row in a few taps.
+Each strength item has one category: Chest, Back, Shoulders, Biceps, Triceps, Legs, Core, or Full Body. When you add an exercise to a routine, the library opens as a sheet with a search field and a chip for each category. The search matches the name, the muscles, and the category.
 
 ## Custom items
 

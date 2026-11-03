@@ -43,4 +43,4 @@ Each baseline on the Baselines screen has its own progress chart. The Overview c
 ## Further reading
 
 - [Tracker records](tracker-records.md): the fields of a baseline and a baseline log.
-- [Habits](habits.md): a simpler daily check-in with a goal ring.
+- [Habits](habits.md): a simpler daily check-in with a daily goal.

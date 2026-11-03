@@ -14,9 +14,9 @@ parent: system.md
 
 Before the first screen, the app must have its database ready, your settings applied, and every store loaded. This page gives the steps in order.
 
-## Why the app waits before it draws
+## The app waits until it is ready
 
-A screen that draws before its store loads shows empty data for a moment, and a tap in that moment can write to the wrong place. So the app shows nothing until each step is done, and then it draws the first screen in one pass.
+The app shows no screen until every step below is done. Then it draws the first screen in one pass, with every store loaded, so no screen shows half of its data.
 
 ## The steps
 
