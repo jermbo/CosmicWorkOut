@@ -85,4 +85,4 @@ Data & backup         ›
 - [US-046 — Personalization](./US-046-personalization.md)
 - [US-043 — Show / Hide Insights Charts](./US-043-insights-chart-visibility.md)
 - [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Settings](../../architecture/settings.md)

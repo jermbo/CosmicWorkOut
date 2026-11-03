@@ -85,7 +85,7 @@ so that I can monitor my overall health, not just my fitness performance.
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
-- [Settings & Preferences Requirements](../../requirements/settings-preferences.md)
+- [Storage](../../architecture/storage.md)
+- [Settings](../../architecture/settings.md)
 - [US-005 — Daily Dashboard](./US-005-daily-dashboard.md)
-- [History & Calendar Requirements](../../requirements/history-calendar.md)
+- [History & Calendar Requirements](../../architecture/logging-date.md)

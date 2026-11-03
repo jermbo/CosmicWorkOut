@@ -17,7 +17,7 @@ The charts don't introduce new data — they reveal patterns in what you're alre
 - **Chart.js only.** Already in the project at v4.5.1. No additional charting dependency.
 - **Insights is a new nav tab.** History/Calendar stays focused on the date-grid view. Insights gets its own route (`/insights`) and a nav slot.
 - **45-day rolling window by default.** Aligns with the debug seed data range and gives enough data for meaningful patterns without overwhelming the UI. Not user-configurable in this version.
-- **Date range chips shipped** (45d, week, MTD, YTD, custom). Chart drill-down / series filtering is on the [roadmap](../../roadmap/README.md#activity--insights).
+- **Date range chips shipped** (45d, week, MTD, YTD, custom). Chart drill-down / series filtering is on the [roadmap](../backlog.md#insights).
 - **Responsive canvas.** Charts use `responsive: true` and `maintainAspectRatio: false` inside fixed-height containers so they work on both mobile and tablet.
 - **Dark/light theme aware.** Charts read CSS custom properties for colors so they adapt to the app's accent color and surface tokens.
 
@@ -58,16 +58,16 @@ Implement in order — US-022 (hub + nav) must land first; charts can be built i
 
 ## Out of Scope for v1.5.0
 
-Deferred items are on the [roadmap](../../roadmap/README.md) (chart interactivity, per-discipline filtering, activity distance/pace, nutrition).
+Deferred items are on the [roadmap](../backlog.md) (chart interactivity, per-discipline filtering, activity distance/pace, nutrition).
 
 ---
 
 ## Related
 
-- [Map — History & Insights](../../map-history-and-insights.md) — every doc on this subject, across releases
-- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [Map — History & Insights](../../architecture/insights.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../architecture/navigation.md) — every doc on this subject, across releases
 - [v1.4.0](../v1.4.0/README.md) — adjacent release
 - [v1.6.0](../v1.6.0/README.md) — adjacent release
 - [Features index](../README.md) — the full release history
-- [Implementation Status](../../implementation/status.md) — what is built today
+- [Features list](../README.md) — what is built today
 - [Glossary](../../glossary.md) — shared vocabulary

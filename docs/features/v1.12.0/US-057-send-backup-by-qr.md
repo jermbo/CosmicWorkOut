@@ -2,7 +2,7 @@
 
 # US-057 — Send a Backup by QR
 
-> **Status:** Built — waiting on a real phone-to-webcam test. Design: [QR Backup](../../roadmap/qr-backup.md). Receiving side: [US-058](./US-058-receive-backup-by-qr.md).
+> **Status:** Built — waiting on a real phone-to-webcam test. Design: [QR Backup](../../initiatives/qr-backup/README.md). Receiving side: [US-058](./US-058-receive-backup-by-qr.md).
 >
 > **As built:** `/settings/data/send` (`src/routes/settings/data/send/+page.svelte`). `exportQrBackup(scope)` in `db/backup.ts` cuts a full export down with `scopeEnvelope()` (`db/backupPayload.ts`, pure): built-ins dropped, dated stores filtered to the window, prefs left out of a window. `src/lib/qrBackup/frames.ts` (pure) deflates, splits by density (250 / 450 / 800 bytes) and encodes frames as `CW1:<crc32>:<index>:<total>:<base45>` — all QR-alphanumeric characters. `qrMatrix.ts` draws each frame with `uqr` (error correction L, 4-module quiet zone); `AnimatedQr.svelte` paints it to a pixelated canvas and steps on a timer. `sendPrefs.ts` keeps `cwout:lastQrBackupAt` and `cwout:qrSendOptions` — per device, never backed up. Screen Wake Lock while codes show. The "since" choice is labelled **Since last**, with the date on the range line under it, so four choices fit a phone. Tested in `frames.test.ts` and `backupPayload.test.ts`, including a round trip through real QR codes and the bundled reader.
 
@@ -72,7 +72,7 @@ As a **Fitness User** who logs on my phone, I want to show my recent data as a Q
 
 ## Related Docs
 
-- [QR Backup — design](../../roadmap/qr-backup.md)
+- [QR Backup — design](../../initiatives/qr-backup/README.md)
 - [US-058 — Receive a Backup by QR](./US-058-receive-backup-by-qr.md)
 - [US-028 — Data Export, Backup & Device Sync](../v1.7.0/US-028-data-export-backup.md) — the backup format this reuses
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)

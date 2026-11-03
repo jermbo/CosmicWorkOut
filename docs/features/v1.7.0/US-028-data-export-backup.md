@@ -4,9 +4,9 @@
 
 > **Status: Shipped (Phase 1) — v1.7.0**
 >
-> Offline-first data portability via JSON file export/import. Phase 2 shipped as [QR backup](../../roadmap/qr-backup.md) in v1.12.0.
+> Offline-first data portability via JSON file export/import. Phase 2 shipped as [QR backup](../../initiatives/qr-backup/README.md) in v1.12.0.
 >
-> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. The envelope shape, `parseBackup()`, count verification and the pre-wipe preflight live in `src/lib/db/backupPayload.ts` — kept free of IndexedDB so they can be unit-tested (`backupPayload.test.ts`, 21 tests); `backup.ts` keeps the transaction plumbing. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#fixed-2026-07-16).
+> **As built:** `src/lib/db/backup.ts` provides `exportBackup()` / `downloadBackup()` / `parseBackup()` / `importBackup()` over a versioned `cosmic-workout-backup` v1 envelope. The envelope shape, `parseBackup()`, count verification and the pre-wipe preflight live in `src/lib/db/backupPayload.ts` — kept free of IndexedDB so they can be unit-tested (`backupPayload.test.ts`, 21 tests); `backup.ts` keeps the transaction plumbing. Export verifies a JSON round-trip of store counts before offering the file. On browsers that support file sharing (`navigator.canShare({ files })`), Export opens the **system share sheet** (Save to Files, Mail, AirDrop); otherwise it downloads the JSON. Restore is **Replace-only** and **staged**: the payload is JSON-flattened, written to a temporary `cosmic-workout-restore` IndexedDB, count-verified, and only then committed to the live database. Failures during staging leave live data unchanged. See [July 2026 hardening audit](../../initiatives/hardening-2026-07/README.md#fixed-2026-07-16).
 
 As a **fitness user**, I want to back up my workout history and move it between devices
 so that I do not lose data when switching phones, clearing browser storage, or using the app on both phone and computer.
@@ -17,7 +17,7 @@ so that I do not lose data when switching phones, clearing browser storage, or u
 
 > "Your data is yours — take it with you."
 
-The app is client-only ([Design Principles](../../vision/principles.md)). Backup and sync must work **entirely on-device**: file download, file picker, and optional local peer transfer. No online services.
+The app is client-only ([Design principles](../../principles.md)). Backup and sync must work **entirely on-device**: file download, file picker, and optional local peer transfer. No online services.
 
 ---
 
@@ -118,7 +118,7 @@ Simplest path. Lives on **Settings → Data & backup** (`/settings/data` — [US
 | --------------------- | --------------------------------------------------------------------------- |
 | **Replace** (default) | Wipe local workout data, import file wholesale. Simplest and safest for v1. |
 
-Merge-on-import is not planned. A file restore is intentionally all-or-nothing; partial updates belong to [QR backup](../../roadmap/qr-backup.md), which replaces a date window. File restore refuses a QR window backup.
+Merge-on-import is not planned. A file restore is intentionally all-or-nothing; partial updates belong to [QR backup](../../initiatives/qr-backup/README.md), which replaces a date window. File restore refuses a QR window backup.
 
 ### Requirements (Phase 1)
 
@@ -149,7 +149,7 @@ Merge-on-import is not planned. A file restore is intentionally all-or-nothing; 
 
 - New module: `src/lib/db/backup.ts` with `exportBackup()` and `importBackup(file)`.
 - Pure payload logic split into `src/lib/db/backupPayload.ts` (2026-09-19) so the restore path is testable without a browser.
-- **Keep the data** (2026-10-25): Export and Restore call `requestPersistentStorage()` so the browser is less likely to clear the app's data — see [Offline Strategy](../../architecture/offline-strategy.md#keeping-data-from-being-cleared-2026-10-25).
+- **Keep the data** (2026-10-25): Export and Restore call `requestPersistentStorage()` so the browser is less likely to clear the app's data — see [Offline](../../architecture/offline.md).
 - **Coverage guard** (2026-10-24): `backupCoverage.test.ts` fails when `database.ts` creates a store that isn't in `DB_STORES`, or the code uses a `cwout:` key that is in neither `BACKUP_LOCAL_KEYS` nor `DEVICE_ONLY_KEYS`. Every new store or key needs a backup decision.
 - **Verified 2026-10-24** in the browser against the debug seed plus a custom exercise and a last activity type: file export → restore, QR Everything, and a QR 90-day window applied to a device with that window and several definitions deleted all came back record-for-record identical. The only differences were the built-in programs' `createdAt` (rebuilt on every boot) and `cwout:habitDay` (transient).
 - Reuse `db.*.getAll()`, `putAllRecords()`, and `clearWorkoutData()` from `database.ts`.
@@ -159,17 +159,17 @@ Merge-on-import is not planned. A file restore is intentionally all-or-nothing; 
 
 ## Phase 2 — Device sync
 
-Shipped in v1.12.0 as [QR backup](../../roadmap/qr-backup.md) ([US-057](../v1.12.0/US-057-send-backup-by-qr.md), [US-058](../v1.12.0/US-058-receive-backup-by-qr.md)): a one-way animated-QR transfer from one device to another. The earlier plan (QR pairing, LAN or WebRTC transfer, two-way merge engine) was dropped 2026-10-24.
+Shipped in v1.12.0 as [QR backup](../../initiatives/qr-backup/README.md) ([US-057](../v1.12.0/US-057-send-backup-by-qr.md), [US-058](../v1.12.0/US-058-receive-backup-by-qr.md)): a one-way animated-QR transfer from one device to another. The earlier plan (QR pairing, LAN or WebRTC transfer, two-way merge engine) was dropped 2026-10-24.
 
 ---
 
 ## Related Docs
 
-- [QR Backup — design](../../roadmap/qr-backup.md)
+- [QR Backup — design](../../initiatives/qr-backup/README.md)
 - [v1.7.0 README](./README.md)
-- [Offline Strategy](../../architecture/offline-strategy.md) — Storage map
-- [Data Model](../../architecture/data-model.md) — Entities and stores
-- [Program Progression](../../implementation/program-progression.md) — Why session merge must not duplicate `programId` + `date`
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Offline](../../architecture/offline.md) — Storage map
+- [Storage](../../architecture/storage.md) — Entities and stores
+- [Next routine](../../architecture/next-routine.md) — Why session merge must not duplicate `programId` + `date`
+- [Settings](../../architecture/settings.md)
 - [US-029 — Health Metrics](./US-029-health-metrics.md)
 - [US-030 — Settings Hub Restructure](./US-030-settings-restructure.md)

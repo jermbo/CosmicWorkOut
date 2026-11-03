@@ -77,7 +77,7 @@ so that I can build dance routines from a useful starter catalog and add my own 
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)
 - [US-015 — Discipline Engine Foundation](./US-015-discipline-engine-foundation.md)
 - [US-006 — Exercise Library](../v1.1.0/US-006-exercise-library.md)
 - [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)

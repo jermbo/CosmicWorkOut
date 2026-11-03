@@ -37,7 +37,7 @@
 
 ## Related
 
-- [Data Model](../../architecture/data-model.md)
-- [Implementation Status](../../implementation/status.md)
+- [Storage](../../architecture/storage.md)
+- [Features list](../README.md)
 - [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md)
 - [US-032 — Granular Data Clearing](./US-032-granular-data-clearing.md)

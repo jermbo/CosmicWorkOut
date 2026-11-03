@@ -2,7 +2,7 @@
 
 # US-054 — This Month Card
 
-> **Status:** Planned — decided in [v1.10.0 — Topic 14](./README.md#topic-14--this-month-card). Build after [US-053](./US-053-personal-records.md) (it shows the record count).
+> **Status:** Not built — decided in [v1.10.0 — Topic 14](./README.md#topic-14--this-month-card); v1.10.0 shipped without it, so it now sits on the [Backlog](../backlog.md#insights). The design below still stands. Build after [US-053](./US-053-personal-records.md) (it shows the record count).
 
 As a **fitness user**, I want a quick read on how this month is going at the top of Insights
 so that I get the headline before the detailed charts.

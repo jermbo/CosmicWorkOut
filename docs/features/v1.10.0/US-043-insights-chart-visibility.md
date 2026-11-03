@@ -66,4 +66,4 @@ so that my Insights page shows only what I actually find useful — and what I k
 - [US-044 — Experimental Insights Charts](./US-044-experimental-insights-charts.md)
 - [US-045 — Settings Feature Hub](./US-045-settings-feature-hub.md)
 - [US-022 — Insights Hub](../v1.5.0/US-022-insights-hub.md)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Settings](../../architecture/settings.md)

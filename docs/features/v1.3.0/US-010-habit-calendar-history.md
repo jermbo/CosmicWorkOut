@@ -43,5 +43,5 @@ so that I can understand my patterns over time and spot trends across weeks and 
 - [v1.2.0 US-008 — Habit Log Page](../v1.2.0/US-008-habit-log-page.md)
 - [US-009 — Habit Creation & Management](./US-009-habit-creation.md)
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
-- [History & Calendar Requirements](../../requirements/history-calendar.md)
-- [Data Model](../../architecture/data-model.md)
+- [History & Calendar Requirements](../../architecture/logging-date.md)
+- [Storage](../../architecture/storage.md)

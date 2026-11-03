@@ -84,4 +84,4 @@ Source of truth: `MOOD_SCALE` in `src/lib/db/types.ts`.
 - [v1.7.0 README](./README.md)
 - [US-009 — Habit Creation](../v1.3.0/US-009-habit-creation.md)
 - [v1.2.0 Mood Scale](../v1.2.0/README.md#mood-scale)
-- [Data Model — Habit](../../architecture/data-model.md#habit--habitlog)
+- [Storage](../../architecture/storage.md)

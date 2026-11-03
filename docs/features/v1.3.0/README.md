@@ -67,7 +67,7 @@ These foundations exist — v1.3.0 adds the missing UI and calendar integration 
 
 ## Out of Scope for v1.3.0
 
-See [roadmap](../../roadmap/README.md) for deferred ideas (e.g. habit icons). Volume trend graphs were superseded by the v1.5.0 Insights hub.
+See [roadmap](../backlog.md) for deferred ideas (e.g. habit icons). Volume trend graphs were superseded by the v1.5.0 Insights hub.
 
 ---
 
@@ -79,10 +79,10 @@ All stories follow the format defined in [user-story-standards.md](../../standar
 
 ## Related
 
-- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
-- [Map — History & Insights](../../map-history-and-insights.md) — every doc on this subject, across releases
+- [Map — Daily Tracking](../../README.md) — every doc on this subject, across releases
+- [Map — History & Insights](../../architecture/insights.md) — every doc on this subject, across releases
 - [v1.2.0](../v1.2.0/README.md) — adjacent release
 - [v1.4.0](../v1.4.0/README.md) — adjacent release
 - [Features index](../README.md) — the full release history
-- [Implementation Status](../../implementation/status.md) — what is built today
+- [Features list](../README.md) — what is built today
 - [Glossary](../../glossary.md) — shared vocabulary

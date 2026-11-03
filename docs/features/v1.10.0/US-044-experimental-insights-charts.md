@@ -97,4 +97,4 @@ so that I can find out which ones actually help me understand my progress — an
 - [US-043 — Show / Hide Insights Charts](./US-043-insights-chart-visibility.md)
 - [US-038 — Baseline Logging & Comparison](./US-038-baseline-logging-comparison.md)
 - [US-040 — Scrolling Charts on Mobile](./US-040-scrolling-charts.md)
-- [Map — History & Insights](../../map-history-and-insights.md)
+- [Map — History & Insights](../../architecture/insights.md)

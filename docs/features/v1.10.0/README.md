@@ -2,7 +2,7 @@
 
 # v1.10.0 — Baselines & Insights Refresh
 
-> **Status:** In progress. **Built:** US-037 – US-052 — checked with type check, lint, unit tests (109) and a production build; US-048 (light mode) and US-051/US-052 (Remove Belly Dance, One Workout Section) also checked with a full click-through in the browser at phone width. **Planned:** US-053 – US-054 (Topics 13 – 14, Insights).
+> **Status:** Shipped. **Built:** US-037 – US-052 — checked with type check, lint, unit tests (109) and a production build; US-048 (light mode) and US-051/US-052 (Remove Belly Dance, One Workout Section) also checked with a full click-through in the browser at phone width. **Not built:** US-053 – US-054 (Topics 13 – 14, Insights) — decided here, then moved to the [Backlog](../backlog.md#insights) when the release shipped without them. The story files keep the design.
 
 Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub. It grew on the branch: Topics 8 – 10 finish work the roadmap and the July 2026 audit had queued; Topics 11 – 14 reshape the app around one focused workout plan and make Insights answer "am I getting stronger?".
 
@@ -10,26 +10,26 @@ Feedback from real use of v1.9.0 Baselines and the v1.5.0 Insights hub. It grew 
 
 ## What's Shipping
 
-| Story                                              | Title                              | Topic | Status  |
-| -------------------------------------------------- | ---------------------------------- | ----- | ------- |
-| [US-037](./US-037-flexible-baseline-metrics.md)    | Flexible Baseline Metrics          | 1     | Built   |
-| [US-038](./US-038-baseline-logging-comparison.md)  | Baseline Logging & Comparison      | 1     | Built   |
-| [US-039](./US-039-tanstack-charts-migration.md)    | Move All Charts to TanStack Charts | 3     | Built   |
-| [US-040](./US-040-scrolling-charts.md)             | Scrolling Charts on Mobile         | 2     | Built   |
-| [US-041](./US-041-all-habits-heat-chart.md)        | All-Habits Heat Chart              | 4     | Built   |
-| [US-042](./US-042-habit-colors.md)                 | Habit Colors                       | 4     | Built   |
-| [US-043](./US-043-insights-chart-visibility.md)    | Show / Hide Insights Charts        | 5     | Built   |
-| [US-044](./US-044-experimental-insights-charts.md) | Experimental Insights Charts       | 5     | Built   |
-| [US-045](./US-045-settings-feature-hub.md)         | Settings Feature Hub               | 6     | Built   |
-| [US-046](./US-046-personalization.md)              | Personalization                    | 6     | Built   |
-| [US-047](./US-047-retire-history.md)               | Retire History                     | 7     | Built   |
-| [US-048](./US-048-light-mode.md)                   | Light Mode                         | 8     | Built   |
-| [US-049](./US-049-lift-plan-rename.md)             | Lift Plan Wording in the UI        | 9     | Built   |
-| [US-050](./US-050-cheap-hardening.md)              | Cheap Hardening                    | 10    | Built   |
-| [US-051](./US-051-remove-belly-dance.md)           | Remove Belly Dance                 | 11    | Built   |
-| [US-052](./US-052-one-workout-section.md)          | One Workout Section                | 12    | Built   |
-| [US-053](./US-053-personal-records.md)             | Personal Records                   | 13    | Planned |
-| [US-054](./US-054-this-month-card.md)              | This Month Card                    | 14    | Planned |
+| Story                                              | Title                              | Topic | Status                 |
+| -------------------------------------------------- | ---------------------------------- | ----- | ---------------------- |
+| [US-037](./US-037-flexible-baseline-metrics.md)    | Flexible Baseline Metrics          | 1     | Built                  |
+| [US-038](./US-038-baseline-logging-comparison.md)  | Baseline Logging & Comparison      | 1     | Built                  |
+| [US-039](./US-039-tanstack-charts-migration.md)    | Move All Charts to TanStack Charts | 3     | Built                  |
+| [US-040](./US-040-scrolling-charts.md)             | Scrolling Charts on Mobile         | 2     | Built                  |
+| [US-041](./US-041-all-habits-heat-chart.md)        | All-Habits Heat Chart              | 4     | Built                  |
+| [US-042](./US-042-habit-colors.md)                 | Habit Colors                       | 4     | Built                  |
+| [US-043](./US-043-insights-chart-visibility.md)    | Show / Hide Insights Charts        | 5     | Built                  |
+| [US-044](./US-044-experimental-insights-charts.md) | Experimental Insights Charts       | 5     | Built                  |
+| [US-045](./US-045-settings-feature-hub.md)         | Settings Feature Hub               | 6     | Built                  |
+| [US-046](./US-046-personalization.md)              | Personalization                    | 6     | Built                  |
+| [US-047](./US-047-retire-history.md)               | Retire History                     | 7     | Built                  |
+| [US-048](./US-048-light-mode.md)                   | Light Mode                         | 8     | Built                  |
+| [US-049](./US-049-lift-plan-rename.md)             | Lift Plan Wording in the UI        | 9     | Built                  |
+| [US-050](./US-050-cheap-hardening.md)              | Cheap Hardening                    | 10    | Built                  |
+| [US-051](./US-051-remove-belly-dance.md)           | Remove Belly Dance                 | 11    | Built                  |
+| [US-052](./US-052-one-workout-section.md)          | One Workout Section                | 12    | Built                  |
+| [US-053](./US-053-personal-records.md)             | Personal Records                   | 13    | Not built — on roadmap |
+| [US-054](./US-054-this-month-card.md)              | This Month Card                    | 14    | Not built — on roadmap |
 
 **Suggested build order:** US-039 (chart foundation) → US-040 → US-037 → US-038 → US-042 → US-041 → US-043 → US-044 → US-045 → US-046 → US-047 → US-048 → US-049 → US-050 → **US-051 → US-052 → US-053 → US-054** (each of the last four builds on the one before).
 
@@ -213,7 +213,7 @@ Candidate charts — all in as experiments:
 | **One row per feature**        | The Settings home becomes a short list, one row per feature, iPhone-Settings style. Each row shows on / off and opens that feature's own page: its toggle, its manage list, and its own options.                                                                                                                                              |
 | **Bring back Personalization** | Restore a look-and-feel page. It was removed after v1.7.0 ([US-030](../v1.7.0/US-030-settings-restructure.md) post-ship note: "single-user app"); that reason no longer holds now that the app is meant for other people too. The old page had accent color, weight unit, density, and roundness — all still applied on boot by `prefsStore`. |
 | **Personalization contents**   | Bring back the four old options: **accent color, weight unit (lb / kg), density, roundness** — plus **Overview layout** (home card order), moved in from its own Settings row.                                                                                                                                                                |
-| **Light mode — deferred**      | **Pulled back in later — [Topic 8](#topic-8--light-mode), [US-048](./US-048-light-mode.md).** Wanted (light / dark / match device), but **not in v1.10.0**. The app is dark-only today, so it needs a full light palette. Revisit next version — logged in the [Roadmap](../../roadmap/README.md).                                            |
+| **Light mode — deferred**      | **Pulled back in later — [Topic 8](#topic-8--light-mode), [US-048](./US-048-light-mode.md).** Wanted (light / dark / match device), but **not in v1.10.0**. The app is dark-only today, so it needs a full light palette. Revisit next version — logged in the [Backlog](../backlog.md).                                            |
 
 ```
 Habits            On  ›
@@ -257,7 +257,7 @@ The UI still said "Goal plans" outside Settings; every user-facing string became
 
 ## Topic 10 — Audit Phase A
 
-Phase A of the [July 2026 Hardening Audit](../../maintenance/audit-2026-07-hardening.md#proposed-order-ifwhen-we-act): backup file-size cap, save-error handling in sheets, streak boundary test.
+Phase A of the [July 2026 hardening audit](../../initiatives/hardening-2026-07/README.md#proposed-order-ifwhen-we-act): backup file-size cap, save-error handling in sheets, streak boundary test.
 
 ---
 
@@ -317,4 +317,4 @@ Phase A of the [July 2026 Hardening Audit](../../maintenance/audit-2026-07-harde
 
 - [US-034 — Baselines Setup](../v1.9.0/US-034-baselines-setup.md)
 - [US-036 — Baselines Progress Charts](../v1.9.0/US-036-baselines-charts.md)
-- [Map — History & Insights](../../map-history-and-insights.md)
+- [Map — History & Insights](../../architecture/insights.md)

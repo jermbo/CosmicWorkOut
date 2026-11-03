@@ -4,7 +4,7 @@
 
 > **Status: Shipped — v1.4.0**
 >
-> The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model).
+> The substrate the rest of v1.4.0 builds on. Generalizes the strength-only model into one schema-driven **Discipline** engine and re-seeds existing strength as the first Discipline — with no change to how strength feels. Implement **first**; belly dance content (US-016, US-017) layers on top. See the [Glossary](../../glossary.md) and the [Storage](../../architecture/storage.md).
 
 As a **fitness user**, I want my existing strength program, history, and session flow to keep working exactly as before while the app gains a flexible foundation for other movement practices,
 so that adding belly dance (and future practices) never forces me to relearn or lose what I already use.
@@ -22,7 +22,7 @@ so that adding belly dance (and future practices) never forces me to relearn or 
 
 2. Generalized entities
    a. Items, routines, programs, and sessions shall each be associated with a Discipline.
-   b. The current strength entities shall be generalized — Exercise → **Item**, Workout → **Routine**, SessionLog → **Session**, and Program gains a Discipline association — with behaviour preserved (see the [naming map](../../glossary.md#naming-map-original--current)).
+   b. The current strength entities shall be generalized — Exercise → **Item**, Workout → **Routine**, SessionLog → **Session**, and Program gains a Discipline association — with behaviour preserved (see the [naming map](../../glossary.md)).
    c. A routine shall be composed of one or more ordered sections; a strength routine has a single `setsReps` section.
    d. Linear progression — next routine = `completedSessionCount % routineCount`, week = `floor(count / daysPerWeek) + 1` — shall be a Discipline-level behaviour, identical to today's strength logic.
    e. The "one session per program per day" rule shall apply per Discipline, allowing one strength and one belly dance session on the same date.
@@ -84,7 +84,7 @@ These were decided up front so the engine doesn't grow scope it doesn't need. Th
 
 - **Concurrent Disciplines, one active program each.** Strength and belly dance run side by side; active program is tracked per `disciplineId`. The user runs them on whatever days they like — strength some days, dance others — with no enforced schedule. (Requirement 6.)
 - **No day-of-week scheduling.** Progression stays **count-driven**: the recommended routine is `completedSessionCount % routineCount` per Discipline (log A → B is recommended next). The app never says "Tuesday is a dance day."
-- **No load periodization / progression scheme.** Weeks are not auto-progressed (no light → heavy → deload engine). Carrying weight forward is the existing per-item **last-used prefill**, which the user adjusts manually. A progression engine is on the [roadmap](../../roadmap/README.md#training-intelligence).
+- **No load periodization / progression scheme.** Weeks are not auto-progressed (no light → heavy → deload engine). Carrying weight forward is the existing per-item **last-used prefill**, which the user adjusts manually. A progression engine is on the [roadmap](../backlog.md#training).
 - **Streaks unchanged in this story.** The existing weekly strength streak keeps working as-is; the cross-Discipline streak rethink is [US-020](./US-020-practice-streaks-calendar.md), not US-015.
 
 ---
@@ -92,9 +92,9 @@ These were decided up front so the engine doesn't grow scope it doesn't need. Th
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [Data Model — Discipline Model](../../architecture/data-model.md#discipline-model)
+- [Storage](../../architecture/storage.md)
 - [Glossary](../../glossary.md)
-- [Program Progression](../../implementation/program-progression.md)
+- [Next routine](../../architecture/next-routine.md)
 - [US-016 — Item Library (Discipline-scoped)](./US-016-practice-item-library.md)
 - [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)
 - [US-001 — Program Library & Selection](../v1.1.0/US-001-program-library.md)

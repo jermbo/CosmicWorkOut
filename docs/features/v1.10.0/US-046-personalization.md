@@ -6,7 +6,7 @@
 >
 > **As built:** `/settings/personalization` — accent swatches (8 presets via `ColorSwatches`), weight unit / density / roundness via a new `SegmentedControl`, and the Overview card-order editor (extracted to `OverviewLayoutEditor.svelte`, also rendered at `/settings/overview`). Everything writes through the existing `prefsStore` setters, so it applies immediately and persists. **Density and roundness now reach the whole app:** they override the base `--space-*` (compact ×0.75, spacious ×1.25) and `--radius-*` tokens (plus a new `--radius-sheet` for bottom sheets) in `app.css`, instead of the few `--r-*` / `--tile-h` tokens they touched before — which is why the old Appearance page seemed to do nothing but color. Charts read `prefsStore.accentColor`, so they recolor live. **Weight unit is a label only** — past readings are not converted; the page says so. The Health page links here for the unit.
 >
-> Restores the look-and-feel page removed after [US-030](../v1.7.0/US-030-settings-restructure.md) (removed as "single-user app" — no longer true). Light mode is **deferred** to the next version ([Roadmap](../../roadmap/README.md)). Decisions: [v1.10.0 — Topic 6](./README.md#topic-6--settings-page).
+> Restores the look-and-feel page removed after [US-030](../v1.7.0/US-030-settings-restructure.md) (removed as "single-user app" — no longer true). Light mode is **deferred** to the next version ([Backlog](../backlog.md)). Decisions: [v1.10.0 — Topic 6](./README.md#topic-6--settings-page).
 
 As a **health-conscious user**, I want one place to make the app look and feel like mine
 so that I can pick my accent color, units, spacing, and home layout without hunting through Settings.
@@ -76,5 +76,5 @@ so that I can pick my accent color, units, spacing, and home layout without hunt
 - [v1.10.0 README](./README.md)
 - [US-045 — Settings Feature Hub](./US-045-settings-feature-hub.md)
 - [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md) — original Appearance page
-- [Settings & Preferences](../../requirements/settings-preferences.md) — accent color rules
-- [Roadmap](../../roadmap/README.md) — light mode
+- [Settings](../../architecture/settings.md) — accent color rules
+- [Backlog](../backlog.md) — light mode

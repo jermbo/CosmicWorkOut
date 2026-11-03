@@ -2,9 +2,9 @@
 
 # US-058 — Receive a Backup by QR
 
-> **Status:** Built — waiting on a real phone-to-webcam test. Design: [QR Backup](../../roadmap/qr-backup.md). Sending side: [US-057](./US-057-send-backup-by-qr.md).
+> **Status:** Built — waiting on a real phone-to-webcam test. Design: [QR Backup](../../initiatives/qr-backup/README.md). Sending side: [US-057](./US-057-send-backup-by-qr.md).
 >
-> **As built:** `/settings/data/receive` (`src/routes/settings/data/receive/+page.svelte`). `src/lib/qrBackup/camera.ts` opens the camera (rear-facing preferred, 1280×720 ideal), lists cameras for the picker, mirrors any camera that isn't rear-facing, and reads frames with `BarcodeDetector` or, failing that, a lazily imported `jsqr`. `FrameCollector` (`frames.ts`) gathers frames and checks the CRC-32. A window is applied by `importWindowBackup()` (`db/backup.ts`) → `replaceDateRange()` (`db/database.ts`): one `readwrite` transaction that deletes each dated store's `by_date` keys in range, writes the received records, and puts definitions and weight memory. The confirm counts this device's records with `countByDateRange()`. Everything goes through the existing staged `importBackup()`, which now refuses a window backup. The Everything confirm shows the same `restoreWarnings()` as file restore (2026-10-25) — a backup missing whole stores, say from an older cached app on the sender, would otherwise empty them without a word. **Start camera** also asks the browser to keep this device's data ([Offline Strategy](../../architecture/offline-strategy.md#keeping-data-from-being-cleared-2026-10-25)). After the reload, Data & backup shows "Backup received." (flag in `sessionStorage`). Checked in the browser by feeding the screen a fake camera that played the animated codes, with the bundled reader forced: all codes read, confirm shown, apply and reload worked. A deliberately broken write left the database unchanged.
+> **As built:** `/settings/data/receive` (`src/routes/settings/data/receive/+page.svelte`). `src/lib/qrBackup/camera.ts` opens the camera (rear-facing preferred, 1280×720 ideal), lists cameras for the picker, mirrors any camera that isn't rear-facing, and reads frames with `BarcodeDetector` or, failing that, a lazily imported `jsqr`. `FrameCollector` (`frames.ts`) gathers frames and checks the CRC-32. A window is applied by `importWindowBackup()` (`db/backup.ts`) → `replaceDateRange()` (`db/database.ts`): one `readwrite` transaction that deletes each dated store's `by_date` keys in range, writes the received records, and puts definitions and weight memory. The confirm counts this device's records with `countByDateRange()`. Everything goes through the existing staged `importBackup()`, which now refuses a window backup. The Everything confirm shows the same `restoreWarnings()` as file restore (2026-10-25) — a backup missing whole stores, say from an older cached app on the sender, would otherwise empty them without a word. **Start camera** also asks the browser to keep this device's data ([Offline](../../architecture/offline.md)). After the reload, Data & backup shows "Backup received." (flag in `sessionStorage`). Checked in the browser by feeding the screen a fake camera that played the animated codes, with the bundled reader forced: all codes read, confirm shown, apply and reload worked. A deliberately broken write left the database unchanged.
 
 ---
 
@@ -85,7 +85,7 @@ As a **Fitness User** backing up to my computer, I want to point its camera at m
 
 ## Related Docs
 
-- [QR Backup — design](../../roadmap/qr-backup.md)
+- [QR Backup — design](../../initiatives/qr-backup/README.md)
 - [US-057 — Send a Backup by QR](./US-057-send-backup-by-qr.md)
 - [US-028 — Data Export, Backup & Device Sync](../v1.7.0/US-028-data-export-backup.md) — file restore, reused for Everything
-- [Program Progression](../../implementation/program-progression.md) — one session per program per day
+- [Next routine](../../architecture/next-routine.md) — one session per program per day

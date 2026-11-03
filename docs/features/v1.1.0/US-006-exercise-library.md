@@ -56,6 +56,6 @@ so that I can find the right movement for any workout and add my own when the bu
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
-- [Program Management Requirements](../../requirements/program-management.md)
+- [Storage](../../architecture/storage.md)
+- [Workout](../../architecture/workout.md)
 - [US-002 — Custom Program Creation](./US-002-custom-program.md)

@@ -85,4 +85,4 @@ so that I can immediately see what still needs to be done and tap into the right
 - [US-008 — Habit Log Page](./US-008-habit-log-page.md)
 - [US-011 — Program Completion State](./US-011-program-complete-state.md)
 - [v1.1.0 US-005 — Daily Dashboard](../v1.1.0/US-005-daily-dashboard.md)
-- [Implementation: App Structure](../../implementation/app-structure.md)
+- [Implementation: App Structure](../../architecture/routes.md)

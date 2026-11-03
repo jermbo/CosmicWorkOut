@@ -96,8 +96,8 @@ so that I stay on track during practice without pre-planning every duration or r
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [How It Works — Session Flow](../../implementation/behavior.md)
-- [Program Progression](../../implementation/program-progression.md)
+- [Wiki home](../../README.md)
+- [Next routine](../../architecture/next-routine.md)
 - [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)
 - [US-018 — Practice Hub & Navigation](./US-018-practice-hub-navigation.md)
 - [US-020 — Cross-Discipline Streaks & Calendar History](./US-020-practice-streaks-calendar.md)

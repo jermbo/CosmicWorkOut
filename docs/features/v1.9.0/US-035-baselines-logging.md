@@ -75,4 +75,4 @@ so that today’s total stays honest and the embarrassing-low target stays visib
 - [US-034 — Baselines Setup](./US-034-baselines-setup.md)
 - [US-036 — Baselines Progress Charts](./US-036-baselines-charts.md)
 - [US-008 — Habit Log Page](../v1.2.0/US-008-habit-log-page.md) — date context pattern
-- [Glossary — Baseline](../../glossary.md#baseline)
+- [Glossary — Baseline](../../glossary.md)

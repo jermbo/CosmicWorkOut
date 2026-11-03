@@ -31,4 +31,4 @@ so that I feel rewarded and am guided toward what to do next.
 
 - [US-007 — Home Screen Redesign](./US-007-home-screen-redesign.md)
 - [v1.1.0 US-005 — Daily Dashboard](../v1.1.0/US-005-daily-dashboard.md)
-- [Implementation: Program Progression](../../implementation/program-progression.md)
+- [Implementation: Program Progression](../../architecture/next-routine.md)

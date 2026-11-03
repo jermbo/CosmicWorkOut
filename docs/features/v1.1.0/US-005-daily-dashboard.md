@@ -79,11 +79,11 @@ so that I can log my workout, habits, and activities with the fewest taps possib
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
-- [Implementation: App Structure](../../implementation/app-structure.md)
-- [Implementation: Behavior](../../implementation/behavior.md)
-- [Vision: North Star](../../vision/north-star.md)
-- [Vision: Principles](../../vision/principles.md)
+- [Storage](../../architecture/storage.md)
+- [Implementation: App Structure](../../architecture/routes.md)
+- [Implementation: Behavior](../../README.md)
+- [Vision: North Star](../../vision.md)
+- [Vision: Principles](../../principles.md)
 - [US-001 — Program Library & Selection](./US-001-program-library.md)
 - [US-003 — Activity Logging](./US-003-activity-logging.md)
 - [US-004 — Habit Tracking](./US-004-habit-tracking.md)

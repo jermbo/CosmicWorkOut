@@ -79,8 +79,8 @@ so that I can see overall momentum across Disciplines and drill into each one se
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [History & Calendar Requirements](../../requirements/history-calendar.md)
-- [Program Progression](../../implementation/program-progression.md)
+- [History & Calendar Requirements](../../architecture/logging-date.md)
+- [Next routine](../../architecture/next-routine.md)
 - [US-018 — Practice Hub & Navigation](./US-018-practice-hub-navigation.md)
 - [US-019 — Dance Session Flow](./US-019-dance-session-flow.md)
 - [v1.3.0 US-010 — Habit History in Calendar](../v1.3.0/US-010-habit-calendar-history.md)

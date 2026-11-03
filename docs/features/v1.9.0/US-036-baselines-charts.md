@@ -63,4 +63,4 @@ so that I can see growth over time (and for two-metric baselines, how the metric
 - [US-034 — Baselines Setup](./US-034-baselines-setup.md)
 - [US-035 — Baselines Daily Logging](./US-035-baselines-logging.md)
 - [v1.5.0 Insights](../v1.5.0/README.md) — `RangeBar` / chart stack
-- [Glossary — Baseline](../../glossary.md#baseline)
+- [Glossary — Baseline](../../glossary.md)
