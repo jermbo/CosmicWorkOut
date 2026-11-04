@@ -67,7 +67,7 @@ so that I can follow a personalized training plan tailored to my specific goals 
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
-- [Program Management Requirements](../../requirements/program-management.md)
-- [Implementation: Program Progression](../../implementation/program-progression.md)
+- [Storage](../../architecture/storage.md)
+- [Workout](../../architecture/workout.md)
+- [Implementation: Program Progression](../../architecture/next-routine.md)
 - [US-001 — Program Library & Selection](./US-001-program-library.md)

@@ -95,4 +95,4 @@ Coffee ▓ ░ ▒ ▓ ▓ ░ ▒         Tue   ░  ▒  ░  ▒
 - [US-042 — Habit Colors](./US-042-habit-colors.md)
 - [US-040 — Scrolling Charts on Mobile](./US-040-scrolling-charts.md)
 - [US-023 — Mood vs Habits Chart](../v1.5.0/US-023-mood-habits-chart.md) — stays
-- [Glossary — Habit](../../glossary.md#habit)
+- [Glossary — Habit](../../glossary.md)

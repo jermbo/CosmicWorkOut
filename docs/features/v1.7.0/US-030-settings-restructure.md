@@ -221,5 +221,5 @@ b. Deep links to `/settings` continue to work (hub). No external links to sub-ro
 - [US-009 — Habit Creation & Management](../v1.3.0/US-009-habit-creation.md)
 - [US-028 — Data Export, Backup & Device Sync](./US-028-data-export-backup.md)
 - [US-029 — Health Metrics](./US-029-health-metrics.md)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
-- [App Structure](../../implementation/app-structure.md)
+- [Settings](../../architecture/settings.md)
+- [Routes](../../architecture/routes.md)

@@ -46,5 +46,5 @@ so that I can read the app comfortably in daylight.
 ## Related Docs
 
 - [US-046 — Personalization](./US-046-personalization.md)
-- [Design Principles — 4](../../vision/principles.md#4-tactile-and-satisfying--dark-only)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Design principles](../../principles.md)
+- [Settings](../../architecture/settings.md)

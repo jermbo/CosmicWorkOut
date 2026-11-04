@@ -78,6 +78,6 @@ Elements pick their kind from markup; `data-feedback="…"` overrides it, and `d
 
 ## Related Docs
 
-- [Design System — Motion & feedback](../../architecture/design-system.md#motion--feedback)
+- [Design System — Motion & feedback](../../architecture/tap-feel.md)
 - [US-055 — Color Fields Redesign](./US-055-color-fields-redesign.md)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Settings](../../architecture/settings.md)

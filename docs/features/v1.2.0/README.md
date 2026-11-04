@@ -18,7 +18,7 @@ Every interaction must be completable with minimal taps. The home screen tells y
 
 - **One global date** — set on the home screen, flows to all pages (`/habits`, `/log`, etc.). No per-page date pickers. Calendar and graphs are for historical browsing.
 - **Each section is its own route** — home cards are summaries; detail and interaction happen on dedicated pages.
-- **No icons on habits** — clean, text-first. Icons on [roadmap](../../roadmap/README.md#ux-polish).
+- **No icons on habits** — clean, text-first. Icons on [roadmap](../backlog.md#training).
 - **Fixed habit order** — habits display in the order set in Settings regardless of completion state. Consistency over smart sorting.
 - **Mood is a first-class habit type** — stored as an integer (-5 to +5) with named labels. Logged via large radio-button tap targets inline on the habits page (not in the grid).
 - **No custom unit types** — habits use named presets only: Times, Minutes, Count, Yes/No, Mood.
@@ -84,10 +84,10 @@ All stories follow the format defined in [user-story-standards.md](../../standar
 
 ## Related
 
-- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
-- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../architecture/navigation.md) — every doc on this subject, across releases
+- [Map — Daily Tracking](../../README.md) — every doc on this subject, across releases
 - [v1.1.0](../v1.1.0/README.md) — adjacent release
 - [v1.3.0](../v1.3.0/README.md) — adjacent release
 - [Features index](../README.md) — the full release history
-- [Implementation Status](../../implementation/status.md) — what is built today
+- [Features list](../README.md) — what is built today
 - [Glossary](../../glossary.md) — shared vocabulary

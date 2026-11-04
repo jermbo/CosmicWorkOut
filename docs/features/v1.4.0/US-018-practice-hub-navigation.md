@@ -80,7 +80,7 @@ so that I can open the app on a dance day and start the right session without ex
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [App Structure](../../implementation/app-structure.md)
+- [Routes](../../architecture/routes.md)
 - [v1.2.0 US-007 — Home Screen Redesign](../v1.2.0/US-007-home-screen-redesign.md)
 - [US-017 — Belly Dance Discipline, Program & Routines](./US-017-belly-dance-program-routines.md)
 - [US-019 — Dance Session Flow](./US-019-dance-session-flow.md)

@@ -132,7 +132,7 @@ type UserPrefs = {
 - Header with global date (inherited from `loggingContext`).
 - **Weight block:** numeric entry (stepper or numpad consistent with app patterns); shows today's value or empty.
 - **Blood pressure block:** systolic / diastolic inputs; optional pulse field; list of today's readings with time; tap to edit/delete.
-- **History:** context-date readings on main view ship today; extended history view on [roadmap](../../roadmap/README.md#ux-polish).
+- **History:** context-date readings on main view ship today; extended history view on [roadmap](../backlog.md#training).
 
 ### Insights (`/insights`)
 
@@ -252,8 +252,8 @@ b. Restore shall re-import health readings with the rest of workout data.
 
 - [v1.7.0 README](./README.md)
 - [US-028 — Data Export, Backup & Device Sync](./US-028-data-export-backup.md)
-- [Data Model — HealthReading](../../architecture/data-model.md#healthreading)
-- [Glossary — Health metrics](../../glossary.md#health-metrics)
-- [Offline Strategy](../../architecture/offline-strategy.md)
-- [Implementation Status](../../implementation/status.md)
+- [Storage](../../architecture/storage.md)
+- [Glossary — Health metrics](../../glossary.md)
+- [Offline](../../architecture/offline.md)
+- [Features list](../README.md)
 - [US-030 — Settings Hub Restructure](./US-030-settings-restructure.md)

@@ -143,7 +143,7 @@ A custom exercise can be referenced by one or more programs (built-in or custom)
 
 | Item                          | Notes                                                                                                                                                                                                                                                                                              |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Per-date workout log clearing | Clearing a single day's logged workout (as opposed to the whole Workout sessions store). Activities and habit logs already support per-entry editing/removal elsewhere in the app; workout sessions don't. Raised during this story's build but deferred — see [roadmap](../../roadmap/README.md). |
+| Per-date workout log clearing | Clearing a single day's logged workout (as opposed to the whole Workout sessions store). Activities and habit logs already support per-entry editing/removal elsewhere in the app; workout sessions don't. Raised during this story's build but deferred — see [roadmap](../backlog.md). |
 
 ---
 
@@ -152,5 +152,5 @@ A custom exercise can be referenced by one or more programs (built-in or custom)
 - [v1.8.0 README](./README.md)
 - [US-028 — Data Export, Backup & Device Sync](../v1.7.0/US-028-data-export-backup.md)
 - [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md)
-- [Data Model](../../architecture/data-model.md)
-- [Implementation Status](../../implementation/status.md)
+- [Storage](../../architecture/storage.md)
+- [Features list](../README.md)

@@ -7,7 +7,7 @@ Two opt-in tracks in this release:
 1. **Lift plans** (shipped as “Goal progression plans”) — Strength wave-loading toward a lift target
 2. **Baselines** — daily floor/ceiling growth tracking
 
-Vocabulary: [Glossary — Lift plan](../../glossary.md#lift-plan) · [Glossary — Baseline](../../glossary.md#baseline)
+Vocabulary: [Glossary — Lift plan](../../glossary.md) · [Glossary — Baseline](../../glossary.md)
 
 ---
 
@@ -79,7 +79,7 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 
 ### What This Is
 
-**Baselines** — opt-in daily floors/ceilings, multi-entry logging, and growth-over-time charts. Separate from Habits and from Lift plans. Discovery: [Roadmap — Baselines](../../roadmap/baselines.md).
+**Baselines** — opt-in daily floors/ceilings, multi-entry logging, and growth-over-time charts. Separate from Habits and from Lift plans. Discovery: [Baselines discovery](../../initiatives/baselines/README.md).
 
 ### What's Shipping (Baselines)
 
@@ -134,8 +134,8 @@ Today's strength programs keep working as-is: manual weight via last-used prefil
 - [US-034 — Baselines Setup](./US-034-baselines-setup.md)
 - [US-035 — Baselines Daily Logging](./US-035-baselines-logging.md)
 - [US-036 — Baselines Progress Charts](./US-036-baselines-charts.md)
-- [Roadmap — Baselines](../../roadmap/baselines.md)
+- [Baselines discovery](../../initiatives/baselines/README.md)
 - [US-029 — Health Metrics](../v1.7.0/US-029-health-metrics.md) — toggle pattern
-- [Program Progression](../../implementation/program-progression.md)
+- [Next routine](../../architecture/next-routine.md)
 - [Glossary](../../glossary.md)
-- [Implementation Status](../../implementation/status.md)
+- [Features list](../README.md)

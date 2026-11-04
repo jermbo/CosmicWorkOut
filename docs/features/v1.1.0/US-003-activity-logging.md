@@ -63,6 +63,6 @@ so that I can track all my movement — not just gym sessions — in one place.
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)
 - [US-005 — Daily Dashboard](./US-005-daily-dashboard.md)
-- [History & Calendar Requirements](../../requirements/history-calendar.md)
+- [History & Calendar Requirements](../../architecture/logging-date.md)

@@ -38,12 +38,12 @@ The user doesn't use the page and it wasn't adding value. Delete was the only th
    a. When a session is logged for the chosen date, `/workout` and `/practice/dance` shall show **Delete** next to **Edit**.
    b. Delete shall ask for confirmation ("This cannot be undone.") before removing the session.
 3. Data
-   a. No stored data shall change. Past days stay fully editable ([no date-based edit lock](../../requirements/history-calendar.md#constraints)).
+   a. No stored data shall change. Past days stay fully editable ([no date-based edit lock](../../architecture/logging-date.md)).
 
 ---
 
 ## Related Docs
 
-- [History & Past Days](../../requirements/history-calendar.md)
-- [How It Works — Reviewing and Fixing Past Days](../../implementation/behavior.md#reviewing-and-fixing-past-days)
+- [Logging date](../../architecture/logging-date.md)
+- [Wiki home](../../README.md)
 - [v1.10.0 README](./README.md)

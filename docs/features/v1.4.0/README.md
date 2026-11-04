@@ -35,7 +35,7 @@ A belly dance session should feel as familiar as a strength session — rotating
 
 ## Architecture Impact
 
-This version is the first that touches the **shared engine**, not just one feature surface. The model generalizes as follows (full entity list in [Data Model](../../architecture/data-model.md)):
+This version is the first that touches the **shared engine**, not just one feature surface. The model generalizes as follows (full entity list in [Storage](../../architecture/storage.md)):
 
 | Today (strength-only) | Generalized    | Note                                  |
 | --------------------- | -------------- | ------------------------------------- |
@@ -92,7 +92,7 @@ Exact catalog contents are defined during US-016 implementation.
 
 ## Out of Scope for v1.4.0
 
-Deferred items moved to the [roadmap](../../roadmap/README.md) (session notes, activity distance/pace, load periodization, additional Disciplines, etc.). Cardio/sports stay on the Activity path — not Disciplines.
+Deferred items moved to the [roadmap](../backlog.md) (session notes, activity distance/pace, load periodization, additional Disciplines, etc.). Cardio/sports stay on the Activity path — not Disciplines.
 
 ---
 
@@ -104,10 +104,10 @@ All stories follow the format defined in [user-story-standards.md](../../standar
 
 ## Related
 
-- [Map — Movement & Training](../../map-movement-and-training.md) — every doc on this subject, across releases
-- [Map — Interface & Navigation](../../map-interface-and-navigation.md) — every doc on this subject, across releases
+- [Map — Movement & Training](../../architecture/workout.md) — every doc on this subject, across releases
+- [Map — Interface & Navigation](../../architecture/navigation.md) — every doc on this subject, across releases
 - [v1.3.0](../v1.3.0/README.md) — adjacent release
 - [v1.5.0](../v1.5.0/README.md) — adjacent release
 - [Features index](../README.md) — the full release history
-- [Implementation Status](../../implementation/status.md) — what is built today
+- [Features list](../README.md) — what is built today
 - [Glossary](../../glossary.md) — shared vocabulary

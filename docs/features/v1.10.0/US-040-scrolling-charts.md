@@ -80,4 +80,4 @@ so that month-to-date or year-to-date charts stay as readable as a 7-day chart, 
 - [v1.10.0 README](./README.md)
 - [US-039 — Move All Charts to TanStack Charts](./US-039-tanstack-charts-migration.md)
 - [US-022 — Insights Hub](../v1.5.0/US-022-insights-hub.md) — range picker
-- [Map — History & Insights](../../map-history-and-insights.md)
+- [Map — History & Insights](../../architecture/insights.md)

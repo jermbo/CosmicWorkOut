@@ -2,7 +2,7 @@
 
 # US-053 — Personal Records
 
-> **Status:** Planned — decided in [v1.10.0 — Topic 13](./README.md#topic-13--personal-records). Build after [US-052](./US-052-one-workout-section.md).
+> **Status:** Not built — decided in [v1.10.0 — Topic 13](./README.md#topic-13--personal-records); v1.10.0 shipped without it, so it now sits on the [Backlog](../backlog.md#insights). The design below still stands. Depends on [US-052](./US-052-one-workout-section.md) (built).
 
 As a **fitness user**, I want the app to tell me when I've done something I've never done before
 so that I can see I'm getting stronger without digging through old sessions.

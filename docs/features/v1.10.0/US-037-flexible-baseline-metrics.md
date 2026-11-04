@@ -89,6 +89,6 @@ so that one baseline can hold my whole "Daily 10" (or a reading session, a bike 
 - [v1.10.0 README](./README.md)
 - [US-038 — Baseline Logging & Comparison](./US-038-baseline-logging-comparison.md)
 - [US-034 — Baselines Setup](../v1.9.0/US-034-baselines-setup.md) — superseded rules
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)
 - [US-028 — Data Export & Backup](../v1.7.0/US-028-data-export-backup.md)
-- [Glossary — Baseline](../../glossary.md#baseline)
+- [Glossary — Baseline](../../glossary.md)

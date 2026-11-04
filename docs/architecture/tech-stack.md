@@ -1,206 +1,50 @@
-[Wiki](../README.md) › [15k — Architecture](../README.md#15k--architecture) › Tech Stack
-
-# Tech Stack
-
-Technology choices for CosmicWorkOut. All choices prioritize web-native approaches.
-
-```mermaid
-flowchart TB
-    subgraph ui ["UI Layer"]
-        SK[SvelteKit routes + layout]
-        SV[Svelte 5 components + runes]
-        CSS[CSS custom properties]
-    end
-
-    subgraph state ["State Layer"]
-        PS[programStore]
-        SS[sessionStore]
-        PR[prefsStore]
-        HS[habit · activity · health · goalPlans · baselines]
-    end
-
-    subgraph data ["Data Layer"]
-        IDB[("IndexedDB")]
-        LS[("localStorage")]
-    end
-
-    subgraph build ["Build"]
-        Vite[Vite dev + build]
-        TS[TypeScript]
-    end
-
-    subgraph offline ["Offline"]
-        SW[Service Worker + PWA]
-    end
-
-    SK --> SV --> PS & SS & PR & HS
-    PS & SS & HS --> IDB
-    PR --> LS
-    SS --> LS
-    Vite --> SK
-    SV -.-> SW
-
-    classDef ui fill:#3b3f8c,stroke:#23264f,color:#ffffff;
-    classDef state fill:#1f6f6f,stroke:#0f3a3a,color:#ffffff;
-    classDef data fill:#7a4f9e,stroke:#46295c,color:#ffffff;
-    classDef build fill:#465569,stroke:#28313e,color:#ffffff;
-    classDef offline fill:#2f7d4f,stroke:#1a472d,color:#ffffff;
-    class SK,SV,CSS ui;
-    class PS,SS,PR,HS state;
-    class IDB,LS data;
-    class Vite,TS build;
-    class SW offline;
-```
-
+---
+name: Tech stack
+description: 'The framework, the tools, and the few dependencies of CosmicWorkOut, and the reason for each choice.'
+altitude: part
+tags:
+  - architecture
+  - tools
+parent: system.md
 ---
 
-## UI Framework — Svelte 5 + SvelteKit
+[Wiki](../README.md) / [System](system.md) / Tech stack
 
-**Svelte 5** with runes (`$state`, `$derived`, `$effect`) for reactive state. **SvelteKit** for routing, layout, and build tooling.
+# Tech stack
 
-File-based routes plus a root layout that owns global overlays (session, completion, recovery banner). SSR is disabled (`ssr = false`) — the app is fully client-rendered. See [App Structure](../implementation/app-structure.md) for the full route list.
+The app uses web technology only, and it keeps its dependencies few. This page tells what each tool does and why it was selected.
 
-```typescript
-// src/routes/+layout.ts
-export const ssr = false;
-```
+## The framework
 
-**Why Svelte:** Component-heavy UI (set tiles, bottom sheets, overlays) with minimal boilerplate. Svelte 5 runes give fine-grained reactivity without a virtual DOM.
+**Svelte 5** builds the screens. Its runes make state reactive: when a value in a store changes, each screen that reads it updates, with no virtual DOM. The screens have many small parts — set tiles, sheets, overlays — and Svelte keeps each one short.
 
----
+**SvelteKit** gives the routes, the layout, and the build. Server rendering is off, because there is no server: the static adapter builds plain files, with one HTML file as the fallback for every route. **Vite** runs the dev server and the build. **TypeScript** types all the code, and the types of the stored records are the contract for the data.
 
-## Build Tool — Vite
+## Styling
 
-Fast dev server on port **5678** (`npm run dev`). Vite + `@sveltejs/vite-plugin-svelte` with runes mode enabled project-wide.
+Styling is plain CSS: design tokens in one global file, and scoped styles in each component. There is no CSS-in-JS. The [styling layers](../standards/styling-layers.md) page tells where each style goes, and the [design system](design-system.md) tells what the tokens look like.
 
----
+## Storage
 
-## Language — TypeScript
+The app talks to IndexedDB through a thin wrapper of its own that returns promises. It does not use a library such as Dexie. The database has a small number of stores, and the wrapper is easy to read and to test.
 
-All application code in TypeScript. Types live in `src/lib/db/types.ts` and mirror IndexedDB records. See [Data Model](data-model.md).
+## Charts
 
----
+TanStack Charts draws each chart as SVG. The library is young, so its version is pinned exactly, and an upgrade is a deliberate step. The app imports only its public modules, never the D3 modules inside it. The [chart scrolling](chart-scrolling.md) page tells how a long range fits on a phone.
 
-## Styling — CSS Custom Properties + Scoped Svelte CSS
+## The dependency rule
 
-Design tokens in `src/app.css` as CSS custom properties (colors, spacing, radius, timing, fonts). Component styles are scoped `<style>` blocks in each `.svelte` file.
+Each package must earn its place. The app has a handful of runtime packages: the chart library, two small QR libraries for the QR backup, and self-hosted fonts. Everything else is a tool for development. The exact versions are in `package.json`, and this page does not copy them, because a copy drifts.
 
-Between the two sits a small set of **primitive components** (`Button`, `Chip`, `FieldLabel`, `DialogTitle`, `SheetBody`, `SheetHeader`) that own recurring patterns. `app.css` holds no UI utility classes — shared patterns are components, not global classes (v1.12.0 patterns included: see [Design System](design-system.md#where-the-patterns-live)). See [Styling](../implementation/dev-guide.md#styling-tokens-and-primitive-components).
+### Example
 
-Dark only, one palette. The only runtime theming is `data-density` on `<html>`, set by the prefs store. The look itself is specified in [Design System](design-system.md); the source mockup is in [`_inspiration/design-02/`](../_inspiration/design-02/).
+The QR backup needs to draw a QR code and to read one from a camera. A browser cannot draw a QR code, and not every browser can read one, so two small libraries earn their place. The custom range in Insights needs a date picker, but the date input of the browser does the job. So no date library ships.
 
-**No CSS-in-JS** — keeps the bundle lean.
+## Motion
 
----
+Animation uses web standards only: the Web Animations API for presses, the View Transitions API between pages, and CSS keyframes.
 
-## Data Persistence — IndexedDB (raw API)
+## Further reading
 
-All session and program data in IndexedDB. A thin Promise wrapper in `src/lib/db/database.ts` — **not Dexie.js**.
-
-```typescript
-// DB name: 'cosmic-workout', version 9
-// Stores: items, programs, sessions (indexed by date), itemLastUsed,
-//         activities, habits, habitLogs, healthReadings, goalPlans
-// Planned on same v9: baselines, baselineLogs
-```
-
-Built-in items and programs are upserted on every boot (so new fields land on old records). Habits seed only on first run. Schema upgrades are **non-destructive** — `onupgradeneeded` creates only missing stores/indexes and never drops existing data. See [Data Model — IndexedDB stores](data-model.md#indexeddb-stores).
-
----
-
-## State Management — Svelte Stores
-
-Class-based stores using Svelte 5 runes. The core ones:
-
-| Store            | File                       | Responsibility                              |
-| ---------------- | -------------------------- | ------------------------------------------- |
-| `programStore`   | `program.svelte.ts`        | Programs, items, sessions, today's routine  |
-| `sessionStore`   | `session.svelte.ts`        | Active session, set logging, finish/abandon |
-| `prefsStore`     | `prefs.svelte.ts`          | User preferences, accent color, density     |
-| `habitStore`     | `habits.svelte.ts`         | Habit definitions, daily logs, mood         |
-| `activityStore`  | `activities.svelte.ts`     | Quick-log activity entries                  |
-| `healthStore`    | `health.svelte.ts`         | Weight + blood pressure readings (US-029)   |
-| `goalPlanStore`  | `goalPlans.svelte.ts`      | Lift plans (US-033)                         |
-| `baselineStore`  | _(planned)_                | Baselines + logs (US-034 / US-035)          |
-| `loggingContext` | `loggingContext.svelte.ts` | Global selected/logging date                |
-| `toastStore`     | `toast.svelte.ts`          | Transient error/info notifications          |
-
-See [State Management](../implementation/state.md) for the complete list and data flow.
-
----
-
-## Offline / PWA — Implemented
-
-Installable PWA via SvelteKit's **built-in service worker** (`src/service-worker.ts` using the `$service-worker` module) plus a web app manifest — **no Workbox**, to keep the dependency surface minimal. The SW precaches the app shell (cache-first) and serves a cached fallback for offline navigations. The build uses `@sveltejs/adapter-static` with an `index.html` SPA fallback.
-
-See [Offline Strategy](offline-strategy.md) for the caching and install details.
-
----
-
-## Charts — TanStack Charts
-
-Since v1.10.0 every chart renders with **TanStack Charts** (`@tanstack/charts`, Svelte adapter, SVG) — [US-039](../features/v1.10.0/US-039-tanstack-charts-migration.md). Shared pieces live in `src/lib/charts/`: `ScrollChart.svelte` (fixed-spacing sideways scroll with pinned value rails — [US-040](../features/v1.10.0/US-040-scrolling-charts.md)), `scale.ts` (nice-axis math), `theme.ts` (column width, margins, colors, tooltip), `color.ts`. Each chart is a component under `src/lib/components/insights/` (plus `BaselineChart`).
-
-- **Alpha library.** TanStack Charts is `0.x`; minor versions may break the API. It is pinned to an **exact** version — upgrade deliberately and fix breaks then.
-- **No transitive imports.** Only import `@tanstack/charts` subpaths. Its D3 modules (e.g. `d3-shape`) are not direct dependencies — the radar closes its shape by repeating the first point instead of importing a curve.
-- **`chart.js`** is still listed in `package.json` until the user removes it after testing; nothing imports it.
-
----
-
-## Key dependency versions
-
-Pinned in `package.json` (kept here as a snapshot; `package.json` is authoritative):
-
-| Package                    | Version |
-| -------------------------- | ------- |
-| `svelte`                   | 5.56.1  |
-| `@sveltejs/kit`            | 2.63.0  |
-| `@sveltejs/adapter-static` | 3.0.10  |
-| `vite`                     | 8.0.16  |
-| `typescript`               | 6.0.3   |
-| `@tanstack/charts`         | 0.18.0  |
-| `chart.js` (unused)        | 4.5.1   |
-
----
-
-## Animations
-
-Web standards only — no animation library. See [Design System — Motion & feedback](design-system.md#motion--feedback).
-
-- **Presses:** one delegated Pointer Events handler (`src/lib/feedback/press.ts`) animates every tappable element with the Web Animations API on the individual `translate` / `scale` properties: sink into the hard shadow on finger-down, spring back with a small overshoot on release. CSS `:active` isn't used for this — it's unreliable on touch.
-- **Page changes:** the View Transitions API, started from `onNavigate` in the root layout.
-- **Everything else:** CSS keyframes in each component, plus Svelte transitions (`RollingNumber`).
-- `transform`, `translate`, `scale`, `opacity` and `box-shadow` only.
-- `prefers-reduced-motion`: the global rule in `app.css` shortens every CSS animation; the press handler, view transitions and `CountUp` skip motion.
-
----
-
-## Haptics
-
-`feedback(kind)` in `src/lib/feedback/` — the Vibration API (`navigator.vibrate`), gated by `prefs.hapticsEnabled`. Works in Android browsers; elsewhere it's absent and the call does nothing. No iOS workarounds — web standard only. The same call plays an optional synthesized Web Audio tone when `prefs.soundEnabled` is on (off by default).
-
----
-
-## Fonts
-
-Self-hosted via `@fontsource/*` packages, imported in `src/app.css` (no external CDN request):
-
-- **Unbounded** (`@fontsource/unbounded`, 700 / 800 / 900) — display: titles and big figures, uppercase
-- **JetBrains Mono** (`@fontsource/jetbrains-mono`, 400 / 500 / 700 / 800) — body, labels, codes, data
-
-Space Grotesk and Inter were removed in v1.12.0.
-
----
-
-## No Backend (By Design)
-
-No server, database backend, API, or auth. See [System Overview](overview.md).
-
----
-
-## Related
-
-- [System Overview](overview.md) — How pieces fit together
-- [Data Model](data-model.md) — IndexedDB stores
-- [Offline Strategy](offline-strategy.md) — Caching strategy
-- [Dev Guide](../implementation/dev-guide.md) — Running locally
+- [Working agreement](../standards/working-agreement.md): the rules for code, such as "no new dependencies".
+- [Offline](offline.md): the service worker, which has no library either.

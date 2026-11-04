@@ -3,7 +3,7 @@
 # US-001 — Program Library & Selection
 
 > **Status: Shipped**
-> All core requirements implemented. Week-by-week schedule preview in the program picker is on the [roadmap](../../roadmap/README.md#ux-polish).
+> All core requirements implemented. Week-by-week schedule preview in the program picker is on the [roadmap](../backlog.md#training).
 
 As a **fitness user**, I want to browse and select from a library of curated workout programs
 so that I can follow a professionally designed training plan without having to build one from scratch.
@@ -57,7 +57,7 @@ so that I can follow a professionally designed training plan without having to b
 
 ## Related Docs
 
-- [Data Model](../../architecture/data-model.md)
-- [Program Management Requirements](../../requirements/program-management.md)
+- [Storage](../../architecture/storage.md)
+- [Workout](../../architecture/workout.md)
 - [US-002 — Custom Program Creation](./US-002-custom-program.md)
 - [US-005 — Daily Dashboard](./US-005-daily-dashboard.md)

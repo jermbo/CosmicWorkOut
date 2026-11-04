@@ -67,4 +67,4 @@ so that low-motivation days still count, and on high-motivation days I can see e
 - [US-037 — Flexible Baseline Metrics](./US-037-flexible-baseline-metrics.md)
 - [US-035 — Baselines Daily Logging](../v1.9.0/US-035-baselines-logging.md) — superseded "cleared" rules
 - [US-044 — Experimental Insights Charts](./US-044-experimental-insights-charts.md) — baseline growth line, personal bests
-- [Glossary — Baseline](../../glossary.md#baseline)
+- [Glossary — Baseline](../../glossary.md)

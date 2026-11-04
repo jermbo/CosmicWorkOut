@@ -1,0 +1,61 @@
+---
+name: Disciplines
+description: 'The general model under Workout: a Discipline declares its sections and metrics, so a new structured practice is configuration, not new code.'
+altitude: part
+tags:
+  - workout
+  - model
+parent: workout.md
+---
+
+[Wiki](../README.md) / [Workout](workout.md) / Disciplines
+
+# Disciplines
+
+Strength is the only structured practice in the app. But the session engine does not know that it is strength. This page tells why, and what a second practice would need.
+
+## The problem it solves
+
+A dance practice, or a mobility flow, has no weight and no sets. An engine that knows only sets × reps would need a second copy for each new practice, and the copies would drift apart. So the engine is general, and each practice describes itself as data.
+
+## What a Discipline declares
+
+A Discipline is configuration in the code, not data on the device, and you cannot edit it. It declares:
+
+- its **sections**, in order — for example a warm-up, a main part, and a cool-down;
+- the **metric** of each section, which decides how you log an item;
+- its **built-in content** — items and templates;
+- its **label**, colour, and icon.
+
+Strength declares one section, the exercise list, with the metric sets × reps × weight.
+
+## The three metrics
+
+| Metric      | You log                        | Counts toward volume |
+| ----------- | ------------------------------ | -------------------- |
+| Sets × reps | Weight and reps for each set   | Yes                  |
+| Measure     | A duration or a number of reps | No                   |
+| Check       | Done or not done               | No                   |
+
+Strength uses only the first. The data model and the session store still handle the other two, but the session screen draws only sets × reps. A Discipline that uses measure or check needs those screen parts built again.
+
+## Bookends
+
+A Discipline can mark a section as a bookend: a warm-up or cool-down that each routine shares. Day A defines the list, and the other days use it unless they set their own. Strength does not use bookends.
+
+## The test for a new practice
+
+Ask: do you want to be guided through a routine that repeats? If yes, it is a Discipline. You write its configuration and its seed content; you do not fork the engine. If you only want a record that you did it, it is an [activity type](activity-log.md) instead, which is one line.
+
+### Example
+
+A second Discipline, Mobility, could declare three sections: warm-up as check, flow as measure, and cool-down as check, marked as bookends. Its items would be stretches. The next-routine count, the plan list, and the stored records would work with no change; the session screen would need its check and measure parts.
+
+## Where the model is not general
+
+One plan is active at a time, for all Disciplines together, and the screens say "Workout", not the name of a Discipline. A second Discipline would need a decision about both.
+
+## Further reading
+
+- [Glossary](../glossary.md): the words Discipline, Section, Metric, and Item.
+- [Workout records](workout-records.md): where the Discipline id is stored.

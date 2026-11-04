@@ -6,7 +6,7 @@
 >
 > **Deviation from plan:** this story specified folding the stores into the existing v9 bump. That only works on a fresh database — `onupgradeneeded` runs only when the version increases, so any install already at v9 would silently lack the two stores and every read would fail. Shipped as **v10** instead, which upgrades existing installs without a wipe.
 >
-> Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Roadmap — Baselines](../../roadmap/baselines.md).
+> Feature flag, Settings CRUD, IndexedDB schema, and navigation surfaces for Baselines. Logging UX: [US-035](./US-035-baselines-logging.md). Charts: [US-036](./US-036-baselines-charts.md). Discovery: [Baselines discovery](../../initiatives/baselines/README.md).
 
 As a **health-conscious user**, I want to define small daily baselines (floors or ceilings) for the things I care about — walking, writing, phone time, tiny workouts —
 so that I can set an embarrassingly low bar once in Settings and use it day to day without rebuilding the Habit or Lift-plan systems.
@@ -114,7 +114,7 @@ type BaselineLog = {
 - [v1.9.0 README](./README.md)
 - [US-035 — Baselines Daily Logging](./US-035-baselines-logging.md)
 - [US-036 — Baselines Progress Charts](./US-036-baselines-charts.md)
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)
 - [US-029 — Health Metrics](../v1.7.0/US-029-health-metrics.md) — toggle pattern
 - [US-009 — Habit Creation](../v1.3.0/US-009-habit-creation.md) — Settings CRUD pattern
-- [Glossary — Baseline](../../glossary.md#baseline)
+- [Glossary — Baseline](../../glossary.md)

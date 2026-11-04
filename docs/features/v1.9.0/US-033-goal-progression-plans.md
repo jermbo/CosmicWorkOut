@@ -17,9 +17,9 @@ so that I can work toward a specific target (e.g. bench 250×5) over several mon
 
 ## Problem
 
-Today's strength programs ([Program Management](../../requirements/program-management.md), [Program Progression](../../implementation/program-progression.md)) rotate A/B/C routines and prefill weight from last session use. The user adjusts load manually. There is no wave-loading engine, no goal-to-plan generator, and no way to run an isolated "bench stint" with auto-calculated progression.
+Today's strength programs ([Workout](../../architecture/workout.md), [Next routine](../../architecture/next-routine.md)) rotate A/B/C routines and prefill weight from last session use. The user adjusts load manually. There is no wave-loading engine, no goal-to-plan generator, and no way to run an isolated "bench stint" with auto-calculated progression.
 
-The [roadmap](../../roadmap/README.md) deferred a load periodization engine. Real usage showed the gap: strength building needs a repeating **build → build → peak → deload** cycle per focus lift, with lighter auto-progression everywhere else, and the ability to **repeat a block** without abandoning the plan.
+The [roadmap](../backlog.md) deferred a load periodization engine. Real usage showed the gap: strength building needs a repeating **build → build → peak → deload** cycle per focus lift, with lighter auto-progression everywhere else, and the ability to **repeat a block** without abandoning the plan.
 
 ---
 
@@ -260,9 +260,9 @@ flowchart TB
 ## Related Docs
 
 - [v1.9.0 README](./README.md)
-- [Program Progression](../../implementation/program-progression.md)
-- [Program Management](../../requirements/program-management.md)
-- [Data Model](../../architecture/data-model.md)
+- [Next routine](../../architecture/next-routine.md)
+- [Workout](../../architecture/workout.md)
+- [Storage](../../architecture/storage.md)
 - [Glossary](../../glossary.md)
-- [Roadmap](../../roadmap/README.md)
-- [Implementation Status](../../implementation/status.md)
+- [Backlog](../backlog.md)
+- [Features list](../README.md)

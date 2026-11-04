@@ -34,6 +34,6 @@ v1.4.0 proved the Discipline model with a handful of dance items. v1.6.0 makes B
 
 ## Related
 
-- [Data Model — Catalog → Item derivation](../../architecture/data-model.md#catalog--item-derivation)
+- [Storage](../../architecture/storage.md)
 - [v1.4.0 — Discipline model & Belly Dance foundation](../v1.4.0/README.md)
-- [Implementation Status](../../implementation/status.md)
+- [Features list](../README.md)

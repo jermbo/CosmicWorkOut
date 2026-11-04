@@ -40,5 +40,5 @@ so that I can fix mistakes without leaving the history view I'm already in.
 ## Related Docs
 
 - [v1.1.0 US-003 — Activity Logging](../v1.1.0/US-003-activity-logging.md)
-- [History & Calendar Requirements](../../requirements/history-calendar.md)
-- [Data Model](../../architecture/data-model.md)
+- [History & Calendar Requirements](../../architecture/logging-date.md)
+- [Storage](../../architecture/storage.md)

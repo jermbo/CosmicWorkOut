@@ -14,7 +14,7 @@ As a **Fitness User**, I want the app to look and feel solid and premium, so tha
 
 | Area         | Decision                                                                                |
 | ------------ | --------------------------------------------------------------------------------------- |
-| **Source**   | [`_inspiration/design-02/`](../../_inspiration/design-02/) — "color fields / brutal".   |
+| **Source**   | [`_inspiration/design-02/`](../../_inspiration/design-02) — "color fields / brutal".   |
 | **Scope**    | Visual only. No new features, no changed flows.                                         |
 | **Theme**    | Dark only.                                                                              |
 | **Settings** | Remove Appearance, Accent color, Roundness. Keep Density, Weight unit, Overview layout. |
@@ -65,4 +65,4 @@ As a **Fitness User**, I want the app to look and feel solid and premium, so tha
 - [Design System](../../architecture/design-system.md)
 - [US-046 — Personalization](../v1.10.0/US-046-personalization.md)
 - [US-048 — Light Mode](../v1.10.0/US-048-light-mode.md) (Removed)
-- [Settings & Preferences](../../requirements/settings-preferences.md)
+- [Settings](../../architecture/settings.md)

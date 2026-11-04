@@ -85,8 +85,8 @@ so that I can follow a structured A/B/C rotation with shared warm-up and cool-do
 ## Related Docs
 
 - [v1.4.0 README](./README.md)
-- [Program Progression](../../implementation/program-progression.md)
-- [Program Management Requirements](../../requirements/program-management.md)
+- [Next routine](../../architecture/next-routine.md)
+- [Workout](../../architecture/workout.md)
 - [US-015 — Discipline Engine Foundation](./US-015-discipline-engine-foundation.md)
 - [US-016 — Item Library (Discipline-scoped)](./US-016-practice-item-library.md)
 - [US-001 — Program Library & Selection](../v1.1.0/US-001-program-library.md)

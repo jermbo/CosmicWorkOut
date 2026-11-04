@@ -40,7 +40,7 @@ This version introduces two new data types not present in v1.0:
 - Habit definitions: id, name, unit, type (count/duration/boolean), daily goal, active flag
 - Daily habit logs: date, habitId, value
 
-See [Data Model](../../architecture/data-model.md) for the full current model.
+See [Storage](../../architecture/storage.md) for the full current model.
 
 ---
 
@@ -60,9 +60,9 @@ All stories in this folder follow the format defined in [\_guide.md](../../stand
 
 ## Related
 
-- [Map — Movement & Training](../../map-movement-and-training.md) — every doc on this subject, across releases
-- [Map — Daily Tracking](../../map-daily-tracking.md) — every doc on this subject, across releases
+- [Map — Movement & Training](../../architecture/workout.md) — every doc on this subject, across releases
+- [Map — Daily Tracking](../../README.md) — every doc on this subject, across releases
 - [v1.2.0](../v1.2.0/README.md) — adjacent release
 - [Features index](../README.md) — the full release history
-- [Implementation Status](../../implementation/status.md) — what is built today
+- [Features list](../README.md) — what is built today
 - [Glossary](../../glossary.md) — shared vocabulary

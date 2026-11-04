@@ -33,11 +33,11 @@ This version does for Strength what v1.6.0 did for Belly Dance — expands a sta
 
 ## Planned
 
-All v1.7.0 stories shipped. Ongoing portability work lives on the [roadmap](../../roadmap/README.md).
+All v1.7.0 stories shipped. Ongoing portability work lives on the [roadmap](../backlog.md).
 
 | ID                                         | Title                             | Status  | Notes                                                                                                         |
 | ------------------------------------------ | --------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- |
-| [US-028](./US-028-data-export-backup.md)   | Data Export, Backup & Device Sync | Phase 1 | JSON export/import on `settings/data`. Phase 2 → [QR backup](../../roadmap/qr-backup.md), shipped in v1.12.0. |
+| [US-028](./US-028-data-export-backup.md)   | Data Export, Backup & Device Sync | Phase 1 | JSON export/import on `settings/data`. Phase 2 → [QR backup](../../initiatives/qr-backup/README.md), shipped in v1.12.0. |
 | [US-029](./US-029-health-metrics.md)       | Health Metrics                    | Shipped | Weight + blood pressure; optional Settings toggle; `/health` + home card + Insights + calendar                |
 | [US-030](./US-030-settings-restructure.md) | Settings Hub Restructure          | Shipped | Hub `/settings` + sub-routes for appearance, habits, data                                                     |
 | [US-031](./US-031-default-habits-tweak.md) | Default Habits & Mood Scale       | Shipped | Water/Coffee first; remove Alcohol; Reading → minutes; mood always on; −2 Agitated                            |
@@ -46,11 +46,11 @@ All v1.7.0 stories shipped. Ongoing portability work lives on the [roadmap](../.
 
 ## Related
 
-- [Data Model — Item](../../architecture/data-model.md#item)
-- [Data Model — HealthReading](../../architecture/data-model.md#healthreading)
-- [Offline Strategy](../../architecture/offline-strategy.md)
+- [Storage](../../architecture/storage.md)
+- [Storage](../../architecture/storage.md)
+- [Offline](../../architecture/offline.md)
 - [Tech Stack — Offline / PWA](../../architecture/tech-stack.md)
-- [Implementation Status](../../implementation/status.md)
+- [Features list](../README.md)
 - [US-028 — Data Export, Backup & Device Sync](./US-028-data-export-backup.md)
 - [US-029 — Health Metrics](./US-029-health-metrics.md)
 - [US-030 — Settings Hub Restructure](./US-030-settings-restructure.md)

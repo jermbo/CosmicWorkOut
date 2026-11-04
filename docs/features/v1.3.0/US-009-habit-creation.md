@@ -77,6 +77,6 @@ so that the habits I track reflect exactly what matters to me and feed into my l
 - [v1.2.0 US-008 — Habit Log Page](../v1.2.0/US-008-habit-log-page.md)
 - [US-010 — Habit History in Calendar](./US-010-habit-calendar-history.md)
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
-- [Data Model](../../architecture/data-model.md)
-- [Settings & Preferences Requirements](../../requirements/settings-preferences.md)
+- [Storage](../../architecture/storage.md)
+- [Settings](../../architecture/settings.md)
 - [US-030 — Settings Hub Restructure](../v1.7.0/US-030-settings-restructure.md)

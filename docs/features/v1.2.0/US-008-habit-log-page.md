@@ -32,7 +32,7 @@ so that I can quickly check off or record each habit for the active date and mov
 
 5. Daily reset
    a. On a new day, all habit rows shall show their default empty state (count = 0, minutes = 0, yes/no = incomplete, mood = unset).
-   b. Viewing a past date shall show the values logged on that date. Past-date values remain fully editable (backfill/correction), consistent with sessions and activities elsewhere in History — see [History & Calendar](../../requirements/history-calendar.md).
+   b. Viewing a past date shall show the values logged on that date. Past-date values remain fully editable (backfill/correction), consistent with sessions and activities elsewhere in History — see [History & Calendar](../../architecture/logging-date.md).
 
 ---
 
@@ -90,4 +90,4 @@ Each option shall be large enough to tap comfortably with a finger. The currentl
 - [US-007 — Home Screen Redesign](./US-007-home-screen-redesign.md)
 - [US-009 — Habit Creation & Management](../v1.3.0/US-009-habit-creation.md)
 - [v1.1.0 US-004 — Habit Tracking](../v1.1.0/US-004-habit-tracking.md)
-- [Data Model](../../architecture/data-model.md)
+- [Storage](../../architecture/storage.md)
