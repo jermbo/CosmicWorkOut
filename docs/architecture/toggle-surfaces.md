@@ -1,6 +1,6 @@
 ---
 name: What each toggle hides
-description: 'The exact list of settings in cwout:prefs, their defaults, and every surface that each of the five feature toggles shows or hides.'
+description: 'Every surface that each of the five feature toggles shows or hides, and the charts that more than one toggle shows.'
 altitude: exact
 tags:
   - settings
@@ -12,25 +12,7 @@ parent: feature-toggles.md
 
 # What each toggle hides
 
-This page is the contract for the settings object and for each surface that a toggle controls. Use it to check a change to a toggle, or to test that a hidden surface is hidden.
-
-## The settings object
-
-Every setting is one field of the JSON object in `cwout:prefs`. A field that is missing takes its default. The docs check fails when a field in the code is not on this page.
-
-| Field                  | Values                               | Default                                          | Where you set it     |
-| ---------------------- | ------------------------------------ | ------------------------------------------------ | -------------------- |
-| `habitsEnabled`        | `true`, `false`                      | `false`                                          | Settings → Habits    |
-| `activityLogEnabled`   | `true`, `false`                      | `false`                                          | Settings → Activity  |
-| `practiceEnabled`      | `true`, `false`                      | `false`                                          | Settings → Workout   |
-| `healthMetricsEnabled` | `true`, `false`                      | `false`                                          | Settings → Health    |
-| `baselinesEnabled`     | `true`, `false`                      | `false`                                          | Settings → Baselines |
-| `weightUnit`           | `lb`, `kg`                           | `lb`                                             | Personalization      |
-| `density`              | `compact`, `comfortable`, `spacious` | `comfortable`                                    | Personalization      |
-| `hapticsEnabled`       | `true`, `false`                      | `true`                                           | Personalization      |
-| `soundEnabled`         | `true`, `false`                      | `false`                                          | Personalization      |
-| `homeCardOrder`        | A list of card ids                   | Habits, Workout, Activity log, Baselines, Health | Personalization      |
-| `hiddenCharts`         | A list of chart ids                  | Empty                                            | Settings → Insights  |
+This page is the contract for each surface that a toggle controls. Use it to check a change to a toggle, or to test that a hidden surface is hidden. Each toggle is one field of the [settings object](settings-object.md), and each is off on a new device.
 
 ## The surfaces of each toggle
 

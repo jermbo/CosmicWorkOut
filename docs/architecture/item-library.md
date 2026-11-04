@@ -16,7 +16,7 @@ When you build a routine, you pick exercises from one library. This page tells w
 
 ## Built-in items
 
-The app ships a catalog of strength exercises. Each has a name, a cue to show during a session, its muscles and equipment, a unit, default sets and reps, and a weight step. The catalog is code. Each start writes it into the database again, so a fix reaches every phone with the next update.
+The app ships a catalog of strength exercises. Each has a name, a cue to show during a session, its muscles and equipment, a unit, default sets and reps, and a weight step. The catalog is code, and the app writes it into the database again on each start, as [schema upgrades](schema-upgrades.md) tells.
 
 You cannot edit a built-in item, because the next start would write over your change. So you make a custom item instead.
 
@@ -34,7 +34,7 @@ Each item has a weight step of 2.5, 5, or 10, and a new custom item starts at 5.
 
 ## The unit
 
-An item uses `lb`, `kg`, `band`, or `bodyweight`. A band or bodyweight item needs no number, so a tap logs it at once. A plain weight shows in your weight unit from Personalization; the unit is a label, and the app does not convert stored numbers.
+An item uses `lb`, `kg`, `band`, or `bodyweight`. A band or bodyweight item needs no number, so a tap logs it at once. A plain weight shows in your weight unit from [Personalization](personalization.md).
 
 ### Example
 
@@ -47,4 +47,3 @@ An item belongs to a [Discipline](disciplines.md) and to one section of it. Stre
 ## Further reading
 
 - [Set logging](set-logging.md): how the weight step rounds a weight.
-- [Schema upgrades](schema-upgrades.md): how the catalog is written again on each start.

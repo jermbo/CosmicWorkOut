@@ -1,6 +1,6 @@
 ---
 name: Working agreement
-description: 'How code is written in this repo, for a person or an agent: the code rules, the three layers of styling, what a unit test can reach, and how to add built-in content.'
+description: 'How code is written in this repo, for a person or an agent: the code rules and why each one exists, what a unit test can reach, and how to add built-in content.'
 altitude: part
 tags:
   - standards
@@ -16,23 +16,12 @@ These rules keep the code small and the same in each file. They apply to each co
 
 ## The code rules
 
-- **Clean, modern code.** Use Svelte 5 runes and the current idioms. Match the style of the file that you change.
-- **No new dependencies.** Solve the problem with what is already in `package.json`. A new package needs a strong reason, and you discuss it first.
-- **Small components.** Prefer many small components to one large one.
-- **Do the work, then show it.** For a task with many steps, do all of it and show it for review at the end. Stop to ask only when a decision blocks you and has no clear answer.
-- **The docs are the memory.** When a decision is made or a behavior changes, change the page that tells it, in the same commit. A new feature gets its page first.
-
-## Three layers of styling
-
-Use the first layer that fits:
-
-1. **Tokens.** Colours, spacing, corners, and timing are CSS custom properties in `src/app.css`. Never type a value that a token already gives.
-2. **Small shared components.** A pattern that recurs, such as a button, a chip, or a sheet header, becomes a component with its own scoped styles.
-3. **Scoped styles.** Everything that belongs to one component stays in that component.
-
-The global stylesheet holds only tokens, the reset, the focus ring, the app shell, and keyframes. A global class for a pattern does not work here, because a scoped rule always wins over it.
-
-A parent cannot style the markup of a child component. So a shared component needs a real prop for each thing that a caller must change; a pass-through class does nothing.
+- **Clean, modern code.** Use Svelte 5 runes and the current idioms. Match the style of the file that you change, so that a reader sees one way to do each thing.
+- **No new dependencies.** Solve the problem with what is already in `package.json`. Each package is code that you must trust and update, so a new one needs a strong reason, and you discuss it first.
+- **Small components.** Prefer many small components to one large one. A small component is short to read, and a pattern that recurs becomes one that each screen shares.
+- **Styles in three layers.** Tokens first, then small shared components, then scoped styles, as [styling layers](styling-layers.md) tells.
+- **Do the work, then show it.** For a task with many steps, do all of it and show it for review at the end. One review of the whole is faster than many stops. Stop to ask only when a decision blocks you and has no clear answer.
+- **The docs are the memory.** When a decision is made or a behavior changes, change the page that tells it, in the same commit. An agent forgets each session, so a decision that is not in the docs is lost. A new feature gets its page first.
 
 ## What a unit test can reach
 

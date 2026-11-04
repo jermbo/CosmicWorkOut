@@ -37,7 +37,7 @@ A session in progress belongs to the phone in your hand. If a backup carried it,
 
 The backup code has two lists: keys that a backup carries, and keys that it never carries. A unit test fails when the app uses a `cwout:` key that is in neither list. So you cannot add a key and forget to decide about it. When you add a key, add it to one list and to this page.
 
-The fields inside `cwout:prefs` are in [what each toggle hides](toggle-surfaces.md) and in [personalization](personalization.md).
+The fields inside `cwout:prefs` are in the [settings object](settings-object.md).
 
 ## Further reading
 

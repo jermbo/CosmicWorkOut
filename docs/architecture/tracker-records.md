@@ -54,6 +54,7 @@ A baseline has a `name`, an `active` flag, a `sortOrder`, and one or more metric
 | Metric field | Rule                                                                    |
 | ------------ | ----------------------------------------------------------------------- |
 | `id`         | Made once and never used again. Logs refer to it, so it must not change |
+| `name`       | The name that you see, such as `Pushups`                                |
 | `measure`    | `duration`, `distance`, or `count`. Fixed when you make the metric      |
 | `baseline`   | The floor. A duration is in minutes                                     |
 | `unit`       | For distance only: `mi`, `km`, `m`, or `yd`                             |

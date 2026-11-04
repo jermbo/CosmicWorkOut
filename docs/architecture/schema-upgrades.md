@@ -22,7 +22,7 @@ IndexedDB has a version number. When the app opens the database with a higher nu
 
 The upgrade step makes each store and each index that does not exist yet, and it leaves the others as they are. It never deletes a store. So the same step works on a new device, on a device one version behind, and on a device many versions behind.
 
-When a record must change shape, the step can transform it, keyed on the old version number. That happened once: when baselines got a new shape, the upgrade from version 10 to 11 cleared the two baseline stores. The old baseline data was from testing only, so to drop it was safer than to convert it. No other store changed.
+When a record must change shape, the step can transform it, keyed on the old version number. One transform exists: an upgrade from version 10 clears the two baseline stores. Their old shape held only test data, so to drop it is safer than to convert it. No other store changes shape.
 
 ### Example
 

@@ -1,6 +1,6 @@
 ---
 name: Offline
-description: 'How the app opens and works with no network: the service worker, the install on a phone, and the request to keep your data.'
+description: 'How the app opens and works with no network: the service worker, how an update arrives, and the install on a phone.'
 altitude: mechanism
 tags:
   - offline
@@ -12,7 +12,7 @@ parent: system.md
 
 # Offline
 
-The app must work with no network from the moment that it opens. This page tells how it serves itself offline, how you install it, and how it asks the browser to keep your data.
+The app must work with no network from the moment that it opens. This page tells how it serves itself offline, how an update arrives, and how you install it.
 
 ## How the service worker answers a request
 
@@ -39,9 +39,9 @@ Each build has its own version, and the name of the saved copy holds that versio
 
 The app has a manifest and icons, so a phone can add it to the home screen. It then opens like an app, with no browser bar. Install and the service worker need a secure origin: HTTPS, or `localhost`. The dev server on the local network is plain HTTP, so a phone that uses it gets no offline copy. On iPhone, you install by hand: Share, then Add to Home Screen.
 
-## A request to keep your data
+### Example
 
-A browser can delete the data of a site. So when you start a backup — export, restore, send by QR, or the camera to receive — the app asks the browser to keep its data. It asks then, not at the first start, because Firefox can show a question, and the question makes sense next to a backup. The answer is only logged; nothing waits for it. This lowers the risk but does not remove it, so a backup off the device is still the real safety.
+You train in a basement gym with no signal, and you open a bookmark to `/habits`. The code and the styles are files of the shell, so the worker serves its saved copies. The page request fails on the network, so the worker serves the saved HTML page, and the app opens on Habits. You log a glass of water, and it saves on the device as on any other day.
 
 ## Further reading
 

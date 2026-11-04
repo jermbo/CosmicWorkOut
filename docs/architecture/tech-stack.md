@@ -22,7 +22,7 @@ The app uses web technology only, and it keeps its dependencies few. This page t
 
 ## Styling
 
-Design tokens — colours, spacing, fonts, timing — are CSS custom properties in one global file. Each component has its own scoped styles. A pattern that recurs becomes a small component, not a global class, because a global class loses to any scoped rule. There is no CSS-in-JS. The [design system](design-system.md) tells what the tokens look like.
+Styling is plain CSS: design tokens in one global file, and scoped styles in each component. There is no CSS-in-JS. The [styling layers](../standards/styling-layers.md) page tells where each style goes, and the [design system](design-system.md) tells what the tokens look like.
 
 ## Storage
 
@@ -34,11 +34,15 @@ TanStack Charts draws each chart as SVG. The library is young, so its version is
 
 ## The dependency rule
 
-Each package must earn its place. The app has a handful of runtime packages: the chart library, two small QR libraries for the QR backup, and self-hosted fonts. The fonts are in the bundle, so the app makes no network request for them. Everything else is a tool for development. The exact versions are in `package.json`, and this page does not copy them, because a copy drifts.
+Each package must earn its place. The app has a handful of runtime packages: the chart library, two small QR libraries for the QR backup, and self-hosted fonts. Everything else is a tool for development. The exact versions are in `package.json`, and this page does not copy them, because a copy drifts.
+
+### Example
+
+The QR backup needs to draw a QR code and to read one from a camera. A browser cannot draw a QR code, and not every browser can read one, so two small libraries earn their place. The custom range in Insights needs a date picker, but the date input of the browser does the job. So no date library ships.
 
 ## Motion
 
-Animation uses web standards only: the Web Animations API for presses, the View Transitions API between pages, and CSS keyframes. Haptics use the Vibration API, and sounds are tones that the app makes at run time.
+Animation uses web standards only: the Web Animations API for presses, the View Transitions API between pages, and CSS keyframes.
 
 ## Further reading
 

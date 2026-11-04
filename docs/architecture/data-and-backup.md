@@ -27,15 +27,15 @@ A **QR backup** needs no network and no file. One device shows an animated QR co
 
 ## The file is the real safety
 
-A browser can delete the data of a site, as the [storage](storage.md) page tells. The app asks the browser to keep it, but only a copy off the device is safe. So keep a recent file somewhere other than the phone.
+A browser can delete the data of a site, as the [storage](storage.md) page tells. So when you start a backup — export, restore, send by QR, or the camera to receive — the app asks the browser to keep its data. It asks then, not at the first start, because Firefox can show a question, and the question makes sense next to a backup. The answer is only logged; nothing waits for it. This lowers the risk but does not remove it, so keep a recent file somewhere other than the phone.
 
 ## Clear data
 
-Data & backup has one clear row for each kind of data — custom exercises, custom programs, workout sessions, activities, habits, health, plan goals, and baselines — and **Clear everything** in a danger zone. Each one asks for confirmation, and the app reloads after it. A clear row shows only while its tracker is on, except Health data, which always shows. The exact effect of each row is in [data clearing](data-clearing.md).
+Data & backup has one clear row for each kind of data, and **Clear everything** in a danger zone. Each one asks for confirmation. The [data clearing](data-clearing.md) page tells what each row deletes and what it keeps.
 
-## Debug data
+## Test data
 
-An advanced row loads about six months of realistic test data: sessions, activities, habit logs, health readings, two plan goals, and two baselines. It keeps your existing data. It does not turn on any tracker, so on a new device it seems to do nothing until you turn trackers on; its confirmation lists the trackers that are off. It does take over the active plan, because the test data has one: the plan that was running is paused first.
+An advanced row loads about six months of realistic test data, so that you can see the charts full. The [debug data](debug-data.md) page tells what it loads and what it changes.
 
 ### Example
 
@@ -43,5 +43,5 @@ You get a new phone. On the old phone you tap Export and AirDrop the file to the
 
 ## Further reading
 
-- [Offline](offline.md): the request to keep your data.
+- [Settings](settings.md): where Data & backup sits among the other settings pages.
 - [localStorage keys](local-storage-keys.md): which small values a backup carries.

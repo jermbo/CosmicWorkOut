@@ -40,4 +40,4 @@ You want to start tracking your weight. You open Settings. Under Features, Healt
 ## Further reading
 
 - [Routes](routes.md): the address of each Settings page.
-- [What each toggle hides](toggle-surfaces.md): every stored setting and its default.
+- [Settings object](settings-object.md): every stored setting and its default.

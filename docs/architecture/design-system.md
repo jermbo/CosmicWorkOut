@@ -54,9 +54,11 @@ You can make the spacing compact, comfortable, or spacious. Each setting scales 
 
 ## How the patterns are built
 
-Tokens — colours, rules, shadows, timing, fonts — are global. A pattern, such as a colour field or a progress bar of blocks, is a small component with its own styles, never a global class. So a component cannot break a pattern by accident.
+Tokens — colours, rules, shadows, timing, fonts — are global. A pattern, such as a colour field or a row of progress blocks, is a small component, as [styling layers](../standards/styling-layers.md) tells. The motion that goes with these rules is in [tap feel](tap-feel.md). The original mockups are in the [inspiration folder](../_inspiration).
 
-The motion that goes with these rules is in [tap feel](tap-feel.md). The original mockups are in the [inspiration folder](../_inspiration).
+### Example
+
+The Habits card on the Overview is a coral field with `[H] HABITS` in its corner and black text on it. You can tap it, so it has a hard shadow of 6 px. When you press the card, it sinks into its shadow, and the Habits screen opens.
 
 ## Further reading
 

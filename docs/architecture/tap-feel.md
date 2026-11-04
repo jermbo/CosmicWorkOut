@@ -38,7 +38,7 @@ The kind of a plain tap comes from the markup: a tab, a radio, or a toggle gives
 
 ## Haptics and sound
 
-Haptics use the Vibration API. Android browsers have it; iPhone browsers do not, so the switch for haptics hides where the browser cannot vibrate. Haptics are on by default. Sound is off by default. Each sound is a short tone that the app makes at run time, so there are no audio files.
+Haptics use the Vibration API. Android browsers have it; iPhone browsers do not, so on an iPhone a tap gives no buzz. Sound is off by default. Each sound is a short tone that the app makes at run time, so there are no audio files.
 
 ## Hold to repeat
 
@@ -51,6 +51,10 @@ When an exercise is done, a stamp lands, and the blue plate behind the list slid
 ## Reduced motion
 
 When your device asks for reduced motion, the press motion, the page transitions, and the count-ups do not run, and each CSS animation ends at once. Haptics and sound still follow their switches.
+
+### Example
+
+Your Water goal is 4 cups, and you hold plus on an Android phone. The button sinks, and after 420 ms the count steps to 1, with a `tick`. At 4 the tile reaches its goal: it jolts, and you feel `success`, a buzz of 14 ms, a pause, and 22 ms.
 
 ## Further reading
 

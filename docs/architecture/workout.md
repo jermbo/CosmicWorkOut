@@ -12,7 +12,7 @@ parent: ../README.md
 
 # Workout
 
-Workout is where you follow a strength plan. It answers one question each time that you open it: what do I train today? It is off until you turn it on in Settings.
+Workout is where you follow a strength plan. It answers one question each time that you open it: what do I train today?
 
 ## One plan at a time
 
@@ -22,7 +22,7 @@ The app lets only one [plan](../glossary.md) be active, so you always know which
 
 You tap **New plan**, and a short wizard asks four things:
 
-1. **Start from.** A built-in template, such as Beginner 101, or "Start from scratch". A template is copied, so your plan is yours to edit. From scratch, you build Days A, B, and C from the [item library](item-library.md), with three days each week and 1 to 52 weeks (12 by default).
+1. **Start from.** A [built-in template](built-in-templates.md), such as Beginner 101, or "Start from scratch". From scratch, you build Days A, B, and C from the [item library](item-library.md), with three days each week and 1 to 52 weeks (12 by default).
 2. **Routines.** Each day needs at least one exercise.
 3. **Working toward a specific lift?** If yes, you pick a focus lift, a starting point, and a goal. The [goal wave](goal-wave.md) page tells what the app then builds.
 4. **Review**, then save.
@@ -42,6 +42,10 @@ You edit a routine on the plan's page. The change goes to the routine of the sam
 ## When a plan ends
 
 A plan ends after weeks × days sessions. The app then offers **Run it again** or **New plan**. A plain plan runs again as a fresh copy from week 1, so the old sessions stay with the old copy. A plan with a goal repeats its last block instead.
+
+### Example
+
+You start from Beginner 101: 4 weeks, 3 days each week. You train on Monday and Saturday, and Saturday gives you Day B, because one session is done. After the twelfth session, **Run it again** starts a new copy at week 1, Day A.
 
 ## What sits under Workout
 

@@ -12,11 +12,11 @@ parent: workout.md
 
 # Disciplines
 
-Strength is the only structured practice in the app today. But the session engine does not know that it is strength. This page tells why, and what a second practice would need.
+Strength is the only structured practice in the app. But the session engine does not know that it is strength. This page tells why, and what a second practice would need.
 
 ## The problem it solves
 
-The app began as a strength tracker, with "exercise", "workout", and "sets × reps" in every part of the code. A dance practice, or a mobility flow, has no weight and no sets. To add one would mean a second copy of the engine. So the engine became general, and each practice describes itself as data.
+A dance practice, or a mobility flow, has no weight and no sets. An engine that knows only sets × reps would need a second copy for each new practice, and the copies would drift apart. So the engine is general, and each practice describes itself as data.
 
 ## What a Discipline declares
 
@@ -51,7 +51,7 @@ Ask: do you want to be guided through a routine that repeats? If yes, it is a Di
 
 A second Discipline, Mobility, could declare three sections: warm-up as check, flow as measure, and cool-down as check, marked as bookends. Its items would be stretches. The next-routine count, the plan list, and the stored records would work with no change; the session screen would need its check and measure parts.
 
-## What is not general yet
+## Where the model is not general
 
 One plan is active at a time, for all Disciplines together, and the screens say "Workout", not the name of a Discipline. A second Discipline would need a decision about both.
 

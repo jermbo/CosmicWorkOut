@@ -223,7 +223,7 @@ for (const file of files.filter(isWiki)) {
 		const n = words?.length ?? 0;
 		// An exact page is short on purpose: its tables and contract blocks carry the content.
 		const tooShort = n < 240 && meta.altitude !== 'exact';
-		if (tooShort || n > 400) warn(file, 'page-length', `${n} words; aim for 270 to 350`);
+		if (tooShort || n > 400) warn(file, 'page-length', `${n} words; aim for 270 to 400`);
 	}
 
 	// diagram: no colours or styles; 10 nodes at most
@@ -243,10 +243,10 @@ for (const file of files.filter(isWiki)) {
 // --- Settings coverage ----------------------------------------------------------
 
 /**
- * Every preference in prefsStore's DEFAULTS must be named (as `key`) on the toggle page,
+ * Every preference in prefsStore's DEFAULTS must be named (as `key`) on the settings object page,
  * so a new setting can't ship without the docs hearing about it.
  */
-const TOGGLE_PAGE = join(ROOT, 'architecture', 'toggle-surfaces.md');
+const TOGGLE_PAGE = join(ROOT, 'architecture', 'settings-object.md');
 const prefsSource = readFileSync('src/lib/stores/prefs.svelte.ts', 'utf8');
 const defaultsBlock = /const DEFAULTS: UserPrefs = \{([\s\S]*?)\n\};/.exec(prefsSource);
 const togglePage = readFileSync(TOGGLE_PAGE, 'utf8');

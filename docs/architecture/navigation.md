@@ -12,7 +12,7 @@ parent: system.md
 
 # Navigation
 
-The app has few tabs and many cards. This page tells how you reach each screen, and why a session never makes you leave the screen that you are on.
+The app has few tabs and many cards. This page tells how you reach each screen, and why a session never makes you leave the screen that you are on. The exact list of addresses, and which toggle each one needs, is in [routes](routes.md).
 
 ## Four tabs at the bottom
 
@@ -33,12 +33,6 @@ When you change the page, the old page drops away and the new one rises in, and 
 ## Settings is a hub
 
 The Settings tab opens a hub with one row for each feature and each app area. Each row opens its own page. The [settings](settings.md) page tells what is on each one.
-
-## Old addresses
-
-Some screens were merged or removed: the history calendar, the practice hub, the separate goal screens, and the old program page. Their addresses are gone, with no redirect. A link to one of them shows the default error page of SvelteKit.
-
-The exact list of addresses, and which toggle each one needs, is in [routes](routes.md).
 
 ## Further reading
 

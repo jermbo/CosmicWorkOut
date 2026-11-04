@@ -32,7 +32,7 @@ This page holds the facts about the project that a contributor or a tool must kn
 | Docs root           | `docs/`                                                                                                                   |
 | Wiki pages          | `docs/README.md`, `docs/vision.md`, `docs/principles.md`, `docs/glossary.md`, `docs/architecture/`, `docs/standards/`     |
 | Not wiki pages      | `docs/features/` (stories, release lists, backlog), `docs/initiatives/` (work notes), `docs/_inspiration/` (design files) |
-| Page rules          | None. The baseline docs-wiki rules apply with no change                                                                   |
+| Page rules          | [Page rules](page-rules.md)                                                                                               |
 | Story rules         | [User story standards](user-story-standards.md)                                                                           |
 | How code is written | [Working agreement](working-agreement.md)                                                                                 |
 
@@ -40,7 +40,7 @@ This page holds the facts about the project that a contributor or a tool must kn
 
 A contributor can be a person or an agent, and an agent forgets each session. So a decision that is not in `docs/` does not persist. When a rule or a behavior changes, the page that tells it changes in the same commit. A new feature or rule gets its page first, and the code comes after the page.
 
-Run the docs check before each commit. It finds broken links and missing page parts. It also finds a setting in the code that the page [what each toggle hides](../architecture/toggle-surfaces.md) does not name.
+Run the docs check before each commit. It finds broken links and missing page parts. It also finds a setting in the code that the [settings object](../architecture/settings-object.md) page does not name.
 
 ## Where a new page goes
 

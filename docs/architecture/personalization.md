@@ -20,11 +20,11 @@ You select `lb` or `kg`. The app uses it for each lift and for your body weight.
 
 ## Density
 
-You select compact, comfortable, or spacious. The app scales every spacing value of the [design system](design-system.md): compact by 0.75, spacious by 1.25. A small phone gets more on the screen; a large phone gets more room for a thumb. Comfortable is the default.
+You select compact, comfortable, or spacious. The app scales every spacing value of the [design system](design-system.md) to match. A small phone gets more on the screen; a large phone gets more room for a thumb. Comfortable is the default.
 
 ## Haptics
 
-Haptics are on by default. The switch shows only where the browser can vibrate, which means Android; an iPhone browser cannot, so the switch is not there. The [tap feel](tap-feel.md) page tells which moment gives which buzz.
+Haptics are on by default. The switch shows only where the browser can vibrate. The [tap feel](tap-feel.md) page tells which moment gives which buzz.
 
 ## Sound
 
@@ -44,4 +44,4 @@ Your friend trains in kg on a small phone. They select `kg` and compact on the f
 
 ## Further reading
 
-- [What each toggle hides](toggle-surfaces.md): the stored name and default of each option.
+- [Settings object](settings-object.md): the stored name and default of each option.

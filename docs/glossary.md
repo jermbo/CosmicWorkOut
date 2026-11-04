@@ -1,6 +1,6 @@
 ---
 name: Glossary
-description: 'The one word for each thing in CosmicWorkOut, the test that sorts a new movement type, and the old names that are gone.'
+description: 'The one word for each thing in CosmicWorkOut, and the test that sorts a new movement type.'
 altitude: overview
 tags:
   - glossary
@@ -34,9 +34,9 @@ Ask one question: do you want the app to guide you through a routine that repeat
 | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | Discipline          | The configuration of one structured practice: its sections, metrics, and built-in content. Strength is the only one |
 | Section             | An ordered part of a routine. Strength has one section, the exercise list                                           |
-| Metric              | The rule for how you log an item: sets × reps × weight, a measured value, or done / not done                        |
-| Item                | One movement, such as Bench Press. Built-in items are read-only; custom items are yours                             |
-| Focus tag           | A label on an item for filtering, such as "core" or "legs"                                                          |
+| Metric              | In a Discipline, the rule for how you log an item: sets × reps × weight, a measured value, or done / not done       |
+| Item                | One movement, such as Bench Press. In Workout, prose and screens call a strength item an exercise                   |
+| Category            | The body part of a strength item, such as Chest or Legs. The item library filters by it                             |
 | Plan                | Routines over a number of weeks that you follow in the Workout section. One plan is active at a time                |
 | Template            | A built-in plan. You start from a copy, so the template never changes                                               |
 | Program             | The stored record of a plan. Use "plan" in prose; "program" names only the record                                   |
@@ -53,7 +53,8 @@ Ask one question: do you want the app to guide you through a routine that repeat
 | Habit               | A daily value with a type, an optional daily goal, a unit, and a colour                                             |
 | Mood                | The protected habit on a scale of −5 to +5. It hides with Habits                                                    |
 | Habit log           | One day's value for one habit                                                                                       |
-| Baseline            | A daily floor that you set, with one or more metrics of duration, distance, or count                                |
+| Baseline            | A daily floor that you set, with one or more baseline metrics                                                       |
+| Baseline metric     | One measure of a baseline: a duration, a distance, or a count, with its floor                                       |
 | Baseline log        | One entry toward a baseline. A day can have many                                                                    |
 | Health metric       | A measurement that the app defines: weight or blood pressure                                                        |
 | Health reading      | One logged measurement                                                                                              |
@@ -62,17 +63,7 @@ Ask one question: do you want the app to guide you through a routine that repeat
 | Built-in            | Content that ships with the app and comes back on each start                                                        |
 | Custom              | Content that you make. The app never changes it                                                                     |
 
-## Old names that are gone
-
-| Old name                         | Word now         | Why it changed                                           |
-| -------------------------------- | ---------------- | -------------------------------------------------------- |
-| Exercise (as a record)           | Item             | An item can belong to any Discipline                     |
-| Workout (one training day)       | Routine          | "Workout" now names the whole section                    |
-| SessionLog                       | Session          | One word across all Disciplines                          |
-| Practice                         | Workout          | The section was merged and renamed                       |
-| Lift plan, goal progression plan | Plan with a goal | A goal is an option on a plan, not a second kind of plan |
-
-Code names can lag behind a word here. The toggle for Workout is `practiceEnabled`, and the stored goal is a `goalPlan`. Prose uses the words in this page.
+The code and the stored data keep a few names that differ from these words. [Code names](architecture/code-names.md) maps each one to its word. Prose always uses the word on this page.
 
 ## Further reading
 

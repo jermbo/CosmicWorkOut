@@ -16,7 +16,7 @@ Some people train to change a number on a scale, or to bring down their blood pr
 
 ## Two metrics with different rules
 
-**Weight** has at most one reading for each date. When you log a weight on a date that already has one, the new value replaces the old one. The reading uses your weight unit from Personalization; the unit is a label, and the app does not convert a stored number.
+**Weight** has at most one reading for each date. When you log a weight on a date that already has one, the new value replaces the old one. The reading shows in your weight unit from [Personalization](personalization.md).
 
 **Blood pressure** can have many readings on one date, such as one in the morning and one in the evening. Each reading has a systolic and a diastolic value, an optional pulse, and the time that you logged it. The time puts the readings of a day in order.
 

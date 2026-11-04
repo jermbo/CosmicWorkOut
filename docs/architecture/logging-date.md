@@ -32,9 +32,9 @@ A session is the one case with a question. When the logging date is not today an
 
 Any past day is open, in each tracker, the same as today. A lock would only stop you from fixing a real mistake, and there is one user, so no one else's data is at risk.
 
-## Why there is no history screen
+## Why you fix the past where you logged it
 
-A separate calendar of history did two jobs: you saw the past, and you changed it. The two jobs are now in better places. Insights shows the past — gaps and streaks show in the heat chart and the "Showing Up" chart. The logging date changes the past, in the screen that already knows how to edit that record. So the calendar went away.
+To look back and to fix a record are two jobs, and each has its own place. Insights shows the past: gaps and streaks show in the heat chart and the "Showing Up" chart. The logging date changes the past, in the screen that already knows how to edit that record. So no screen holds a calendar of history, and you never learn a second way to edit a record.
 
 ### Example
 

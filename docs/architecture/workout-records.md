@@ -45,12 +45,13 @@ erDiagram
 
 A routine has an `id`, a `name`, an optional `letter` (`A`, `B`, `C`), and its sections. Strength has one section, `exercises`. Each entry in a section names an `itemId`, a number of `sets`, and target `reps` as text, such as `"8-10"`.
 
-An item has an `id`, a `name`, a `cue` to show during a session, a body-part category, a `unit` (`lb`, `kg`, `band`, or `bodyweight`), default sets and reps, and a `weightIncrement` of 2.5, 5, or 10.
+An item has an `id`, a `name`, a `disciplineId`, the `section` that it belongs to, a `cue` to show during a session, a body-part category, a `unit` (`lb`, `kg`, `band`, or `bodyweight`), default sets and reps, and a `weightIncrement` of 2.5, 5, or 10.
 
 ## Session
 
 | Field                     | Rule                                                             |
 | ------------------------- | ---------------------------------------------------------------- |
+| `disciplineId`            | Always `strength`. The streak and the session count read it      |
 | `date`                    | The logging date, year-month-day. One session per plan per date  |
 | `programId`, `routineId`  | The plan and the routine that you did                            |
 | `startedAt`, `finishedAt` | Times in ISO form                                                |

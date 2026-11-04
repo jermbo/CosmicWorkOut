@@ -34,7 +34,7 @@ You tap **Start** on today's routine. The session opens as an overlay, and the a
 
 ## While you train
 
-Each set that you log is written to the session in localStorage at once, with no batch and no delay. So the stored copy always matches the screen. The app also stores the new last weight of the item, as [set logging](set-logging.md) tells.
+Each set that you log is saved at once, so the stored copy always matches the screen. The [set logging](set-logging.md) page tells what one set writes.
 
 ## Finish
 
