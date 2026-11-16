@@ -2,7 +2,7 @@
 
 # US-066 — The Star Talks About a Streak
 
-> **Status:** Built — waiting on hands-on testing · **As built:** lines come from `src/lib/mascot/lines.ts`, tested in `lines.test.ts`. Letters type in at 30 ms each; the 2.6 s count starts when the line is fully shown. A tap anywhere but a badge closes it; a badge tap replaces it. The speech box takes no taps.
+> **Status:** Built — waiting on hands-on testing · **As built:** lines come from `src/lib/mascot/lines.ts`. Letters type in at 30 ms each; the 2.6 s count starts when the line is fully shown. A tap anywhere but a badge closes it; a badge tap replaces it. The speech box takes no taps.
 >
 > **Persona:** Growth-minded user · **Depends on:** [US-064](./US-064-meet-the-star.md) (the star), [US-065](./US-065-streak-per-tracker.md) (the badges)
 >

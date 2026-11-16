@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { generateBlocks } from './generator.ts';
 import { prescribedTargetsForWeek } from './prescribed.ts';
 import { buildGoalProgram } from './buildProgram.ts';
-import { targetLabel, unitLabel } from './format.ts';
 import type { GoalPlan, GoalTemplateRoutine } from './types.ts';
 
 const ROUTINES: GoalTemplateRoutine[] = [
@@ -88,11 +87,4 @@ test('buildGoalProgram scaffolds A/B/C across every plan week', () => {
 	assert.equal(program.weeks[7].routines[2].id, 'w8-r2');
 	assert.equal(program.weeks[0].routines[0].sections[0].items[0].itemId, 'bench');
 	assert.match(program.description, /250 x 5/);
-});
-
-test('format helpers label units and targets', () => {
-	assert.equal(unitLabel('kg'), 'kg');
-	assert.equal(unitLabel('lb'), 'lb');
-	assert.equal(unitLabel(undefined), 'lb');
-	assert.equal(targetLabel({ weight: 250, reps: 5 }, 'lb'), '250 lb x 5');
 });

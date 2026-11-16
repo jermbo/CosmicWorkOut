@@ -14,22 +14,16 @@ import {
 	BACKUP_LOCAL_KEYS,
 	DB_STORES,
 	STORE_KEY_PATH,
-	BackupValidationError,
 	DATED_STORES,
-	UPSERT_STORES,
 	WINDOW_LOCAL_KEYS,
 	assertCountsMatch,
-	assertStoresAreArrays,
-	assertWindowRecords,
-	dropLegacyBaselines,
 	expectedCounts,
-	fillActivityTypes,
 	localEntriesOf,
 	scopeEnvelope,
-	scopeOf,
-	toPlainEnvelope,
 } from './backupPayload';
-import type { BackupEnvelope, BackupScope, DatedStore, StoreCounts } from './backupPayload';
+import type { BackupEnvelope, BackupScope, DatedStore } from './backupPayload';
+import { prepareFullRestore, prepareWindowRestore, stageAndCommit } from './restore';
+import type { RestoreTarget } from './restore';
 
 export { BackupValidationError, assertBackupSize, parseBackup } from './backupPayload';
 export type { BackupEnvelope, BackupScope } from './backupPayload';
@@ -254,141 +248,45 @@ function countOnDb(idb: IDBDatabase, storeName: string): Promise<number> {
 	});
 }
 
-async function writeAndVerifyStaging(plain: BackupEnvelope, expected: StoreCounts): Promise<void> {
-	await deleteStagingDb().catch(() => {
-		/* nothing to delete */
-	});
-
-	const staging = await openStagingDb();
-	try {
-		for (const store of DB_STORES) {
-			const records = (plain.db[store] ?? []) as unknown[];
-			console.info(`[backup-restore] staging ${records.length} → ${store}`);
-			await putAllOnDb(staging, store, records);
-		}
-
-		const staged = {} as StoreCounts;
-		for (const store of DB_STORES) {
-			staged[store] = await countOnDb(staging, store);
-		}
-		assertCountsMatch(expected, staged, 'staging');
-		console.info('[backup-restore] staging verified', staged);
-	} finally {
-		staging.close();
-	}
-}
-
-async function countLiveStores(): Promise<StoreCounts> {
-	const live = {} as StoreCounts;
-	for (const store of DB_STORES) {
-		live[store] = await countRecords(store);
-	}
-	return live;
-}
-
-async function commitLiveFromPlain(plain: BackupEnvelope, expected: StoreCounts): Promise<void> {
-	await clearWorkoutData();
-	console.info('[backup-restore] live stores cleared');
-
-	for (const store of DB_STORES) {
-		const records = (plain.db[store] ?? []) as unknown[];
-		if (records.length === 0) continue;
-		console.info(`[backup-restore] writing ${records.length} → ${store}`);
-		await putAllRecords(store, records, { silent: true });
-	}
-
-	const live = await countLiveStores();
-	assertCountsMatch(expected, live, 'live');
-	console.info('[backup-restore] live verified', live);
-}
+/** The real databases a restore writes to. The steps themselves live in `restore.ts`. */
+const indexedDbTarget: RestoreTarget = {
+	async openStaging() {
+		await deleteStagingDb().catch(() => {
+			/* nothing to delete */
+		});
+		const staging = await openStagingDb();
+		return {
+			write: (store, records) => putAllOnDb(staging, store, records),
+			count: (store) => countOnDb(staging, store),
+			close: () => staging.close(),
+		};
+	},
+	deleteStaging: deleteStagingDb,
+	clearLive: clearWorkoutData,
+	writeLive: (store, records) => putAllRecords(store, records, { silent: true }),
+	countLive: countRecords,
+};
 
 /**
  * Replace all on-device workout data with the contents of a validated backup.
- *
- * Safety model for device transfer:
- * 1. Flatten + validate (live data untouched)
- * 2. Write the full backup into a staging IndexedDB and verify counts
- * 3. Only then clear live stores and write the same payload
- * 4. Verify live counts; delete staging
- *
- * If anything fails before step 3, existing on-device data is unchanged.
- * Does not reload — the caller decides when to refresh.
+ * If anything fails before live stores are cleared, existing data is unchanged —
+ * see `restore.ts` for the steps. Does not reload — the caller decides when to refresh.
  */
 export async function importBackup(envelope: BackupEnvelope): Promise<void> {
-	const plain = toPlainEnvelope(envelope);
-	if (scopeOf(plain).kind === 'window') {
-		// Replacing everything with a date window would wipe every day outside it.
-		throw new BackupValidationError(
-			'This is a partial backup from Send by QR. Receive it with Receive by QR instead.',
-		);
-	}
-	if (dropLegacyBaselines(plain)) {
-		console.info('[backup-restore] dropped pre-v1.10.0 baselines from the backup');
-	}
-	assertStoresAreArrays(plain);
-	if (fillActivityTypes(plain, generateId, new Date().toISOString())) {
-		console.info('[backup-restore] built the activity type list from a pre-v1.13.0 backup');
-	}
-	const expected = expectedCounts(plain);
-
+	const plain = prepareFullRestore(envelope, generateId, new Date().toISOString());
 	console.info('[backup-restore] starting', {
 		exportedAt: plain.exportedAt,
 		version: plain.version,
-		stores: expected,
+		stores: expectedCounts(plain),
 	});
 
-	try {
-		structuredClone(plain.db);
-	} catch (err) {
-		console.error('[backup-restore] preflight structuredClone failed', err);
-		throw new BackupValidationError(
-			'This backup contains data that cannot be stored in IndexedDB.',
-		);
-	}
-
-	const localEntries = localEntriesOf(plain);
-
-	// Phase A — prove the backup is writable without touching live data.
-	try {
-		await writeAndVerifyStaging(plain, expected);
-	} catch (err) {
-		await deleteStagingDb().catch(() => {
-			/* best-effort cleanup */
-		});
-		console.error('[backup-restore] staging failed — live data untouched', err);
-		if (err instanceof BackupValidationError) throw err;
-		throw new BackupValidationError(
-			err instanceof Error
-				? `Could not prepare the restore (${err.message}). Your existing data is unchanged.`
-				: 'Could not prepare the restore. Your existing data is unchanged.',
-		);
-	}
-
-	// Phase B — replace live data. Staging already proved the payload is writable.
-	try {
-		await commitLiveFromPlain(plain, expected);
-	} catch (err) {
-		console.error('[backup-restore] live commit failed — retrying once from prepared payload', err);
-		try {
-			await commitLiveFromPlain(plain, expected);
-		} catch (retryErr) {
-			console.error('[backup-restore] live retry failed', retryErr);
-			// Leave staging in place so a re-import or DevTools inspection still has a full copy.
-			throw new Error(
-				'Restore failed while replacing on-device data. Re-import the same backup file — do not delete it. Your original backup file is still the source of truth.',
-				{ cause: retryErr },
-			);
-		}
-	}
-
-	await deleteStagingDb().catch((err) => {
-		console.warn('[backup-restore] could not delete staging DB (harmless)', err);
-	});
+	await stageAndCommit(plain, indexedDbTarget);
 
 	localStorage.removeItem('cwout:activeSession');
 	localStorage.removeItem('cwout:habitDay');
 	localStorage.removeItem('cwout:activeProgramId');
 
+	const localEntries = localEntriesOf(plain);
 	for (const key of BACKUP_LOCAL_KEYS) {
 		if (key in localEntries) writeLocal(key, localEntries[key]);
 	}
@@ -419,37 +317,9 @@ export async function countWindowOnDevice(
  * Does not reload — the caller decides when to refresh.
  */
 export async function importWindowBackup(envelope: BackupEnvelope): Promise<void> {
-	const plain = toPlainEnvelope(envelope);
-	const scope = scopeOf(plain);
-	if (scope.kind !== 'window') {
-		throw new BackupValidationError('This backup is not a date-range backup.');
-	}
-	assertStoresAreArrays(plain);
-	assertWindowRecords(plain, scope.from, scope.to);
-
-	try {
-		structuredClone(plain.db);
-	} catch (err) {
-		console.error('[qr-receive] preflight structuredClone failed', err);
-		throw new BackupValidationError(
-			'This backup contains data that cannot be stored in IndexedDB.',
-		);
-	}
-
-	// A store missing from the payload is left alone rather than cleared.
-	const replace: Record<string, unknown[]> = {};
-	for (const store of DATED_STORES) {
-		const records = plain.db[store];
-		if (Array.isArray(records)) replace[store] = records;
-	}
-	const upsert: Record<string, unknown[]> = {};
-	for (const store of UPSERT_STORES) {
-		const records = plain.db[store];
-		if (Array.isArray(records) && records.length > 0) upsert[store] = records;
-	}
-
-	console.info('[qr-receive] applying window', scope, expectedCounts(plain));
-	await replaceDateRange(scope.from, scope.to, replace, upsert);
+	const { from, to, replace, upsert, plain } = prepareWindowRestore(envelope);
+	console.info('[qr-receive] applying window', { from, to }, expectedCounts(plain));
+	await replaceDateRange(from, to, replace, upsert);
 
 	const localEntries = localEntriesOf(plain);
 	for (const key of WINDOW_LOCAL_KEYS) {

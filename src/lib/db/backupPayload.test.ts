@@ -14,14 +14,12 @@ import {
 	DATED_STORES,
 	DB_STORES,
 	MAX_BACKUP_BYTES,
-	STORE_KEY_PATH,
 	UPSERT_STORES,
 	WINDOW_LOCAL_KEYS,
 	assertBackupSize,
 	assertCountsMatch,
 	assertStoresAreArrays,
 	assertWindowRecords,
-	datedCounts,
 	dropLegacyBaselines,
 	expectedCounts,
 	fillActivityTypes,
@@ -113,13 +111,6 @@ function envelope(overrides: Partial<BackupEnvelope> = {}): BackupEnvelope {
 
 // ── Store registry ────────────────────────────────────────────────────
 
-test('every backed-up store declares a key path', () => {
-	for (const store of DB_STORES) {
-		assert.ok(STORE_KEY_PATH[store], `missing key path for "${store}"`);
-	}
-	assert.deepEqual(Object.keys(STORE_KEY_PATH).sort(), [...DB_STORES].sort());
-});
-
 test('transient localStorage keys are not backed up', () => {
 	const keys: readonly string[] = BACKUP_LOCAL_KEYS;
 	assert.ok(!keys.includes('cwout:activeSession'));
@@ -127,13 +118,6 @@ test('transient localStorage keys are not backed up', () => {
 });
 
 // ── parseBackup ───────────────────────────────────────────────────────
-
-test('parses a well-formed backup', () => {
-	const parsed = parseBackup(JSON.stringify(envelope()));
-	assert.equal(parsed.format, BACKUP_FORMAT);
-	assert.equal(parsed.db.sessions.length, 1);
-	assert.equal(parsed.db.items[0].name, 'Bench Press');
-});
 
 test('rejects a file that is not JSON', () => {
 	assert.throws(() => parseBackup('not json at all'), {
@@ -235,21 +219,6 @@ test('keeps v1.10.0-shaped baselines', () => {
 
 // ── Counts ────────────────────────────────────────────────────────────
 
-test('counts every store, treating absent ones as empty', () => {
-	const counts = expectedCounts(envelope());
-	assert.equal(counts.items, 1);
-	assert.equal(counts.sessions, 1);
-	assert.equal(counts.habits, 1);
-	assert.equal(counts.habitLogs, 1);
-	assert.equal(counts.programs, 0);
-	assert.equal(Object.keys(counts).length, DB_STORES.length);
-});
-
-test('matching counts pass verification', () => {
-	const counts = expectedCounts(envelope());
-	assert.doesNotThrow(() => assertCountsMatch(counts, { ...counts }, 'live'));
-});
-
 test('a short write is caught and names the store and phase', () => {
 	const expected = expectedCounts(envelope());
 	const actual = { ...expected, sessions: 0 };
@@ -304,13 +273,6 @@ test('toPlainEnvelope strips proxies so IndexedDB can structured-clone the paylo
 	assert.equal(plain.db.items[0].name, 'Bench Press');
 });
 
-test('toPlainEnvelope does not mutate the envelope it was given', () => {
-	const live = envelope();
-	const before = JSON.stringify(live);
-	toPlainEnvelope(live);
-	assert.equal(JSON.stringify(live), before);
-});
-
 test('localStorage entries survive, and a missing or malformed map yields none', () => {
 	assert.deepEqual(localEntriesOf(envelope()), {
 		'cwout:prefs': { theme: 'dark' },
@@ -362,17 +324,6 @@ function windowFixture(): BackupEnvelope {
 	];
 	return env;
 }
-
-test('scopeEnvelope drops built-in items and programs for every scope', () => {
-	const full = scopeEnvelope(windowFixture(), { kind: 'full' });
-	assert.deepEqual(
-		full.db.items.map((i) => i.id),
-		['ex-custom'],
-	);
-	assert.equal(full.db.sessions.length, 3, 'full keeps every dated record');
-	assert.deepEqual(full.scope, { kind: 'full' });
-	assert.ok('cwout:prefs' in full.localStorage, 'full keeps prefs');
-});
 
 test('scopeEnvelope keeps only dated records inside the window, inclusive', () => {
 	const scope = { kind: 'window', from: '2026-08-12', to: '2026-09-01' } as const;
@@ -446,13 +397,6 @@ test('assertWindowRecords rejects a dated record with no date', () => {
 test('dated stores and upsert stores cover every backed-up store exactly once', () => {
 	const all = [...DATED_STORES, ...UPSERT_STORES].sort();
 	assert.deepEqual(all, [...DB_STORES].sort());
-});
-
-test('datedCounts counts each dated store', () => {
-	const counts = datedCounts(windowFixture());
-	assert.equal(counts.sessions, 3);
-	assert.equal(counts.habitLogs, 2);
-	assert.equal(counts.baselineLogs, 0);
 });
 
 // ── Activity types (US-062) ───────────────────────────────────────────

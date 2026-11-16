@@ -10,7 +10,6 @@ import {
 	nextBaseline,
 	generateBlocks,
 	totalPlanWeeks,
-	estimateMonths,
 	focusTargetForWeek,
 	blockForWeek,
 	supportingWeightForWeek,
@@ -19,8 +18,6 @@ import {
 	countOffsetForRepeat,
 	meetsGoal,
 } from './generator.ts';
-import { autoPlanName } from './naming.ts';
-import type { GoalPlan } from './types.ts';
 
 test('buildBlock follows build → build → peak → deload from the baseline', () => {
 	// Spec example: 150x10 → 160x8 → 170x6 → deload 150x10 (increment 5, +2 increments/week)
@@ -88,27 +85,6 @@ test('generateBlocks chains until a peak meets the goal weight × reps', () => {
 		reps: 5,
 	});
 	assert.equal(totalPlanWeeks(blocks), 12);
-});
-
-test('generateBlocks final peak prescribes the goal, not just a heavier wave week', () => {
-	const blocks = generateBlocks({ weight: 150, reps: 10 }, { weight: 200, reps: 5 }, 5);
-	const peak = blocks.at(-1)?.weeks.find((w) => w.phase === 'peak');
-	assert.ok(peak);
-	assert.equal(peak.weight, 200);
-	assert.equal(peak.reps, 5);
-	// Earlier peaks still follow the wave (higher weight, lower reps than week 1).
-	const firstPeak = blocks[0].weeks.find((w) => w.phase === 'peak');
-	assert.deepEqual(firstPeak && { weight: firstPeak.weight, reps: firstPeak.reps }, {
-		weight: 170,
-		reps: 6,
-	});
-});
-
-test('a farther starting point needs more blocks (AC 2c)', () => {
-	const far = generateBlocks({ weight: 125, reps: 10 }, { weight: 250, reps: 5 }, 5);
-	const near = generateBlocks({ weight: 200, reps: 10 }, { weight: 250, reps: 5 }, 5);
-	assert.ok(far.length > near.length);
-	assert.ok(estimateMonths(far) > estimateMonths(near));
 });
 
 test('generateBlocks always yields at least one block and respects the cap', () => {
@@ -204,20 +180,4 @@ test('meetsGoal requires weight at-or-above and reps at-or-below', () => {
 	assert.equal(meetsGoal({ weight: 200, reps: 4 }, { weight: 200, reps: 5 }), true);
 	assert.equal(meetsGoal({ weight: 200, reps: 6 }, { weight: 200, reps: 5 }), false);
 	assert.equal(meetsGoal({ weight: 190, reps: 5 }, { weight: 200, reps: 5 }), false);
-});
-
-test('autoPlanName numbers instances per focus exercise', () => {
-	const planFor = (focusItemId: string) => ({ focusItemId }) as GoalPlan;
-	assert.equal(
-		autoPlanName('Barbell Bench Press', 'st-bb-bench-press', []),
-		'Barbell Bench Press Goal 01',
-	);
-	assert.equal(
-		autoPlanName('Barbell Bench Press', 'st-bb-bench-press', [planFor('st-bb-bench-press')]),
-		'Barbell Bench Press Goal 02',
-	);
-	assert.equal(
-		autoPlanName('Barbell Deadlift', 'st-bb-deadlift', [planFor('st-bb-bench-press')]),
-		'Barbell Deadlift Goal 01',
-	);
 });

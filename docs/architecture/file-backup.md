@@ -40,6 +40,8 @@ flowchart TD
 4. **Commit.** Only now does it clear the live stores and write the backup into them, and count again. If this fails, it tries once more from the same prepared data. If that fails too, it keeps the staging database and tells you to import the same file again.
 5. **Finish.** It removes the session in progress, writes the backup's localStorage keys, and writes the built-in content again. Then the app reloads.
 
+The steps 3 and 4 live in `src/lib/db/restore.ts`, which takes the databases as an argument; `backup.ts` passes the real ones. `restore.test.ts` runs the steps against a fake that fails a write or loses a row, and checks that live data is never cleared before staging passes.
+
 ## Why two databases
 
 The staging step proves that every record can be stored — the right shape, nothing that the database rejects — before any data is lost. The risk moves from "your data is gone" to "the restore did not start".

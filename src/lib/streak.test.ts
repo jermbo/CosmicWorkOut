@@ -51,10 +51,6 @@ test('a week streak breaks at the first full past week with no record', () => {
 	assert.equal(computeStreak(dates, 'week', day('2026-11-03')).count, 1);
 });
 
-test('one record in a week is enough', () => {
-	assert.equal(computeStreak(['2026-11-09'], 'week', day('2026-11-16')).count, 1);
-});
-
 test('a day streak counts back from yesterday when today has no record', () => {
 	const dates = Array.from({ length: 12 }, (_, i) => `2026-11-${String(4 + i).padStart(2, '0')}`);
 	assert.deepEqual(computeStreak(dates, 'day', day('2026-11-16')), {

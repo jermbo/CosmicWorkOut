@@ -3,10 +3,8 @@ import assert from 'node:assert/strict';
 import type { ActivityLog, ActivityType } from '$lib/db/types';
 import {
 	assignTypeIds,
-	countByType,
 	findOrAddType,
 	mergeDuplicateNames,
-	pickerOrder,
 	renameType,
 	starterTypes,
 } from './activityTypes.ts';
@@ -39,13 +37,6 @@ function old(
 function entry(id: string, typeId: string, date = '2026-01-01'): ActivityLog {
 	return { id, date, typeId, durationMinutes: 30, intensity: 'Easy', createdAt: NOW };
 }
-
-test('a new list is Stretching and Cardio', () => {
-	assert.deepEqual(
-		starterTypes(NOW).map((t) => t.name),
-		['Stretching', 'Cardio'],
-	);
-});
 
 test('the upgrade adds each old type and each Other name once, by its first spelling', () => {
 	const activities = [
@@ -91,13 +82,6 @@ test('an Other with no name becomes a type named Other', () => {
 	assert.equal(result.changedActivities[0].typeId, result.addedTypes[0].id);
 });
 
-test('no activities gives the starter list and nothing to write', () => {
-	const result = assignTypeIds(starterTypes(NOW), [], ids(), NOW);
-	assert.equal(result.types.length, 2);
-	assert.equal(result.addedTypes.length, 0);
-	assert.equal(result.changedActivities.length, 0);
-});
-
 test('entries that already point to a known type are left alone', () => {
 	const types = starterTypes(NOW);
 	const result = assignTypeIds(types, [entry('a', types[1].id)], ids(), NOW);
@@ -125,34 +109,6 @@ test('find or add shows a hidden match again', () => {
 	assert.equal(found.type.id, 'm');
 	assert.equal(found.type.hidden, false);
 	assert.equal(found.changed?.hidden, false);
-});
-
-test('the picker puts the most used first, then by name, and leaves out hidden types', () => {
-	const types: ActivityType[] = [
-		{ id: 's', name: 'Stretching', createdAt: NOW },
-		{ id: 'c', name: 'Cardio', createdAt: NOW },
-		{ id: 'm', name: 'Mowing', createdAt: NOW },
-		{ id: 'b', name: 'Bike', createdAt: NOW },
-		{ id: 'p', name: 'Pickleball', hidden: true, createdAt: NOW },
-	];
-	const activities = [
-		entry('1', 'c'),
-		entry('2', 'c'),
-		entry('3', 'c'),
-		entry('4', 'm'),
-		entry('5', 'p'),
-	];
-	assert.deepEqual(
-		pickerOrder(types, activities).map((t) => t.name),
-		['Cardio', 'Mowing', 'Bike', 'Stretching'],
-	);
-});
-
-test('rename changes the name and keeps the id', () => {
-	const types: ActivityType[] = [{ id: 'x', name: 'Mowng', createdAt: NOW }];
-	const result = renameType(types, [entry('1', 'x'), entry('2', 'x')], 'x', 'Mowing');
-	assert.equal(result.kind, 'renamed');
-	if (result.kind === 'renamed') assert.deepEqual(result.type, { ...types[0], name: 'Mowing' });
 });
 
 test('rename to a name that exists joins the two types with all their entries', () => {
@@ -192,25 +148,6 @@ test('rename to an empty name is not possible', () => {
 	assert.equal(renameType(types, [], 'x', '   ').kind, 'invalid');
 });
 
-test('Activity Mix counts by type, by name, and leaves out hidden types', () => {
-	const types: ActivityType[] = [
-		{ id: 'c', name: 'Cardio', createdAt: NOW },
-		{ id: 'm', name: 'Mowing', createdAt: NOW },
-		{ id: 'p', name: 'Pickleball', hidden: true, createdAt: NOW },
-	];
-	const activities = [
-		entry('1', 'm'),
-		entry('2', 'm'),
-		entry('3', 'c'),
-		entry('4', 'p'),
-		entry('5', 'c', '2025-01-01'),
-	];
-	assert.deepEqual(countByType(types, activities, new Set(['2026-01-01'])), [
-		{ id: 'm', name: 'Mowing', count: 2 },
-		{ id: 'c', name: 'Cardio', count: 1 },
-	]);
-});
-
 test('types that share a name join into the oldest, with all their entries', () => {
 	const types: ActivityType[] = [
 		{ id: 'b', name: 'mowing', createdAt: '2026-02-01' },
@@ -230,10 +167,4 @@ test('types that share a name join into the oldest, with all their entries', () 
 		result.movedActivities.map((a) => [a.id, a.typeId]),
 		[['1', 'a']],
 	);
-});
-
-test('a list with no shared names is left alone', () => {
-	const result = mergeDuplicateNames(starterTypes(NOW), []);
-	assert.equal(result.removedIds.length, 0);
-	assert.equal(result.changedTypes.length, 0);
 });

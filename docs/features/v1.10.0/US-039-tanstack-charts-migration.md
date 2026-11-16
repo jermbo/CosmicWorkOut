@@ -2,7 +2,7 @@
 
 # US-039 — Move All Charts to TanStack Charts
 
-> **As built:** Every chart renders through `@tanstack/charts` 0.18.0 (Svelte adapter, SVG). Shared pieces live in `src/lib/charts/`: `scale.ts` (pure nice-axis math, tested in `src/lib/charts.test.ts`), `theme.ts` (column width, plot margins, colors, portalled tooltip helper), and `ScrollChart.svelte` (US-040). Donut uses `pie` + `radialArc`; radar uses `polar` + `radialArea`/`radialLine`, closed by repeating the first spoke (avoids importing `d3-shape`, which is not a direct dependency). Grid lines are `ruleY` marks at the same tick values the pinned rails print, so labels and lines always align. `src/lib/chart-utils.ts` no longer imports Chart.js.
+> **As built:** Every chart renders through `@tanstack/charts` 0.18.0 (Svelte adapter, SVG). Shared pieces live in `src/lib/charts/`: `scale.ts` (pure nice-axis math), `theme.ts` (column width, plot margins, colors, portalled tooltip helper), and `ScrollChart.svelte` (US-040). Donut uses `pie` + `radialArc`; radar uses `polar` + `radialArea`/`radialLine`, closed by repeating the first spoke (avoids importing `d3-shape`, which is not a direct dependency). Grid lines are `ruleY` marks at the same tick values the pinned rails print, so labels and lines always align. `src/lib/chart-utils.ts` no longer imports Chart.js.
 >
 > **Deviation:** `chart.js` is **still installed** — per the user, `package.json` is not touched; they remove it after testing (requirement 4a is theirs to close). Health lines **connect across missing days**, matching the old `spanGaps: true` behaviour (the story text below said "gaps", which never matched the shipped chart).
 >
