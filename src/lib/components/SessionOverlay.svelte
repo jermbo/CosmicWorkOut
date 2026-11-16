@@ -1,15 +1,15 @@
 <script lang="ts">
 	import RollingNumber from './RollingNumber.svelte';
 	import { onMount, onDestroy, tick, untrack } from 'svelte';
-	import { formatElapsed, formatCountWithWord } from '$lib/format';
-	import type { ActiveItem, ActiveSet } from '$lib/db/types';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
+	import { formatElapsed, formatCountWithWord } from '#lib/format';
+	import type { ActiveItem, ActiveSet } from '#lib/db/types';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import ExerciseCard from './ExerciseCard.svelte';
 	import LogSetSheet from './LogSetSheet.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
-	import { feedback, prefersReducedMotion } from '$lib/feedback';
+	import { feedback, prefersReducedMotion } from '#lib/feedback';
 	import {
 		PLATE_DELAY_MS,
 		PLATE_LIFT,
@@ -19,7 +19,7 @@
 		handoffScrollTop,
 		plateKeyframes,
 		type Box,
-	} from '$lib/feedback/plate';
+	} from '#lib/feedback/plate';
 
 	let showAbandonConfirm = $state(false);
 	let elapsed = $state(0);

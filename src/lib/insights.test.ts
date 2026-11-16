@@ -8,7 +8,7 @@ import {
 	metricDailyTotals,
 	habitDailyValues,
 } from './insights/logic.ts';
-import type { BaselineLog, Habit, HabitLog } from '$lib/db/types';
+import type { BaselineLog, Habit, HabitLog } from '#lib/db/types';
 
 // ── Fixtures ─────────────────────────────────────────────────
 

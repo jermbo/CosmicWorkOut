@@ -1,7 +1,7 @@
-import type { HealthReading, WeightValues, BloodPressureValues } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { isWeightReading, isBloodPressureReading } from '$lib/health/metrics';
+import type { HealthReading, WeightValues, BloodPressureValues } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { isWeightReading, isBloodPressureReading } from '#lib/health/metrics';
 import { mascotStore } from './mascot.svelte';
 
 class HealthStore {

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { INSIGHT_CHARTS } from '$lib/insights/charts';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsRow from '$lib/components/SettingsRow.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { INSIGHT_CHARTS } from '#lib/insights/charts';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsRow from '#lib/components/SettingsRow.svelte';
 
 	/*
 	 * One row per feature (v1.10.0, US-045). Each opens that feature's page, which

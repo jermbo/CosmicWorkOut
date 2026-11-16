@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { ActivityType } from '$lib/db/types';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { findTypeByName } from '$lib/activityTypes';
+	import type { ActivityType } from '#lib/db/types';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { findTypeByName } from '#lib/activityTypes';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import SheetBody from './SheetBody.svelte';

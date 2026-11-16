@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Habit } from '$lib/db/types';
-	import { MOOD_SCALE } from '$lib/db/types';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { formatMoodValue } from '$lib/habits';
-	import { minuteUnitLabel } from '$lib/format';
-	import HabitCard from '$lib/components/HabitCard.svelte';
-	import ValueDialog from '$lib/components/ValueDialog.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import type { Habit } from '#lib/db/types';
+	import { MOOD_SCALE } from '#lib/db/types';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { formatMoodValue } from '#lib/habits';
+	import { minuteUnitLabel } from '#lib/format';
+	import HabitCard from '#lib/components/HabitCard.svelte';
+	import ValueDialog from '#lib/components/ValueDialog.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.habitsEnabled);
 

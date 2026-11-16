@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import { runItAgain } from '$lib/plans/actions';
-	import WorkoutPicker from '$lib/components/WorkoutPicker.svelte';
-	import TodayWorkout from '$lib/components/TodayWorkout.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import { todayIso, formatWeekdayShortDate } from '$lib/date';
-	import { formatDuration } from '$lib/format';
-	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { runItAgain } from '#lib/plans/actions';
+	import WorkoutPicker from '#lib/components/WorkoutPicker.svelte';
+	import TodayWorkout from '#lib/components/TodayWorkout.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import { todayIso, formatWeekdayShortDate } from '#lib/date';
+	import { formatDuration } from '#lib/format';
+	import { STRENGTH_DISCIPLINE_ID } from '#lib/discipline';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 

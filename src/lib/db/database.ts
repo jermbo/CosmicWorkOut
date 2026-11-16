@@ -11,13 +11,13 @@ import type {
 	Baseline,
 	BaselineLog,
 } from './types';
-import type { GoalPlan } from '$lib/goalPlans/types';
+import type { GoalPlan } from '#lib/goalPlans/types';
 import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';
-import { generateGoalPlanSampleData } from '$lib/goalPlans/sampleData';
-import { toastStore } from '$lib/stores/toast.svelte';
-import { assignTypeIds, mergeDuplicateNames, starterTypes } from '$lib/activityTypes';
-import { generateId } from '$lib/utils';
+import { generateGoalPlanSampleData } from '#lib/goalPlans/sampleData';
+import { toastStore } from '#lib/stores/toast.svelte';
+import { assignTypeIds, mergeDuplicateNames, starterTypes } from '#lib/activityTypes';
+import { generateId } from '#lib/utils';
 
 function reportWriteError(error: unknown): void {
 	console.error('IndexedDB write failed:', error);

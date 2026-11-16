@@ -1,8 +1,8 @@
 <!-- One Insights chart card: title, optional "Experimental" badge, and ⋯ → Hide (US-043). -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { InsightChartDef } from '$lib/insights/charts';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { InsightChartDef } from '#lib/insights/charts';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 
 	let { chart, children }: { chart: InsightChartDef; children: Snippet } = $props();
 

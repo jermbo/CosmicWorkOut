@@ -4,11 +4,11 @@
 	See docs/architecture/health-card.md.
 -->
 <script lang="ts">
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import type { HealthChartView } from '$lib/db/types';
-	import { averageBp, bpReadingsIn, healthLog, weightChange, weightsIn } from '$lib/health/bpZones';
-	import SegmentedControl from '$lib/components/SegmentedControl.svelte';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import type { HealthChartView } from '#lib/db/types';
+	import { averageBp, bpReadingsIn, healthLog, weightChange, weightsIn } from '#lib/health/bpZones';
+	import SegmentedControl from '#lib/components/SegmentedControl.svelte';
 	import ChartHealthReadings from './ChartHealthReadings.svelte';
 	import ChartHealthTrend from './ChartHealthTrend.svelte';
 	import ChartHealthLog from './ChartHealthLog.svelte';

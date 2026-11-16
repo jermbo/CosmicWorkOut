@@ -7,7 +7,7 @@ import {
 	replaceDateRange,
 	initDB,
 } from './database';
-import { generateId } from '$lib/utils';
+import { generateId } from '#lib/utils';
 import {
 	BACKUP_FORMAT,
 	BACKUP_VERSION,

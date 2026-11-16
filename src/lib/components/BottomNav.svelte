@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 
 	let { pathname }: { pathname: string } = $props();
 

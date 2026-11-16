@@ -7,9 +7,9 @@
 <script lang="ts">
 	import { cell, defineChart } from '@tanstack/charts';
 	import { scaleBand } from '@tanstack/charts/scales/band';
-	import type { Habit } from '$lib/db/types';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { habitColor, moodBadColor } from '$lib/habitColors';
+	import type { Habit } from '#lib/db/types';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { habitColor, moodBadColor } from '#lib/habitColors';
 	import {
 		HEAT_EMPTY,
 		HEAT_NEUTRAL,
@@ -17,8 +17,8 @@
 		habitHeatRow,
 		heatValueLabel,
 		type HeatCell,
-	} from '$lib/insights/heat';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
+	} from '#lib/insights/heat';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
 	import {
 		PLOT_MARGIN,
 		chartPalette,
@@ -26,7 +26,7 @@
 		longDate,
 		shortDate,
 		withAlpha,
-	} from '$lib/charts/theme';
+	} from '#lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 

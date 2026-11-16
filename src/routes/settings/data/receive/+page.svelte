@@ -13,19 +13,19 @@
 		importBackup,
 		importWindowBackup,
 		parseBackup,
-	} from '$lib/db/backup';
-	import type { BackupScope } from '$lib/db/backup';
+	} from '#lib/db/backup';
+	import type { BackupScope } from '#lib/db/backup';
 	import {
 		DATED_STORES,
 		assertWindowRecords,
 		datedCounts,
 		restoreWarnings,
 		scopeOf,
-	} from '$lib/db/backupPayload';
-	import type { DatedStore } from '$lib/db/backupPayload';
-	import { formatShortDate } from '$lib/date';
-	import { requestPersistentStorage } from '$lib/db/persistence';
-	import { feedback } from '$lib/feedback';
+	} from '#lib/db/backupPayload';
+	import type { DatedStore } from '#lib/db/backupPayload';
+	import { formatShortDate } from '#lib/date';
+	import { requestPersistentStorage } from '#lib/db/persistence';
+	import { feedback } from '#lib/feedback';
 	import {
 		cameraErrorMessage,
 		cameraUnavailableReason,
@@ -34,14 +34,14 @@
 		openCamera,
 		shouldMirror,
 		stopCamera,
-	} from '$lib/qrBackup/camera';
-	import type { QrReader } from '$lib/qrBackup/camera';
-	import { FrameCollector, inflate } from '$lib/qrBackup/frames';
-	import { countLabel } from '$lib/qrBackup/summary';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	} from '#lib/qrBackup/camera';
+	import type { QrReader } from '#lib/qrBackup/camera';
+	import { FrameCollector, inflate } from '#lib/qrBackup/frames';
+	import { countLabel } from '#lib/qrBackup/summary';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import Button from '#lib/components/Button.svelte';
+	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
 
 	/** Toast shown on Data & backup after the reload that follows a successful receive. */
 	const FLASH_KEY = 'cwout:qrReceived';

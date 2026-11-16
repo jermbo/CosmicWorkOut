@@ -1,23 +1,23 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Baseline, BaselineLog } from '$lib/db/types';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
+	import type { Baseline, BaselineLog } from '#lib/db/types';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
 	import {
 		differenceFromBaseline,
 		formatDifference,
 		formatValue,
 		isMetricLogged,
 		visibleMetrics,
-	} from '$lib/baselines/logic';
-	import { buildDatesBetween, computeRange, type RangeKey } from '$lib/chart-utils';
-	import { formatTime } from '$lib/date';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import RangeBar from '$lib/components/insights/RangeBar.svelte';
-	import BaselineChart from '$lib/components/BaselineChart.svelte';
-	import BaselineEntryDialog from '$lib/components/BaselineEntryDialog.svelte';
-	import Icon from '$lib/components/Icon.svelte';
+	} from '#lib/baselines/logic';
+	import { buildDatesBetween, computeRange, type RangeKey } from '#lib/chart-utils';
+	import { formatTime } from '#lib/date';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import RangeBar from '#lib/components/insights/RangeBar.svelte';
+	import BaselineChart from '#lib/components/BaselineChart.svelte';
+	import BaselineEntryDialog from '#lib/components/BaselineEntryDialog.svelte';
+	import Icon from '#lib/components/Icon.svelte';
 
 	let contextDate = $derived(loggingContext.date);
 	let baselines = $derived(baselineStore.activeBaselines);

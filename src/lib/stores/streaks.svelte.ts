@@ -1,5 +1,5 @@
-import { computeStreak, habitStreakDates, STREAK_TRACKERS } from '$lib/streak';
-import type { Streak, StreakInfo, StreakTracker } from '$lib/streak';
+import { computeStreak, habitStreakDates, STREAK_TRACKERS } from '#lib/streak';
+import type { Streak, StreakInfo, StreakTracker } from '#lib/streak';
 import { programStore } from './program.svelte';
 import { habitStore } from './habits.svelte';
 import { activityStore } from './activities.svelte';

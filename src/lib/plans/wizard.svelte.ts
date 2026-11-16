@@ -1,17 +1,17 @@
-import type { Item, Program } from '$lib/db/types';
-import type { GoalTemplateRoutine } from '$lib/goalPlans/types';
+import type { Item, Program } from '#lib/db/types';
+import type { GoalTemplateRoutine } from '#lib/goalPlans/types';
 import {
 	SCRATCH_TEMPLATE_ID,
 	blankGoalRoutines,
 	routinesFromTemplate,
-} from '$lib/goalPlans/templates';
-import { generateBlocks, totalPlanWeeks, estimateMonths } from '$lib/goalPlans/generator';
-import { unitLabel } from '$lib/goalPlans/format';
-import { db } from '$lib/db/database';
-import { programStore } from '$lib/stores/program.svelte';
-import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-import { buildGoalProgram } from '$lib/goalPlans/buildProgram';
-import { generateId } from '$lib/utils';
+} from '#lib/goalPlans/templates';
+import { generateBlocks, totalPlanWeeks, estimateMonths } from '#lib/goalPlans/generator';
+import { unitLabel } from '#lib/goalPlans/format';
+import { db } from '#lib/db/database';
+import { programStore } from '#lib/stores/program.svelte';
+import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+import { buildGoalProgram } from '#lib/goalPlans/buildProgram';
+import { generateId } from '#lib/utils';
 import { SvelteSet, SvelteDate } from 'svelte/reactivity';
 import { activatePlan } from './actions';
 

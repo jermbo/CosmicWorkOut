@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { toastStore } from '$lib/stores/toast.svelte';
-	import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
-	import { PlanWizard, DAYS_PER_WEEK } from '$lib/plans/wizard.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import LibrarySheet from '$lib/components/LibrarySheet.svelte';
-	import { strengthLibrary } from '$lib/itemLibrary';
-	import PlanWizardSteps from '$lib/components/plans/PlanWizardSteps.svelte';
-	import PlanStartStep from '$lib/components/plans/PlanStartStep.svelte';
-	import PlanRoutinesStep from '$lib/components/plans/PlanRoutinesStep.svelte';
-	import PlanGoalStep from '$lib/components/plans/PlanGoalStep.svelte';
-	import PlanReviewStep from '$lib/components/plans/PlanReviewStep.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { toastStore } from '#lib/stores/toast.svelte';
+	import { STRENGTH_DISCIPLINE_ID } from '#lib/discipline';
+	import { PlanWizard, DAYS_PER_WEEK } from '#lib/plans/wizard.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import LibrarySheet from '#lib/components/LibrarySheet.svelte';
+	import { strengthLibrary } from '#lib/itemLibrary';
+	import PlanWizardSteps from '#lib/components/plans/PlanWizardSteps.svelte';
+	import PlanStartStep from '#lib/components/plans/PlanStartStep.svelte';
+	import PlanRoutinesStep from '#lib/components/plans/PlanRoutinesStep.svelte';
+	import PlanGoalStep from '#lib/components/plans/PlanGoalStep.svelte';
+	import PlanReviewStep from '#lib/components/plans/PlanReviewStep.svelte';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 

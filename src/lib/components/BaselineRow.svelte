@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Baseline } from '$lib/db/types';
-	import { baselineSummary, visibleMetrics } from '$lib/baselines/logic';
+	import type { Baseline } from '#lib/db/types';
+	import { baselineSummary, visibleMetrics } from '#lib/baselines/logic';
 	import Icon from './Icon.svelte';
 
 	type Props = {

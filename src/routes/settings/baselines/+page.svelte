@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Baseline } from '$lib/db/types';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import BaselineForm from '$lib/components/BaselineForm.svelte';
-	import BaselineRow from '$lib/components/BaselineRow.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
+	import type { Baseline } from '#lib/db/types';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import BaselineForm from '#lib/components/BaselineForm.svelte';
+	import BaselineRow from '#lib/components/BaselineRow.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
 
 	let showForm = $state(false);
 	let editingBaseline = $state<Baseline | null>(null);

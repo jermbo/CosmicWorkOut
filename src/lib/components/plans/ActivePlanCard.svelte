@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Program } from '$lib/db/types';
+	import type { Program } from '#lib/db/types';
 
 	type Props = {
 		program: Program;

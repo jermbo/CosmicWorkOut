@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { RANGE_OPTIONS, type RangeKey } from '$lib/chart-utils';
-	import { toLocalIso } from '$lib/date';
+	import { RANGE_OPTIONS, type RangeKey } from '#lib/chart-utils';
+	import { toLocalIso } from '#lib/date';
 	import { SvelteDate } from 'svelte/reactivity';
 
 	let {

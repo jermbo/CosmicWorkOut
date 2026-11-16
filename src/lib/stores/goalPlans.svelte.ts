@@ -1,5 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
-import type { Item, Routine, Week } from '$lib/db/types';
+import type { Item, Routine, Week } from '#lib/db/types';
 import type {
 	GoalPlan,
 	GoalTarget,
@@ -7,7 +7,7 @@ import type {
 	ProgressionBlock,
 	SupportingBaseline,
 	WaveWeek,
-} from '$lib/goalPlans/types';
+} from '#lib/goalPlans/types';
 import {
 	generateBlocks,
 	totalPlanWeeks,
@@ -17,12 +17,12 @@ import {
 	blockForWeek,
 	countOffsetForRepeat,
 	WEEKS_PER_BLOCK,
-} from '$lib/goalPlans/generator';
-import { buildGoalProgram } from '$lib/goalPlans/buildProgram';
-import { prescribedTargetsForWeek, type PrescribedTarget } from '$lib/goalPlans/prescribed';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+} from '#lib/goalPlans/generator';
+import { buildGoalProgram } from '#lib/goalPlans/buildProgram';
+import { prescribedTargetsForWeek, type PrescribedTarget } from '#lib/goalPlans/prescribed';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { STRENGTH_DISCIPLINE_ID } from '#lib/discipline';
 import { programStore } from './program.svelte';
 
 const DEFAULT_INCREMENT = 5;

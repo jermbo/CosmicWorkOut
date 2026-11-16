@@ -6,9 +6,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
-	import { ENTRANCES, type ActionName } from '$lib/mascot/sprite';
-	import Mascot from '$lib/components/Mascot.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import { ENTRANCES, type ActionName } from '#lib/mascot/sprite';
+	import Mascot from '#lib/components/Mascot.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
 
 	type Card = {
 		id: ActionName | 'idle' | 'talk';

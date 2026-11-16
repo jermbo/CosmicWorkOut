@@ -1,7 +1,7 @@
 <!-- Log view of the Health card (US-060): every reading in the range, newest first, by date. -->
 <script lang="ts">
-	import { longDate } from '$lib/charts/theme';
-	import type { LogDay } from '$lib/health/bpZones';
+	import { longDate } from '#lib/charts/theme';
+	import type { LogDay } from '#lib/health/bpZones';
 
 	let { days, unit }: { days: LogDay[]; unit: string } = $props();
 </script>

@@ -7,8 +7,8 @@
 	import { barY, defineChart, group, ruleY } from '@tanstack/charts';
 	import { scaleBand } from '@tanstack/charts/scales/band';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
 	import {
 		chartGrid,
 		PLOT_MARGIN,
@@ -16,8 +16,8 @@
 		longDate,
 		shortDate,
 		FIELD,
-	} from '$lib/charts/theme';
-	import { BP_NORMAL_LIMIT, BP_ZONES, type BpRow } from '$lib/health/bpZones';
+	} from '#lib/charts/theme';
+	import { BP_NORMAL_LIMIT, BP_ZONES, type BpRow } from '#lib/health/bpZones';
 
 	let { dates, rows }: { dates: string[]; rows: BpRow[] } = $props();
 

@@ -1,4 +1,4 @@
-import { prefsStore } from '$lib/stores/prefs.svelte';
+import { prefsStore } from '#lib/stores/prefs.svelte';
 import { TONES, VIBRATION, type FeedbackKind } from './patterns';
 
 export type { FeedbackKind } from './patterns';

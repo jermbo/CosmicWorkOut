@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { HealthReading, WeightValues, BloodPressureValues } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { HealthReading, WeightValues, BloodPressureValues } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import HomeCard from './HomeCard.svelte';
 
 	type Props = {

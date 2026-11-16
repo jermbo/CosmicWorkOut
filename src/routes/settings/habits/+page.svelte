@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Habit } from '$lib/db/types';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import HabitForm from '$lib/components/HabitForm.svelte';
-	import HabitRow from '$lib/components/HabitRow.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { Habit } from '#lib/db/types';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import HabitForm from '#lib/components/HabitForm.svelte';
+	import HabitRow from '#lib/components/HabitRow.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 
 	let showHabitForm = $state(false);
 	let editingHabit = $state<Habit | null>(null);

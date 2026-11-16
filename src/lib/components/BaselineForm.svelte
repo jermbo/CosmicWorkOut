@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Baseline, BaselineMeasure, DistanceUnit } from '$lib/db/types';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
+	import type { Baseline, BaselineMeasure, DistanceUnit } from '#lib/db/types';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
 	import {
 		BASELINE_MEASURES,
 		BASELINE_PRESETS,
@@ -10,7 +10,7 @@
 		parseDuration,
 		visibleMetrics,
 		type BaselineMetricDraft,
-	} from '$lib/baselines/logic';
+	} from '#lib/baselines/logic';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';
 	import DialogTitle from './DialogTitle.svelte';

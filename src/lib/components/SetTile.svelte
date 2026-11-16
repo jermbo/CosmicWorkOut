@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
-	import type { ActiveSet } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { ActiveSet } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 
 	type Props = {
 		set: ActiveSet;

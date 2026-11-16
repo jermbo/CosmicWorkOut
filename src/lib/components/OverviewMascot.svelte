@@ -7,10 +7,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
-	import { todayIso } from '$lib/date';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { streakStore, type TrackerStreak } from '$lib/stores/streaks.svelte';
-	import { shouldWelcome, streakLine, welcomeLine } from '$lib/mascot/lines';
+	import { todayIso } from '#lib/date';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { streakStore, type TrackerStreak } from '#lib/stores/streaks.svelte';
+	import { shouldWelcome, streakLine, welcomeLine } from '#lib/mascot/lines';
 	import Mascot from './Mascot.svelte';
 	import StreakBadge from './StreakBadge.svelte';
 

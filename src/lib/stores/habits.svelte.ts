@@ -1,10 +1,10 @@
-import type { Habit, HabitLog, HabitType } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { todayIso } from '$lib/date';
-import { isHabitComplete, habitProgressPct } from '$lib/habits';
-import { nextDefaultColor, withDefaultColors } from '$lib/habitColors';
-import { reachesDailyGoal } from '$lib/mascot/celebrate';
+import type { Habit, HabitLog, HabitType } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { todayIso } from '#lib/date';
+import { isHabitComplete, habitProgressPct } from '#lib/habits';
+import { nextDefaultColor, withDefaultColors } from '#lib/habitColors';
+import { reachesDailyGoal } from '#lib/mascot/celebrate';
 import { mascotStore } from './mascot.svelte';
 
 const TODAY_KEY = 'cwout:habitDay';

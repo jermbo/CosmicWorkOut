@@ -4,11 +4,11 @@
  * like one thing where the UI needs that: activating, pausing, and restarting
  * whichever kind of plan `programId` turns out to be.
  */
-import type { Program } from '$lib/db/types';
-import type { GoalPlan } from '$lib/goalPlans/types';
-import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
-import { programStore } from '$lib/stores/program.svelte';
-import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
+import type { Program } from '#lib/db/types';
+import type { GoalPlan } from '#lib/goalPlans/types';
+import { STRENGTH_DISCIPLINE_ID } from '#lib/discipline';
+import { programStore } from '#lib/stores/program.svelte';
+import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
 
 export type PlanMeta = {
 	program: Program;

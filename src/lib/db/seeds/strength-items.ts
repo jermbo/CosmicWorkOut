@@ -1,5 +1,5 @@
 import type { Item } from '../types';
-import { STRENGTH_DISCIPLINE_ID } from '$lib/discipline';
+import { STRENGTH_DISCIPLINE_ID } from '#lib/discipline';
 import { strengthExerciseSeeds } from './strength-exercises';
 
 export const strengthItems: Item[] = strengthExerciseSeeds.map((e) => ({

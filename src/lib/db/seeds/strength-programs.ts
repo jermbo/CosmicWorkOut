@@ -1,5 +1,5 @@
 import type { Program, Routine, RoutineColor, Week } from '../types';
-import { STRENGTH_DISCIPLINE_ID, singleSection } from '$lib/discipline';
+import { STRENGTH_DISCIPLINE_ID, singleSection } from '#lib/discipline';
 
 type ExerciseSlot = { itemId: string; sets: number; reps: string };
 

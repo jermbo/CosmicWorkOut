@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import ActivityLogSheet from '$lib/components/ActivityLogSheet.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import { formatActivitySummary } from '$lib/activities';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import ActivityLogSheet from '#lib/components/ActivityLogSheet.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import { formatActivitySummary } from '#lib/activities';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.activityLogEnabled);
 

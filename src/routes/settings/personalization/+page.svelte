@@ -5,14 +5,14 @@
 	with fixed per-domain colors (docs/architecture/design-system.md).
 -->
 <script lang="ts">
-	import type { Density } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import OverviewLayoutEditor from '$lib/components/OverviewLayoutEditor.svelte';
-	import SegmentedControl from '$lib/components/SegmentedControl.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
-	import SettingsRow from '$lib/components/SettingsRow.svelte';
-	import { canVibrate, feedback } from '$lib/feedback';
+	import type { Density } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import OverviewLayoutEditor from '#lib/components/OverviewLayoutEditor.svelte';
+	import SegmentedControl from '#lib/components/SegmentedControl.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
+	import SettingsRow from '#lib/components/SettingsRow.svelte';
+	import { canVibrate, feedback } from '#lib/feedback';
 
 	// Only offer haptics where the browser can actually vibrate.
 	const vibrationSupported = canVibrate();

@@ -1,6 +1,6 @@
-import type { Baseline, BaselineLog } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
+import type { Baseline, BaselineLog } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
 import { mascotStore } from './mascot.svelte';
 import {
 	entriesForDate,
@@ -8,7 +8,7 @@ import {
 	mergeMetrics,
 	totalsFor,
 	type BaselineMetricDraft,
-} from '$lib/baselines/logic';
+} from '#lib/baselines/logic';
 
 export type { BaselineMetricDraft };
 

@@ -1,8 +1,8 @@
-import type { Program, Item, Routine, RoutineItem, Session, RoutineColor } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { todayIso } from '$lib/date';
-import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines } from '$lib/discipline';
+import type { Program, Item, Routine, RoutineItem, Session, RoutineColor } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { todayIso } from '#lib/date';
+import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines } from '#lib/discipline';
 import { SvelteMap } from 'svelte/reactivity';
 
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';

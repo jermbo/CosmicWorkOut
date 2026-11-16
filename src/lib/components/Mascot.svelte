@@ -26,7 +26,7 @@
 		PALETTE,
 		type ActionName,
 		type Frame,
-	} from '$lib/mascot/sprite';
+	} from '#lib/mascot/sprite';
 
 	type Props = {
 		/** Screen pixels per star pixel. Whole numbers keep the pixels square and sharp. */

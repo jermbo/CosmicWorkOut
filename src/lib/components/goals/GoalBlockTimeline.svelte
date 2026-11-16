@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { GoalPlan } from '$lib/goalPlans/types';
-	import { WEEKS_PER_BLOCK } from '$lib/goalPlans/generator';
+	import type { GoalPlan } from '#lib/goalPlans/types';
+	import { WEEKS_PER_BLOCK } from '#lib/goalPlans/generator';
 
 	type Props = {
 		plan: GoalPlan;

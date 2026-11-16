@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Item } from '$lib/db/types';
-	import type { ProgressionBlock } from '$lib/goalPlans/types';
+	import type { Item } from '#lib/db/types';
+	import type { ProgressionBlock } from '#lib/goalPlans/types';
 
 	type Props = {
 		name: string;

@@ -4,7 +4,7 @@
 	rendering, so every square stays sharp for the camera.
 -->
 <script lang="ts">
-	import { frameMatrix } from '$lib/qrBackup/qrMatrix';
+	import { frameMatrix } from '#lib/qrBackup/qrMatrix';
 
 	type Props = {
 		frames: string[];

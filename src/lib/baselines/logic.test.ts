@@ -11,7 +11,7 @@ import {
 	mergeMetrics,
 	isLegacyBaseline,
 } from './logic.ts';
-import type { Baseline, BaselineLog, BaselineMetric } from '$lib/db/types';
+import type { Baseline, BaselineLog, BaselineMetric } from '#lib/db/types';
 
 const pushups: BaselineMetric = {
 	id: 'm-push',

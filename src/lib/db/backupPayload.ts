@@ -11,7 +11,7 @@ import type {
 	Baseline,
 	BaselineLog,
 } from './types';
-import type { GoalPlan } from '$lib/goalPlans/types';
+import type { GoalPlan } from '#lib/goalPlans/types';
 import { isLegacyBaseline } from '../baselines/logic.ts';
 import { assignTypeIds, starterTypes } from '../activityTypes.ts';
 

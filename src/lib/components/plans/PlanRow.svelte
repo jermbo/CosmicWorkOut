@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { GoalPlan } from '$lib/goalPlans/types';
-	import type { Program } from '$lib/db/types';
-	import { targetLabel, unitLabel } from '$lib/goalPlans/format';
-	import { programStore } from '$lib/stores/program.svelte';
+	import type { GoalPlan } from '#lib/goalPlans/types';
+	import type { Program } from '#lib/db/types';
+	import { targetLabel, unitLabel } from '#lib/goalPlans/format';
+	import { programStore } from '#lib/stores/program.svelte';
 
 	type Props = {
 		program: Program;

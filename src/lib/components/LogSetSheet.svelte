@@ -1,9 +1,9 @@
 <script lang="ts">
 	import RollingNumber from './RollingNumber.svelte';
-	import { holdRepeat } from '$lib/feedback/holdRepeat';
+	import { holdRepeat } from '#lib/feedback/holdRepeat';
 	import { onMount, tick, untrack } from 'svelte';
-	import type { Item, ActiveSet } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { Item, ActiveSet } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 
 	const BANDS = ['Light', 'Med', 'Heavy'];

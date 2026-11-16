@@ -2,7 +2,7 @@
  * Pure aggregation behind the Insights charts (v1.10.0). No stores, no DOM —
  * tested in src/lib/insights.test.ts.
  */
-import type { BaselineLog, Habit, HabitLog } from '$lib/db/types';
+import type { BaselineLog, Habit, HabitLog } from '#lib/db/types';
 
 /** The row with the highest positive value; ties go to the most recent. */
 export function bestDay<T extends { date: string; value: number }>(rows: readonly T[]): T | null {

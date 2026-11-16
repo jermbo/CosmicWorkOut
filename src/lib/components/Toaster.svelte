@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { toastStore } from '$lib/stores/toast.svelte';
+	import { toastStore } from '#lib/stores/toast.svelte';
 	import Icon from './Icon.svelte';
 
 	function roleForKind(kind: string): 'alert' | 'status' {

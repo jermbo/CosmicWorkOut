@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { programStore } from '$lib/stores/program.svelte';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { type RangeKey, computeRange, buildDatesBetween } from '$lib/chart-utils';
-	import RangeBar from '$lib/components/insights/RangeBar.svelte';
-	import ChartMoodHabits from '$lib/components/insights/ChartMoodHabits.svelte';
-	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
-	import ChartActivityMix from '$lib/components/insights/ChartActivityMix.svelte';
-	import ChartHealth from '$lib/components/insights/ChartHealth.svelte';
-	import ChartAllHabits from '$lib/components/insights/ChartAllHabits.svelte';
-	import ChartWeekVsWeek from '$lib/components/insights/ChartWeekVsWeek.svelte';
-	import InsightCard from '$lib/components/insights/InsightCard.svelte';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { INSIGHT_CHARTS, chartAvailable, type InsightFeature } from '$lib/insights/charts';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { type RangeKey, computeRange, buildDatesBetween } from '#lib/chart-utils';
+	import RangeBar from '#lib/components/insights/RangeBar.svelte';
+	import ChartMoodHabits from '#lib/components/insights/ChartMoodHabits.svelte';
+	import ChartWeeklyVolume from '#lib/components/insights/ChartWeeklyVolume.svelte';
+	import ChartActivityMix from '#lib/components/insights/ChartActivityMix.svelte';
+	import ChartHealth from '#lib/components/insights/ChartHealth.svelte';
+	import ChartAllHabits from '#lib/components/insights/ChartAllHabits.svelte';
+	import ChartWeekVsWeek from '#lib/components/insights/ChartWeekVsWeek.svelte';
+	import InsightCard from '#lib/components/insights/InsightCard.svelte';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { INSIGHT_CHARTS, chartAvailable, type InsightFeature } from '#lib/insights/charts';
 	import { resolve } from '$app/paths';
 
 	let rangeKey = $state<RangeKey>('last-7');

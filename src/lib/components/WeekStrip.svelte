@@ -1,8 +1,8 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve -- week date navigation uses resolveHref() */
-	import type { Session } from '$lib/db/types';
+	import type { Session } from '#lib/db/types';
 	import { goto } from '$app/navigation';
-	import { resolveHref } from '$lib/navigation';
+	import { resolveHref } from '#lib/navigation';
 	import {
 		addDays,
 		formatWeekRange,
@@ -11,10 +11,10 @@
 		mondayOf,
 		todayIso,
 		toLocalIso,
-	} from '$lib/date';
-	import { formatWeeksAgo } from '$lib/format';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { habitStore } from '$lib/stores/habits.svelte';
+	} from '#lib/date';
+	import { formatWeeksAgo } from '#lib/format';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { habitStore } from '#lib/stores/habits.svelte';
 	import { SvelteDate } from 'svelte/reactivity';
 
 	type Props = {

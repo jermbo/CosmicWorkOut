@@ -3,7 +3,7 @@ import type {
 	HealthReading,
 	WeightValues,
 	BloodPressureValues,
-} from '$lib/db/types';
+} from '#lib/db/types';
 
 export type MetricCardinality = 'single' | 'multiple';
 

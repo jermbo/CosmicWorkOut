@@ -2,7 +2,7 @@
  * The user's own list of activity types (v1.13.0, US-061 / US-063). Pure: no stores,
  * no DOM — tested in activityTypes.test.ts. The store and the database call these.
  */
-import type { ActivityLog, ActivityType } from '$lib/db/types';
+import type { ActivityLog, ActivityType } from '#lib/db/types';
 
 /** A new list, and a list reset by clearing the Activity log. Other is not a type. */
 export const STARTER_TYPE_NAMES = ['Stretching', 'Cardio'] as const;

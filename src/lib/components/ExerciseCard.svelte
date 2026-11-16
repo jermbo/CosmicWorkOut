@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack, onDestroy } from 'svelte';
-	import type { ActiveItem, Item } from '$lib/db/types';
+	import type { ActiveItem, Item } from '#lib/db/types';
 	import SetTile from './SetTile.svelte';
-	import { feedback } from '$lib/feedback';
+	import { feedback } from '#lib/feedback';
 
 	type Props = {
 		activeExercise: ActiveItem;

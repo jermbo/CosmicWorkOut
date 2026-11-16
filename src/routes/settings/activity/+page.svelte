@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { ActivityType } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
-	import ActivityTypeRow from '$lib/components/ActivityTypeRow.svelte';
-	import ActivityTypeRenameSheet from '$lib/components/ActivityTypeRenameSheet.svelte';
+	import type { ActivityType } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
+	import ActivityTypeRow from '#lib/components/ActivityTypeRow.svelte';
+	import ActivityTypeRenameSheet from '#lib/components/ActivityTypeRenameSheet.svelte';
 
 	let renaming = $state<ActivityType | null>(null);
 </script>

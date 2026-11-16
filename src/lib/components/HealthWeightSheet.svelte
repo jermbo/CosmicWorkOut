@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { holdRepeat } from '$lib/feedback/holdRepeat';
+	import { holdRepeat } from '#lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
-	import type { HealthReading, WeightValues } from '$lib/db/types';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import type { HealthReading, WeightValues } from '#lib/db/types';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import SheetBody from './SheetBody.svelte';

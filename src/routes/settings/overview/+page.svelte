@@ -1,6 +1,6 @@
 <script lang="ts">
-	import OverviewLayoutEditor from '$lib/components/OverviewLayoutEditor.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	import OverviewLayoutEditor from '#lib/components/OverviewLayoutEditor.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
 </script>
 
 <svelte:head>

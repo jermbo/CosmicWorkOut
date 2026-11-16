@@ -2,10 +2,10 @@
 	import { defineChart } from '@tanstack/charts';
 	import { pie, polar, radialArc } from '@tanstack/charts/polar';
 	import { Chart } from '@tanstack/charts/svelte';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { ACTIVITY_PALETTE } from '$lib/chart-utils';
-	import { chartTooltip } from '$lib/charts/theme';
-	import { countByType } from '$lib/activityTypes';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { ACTIVITY_PALETTE } from '#lib/chart-utils';
+	import { chartTooltip } from '#lib/charts/theme';
+	import { countByType } from '#lib/activityTypes';
 
 	let { dates, rangeLabel }: { dates: string[]; rangeLabel: string } = $props();
 

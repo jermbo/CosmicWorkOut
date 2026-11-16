@@ -2,20 +2,20 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import type { Routine } from '$lib/db/types';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { flattenItems } from '$lib/discipline';
-	import { activatePlan, pausePlan } from '$lib/plans/actions';
-	import { targetLabel, unitLabel } from '$lib/goalPlans/format';
-	import WorkoutEditor from '$lib/components/WorkoutEditor.svelte';
-	import GoalBlockTimeline from '$lib/components/goals/GoalBlockTimeline.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import Icon from '$lib/components/Icon.svelte';
-	import FieldLabel from '$lib/components/FieldLabel.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import type { Routine } from '#lib/db/types';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { flattenItems } from '#lib/discipline';
+	import { activatePlan, pausePlan } from '#lib/plans/actions';
+	import { targetLabel, unitLabel } from '#lib/goalPlans/format';
+	import WorkoutEditor from '#lib/components/WorkoutEditor.svelte';
+	import GoalBlockTimeline from '#lib/components/goals/GoalBlockTimeline.svelte';
+	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import Icon from '#lib/components/Icon.svelte';
+	import FieldLabel from '#lib/components/FieldLabel.svelte';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { holdRepeat } from '$lib/feedback/holdRepeat';
+	import { holdRepeat } from '#lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
-	import type { ActivityLog, ActivityIntensity } from '$lib/db/types';
-	import { activityStore, type ActivityTypeChoice } from '$lib/stores/activities.svelte';
-	import { todayIso } from '$lib/date';
-	import { formatMinutes } from '$lib/format';
+	import type { ActivityLog, ActivityIntensity } from '#lib/db/types';
+	import { activityStore, type ActivityTypeChoice } from '#lib/stores/activities.svelte';
+	import { todayIso } from '#lib/date';
+	import { formatMinutes } from '#lib/format';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import SheetBody from './SheetBody.svelte';

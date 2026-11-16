@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Routine } from '$lib/db/types';
+	import type { Routine } from '#lib/db/types';
 
 	type Props = {
 		workouts: Routine[];

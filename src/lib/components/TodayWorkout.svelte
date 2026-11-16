@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { Routine, Item } from '$lib/db/types';
-	import { formatMinutes } from '$lib/format';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { flattenItems } from '$lib/discipline';
+	import type { Routine, Item } from '#lib/db/types';
+	import { formatMinutes } from '#lib/format';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { flattenItems } from '#lib/discipline';
 
 	type Props = {
 		workout: Routine;

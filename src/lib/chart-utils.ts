@@ -2,7 +2,7 @@
  * Date-range helpers shared by Insights and Baselines. Chart rendering lives in
  * src/lib/charts/ (TanStack Charts); nothing here imports a chart library.
  */
-import { toLocalIso } from '$lib/date';
+import { toLocalIso } from '#lib/date';
 
 export const ACTIVITY_PALETTE = [
 	'#60c6ff',

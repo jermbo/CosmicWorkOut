@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { ActivityLog } from '$lib/db/types';
-	import { formatActivityChip } from '$lib/activities';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { formatCountWithWord } from '$lib/format';
+	import type { ActivityLog } from '#lib/db/types';
+	import { formatActivityChip } from '#lib/activities';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { formatCountWithWord } from '#lib/format';
 	import HomeCard from './HomeCard.svelte';
 
 	type Props = {

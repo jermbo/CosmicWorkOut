@@ -1,12 +1,12 @@
 <!-- Overview card order (Personalization, US-046). Also rendered at /settings/overview. -->
 <script lang="ts">
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import {
 		DEFAULT_HOME_CARD_ORDER,
 		HOME_CARD_LABELS,
 		reorderHomeCards,
 		type HomeCardId,
-	} from '$lib/homeCards';
+	} from '#lib/homeCards';
 	import Icon from './Icon.svelte';
 
 	let draggingId = $state<HomeCardId | null>(null);

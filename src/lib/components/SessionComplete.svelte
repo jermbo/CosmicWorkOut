@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { formatDuration, formatVolume } from '$lib/format';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { formatDuration, formatVolume } from '#lib/format';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
-	import { feedback } from '$lib/feedback';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import { planGoalReached } from '$lib/goalPlans/goalReached';
+	import { feedback } from '#lib/feedback';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { planGoalReached } from '#lib/goalPlans/goalReached';
 	import BottomSheet from './BottomSheet.svelte';
 	import CountUp from './CountUp.svelte';
 	import Mascot from './Mascot.svelte';

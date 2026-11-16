@@ -1,7 +1,7 @@
-import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { todayIso } from '$lib/date';
+import type { ActivityLog, ActivityType, ActivityIntensity } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { todayIso } from '#lib/date';
 import { mascotStore } from './mascot.svelte';
 import {
 	findOrAddType,
@@ -9,7 +9,7 @@ import {
 	pickerOrder,
 	renameType,
 	sortByName,
-} from '$lib/activityTypes';
+} from '#lib/activityTypes';
 import { SvelteMap } from 'svelte/reactivity';
 
 /** Holds a type id since v1.13.0 (US-061). An older value is a type name. */

@@ -1,5 +1,5 @@
-import type { Program } from '$lib/db/types';
-import { flattenItems } from '$lib/discipline';
+import type { Program } from '#lib/db/types';
+import { flattenItems } from '#lib/discipline';
 import type { GoalTemplateRoutine } from './types';
 
 /** Synthetic template id for a plan built from an empty A/B/C scaffold. */

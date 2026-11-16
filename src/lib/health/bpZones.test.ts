@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { bpZone, bpReadingsIn, averageBp } from './bpZones.ts';
-import type { HealthReading } from '$lib/db/types';
+import type { HealthReading } from '#lib/db/types';
 
 const at = (date: string, hour: number) => {
 	const [y, m, d] = date.split('-').map(Number);

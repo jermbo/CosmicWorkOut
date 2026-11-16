@@ -4,7 +4,7 @@ import type {
 	BaselineMeasure,
 	BaselineMetric,
 	DistanceUnit,
-} from '$lib/db/types';
+} from '#lib/db/types';
 
 /*
  * Baselines v1.10.0 (US-037 / US-038):

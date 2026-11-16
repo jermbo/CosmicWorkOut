@@ -1,4 +1,4 @@
-import { generateId } from '$lib/utils';
+import { generateId } from '#lib/utils';
 
 export type ToastKind = 'error' | 'info';
 

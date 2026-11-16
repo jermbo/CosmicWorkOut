@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ActivityType } from '$lib/db/types';
-	import { formatCountWithWord } from '$lib/format';
+	import type { ActivityType } from '#lib/db/types';
+	import { formatCountWithWord } from '#lib/format';
 	import Icon from './Icon.svelte';
 
 	type Props = {

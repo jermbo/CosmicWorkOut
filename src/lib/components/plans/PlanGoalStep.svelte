@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Item } from '$lib/db/types';
+	import type { Item } from '#lib/db/types';
 	import WeightRepsInputs from '../goals/WeightRepsInputs.svelte';
 	import FieldLabel from '../FieldLabel.svelte';
 

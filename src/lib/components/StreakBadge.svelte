@@ -3,8 +3,8 @@
 	its tracker. At 0 it is empty: diagonal stripes, a dashed border, "A 0".
 -->
 <script lang="ts">
-	import type { TrackerStreak } from '$lib/stores/streaks.svelte';
-	import { badgeLabel, badgeText } from '$lib/mascot/lines';
+	import type { TrackerStreak } from '#lib/stores/streaks.svelte';
+	import { badgeLabel, badgeText } from '#lib/mascot/lines';
 
 	type Props = {
 		streak: TrackerStreak;

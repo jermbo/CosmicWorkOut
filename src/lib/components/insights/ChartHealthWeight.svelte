@@ -3,8 +3,8 @@
 	import { defineChart, lineY, ruleY } from '@tanstack/charts';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { scalePoint } from '@tanstack/charts/scales/point';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
 	import {
 		chartGrid,
 		PLOT_MARGIN,
@@ -12,8 +12,8 @@
 		longDate,
 		shortDate,
 		FIELD,
-	} from '$lib/charts/theme';
-	import type { WeightRow } from '$lib/health/bpZones';
+	} from '#lib/charts/theme';
+	import type { WeightRow } from '#lib/health/bpZones';
 
 	let { dates, rows, unit }: { dates: string[]; rows: WeightRow[]; unit: string } = $props();
 

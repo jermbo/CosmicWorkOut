@@ -1,5 +1,5 @@
-import type { UserPrefs, Density, HealthChartView } from '$lib/db/types';
-import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
+import type { UserPrefs, Density, HealthChartView } from '#lib/db/types';
+import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '#lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 

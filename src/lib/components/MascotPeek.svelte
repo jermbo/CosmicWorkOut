@@ -8,7 +8,7 @@
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
 	import { tick, untrack } from 'svelte';
-	import { mascotStore } from '$lib/stores/mascot.svelte';
+	import { mascotStore } from '#lib/stores/mascot.svelte';
 	import Mascot from './Mascot.svelte';
 	import {
 		EXITS,
@@ -17,7 +17,7 @@
 		runOff,
 		type EntranceName,
 		type ExitName,
-	} from '$lib/mascot/sprite';
+	} from '#lib/mascot/sprite';
 
 	const SCALE = 3;
 

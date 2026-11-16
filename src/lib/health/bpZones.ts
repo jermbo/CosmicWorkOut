@@ -3,7 +3,7 @@
  * zones, the readings of a range, and the headline numbers. No stores, no DOM —
  * tested in src/lib/health/bpZones.test.ts. See docs/architecture/health-card.md.
  */
-import type { BloodPressureValues, HealthReading, WeightValues } from '$lib/db/types';
+import type { BloodPressureValues, HealthReading, WeightValues } from '#lib/db/types';
 
 export type BpZoneId = 'normal' | 'elevated' | 'stage1' | 'stage2' | 'severe';
 

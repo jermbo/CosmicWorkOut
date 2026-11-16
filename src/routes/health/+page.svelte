@@ -1,14 +1,14 @@
 <script lang="ts">
-	import type { HealthReading, BloodPressureValues } from '$lib/db/types';
+	import type { HealthReading, BloodPressureValues } from '#lib/db/types';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { formatTime } from '$lib/date';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import HealthWeightSheet from '$lib/components/HealthWeightSheet.svelte';
-	import HealthBloodPressureSheet from '$lib/components/HealthBloodPressureSheet.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { formatTime } from '#lib/date';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import HealthWeightSheet from '#lib/components/HealthWeightSheet.svelte';
+	import HealthBloodPressureSheet from '#lib/components/HealthBloodPressureSheet.svelte';
 
 	// Feature is gated — bounce out if it was disabled while navigating here.
 	$effect(() => {

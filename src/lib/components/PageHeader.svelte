@@ -2,12 +2,12 @@
 	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import type { Snippet } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { resolveHref } from '$lib/navigation';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { formatWeekdayShortDate, todayIso } from '$lib/date';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import { resolveHref } from '#lib/navigation';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { formatWeekdayShortDate, todayIso } from '#lib/date';
+	import WeekStrip from '#lib/components/WeekStrip.svelte';
 
 	type Props = {
 		title: string;

@@ -1,5 +1,5 @@
-import type { ActivityLog } from '$lib/db/types';
-import { formatMinutes } from '$lib/format';
+import type { ActivityLog } from '#lib/db/types';
+import { formatMinutes } from '#lib/format';
 
 /** `name` is the entry's type name — `activityStore.nameOf(activity)`. */
 export function formatActivitySummary(

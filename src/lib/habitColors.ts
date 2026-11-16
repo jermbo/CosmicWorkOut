@@ -1,4 +1,4 @@
-import type { Habit } from '$lib/db/types';
+import type { Habit } from '#lib/db/types';
 
 /*
  * Habit colors (v1.10.0, US-042). Pure — tested in src/lib/habitColors.test.ts.
