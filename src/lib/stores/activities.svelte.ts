@@ -2,6 +2,7 @@ import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types
 import { db } from '$lib/db/database';
 import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
+import { mascotStore } from './mascot.svelte';
 import {
 	findOrAddType,
 	findTypeByName,
@@ -128,6 +129,7 @@ class ActivityStore {
 		await db.activities.put(entry);
 		this.activities = [...this.activities, entry];
 		this.rememberType(typeId);
+		mascotStore.celebrateLog();
 		return entry;
 	}
 

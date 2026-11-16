@@ -23,8 +23,9 @@ As a **growth-minded user**, I want a small pixel star that lives in the app, on
    b. The icons and the header shall come from the same drawing.
    c. The header image shall show at all times; no switch hides it.
 3. Idle
-   a. In the Overview header, the star shall breathe in two frames, one every 700 ms.
-   b. At random times, between 1.8 s and 4.6 s apart, it shall blink (110 ms) or look left or right (900 ms).
+   a. In the Overview header, the star shall breathe slowly and unevenly (1.1 to 1.6 s a side); only its top point moves, never its arms.
+   b. Every 3 to 7 s it shall do one bit, picked at random by weight: a blink, a double blink, a look around, a smile, a foot tap, a hum, a bounce, or a stretch (decision 24).
+   c. With no tap for 45 s it shall fall asleep, with Zs; the next tap wakes it.
 4. Reduced motion
    a. When the device asks for reduced motion, the star shall show its still standing frame, with no idle.
 

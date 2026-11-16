@@ -19,7 +19,7 @@ Habits are the small things that you want to do each day: water, reading, a few 
 
 Each habit is a tile in its own colour. The tile shows the value of the day over the goal, such as `3/4`, and a row of progress blocks under it. A goal of 12 or less gets one block for each unit; a larger goal gets ten blocks, one for each tenth. A tile with no value yet has diagonal stripes.
 
-You tap or hold plus and minus, or you tap the number to type an exact value. A Yes / No habit has one button: **Mark done**, which becomes **✓ Done**. When a habit reaches its goal, the tile jolts and flashes, with a `success` buzz, and the [Mascot](mascot.md) peeks up above the bottom bar, hops, and drops away. It comes up on the side away from your tap, takes no taps, and comes only on the log that crosses the goal, not on one under it or past it.
+You tap or hold plus and minus, or you tap the number to type an exact value. A Yes / No habit has one button: **Mark done**, which becomes **✓ Done**. When a habit reaches its goal, the tile jolts and flashes, with a `success` buzz, and the [Mascot](mascot.md) comes in along the top of the bottom bar, hops, and leaves, a random way each time. It comes in on the side away from your tap, takes no taps, and comes only on the log that crosses the goal, not on one under it or past it. A habit with no goal crosses it with its first log of the day.
 
 A minutes habit moves by 5. Any other habit moves by about a tenth of its goal, as a simple number: 4 cups by 1, 500 words by 50.
 

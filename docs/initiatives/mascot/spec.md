@@ -18,7 +18,7 @@ You check in on your habits every day, but the only streak in the app counts wee
 
 A small pixel star lives in the app. It is the icon on your home screen, and it sits in the Overview header next to a row of streak badges, one for each tracker that you use.
 
-On Monday morning you open the app. The star waves: "Morning! Habits: day 12". You tap the coral **H 12D** badge, and it says "Habits: 12 days! Log one today for 13." The Activity badge reads **A 0**, striped, and the star shrugs when you tap it. Tonight you finish Day B; the result screen opens, and the star dances above your totals.
+On Monday morning you open the app. The star waves: "Morning! Habits: day 12". You tap the coral **H 12D** badge, and it says "Habits: 12 days! Log one today for 13." The Activity badge reads **A 0**, striped, and the star shrugs when you tap it. Tonight you finish Day B; the result screen opens, and the star runs in and dances above your totals.
 
 ## In scope
 
@@ -27,8 +27,8 @@ On Monday morning you open the app. The star waves: "Morning! Habits: day 12". Y
    - a. The image shows even when Mascot motion is off (decision 4)
 3. The star moves only in drawn frames, in whole pixels, never rotated or stretched (decision 13)
    - a. Each frame is a pixel map, drawn as SVG; the icons come from the same drawing (decision 19)
-4. The star has six actions: idle, wave, talk, happy hop, dance, and shrug (decision 17)
-   - a. Idle: it breathes, blinks, and looks around, at random times (decision 17)
+4. The star's actions: idle, wave, talk, happy hop, dance, shrug (decision 17), and its ways in and out (decisions 23, 24)
+   - a. Idle: it breathes, does a bit of personality at random times, and sleeps when left alone (decisions 17, 24)
 5. On the first open of each day, the star waves in the Overview header with one line, and it never blocks the screen (decision 14)
    - a. The line names your longest streak that is going (decision 22)
 6. Each tracker has its own streak: Workout, Habits, Activity, Health, Baselines (decision 7)
@@ -44,7 +44,7 @@ On Monday morning you open the app. The star waves: "Morning! Habits: day 12". Y
 9. The star celebrates three moments, and it comes to the screen of the moment (decision 15, open to change)
    - a. A session is done: it dances on the session result screen, above the totals (decision 15 a)
    - b. A plan goal is reached, which is the session in which you log the focus lift at the goal weight × reps or more: it dances (decision 15 b)
-   - c. A habit reaches its daily goal: it peeks up above the bottom bar, hops, and drops away (decision 15 a)
+   - c. A habit reaches its daily goal: it comes in along the bottom bar, hops, and leaves, a random way each time (decisions 15 a, 23, 24)
 10. A "Mascot motion" switch in Settings › Personalization, on by default, turns off the welcome and the celebrations (decision 16)
     - a. With reduced motion, the star shows still frames (decision 16)
 
@@ -68,7 +68,7 @@ On Monday morning you open the app. The star waves: "Morning! Habits: day 12". Y
 | [Overview screen](../../architecture/overview-screen.md)                                                           | The header has the star and the row of badges                                                   |
 | [Tap feel](../../architecture/tap-feel.md)                                                                         | The celebrations of the star join "Moments that need more"                                      |
 | [Session lifecycle](../../architecture/session-lifecycle.md), [Goal wave](../../architecture/goal-wave.md)         | The result screen shows the star; when a plan goal counts as reached                            |
-| [Habits](../../architecture/habits.md)                                                                             | A habit at its goal brings the star up above the bottom bar                                     |
+| [Habits](../../architecture/habits.md)                                                                             | A habit at its goal brings the star running along the bottom bar                                |
 | [Personalization](../../architecture/personalization.md), [Settings object](../../architecture/settings-object.md) | The Mascot motion switch                                                                        |
 | [Local storage keys](../../architecture/local-storage-keys.md)                                                     | One key for the date of the last welcome                                                        |
 | [Design system](../../architecture/design-system.md)                                                               | The star and the app icons                                                                      |
@@ -87,7 +87,7 @@ On Monday morning you open the app. The star waves: "Morning! Habits: day 12". Y
 | 7 b      | A tracker with no streak shows a striped badge at 0                                                     |
 | 8        | Tap each badge; the star says its line; at 0 it shrugs                                                  |
 | 9 a, 9 b | Finish a session, and one where the focus lift hits the goal; the star dances on the result screen      |
-| 9 c      | Log Water to its goal on the Habits screen; the star peeks up and hops                                  |
+| 9 c      | Log Water to its goal on the Habits screen; the star runs in, hops, and jumps off                       |
 | 10       | Turn Mascot motion off: no welcome, no celebrations, the image stays. With reduced motion, still frames |
 
 **Worth an automatic test** (pure modules, as the project tests today):

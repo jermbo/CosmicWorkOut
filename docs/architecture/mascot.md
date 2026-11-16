@@ -1,6 +1,6 @@
 ---
 name: Mascot
-description: 'The pixel star that is the face of the app: how it is drawn, its six actions, where it shows, when it talks and celebrates, and the switch and reduced motion that calm it.'
+description: 'The pixel star that is the face of the app: how it is drawn, its actions, where it shows, when it talks and celebrates, and the switch and reduced motion that calm it.'
 altitude: part
 tags:
   - mascot
@@ -17,26 +17,34 @@ The app records well, but nothing in it used to be glad that you came back. The 
 
 ## Drawn frames only
 
-Each pose and each face is a pixel map in `src/lib/mascot/sprite.ts`, drawn as SVG with square pixels. The star moves only by changing frames, and by whole pixels of its own grid. It is never rotated, squashed, stretched, or slid by a tween: pixel art looks cheap when it bends. The icons are drawn from the same maps by `npm run icons`. **Settings › Personalization › Mascot gallery** plays every action on a loop, with the same component and frames, so the gallery cannot drift from the app.
+Each pose and each face is a pixel map in `src/lib/mascot/sprite.ts`, drawn as SVG with square pixels. It moves only by changing frames and by whole pixels of its grid; it is never rotated, stretched, or slid by a tween. `npm run icons` draws the icons from the same maps. **Settings › Personalization › Mascot gallery** loops every action with the same component.
 
-## Six actions
+## Actions
 
-| Action    | When                                         | Frames                                                           |
-| --------- | -------------------------------------------- | ---------------------------------------------------------------- |
-| Idle      | Always, in the Overview header               | Breathes every 700 ms; blinks or looks around every 1.8 to 4.6 s |
-| Wave      | The first open of each day                   | An arm up and down, three times                                  |
-| Talk      | A line types in, after a badge tap           | The mouth opens and closes                                       |
-| Shrug     | A badge at 0                                 | Both arms up                                                     |
-| Happy hop | A habit reaches its daily goal               | Crouch, jump, land                                               |
-| Dance     | A session is done, or a plan goal is reached | Jumps, a turn, sways, sparkles                                   |
+| Action    | When                                         | Frames                                                   |
+| --------- | -------------------------------------------- | -------------------------------------------------------- |
+| Idle      | Always, in the Overview header               | A slow breath, and a bit of personality every 3 to 7 s   |
+| Wave      | The first open of each day                   | An arm up and down, three times                          |
+| Talk      | A line types in, after a badge tap           | The mouth opens and closes                               |
+| Shrug     | A badge at 0                                 | Both arms up                                             |
+| Happy hop | A habit reaches its daily goal               | Crouch, jump, land                                       |
+| Dance     | A session is done, or a plan goal is reached | Jumps, a turn, sways, sparkles                           |
+| Ways in   | Before a hop or a dance                      | Run in, hop in, peek in, dash in, drop in from the sky   |
+| Ways out  | After the habit hop                          | Jump off, run off, run back, blast off, wave bye and hop |
+
+## Idle and the celebrations
+
+At rest, only its top point dips as it breathes. Every 3 to 7 s it does a random bit, like a foot tap. After 45 s with no tap, it sleeps.
+
+For a habit goal or any new log, it comes in along the bottom bar, away from your tap, hops, and leaves. The ways in and out are random, never the same twice in a row; each side has its own ways in.
 
 ## Lines
 
-A tap on a [streak](week-streak.md) badge makes the star say one line in a speech box, typed letter by letter: "Habits: 12 days! Log one today for 13." When today already counts: "Habits: 13 days. Today counts." At 0 it shrugs: "Activity: 0. Log one this week to start." The line goes 2.6 s after it is fully shown, or at the next tap. The speech box takes no taps, so it never blocks a button.
+A tap on a [streak](week-streak.md) badge makes the star say one line in a speech box, typed letter by letter: "Habits: 12 days! Log one today for 13." When today already counts: "Habits: 13 days. Today counts." At 0 it shrugs: "Activity: 0. Log one this week to start." The line goes 2.6 s after it is shown, or at the next tap. The speech box takes no taps.
 
 ## The daily welcome
 
-On the first open of each calendar day, the Overview star waves and names the longest streak that is going: "Morning! Habits: day 12", or "Morning!" with none. The date of the welcome is kept in `cwout:lastWelcome`, so a second open that day shows nothing. It covers nothing: you can tap a card while it plays.
+On the first open of each calendar day, the Overview star waves and names the longest streak that is going: "Morning! Habits: day 12", or "Morning!" with none. The date is kept in `cwout:lastWelcome`, so a second open that day shows nothing.
 
 ## Calm it down
 
@@ -44,7 +52,7 @@ The **Mascot motion** switch in [Personalization](personalization.md) is on by d
 
 ### Example
 
-Monday morning, your Habits streak is 12 days. You open the app: the star waves, "Morning! Habits: day 12". You tap the grey `A 0` badge; it shrugs. Tonight you finish Day B, and the star dances above your totals.
+Monday morning, your Habits streak is 12 days. You open the app: the star waves, "Morning! Habits: day 12". You tap the grey `A 0` badge; it shrugs. Tonight you finish Day B: the star runs in and dances above your totals.
 
 ## Further reading
 

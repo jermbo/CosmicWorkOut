@@ -37,8 +37,14 @@
 	onMount(() => {
 		feedback('win');
 		if (!celebrate) return;
-		// Dance once, after the bars have swept away. The buttons stay usable throughout.
-		const t = setTimeout(() => void mascot?.play('dance'), 750);
+		// After the bars have swept away, the star comes in (a way picked at random) and
+		// dances once. The buttons stay
+		// usable throughout.
+		const t = setTimeout(async () => {
+			const ways = ['runIn', 'hopIn', 'dashIn', 'dropIn'] as const;
+			await mascot?.play(ways[Math.floor(Math.random() * ways.length)]);
+			await mascot?.play('dance');
+		}, 750);
 		return () => clearTimeout(t);
 	});
 
@@ -74,6 +80,7 @@
 				<Mascot
 					bind:this={mascot}
 					scale={5}
+					offstage
 				/>
 			</div>
 		{:else}
@@ -256,15 +263,17 @@
 		padding-inline: var(--space-8);
 	}
 
-	/* The star fades in with the stamp's timing; it never slides or scales (decision 13). */
+	/*
+	 * The star comes in from the left edge of the sheet or from above, by whole star pixels (decision 13);
+	 * the clip spans the sheet's full width, and its jumps go up past it.
+	 */
 	.session-complete__star {
-		animation: star-in var(--duration-normal) linear 650ms both;
-	}
-
-	@keyframes star-in {
-		from {
-			opacity: 0;
-		}
+		display: flex;
+		justify-content: center;
+		align-self: stretch;
+		margin-inline: calc(var(--space-8) * -1);
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 
 	.session-complete__graphic {

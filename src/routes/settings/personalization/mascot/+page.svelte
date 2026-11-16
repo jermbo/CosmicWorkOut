@@ -6,7 +6,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
-	import type { ActionName } from '$lib/mascot/sprite';
+	import { ENTRANCES, type ActionName } from '$lib/mascot/sprite';
 	import Mascot from '$lib/components/Mascot.svelte';
 	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
 
@@ -17,12 +17,22 @@
 	};
 
 	const CARDS: Card[] = [
-		{ id: 'idle', name: 'Idle', when: 'Always, in the Overview header' },
+		{ id: 'idle', name: 'Idle', when: 'Always, in the Overview header; asleep after 45 s' },
 		{ id: 'wave', name: 'Wave', when: 'The first open of the day' },
 		{ id: 'talk', name: 'Talk', when: 'A tap on a streak badge' },
 		{ id: 'shrug', name: 'Shrug', when: 'A badge at 0' },
 		{ id: 'hop', name: 'Happy hop', when: 'A habit reaches its daily goal' },
 		{ id: 'dance', name: 'Dance', when: 'A session is done' },
+		{ id: 'runIn', name: 'Run in', when: 'A way in, from the left' },
+		{ id: 'hopIn', name: 'Hop in', when: 'A way in, from the left' },
+		{ id: 'peekIn', name: 'Peek in', when: 'A way in, from the right' },
+		{ id: 'dashIn', name: 'Dash in', when: 'A way in, from the right' },
+		{ id: 'dropIn', name: 'Drop in', when: 'A way in, from either side' },
+		{ id: 'jumpOff', name: 'Jump off', when: 'A way out, after the hop' },
+		{ id: 'runOff', name: 'Run off', when: 'A way out, after the hop' },
+		{ id: 'runBack', name: 'Run back', when: 'A way out, after the hop' },
+		{ id: 'rocketUp', name: 'Blast off', when: 'A way out, after the hop' },
+		{ id: 'waveBye', name: 'Wave bye', when: 'A way out, after the hop' },
 	];
 
 	/** The pause between two loops of an action. */
@@ -90,6 +100,7 @@
 						bind:this={stars[card.id]}
 						scale={5}
 						idle={card.id === 'idle'}
+						offstage={(ENTRANCES as readonly string[]).includes(card.id)}
 					/>
 				</div>
 				<p class="gallery__name">{card.name}</p>
@@ -124,8 +135,10 @@
 		text-align: center;
 	}
 
-	/* Room above the star for its jumps. */
+	/* Room above the star for its jumps. A run in starts, and a jump off ends, past its clip. */
 	.gallery__stage {
+		align-self: stretch;
+		overflow: clip;
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;

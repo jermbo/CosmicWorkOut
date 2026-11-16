@@ -9,13 +9,20 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import {
 		ACTIONS,
+		BODY_W,
+		DUST_COLOR,
+		DUST_FRAMES,
+		EXITS,
 		IDLE,
 		SPARKLE_COLORS,
 		SPARKLE_FRAMES,
 		STANDING,
 		TALK_FRAMES,
 		VIEWBOX,
+		Z_COLOR,
+		Z_FRAME,
 		framePixels,
+		pickIdleBit,
 		PALETTE,
 		type ActionName,
 		type Frame,
@@ -24,17 +31,32 @@
 	type Props = {
 		/** Screen pixels per star pixel. Whole numbers keep the pixels square and sharp. */
 		scale?: number;
-		/** Breathe, blink and look around while nothing else plays. */
+		/** Breathe and show a little personality while nothing else plays; sleep when left alone. */
 		idle?: boolean;
+		/** Face left: the frames are drawn facing right, and every move is mirrored. */
+		flip?: boolean;
+		/** Out of sight until an action plays, for a star that will run in. */
+		offstage?: boolean;
 	};
 
-	let { scale = 3, idle = false }: Props = $props();
+	let { scale = 3, idle = false, flip = false, offstage = false }: Props = $props();
 
 	const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce');
 
 	let frame = $state<Frame>(STANDING);
 	let busy = $state(false);
-	let pixels = $derived(framePixels(frame));
+	let pixels = $derived(framePixels(frame, flip !== (frame.turn ?? false)));
+	/** Left after an exit, and before the first action of an offstage star. */
+	// svelte-ignore state_referenced_locally
+	let away = $state(offstage);
+	let shown = $derived(!away || reducedMotion.current);
+	/** The frame's offset in whole star pixels; mirrored along with the drawing. */
+	let dx = $derived(flip ? -(frame.x ?? 0) : (frame.x ?? 0));
+
+	type Dust = { id: number; x: number; y: number; step: number };
+	let dust = $state<Dust[]>([]);
+	/** The Zs that float up while it sleeps. */
+	let zs = $state<Dust[]>([]);
 
 	type Sparkle = { id: number; x: number; y: number; color: string; step: number };
 	let sparkles = $state<Sparkle[]>([]);
@@ -84,21 +106,72 @@
 		}
 	}
 
+	/** A star-grid x, mirrored when the star faces left. */
+	const mx = (x: number, w: number) => (flip ? BODY_W - 1 - (x + w - 1) : x);
+
+	/**
+	 * A puff of dust behind the feet (or on both sides), where the frame is. It stays where
+	 * it was kicked up while the star moves on.
+	 */
+	function kick(f: Frame): void {
+		const w = DUST_FRAMES[0][0].length;
+		const fx = f.x ?? 0;
+		const left = fx - 4;
+		const right = fx + BODY_W - 2;
+		const spots = f.dust === 'both' ? [left, right] : [f.turn ? right : left];
+		for (const spot of spots) {
+			const d: Dust = { id: ++sparkleId, x: mx(spot, w), y: 11, step: 0 };
+			dust = [...dust, d];
+			void (async () => {
+				for (let i = 1; i < DUST_FRAMES.length && !stopped; i++) {
+					await wait(80);
+					dust = dust.map((p) => (p.id === d.id ? { ...p, step: i } : p));
+				}
+				await wait(80);
+				dust = dust.filter((p) => p.id !== d.id);
+			})();
+		}
+	}
+
+	/** A Z that floats up and away from the top right of the head while it sleeps. */
+	function floatZ(): void {
+		const z: Dust = { id: ++sparkleId, x: mx(12, Z_FRAME[0].length), y: -2, step: 0 };
+		zs = [...zs, z];
+		void (async () => {
+			for (let i = 1; i < 6 && !stopped; i++) {
+				await wait(280);
+				zs = zs.map((p) => (p.id === z.id ? { ...p, step: i } : p));
+			}
+			await wait(280);
+			zs = zs.filter((p) => p.id !== z.id);
+		})();
+	}
+
 	/** Each play or talk takes a new run; a newer run makes an older one stop. */
 	let run = 0;
 
-	/** Play one action from start to end, then stand. Resolves at once under reduced motion. */
-	export async function play(name: ActionName): Promise<void> {
+	/**
+	 * Play one action from start to end, then stand; after an exit, the star stays out of
+	 * sight. `frames` replaces the stock frames, for a move sized to the screen. Resolves at
+	 * once under reduced motion.
+	 */
+	export async function play(
+		name: ActionName,
+		frames: readonly Frame[] = ACTIONS[name],
+	): Promise<void> {
 		if (reducedMotion.current) return;
 		const mine = ++run;
 		busy = true;
-		for (const f of ACTIONS[name]) {
+		away = false;
+		for (const f of frames) {
 			if (stopped || mine !== run) return;
 			frame = f;
 			if (f.spark) burst();
+			if (f.dust) kick(f);
 			await wait(f.t);
 		}
 		if (mine !== run) return;
+		if ((EXITS as readonly string[]).includes(name)) away = true;
 		frame = STANDING;
 		busy = false;
 	}
@@ -131,49 +204,74 @@
 		};
 	}
 
-	// Idle (US-064 3): two breathing frames, 700 ms each, and at random times 1.8–4.6 s
-	// apart a blink (110 ms) or a look left or right (900 ms).
+	// Idle (US-064 3): a slow, uneven breath; every 3 to 7 s a bit of personality, picked
+	// at random by weight (a blink, a look around, a foot tap, a hum, a stretch…). With no
+	// tap anywhere for 45 s it falls asleep, with Zs; the next tap wakes it.
 	$effect(() => {
 		if (!idle || reducedMotion.current || busy) return;
 		let alive = true;
-		let breath = 0;
-		let face: Frame['f'] = 'open';
-		let breathTimer: ReturnType<typeof setTimeout>;
-		let eventTimer: ReturnType<typeof setTimeout>;
+		let asleep = false;
+		let lastTap = performance.now();
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		let cut: (() => void) | undefined;
 
-		const show = () => {
-			const body = IDLE.breathe[breath % 2];
-			frame = { ...body, f: face };
+		const pause = (ms: number) =>
+			new Promise<void>((resolve) => {
+				cut = resolve;
+				timer = setTimeout(resolve, ms);
+			});
+		const onTap = () => {
+			lastTap = performance.now();
+			if (!asleep) return;
+			clearTimeout(timer);
+			cut?.();
 		};
-		const breathe = () => {
-			if (!alive) return;
-			breath++;
-			show();
-			breathTimer = setTimeout(breathe, IDLE.breathe[breath % 2].t);
+		const show = (f: Frame) => {
+			if (alive) frame = f;
 		};
-		const nextEvent = () => {
-			const gap = IDLE.minGap + Math.random() * (IDLE.maxGap - IDLE.minGap);
-			eventTimer = setTimeout(() => {
-				if (!alive) return;
-				const roll = Math.random();
-				const e = roll < 0.5 ? IDLE.blink : roll < 0.75 ? IDLE.lookL : IDLE.lookR;
-				face = e.f;
-				show();
-				eventTimer = setTimeout(() => {
-					face = 'open';
-					show();
-					nextEvent();
-				}, e.t);
-			}, gap);
-		};
+		const between = (a: number, b: number) => a + Math.random() * (b - a);
+		const sleepy = () => performance.now() - lastTap > IDLE.sleepAfter;
 
-		show();
-		breathTimer = setTimeout(breathe, IDLE.breathe[0].t);
-		nextEvent();
+		async function loop(): Promise<void> {
+			while (alive) {
+				if (sleepy()) {
+					asleep = true;
+					for (let i = 0; alive && sleepy(); i++) {
+						const f = IDLE.sleep[i % 2];
+						show(f);
+						if (i % 2 === 0) floatZ();
+						await pause(f.t);
+					}
+					asleep = false;
+					for (const f of IDLE.wake) {
+						show(f);
+						await pause(f.t);
+						if (!alive) return;
+					}
+					continue;
+				}
+				const until = performance.now() + between(IDLE.minGap, IDLE.maxGap);
+				for (let i = 0; alive && performance.now() < until && !sleepy(); i++) {
+					show(i % 2 === 0 ? STANDING : { b: 'breathe', t: 0 });
+					await pause(between(IDLE.breathMin, IDLE.breathMax));
+				}
+				if (!alive || sleepy()) continue;
+				for (const f of IDLE.bits[pickIdleBit(Math.random())].frames) {
+					show(f);
+					await pause(f.t);
+					if (!alive) return;
+				}
+			}
+		}
+
+		window.addEventListener('pointerdown', onTap);
+		window.addEventListener('keydown', onTap);
+		void loop();
 		return () => {
 			alive = false;
-			clearTimeout(breathTimer);
-			clearTimeout(eventTimer);
+			clearTimeout(timer);
+			window.removeEventListener('pointerdown', onTap);
+			window.removeEventListener('keydown', onTap);
 			// A play or talk that stopped the idle has set its own frame already.
 			if (!busy) frame = STANDING;
 		};
@@ -190,17 +288,50 @@
 		viewBox="{VIEWBOX.x} {VIEWBOX.y} {VIEWBOX.w} {VIEWBOX.h}"
 		shape-rendering="crispEdges"
 	>
-		<g transform="translate({frame.x ?? 0} {frame.y ?? 0})">
-			{#each pixels as [x, y, c], i (i)}
-				<rect
-					{x}
-					{y}
-					width="1.02"
-					height="1.02"
-					fill={PALETTE[c]}
-				/>
+		{#if shown}
+			<g transform="translate({dx} {frame.y ?? 0})">
+				{#each pixels as [x, y, c], i (i)}
+					<rect
+						{x}
+						{y}
+						width="1.02"
+						height="1.02"
+						fill={PALETTE[c]}
+					/>
+				{/each}
+			</g>
+		{/if}
+		{#each zs as z (z.id)}
+			{#each Z_FRAME as row, py (py)}
+				{#each [...row] as ch, px (px)}
+					{#if ch !== '.'}
+						<rect
+							x={z.x + px + (flip ? -1 : 1) * Math.floor(z.step / 2)}
+							y={z.y + py - z.step * 2}
+							width="1.02"
+							height="1.02"
+							fill={Z_COLOR}
+							opacity={1 - z.step / 6}
+						/>
+					{/if}
+				{/each}
 			{/each}
-		</g>
+		{/each}
+		{#each dust as d (d.id)}
+			{#each DUST_FRAMES[d.step] as row, py (py)}
+				{#each [...(flip ? [...row].reverse() : row)] as ch, px (px)}
+					{#if ch !== '.'}
+						<rect
+							x={d.x + px}
+							y={d.y + py}
+							width="1.02"
+							height="1.02"
+							fill={DUST_COLOR}
+						/>
+					{/if}
+				{/each}
+			{/each}
+		{/each}
 		{#each sparkles as s (s.id)}
 			{#each SPARKLE_FRAMES[s.step] as row, sy (sy)}
 				{#each [...row] as ch, sx (sx)}
