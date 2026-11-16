@@ -1,11 +1,8 @@
+<!-- Weight line under the blood-pressure view of the Health card (US-060), on the same dates. -->
 <script lang="ts">
-	import { SvelteMap } from 'svelte/reactivity';
 	import { defineChart, lineY, ruleY } from '@tanstack/charts';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { scalePoint } from '@tanstack/charts/scales/point';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { isWeightReading } from '$lib/health/metrics';
 	import ScrollChart from '$lib/charts/ScrollChart.svelte';
 	import { niceAxis } from '$lib/charts/scale';
 	import {
@@ -14,39 +11,27 @@
 		chartTooltip,
 		longDate,
 		shortDate,
-		CHART_ACCENT,
+		FIELD,
 	} from '$lib/charts/theme';
+	import type { WeightRow } from '$lib/health/bpZones';
 
-	let { dates }: { dates: string[] } = $props();
+	let { dates, rows, unit }: { dates: string[]; rows: WeightRow[]; unit: string } = $props();
 
-	type Row = { date: string; value: number };
-
-	let unit = $derived(prefsStore.weightUnit);
-
-	// Missing days are skipped, so the line connects readings across gaps.
-	let rows = $derived.by<Row[]>(() => {
-		const byDate = new SvelteMap<string, number>();
-		for (const r of healthStore.readings) {
-			if (isWeightReading(r)) byDate.set(r.date, r.values.value);
-		}
-		return dates.flatMap((date) => {
-			const value = byDate.get(date);
-			return value === undefined ? [] : [{ date, value }];
-		});
-	});
-
-	let axis = $derived(niceAxis(rows.map((r) => r.value)));
+	let axis = $derived(
+		niceAxis(
+			rows.map((r) => r.value),
+			{ count: 2 },
+		),
+	);
 
 	function build() {
-		const accent = CHART_ACCENT;
-		const [lo, hi] = axis.domain;
 		return defineChart({
 			marks: [
 				ruleY(axis.ticks, { stroke: chartGrid() }),
 				lineY(rows, {
 					x: 'date',
 					y: 'value',
-					stroke: accent,
+					stroke: FIELD.health,
 					strokeWidth: 2,
 					points: true,
 				}),
@@ -56,10 +41,10 @@
 					scale: scalePoint<string>().domain(dates).padding(0.5),
 					axis: { ticks: { format: shortDate, size: 0 } },
 				},
-				y: { scale: scaleLinear().domain([lo, hi]), axis: false },
+				y: { scale: scaleLinear().domain(axis.domain), axis: false },
 			},
 			margin: PLOT_MARGIN,
-			tooltip: chartTooltip<Row>(
+			tooltip: chartTooltip<WeightRow>(
 				(d) => longDate(d.date),
 				(p) => ({ label: 'Weight', value: `${p.datum.value} ${unit}` }),
 			),
@@ -70,6 +55,7 @@
 <ScrollChart
 	columns={dates.length}
 	definition={build}
+	height={120}
 	ariaLabel="Line chart: body weight over the selected period"
 	left={{ axis, unit }}
 />

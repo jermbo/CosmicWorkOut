@@ -27,7 +27,7 @@ These rules keep the code small and the same in each file. They apply to each co
 
 `npm test` runs Node's own test runner, with types stripped, and no browser. So a test reaches only pure modules, which import nothing at run time except other pure modules. A store or a browser module is out of reach.
 
-When logic worth a test sits behind IndexedDB or the DOM, move the decision into a pure module. The backup code is split this way: the checks before a restore are pure and tested. A new test folder needs its glob in the `test` script.
+When logic worth a test sits behind IndexedDB or the DOM, move the decision into a pure module. The backup code is split this way: the checks before a restore are pure and tested. The `test` script finds every `*.test.ts` file under `src/`, so a new test file in any folder runs with no change to `package.json`.
 
 ## Add a built-in exercise
 

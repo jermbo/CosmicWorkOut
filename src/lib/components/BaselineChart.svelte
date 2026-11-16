@@ -83,7 +83,7 @@
 						id: s.metric.id,
 						x: 'date',
 						y: 'value',
-						// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+						// See ChartHealthTrend: `group-x` needs a distinct `z` per series.
 						z: () => s.metric.id,
 						stroke: s.color,
 						strokeWidth: 2,

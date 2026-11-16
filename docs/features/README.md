@@ -21,6 +21,7 @@ New stories follow the [user story standards](../standards/user-story-standards.
 | [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                                      | US-033 – US-036                       |
 | [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings, one Workout section | US-037 – US-054 (053 – 054 not built) |
 | [v1.12.0](v1.12.0/README.md) | Color fields redesign (dark only), tap feel, QR backup      | US-055 – US-058                       |
+| [v1.13.0](v1.13.0/README.md) | Insights cleanup, one Health card                           | US-059 – US-060                       |
 
 ## What was removed later
 
@@ -34,6 +35,7 @@ A story tells what was built in its release. Some of it was taken out in a later
 | Separate Practice and Lift plans areas  | v1.10.0      | [US-052](v1.10.0/US-052-one-workout-section.md)   |
 | Exercise progress chart                 | v1.10.0      | Commit `9798644`; found missing during v1.10.0    |
 | Light mode, accent colour, roundness    | v1.12.0      | [US-055](v1.12.0/US-055-color-fields-redesign.md) |
+| Eight Insights charts                   | v1.13.0      | [US-059](v1.13.0/US-059-trim-insights-charts.md)  |
 
 ## Notes
 

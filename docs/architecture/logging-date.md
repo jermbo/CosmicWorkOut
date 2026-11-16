@@ -34,7 +34,7 @@ Any past day is open, in each tracker, the same as today. A lock would only stop
 
 ## Why you fix the past where you logged it
 
-To look back and to fix a record are two jobs, and each has its own place. Insights shows the past: gaps and streaks show in the heat chart and the "Showing Up" chart. The logging date changes the past, in the screen that already knows how to edit that record. So no screen holds a calendar of history, and you never learn a second way to edit a record.
+To look back and to fix a record are two jobs, and each has its own place. Insights shows the past: gaps and streaks show in the All Habits heat chart. The logging date changes the past, in the screen that already knows how to edit that record. So no screen holds a calendar of history, and you never learn a second way to edit a record.
 
 ### Example
 

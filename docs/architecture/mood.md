@@ -39,11 +39,11 @@ A mood can be good or bad, so Mood has two colours: green for a value above zero
 
 ## Where mood shows
 
-On the Habits screen, the week strip in the header shows a dot for each day with a mood, in the good or the bad colour. In Insights, Mood vs Habits sets your mood next to coffee and water, and On Days When… compares your mood on days when a thing occurred with days when it did not. All Habits and Day of Week include it too.
+On the Habits screen, the week strip in the header shows a dot for each day with a mood, in the good or the bad colour. In Insights, Mood vs Habits sets your mood next to coffee and water, and All Habits shows it as a row of its own.
 
 ### Example
 
-On Monday you tap +3, Focused. In the evening you feel worse and tap −1, Tired; the day now holds −1. The week strip shows an orange dot on Monday. A month later, On Days When… shows that your mood is higher on days with a workout.
+On Monday you tap +3, Focused. In the evening you feel worse and tap −1, Tired; the day now holds −1. The week strip shows an orange dot on Monday. A month later, Mood vs Habits shows that your mood dips on days with little water.
 
 ## Further reading
 

@@ -16,19 +16,19 @@ This page is the contract for each surface that a toggle controls. Use it to che
 
 ## The surfaces of each toggle
 
-| Surface          | Habits                                                   | Activity log            | Workout                                                         | Health metrics                               | Baselines                    |
-| ---------------- | -------------------------------------------------------- | ----------------------- | --------------------------------------------------------------- | -------------------------------------------- | ---------------------------- |
-| Bottom bar       | —                                                        | —                       | Workout tab                                                     | —                                            | —                            |
-| Screen when off  | `/habits` goes to Overview                               | `/log` goes to Overview | every `/workout` screen goes to Overview                        | `/health` goes to Overview                   | `/baselines` shows a message |
-| Overview card    | Habits                                                   | Activity log            | Workout, and the week-streak badge                              | Health                                       | Baselines                    |
-| Week-strip marks | Habit dots                                               | Activity dots           | Session dots                                                    | Health dots                                  | —                            |
-| Insights charts  | Mood vs Habits, All Habits, On Days When…, Habit Balance | Activity Mix            | Weekly Volume                                                   | Health Summary, Weight Trend, Blood Pressure | Baseline Growth, Time of Day |
-| Clear rows       | Habits                                                   | Activity log            | Custom exercises, Custom programs, Workout sessions, Plan goals | — (Health data always shows)                 | Baselines                    |
-| Overlays         | —                                                        | —                       | Session overlay, result screen, crash-recovery banner           | —                                            | —                            |
+| Surface          | Habits                     | Activity log            | Workout                                                         | Health metrics               | Baselines                    |
+| ---------------- | -------------------------- | ----------------------- | --------------------------------------------------------------- | ---------------------------- | ---------------------------- |
+| Bottom bar       | —                          | —                       | Workout tab                                                     | —                            | —                            |
+| Screen when off  | `/habits` goes to Overview | `/log` goes to Overview | every `/workout` screen goes to Overview                        | `/health` goes to Overview   | `/baselines` shows a message |
+| Overview card    | Habits                     | Activity log            | Workout, and the week-streak badge                              | Health                       | Baselines                    |
+| Week-strip marks | Habit dots                 | Activity dots           | Session dots                                                    | Health dots                  | —                            |
+| Insights charts  | Mood vs Habits, All Habits | Activity Mix            | Weekly Volume                                                   | Health Summary               | —                            |
+| Clear rows       | Habits                     | Activity log            | Custom exercises, Custom programs, Workout sessions, Plan goals | — (Health data always shows) | Baselines                    |
+| Overlays         | —                          | —                       | Session overlay, result screen, crash-recovery banner           | —                            | —                            |
 
 ## Charts that more than one toggle shows
 
-Showing Up and Day of Week show while Habits or Baselines is on. This Week vs Last Week shows while Habits, Baselines, or Workout is on. A chart that you hid in `hiddenCharts` stays hidden whatever the toggles are.
+This Week vs Last Week shows while Habits, Baselines, or Workout is on. It is the only Insights chart for Baselines; each baseline keeps its own chart on the Baselines screen. A chart that you hid in `hiddenCharts` stays hidden whatever the toggles are.
 
 ## Further reading
 

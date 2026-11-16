@@ -190,7 +190,11 @@ export interface UserPrefs {
 	baselinesEnabled: boolean;
 	/** Insights chart ids the user has hidden (v1.10.0, US-043). Unknown ids are ignored. */
 	hiddenCharts: string[];
+	/** Blood-pressure view on the Health card (v1.13.0, US-060). */
+	healthChartView: HealthChartView;
 }
+
+export type HealthChartView = 'readings' | 'trend' | 'log';
 
 export interface ActiveSet {
 	setNumber: number;

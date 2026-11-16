@@ -57,7 +57,7 @@
 		return defineChart({
 			marks: [
 				ruleY(moodAxis.ticks, { stroke: chartGrid() }),
-				// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+				// See ChartHealthTrend: `group-x` needs a distinct `z` per series.
 				lineY(coffee, {
 					id: 'coffee',
 					x: 'date',

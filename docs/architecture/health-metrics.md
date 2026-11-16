@@ -30,11 +30,11 @@ The app defines the metrics in its code, and you cannot add one. Each has its ow
 
 ## Where readings show
 
-The Health card on the Overview shows the weight and the blood pressure of the date. Insights has three charts: a Health Summary with the last weight and seven days of blood pressure, a Weight Trend, and a Blood Pressure chart. Blood pressure charts use the average of each day, so three readings on Monday make one point.
+The Health card on the Overview shows the weight and the blood pressure of the date. Insights has one [Health card](health-card.md) for both metrics. Its Readings view draws each blood-pressure reading as its own bar; its Trend view uses the average of each day, so three readings on Monday make one point.
 
 ### Example
 
-On Monday morning you log 128/82 with a pulse of 64, and in the evening 122/78. On Tuesday you log a weight of 182.4 lb. The Blood Pressure chart shows one point for Monday: 125/80. The Weight Trend shows 182.4 on Tuesday.
+On Monday morning you log 128/82 with a pulse of 64, and in the evening 122/78. On Tuesday you log a weight of 182.4 lb. The Health card shows two bars for Monday in Readings, and one point of 125/80 in Trend. Its weight line shows 182.4 on Tuesday.
 
 ## Further reading
 

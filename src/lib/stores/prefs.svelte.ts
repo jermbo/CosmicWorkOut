@@ -1,4 +1,4 @@
-import type { UserPrefs, Density } from '$lib/db/types';
+import type { UserPrefs, Density, HealthChartView } from '$lib/db/types';
 import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
@@ -15,7 +15,10 @@ const DEFAULTS: UserPrefs = {
 	healthMetricsEnabled: false,
 	baselinesEnabled: false,
 	hiddenCharts: [],
+	healthChartView: 'readings',
 };
+
+const HEALTH_CHART_VIEWS: readonly HealthChartView[] = ['readings', 'trend', 'log'];
 
 class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
@@ -29,6 +32,7 @@ class PrefsStore {
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 	hiddenCharts = $state<string[]>([]);
+	healthChartView = $state<HealthChartView>(DEFAULTS.healthChartView);
 
 	/**
 	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
@@ -62,6 +66,11 @@ class PrefsStore {
 				this.hiddenCharts = Array.isArray(parsed.hiddenCharts)
 					? parsed.hiddenCharts.filter((id): id is string => typeof id === 'string')
 					: [];
+				this.healthChartView = HEALTH_CHART_VIEWS.includes(
+					parsed.healthChartView as HealthChartView,
+				)
+					? (parsed.healthChartView as HealthChartView)
+					: DEFAULTS.healthChartView;
 			}
 		} catch (e) {
 			// Corrupt prefs must never block app startup — fall back to defaults.
@@ -84,6 +93,7 @@ class PrefsStore {
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			baselinesEnabled: this.baselinesEnabled,
 			hiddenCharts: this.hiddenCharts,
+			healthChartView: this.healthChartView,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
@@ -130,6 +140,12 @@ class PrefsStore {
 	setChartHidden(id: string, hidden: boolean): void {
 		const rest = this.hiddenCharts.filter((c) => c !== id);
 		this.hiddenCharts = hidden ? [...rest, id] : rest;
+		this.save();
+	}
+
+	/** Remember the Health card's blood-pressure view on this device (US-060). */
+	setHealthChartView(view: HealthChartView): void {
+		this.healthChartView = view;
 		this.save();
 	}
 

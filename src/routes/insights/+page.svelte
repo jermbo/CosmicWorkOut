@@ -4,23 +4,14 @@
 	import { habitStore } from '$lib/stores/habits.svelte';
 	import { healthStore } from '$lib/stores/health.svelte';
 	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { todayIso } from '$lib/date';
-	import { rollingBpAverage } from '$lib/health/metrics';
 	import { type RangeKey, computeRange, buildDatesBetween } from '$lib/chart-utils';
 	import RangeBar from '$lib/components/insights/RangeBar.svelte';
 	import ChartMoodHabits from '$lib/components/insights/ChartMoodHabits.svelte';
 	import ChartWeeklyVolume from '$lib/components/insights/ChartWeeklyVolume.svelte';
 	import ChartActivityMix from '$lib/components/insights/ChartActivityMix.svelte';
-	import ChartHabitRadar from '$lib/components/insights/ChartHabitRadar.svelte';
-	import ChartHealthWeight from '$lib/components/insights/ChartHealthWeight.svelte';
-	import ChartHealthBP from '$lib/components/insights/ChartHealthBP.svelte';
+	import ChartHealth from '$lib/components/insights/ChartHealth.svelte';
 	import ChartAllHabits from '$lib/components/insights/ChartAllHabits.svelte';
-	import ChartBaselineGrowth from '$lib/components/insights/ChartBaselineGrowth.svelte';
-	import ChartShowUpRate from '$lib/components/insights/ChartShowUpRate.svelte';
 	import ChartWeekVsWeek from '$lib/components/insights/ChartWeekVsWeek.svelte';
-	import ChartDayOfWeek from '$lib/components/insights/ChartDayOfWeek.svelte';
-	import ChartOnDaysWhen from '$lib/components/insights/ChartOnDaysWhen.svelte';
-	import ChartTimeOfDay from '$lib/components/insights/ChartTimeOfDay.svelte';
 	import InsightCard from '$lib/components/insights/InsightCard.svelte';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import { INSIGHT_CHARTS, chartAvailable, type InsightFeature } from '$lib/insights/charts';
@@ -79,7 +70,6 @@
 	let habitsEnabled = $derived(prefsStore.habitsEnabled);
 	let hasActivities = $derived(activityLogEnabled && activityStore.activities.length > 0);
 	let hasHabitLogs = $derived(habitsEnabled && habitStore.logs.length > 0);
-	let hasHabits = $derived(habitsEnabled && habitStore.activeHabits.length > 0);
 
 	let healthEnabled = $derived(prefsStore.healthMetricsEnabled);
 	let hasWeight = $derived(
@@ -88,8 +78,6 @@
 	let hasBp = $derived(
 		healthEnabled && healthStore.readings.some((r) => r.metricId === 'bloodPressure'),
 	);
-	let latestWeight = $derived(healthStore.latestWeight());
-	let bp7day = $derived(rollingBpAverage(healthStore.readings, 7, todayIso()));
 
 	let baselinesEnabled = $derived(prefsStore.baselinesEnabled);
 	let hasBaselineLogs = $derived(baselinesEnabled && baselineStore.logs.length > 0);
@@ -113,12 +101,9 @@
 	/** Existing charts need their own data; experimental ones explain their own empty state. */
 	let hasData = $derived<Record<string, boolean>>({
 		'mood-habits': hasHabitLogs,
-		'habit-radar': hasHabits && hasHabitLogs,
 		'weekly-volume': hasSessions,
 		'activity-mix': hasActivities,
 		'health-summary': hasWeight || hasBp,
-		weight: hasWeight,
-		'blood-pressure': hasBp,
 	});
 
 	/** Only name the things the user has actually turned on. */
@@ -175,18 +160,8 @@
 						<ChartMoodHabits {dates} />
 					{:else if chart.id === 'all-habits'}
 						<ChartAllHabits {dates} />
-					{:else if chart.id === 'baseline-growth'}
-						<ChartBaselineGrowth {dates} />
-					{:else if chart.id === 'show-up-rate'}
-						<ChartShowUpRate {dates} />
 					{:else if chart.id === 'week-vs-week'}
 						<ChartWeekVsWeek />
-					{:else if chart.id === 'day-of-week'}
-						<ChartDayOfWeek {dates} />
-					{:else if chart.id === 'on-days-when'}
-						<ChartOnDaysWhen {dates} />
-					{:else if chart.id === 'time-of-day'}
-						<ChartTimeOfDay {dates} />
 					{:else if chart.id === 'weekly-volume'}
 						<ChartWeeklyVolume {dates} />
 					{:else if chart.id === 'activity-mix'}
@@ -194,31 +169,8 @@
 							{dates}
 							{rangeLabel}
 						/>
-					{:else if chart.id === 'habit-radar'}
-						<ChartHabitRadar {dates} />
 					{:else if chart.id === 'health-summary'}
-						<div class="health-summary">
-							{#if latestWeight}
-								<div class="health-summary__stat">
-									<span class="health-summary__num"
-										>{latestWeight.values.value}<span class="health-summary__unit"
-											>{prefsStore.weightUnit}</span
-										></span
-									>
-									<span class="health-summary__label">Latest weight</span>
-								</div>
-							{/if}
-							{#if bp7day}
-								<div class="health-summary__stat">
-									<span class="health-summary__num">{bp7day.systolic}/{bp7day.diastolic}</span>
-									<span class="health-summary__label">7-day avg BP</span>
-								</div>
-							{/if}
-						</div>
-					{:else if chart.id === 'weight'}
-						<ChartHealthWeight {dates} />
-					{:else if chart.id === 'blood-pressure'}
-						<ChartHealthBP {dates} />
+						<ChartHealth {dates} />
 					{/if}
 				</InsightCard>
 			{/each}
@@ -274,36 +226,6 @@
 		.charts {
 			grid-template-columns: 1fr 1fr;
 		}
-	}
-
-	.health-summary {
-		display: flex;
-		gap: var(--space-8);
-	}
-
-	.health-summary__stat {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.health-summary__num {
-		font-family: var(--font-mono);
-		font-size: 1.75rem;
-		font-weight: 700;
-		color: var(--color-text-primary);
-	}
-
-	.health-summary__unit {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: var(--color-text-muted);
-		margin-inline-start: 4px;
-	}
-
-	.health-summary__label {
-		font-size: 0.8125rem;
-		color: var(--color-text-secondary);
 	}
 
 	.empty-state {

@@ -40,4 +40,4 @@ The badge shows only while Workout is on, because the sessions belong to Workout
 ## Further reading
 
 - [Session lifecycle](session-lifecycle.md): when a session is stored and gets its date.
-- [Insights](insights.md): the "Showing Up" chart for a longer view of gaps.
+- [Insights](insights.md): the All Habits chart for a longer view of gaps.

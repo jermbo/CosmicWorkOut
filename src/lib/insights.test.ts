@@ -1,15 +1,9 @@
-// Pure-function tests for Insights aggregation. Lives at src/lib/ so the existing
-// `npm test` glob picks it up without touching package.json.
+// Pure-function tests for Insights aggregation.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
 	bestDay,
-	showUpRate,
-	weekdayAverages,
-	splitByCondition,
 	compareWeeks,
-	hourHistogram,
-	hourLabel,
 	mondayOf,
 	weekdayIndex,
 	metricDailyTotals,
@@ -136,54 +130,13 @@ test('calendarSlots pads to whole Monday–Sunday weeks', () => {
 	assert.equal(slots[6].weekday, 6);
 });
 
-// ── Experimental charts (US-044) ─────────────────────────────
+// ── Week helpers and This Week vs Last Week (US-044) ─────────
 
 test('mondayOf and weekdayIndex use Monday-first weeks', () => {
 	// 2026-09-20 is a Sunday; 2026-09-21 a Monday.
 	assert.equal(weekdayIndex('2026-09-20'), 6);
 	assert.equal(weekdayIndex('2026-09-21'), 0);
 	assert.equal(mondayOf('2026-09-20'), '2026-09-14');
-});
-
-test('showUpRate is percent of in-range days logged per week', () => {
-	const dates = [
-		'2026-09-14',
-		'2026-09-15',
-		'2026-09-16',
-		'2026-09-17',
-		'2026-09-18',
-		'2026-09-19',
-		'2026-09-20',
-	];
-	const logged = new Set(['2026-09-14', '2026-09-15', '2026-09-16', '2026-09-17', '2026-09-18']);
-	const [week] = showUpRate(logged, dates);
-	assert.equal(week.week, '2026-09-14');
-	assert.equal(week.logged, 5);
-	assert.equal(week.pct, 71);
-});
-
-test('weekdayAverages averages logged days and leaves empty weekdays null', () => {
-	const values = new Map([
-		['2026-09-14', 4], // Mon
-		['2026-09-21', 6], // Mon
-		['2026-09-15', 1], // Tue
-	]);
-	const dates = ['2026-09-14', '2026-09-15', '2026-09-16', '2026-09-21'];
-	const avg = weekdayAverages(values, dates);
-	assert.equal(avg[0].average, 5);
-	assert.equal(avg[1].average, 1);
-	assert.equal(avg[2].average, null);
-});
-
-test('splitByCondition compares groups and needs 3 days in each', () => {
-	const dates = ['d1', 'd2', 'd3', 'd4', 'd5', 'd6'];
-	const mood = new Map(dates.map((d, i) => [d, i < 3 ? 3 : 1]));
-	const workouts = new Set(['d1', 'd2', 'd3']);
-	const split = splitByCondition(mood, workouts, dates);
-	assert.deepEqual(split.whenTrue, { average: 3, days: 3 });
-	assert.deepEqual(split.whenFalse, { average: 1, days: 3 });
-	assert.equal(split.enough, true);
-	assert.equal(splitByCondition(mood, new Set(['d1', 'd2']), dates).enough, false);
 });
 
 test('compareWeeks uses the same weekdays so far', () => {
@@ -196,16 +149,6 @@ test('compareWeeks uses the same weekdays so far', () => {
 	]);
 	const cmp = compareWeeks(values, '2026-09-23');
 	assert.deepEqual(cmp, { thisWeek: 20, lastWeek: 5, trend: 'up', span: 3 });
-});
-
-test('hourHistogram buckets by local hour', () => {
-	const at = (h: number) => new Date(2026, 8, 21, h, 15).toISOString();
-	const hours = hourHistogram([at(6), at(6), at(7), at(21)]);
-	assert.equal(hours[6], 2);
-	assert.equal(hours[7], 1);
-	assert.equal(hours[21], 1);
-	assert.equal(hourLabel(0), '12a');
-	assert.equal(hourLabel(13), '1p');
 });
 
 test('metricDailyTotals sums per day and skips blank metrics', () => {

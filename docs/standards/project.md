@@ -24,7 +24,7 @@ This page holds the facts about the project that a contributor or a tool must kn
 | Install             | `npm install`                                                                                                             |
 | Run                 | `npm run dev` — port 5678, also on the local network for a phone                                                          |
 | Build               | `npm run build`, then `npm run preview`                                                                                   |
-| Test                | `npm test` — Node's own test runner, pure modules only                                                                    |
+| Test                | `npm test` — Node's own test runner, pure modules only; runs every `src/**/*.test.ts`                                     |
 | Type check          | `npm run check`                                                                                                           |
 | Lint and format     | `npm run lint` (writes fixes), `npm run format`                                                                           |
 | Docs check          | `npm run docs:links` — links, anchors, page parts, and settings coverage. It fails on an error                            |

@@ -48,98 +48,6 @@ export function addDays(iso: string, days: number): string {
 
 export const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
-// ── Showing-up rate (US-044 #2) ───────────────────────────────
-
-export interface WeekRate {
-	/** Monday of the week. */
-	week: string;
-	/** Days of this week inside the range. */
-	days: number;
-	logged: number;
-	/** 0–100. */
-	pct: number;
-}
-
-/** Percent of in-range days per week that have a log. */
-export function showUpRate(loggedDates: ReadonlySet<string>, dates: readonly string[]): WeekRate[] {
-	const byWeek = new Map<string, WeekRate>();
-	for (const date of dates) {
-		const week = mondayOf(date);
-		const row = byWeek.get(week) ?? { week, days: 0, logged: 0, pct: 0 };
-		row.days += 1;
-		if (loggedDates.has(date)) row.logged += 1;
-		byWeek.set(week, row);
-	}
-	return [...byWeek.values()].map((r) => ({ ...r, pct: Math.round((r.logged / r.days) * 100) }));
-}
-
-// ── Day-of-week pattern (US-044 #3) ───────────────────────────
-
-export interface WeekdayAverage {
-	weekday: (typeof WEEKDAY_LABELS)[number];
-	/** Null when that weekday has no data in the range — shown empty, not zero. */
-	average: number | null;
-	days: number;
-}
-
-/** Average value per weekday over days that have a value. */
-export function weekdayAverages(
-	values: ReadonlyMap<string, number>,
-	dates: readonly string[],
-): WeekdayAverage[] {
-	const sums = Array.from({ length: 7 }, () => ({ total: 0, days: 0 }));
-	for (const date of dates) {
-		const v = values.get(date);
-		if (v === undefined) continue;
-		const s = sums[weekdayIndex(date)];
-		s.total += v;
-		s.days += 1;
-	}
-	return sums.map((s, i) => ({
-		weekday: WEEKDAY_LABELS[i],
-		average: s.days === 0 ? null : Math.round((s.total / s.days) * 100) / 100,
-		days: s.days,
-	}));
-}
-
-// ── "On days when…" (US-044 #4) ───────────────────────────────
-
-export const MIN_GROUP_DAYS = 3;
-
-export interface ConditionSplit {
-	whenTrue: { average: number | null; days: number };
-	whenFalse: { average: number | null; days: number };
-	/** False when either group has fewer than MIN_GROUP_DAYS days. */
-	enough: boolean;
-}
-
-/**
- * Average of the outcome on days the condition held vs days it didn't. Only days
- * where the outcome was logged count toward either group.
- */
-export function splitByCondition(
-	outcome: ReadonlyMap<string, number>,
-	condition: ReadonlySet<string>,
-	dates: readonly string[],
-): ConditionSplit {
-	const t = { total: 0, days: 0 };
-	const f = { total: 0, days: 0 };
-	for (const date of dates) {
-		const v = outcome.get(date);
-		if (v === undefined) continue;
-		const g = condition.has(date) ? t : f;
-		g.total += v;
-		g.days += 1;
-	}
-	const avg = (g: { total: number; days: number }) =>
-		g.days === 0 ? null : Math.round((g.total / g.days) * 100) / 100;
-	return {
-		whenTrue: { average: avg(t), days: t.days },
-		whenFalse: { average: avg(f), days: f.days },
-		enough: t.days >= MIN_GROUP_DAYS && f.days >= MIN_GROUP_DAYS,
-	};
-}
-
 // ── This week vs last week (US-044 #5) ────────────────────────
 
 export interface WeekComparison {
@@ -169,25 +77,6 @@ export function compareWeeks(values: ReadonlyMap<string, number>, today: string)
 	return { thisWeek, lastWeek, trend, span };
 }
 
-// ── Time of day (US-044 #6) ───────────────────────────────────
-
-/** Entries per hour of day (0–23) from ISO datetimes, in local time. */
-export function hourHistogram(recordedAt: readonly string[]): number[] {
-	const hours = new Array<number>(24).fill(0);
-	for (const iso of recordedAt) {
-		const d = new Date(iso);
-		if (Number.isNaN(d.getTime())) continue;
-		hours[d.getHours()] += 1;
-	}
-	return hours;
-}
-
-/** 0 → "12a", 13 → "1p". */
-export function hourLabel(hour: number): string {
-	const h = hour % 12 === 0 ? 12 : hour % 12;
-	return `${h}${hour < 12 ? 'a' : 'p'}`;
-}
-
 // ── Daily values from stored logs ─────────────────────────────
 
 /**
@@ -207,11 +96,6 @@ export function metricDailyTotals(
 		totals.set(log.date, Math.round(((totals.get(log.date) ?? 0) + v) * 1e4) / 1e4);
 	}
 	return totals;
-}
-
-/** Dates with any entry for the baseline — the days it was done. */
-export function baselineLoggedDates(logs: readonly BaselineLog[], baselineId: string): Set<string> {
-	return new Set(logs.filter((l) => l.baselineId === baselineId).map((l) => l.date));
 }
 
 /**
