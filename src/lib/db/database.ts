@@ -4,6 +4,7 @@ import type {
 	Session,
 	ItemLastUsed,
 	ActivityLog,
+	ActivityType,
 	Habit,
 	HabitLog,
 	HealthReading,
@@ -15,6 +16,8 @@ import { builtInItems, builtInPrograms, builtInHabits } from './seed';
 import { generateDebugSeedData } from './debugSeed';
 import { generateGoalPlanSampleData } from '$lib/goalPlans/sampleData';
 import { toastStore } from '$lib/stores/toast.svelte';
+import { assignTypeIds, mergeDuplicateNames, starterTypes } from '$lib/activityTypes';
+import { generateId } from '$lib/utils';
 
 function reportWriteError(error: unknown): void {
 	console.error('IndexedDB write failed:', error);
@@ -22,7 +25,7 @@ function reportWriteError(error: unknown): void {
 }
 
 const DB_NAME = 'cosmic-workout';
-const DB_VERSION = 11;
+const DB_VERSION = 12;
 
 /** Every IndexedDB object store — keep in sync with onupgradeneeded. */
 export const ALL_STORE_NAMES = [
@@ -31,6 +34,7 @@ export const ALL_STORE_NAMES = [
 	'sessions',
 	'itemLastUsed',
 	'activities',
+	'activityTypes',
 	'habits',
 	'habitLogs',
 	'healthReadings',
@@ -79,6 +83,11 @@ function openDB(): Promise<IDBDatabase> {
 
 			const actStore = ensureStore('activities', { keyPath: 'id' });
 			ensureIndex(actStore, 'by_date', 'date');
+
+			// v12 (v1.13.0, US-061): the user's own list of activity types. The entries
+			// get their type ids in initDB (ensureActivityTypes), which also repairs a
+			// restore of an older backup the same way.
+			ensureStore('activityTypes', { keyPath: 'id' });
 
 			ensureStore('habits', { keyPath: 'id' });
 
@@ -445,7 +454,9 @@ export async function clearWorkoutSessions(): Promise<void> {
 }
 
 export async function clearActivityLog(): Promise<void> {
-	await clearStores(['activities']);
+	// The list of types resets with the log (US-062); initDB writes the starter types.
+	await clearStores(['activities', 'activityTypes']);
+	localStorage.removeItem('cwout:lastActivityType');
 	location.reload();
 }
 
@@ -529,6 +540,36 @@ async function seedHabitsIfEmpty(): Promise<void> {
 	}
 }
 
+/**
+ * Make sure the list of activity types exists and each entry points to a type
+ * (US-061, US-062). An empty list gets the starter types. An entry with no known type
+ * id — from before v1.13.0, an older backup, or another device's QR backup — gets the
+ * id of its old type or Other name, which joins the list once. Runs on each start.
+ */
+async function ensureActivityTypes(): Promise<void> {
+	const now = new Date().toISOString();
+	let types = await getAll<ActivityType>('activityTypes');
+	if (types.length === 0) {
+		types = starterTypes(now);
+		await putAllRecords('activityTypes', types);
+	}
+	let activities = await getAll<ActivityLog>('activities');
+	const upgrade = assignTypeIds(types, activities, generateId, now);
+	if (upgrade.addedTypes.length > 0) await putAllRecords('activityTypes', upgrade.addedTypes);
+	if (upgrade.changedActivities.length > 0) {
+		await putAllRecords('activities', upgrade.changedActivities);
+		const changed = new Map(upgrade.changedActivities.map((a) => [a.id, a]));
+		activities = activities.map((a) => changed.get(a.id) ?? a);
+	}
+
+	// A QR window from another device can bring a second type of the same name.
+	const dedupe = mergeDuplicateNames(upgrade.types, activities);
+	if (dedupe.removedIds.length === 0) return;
+	if (dedupe.movedActivities.length > 0) await putAllRecords('activities', dedupe.movedActivities);
+	if (dedupe.changedTypes.length > 0) await putAllRecords('activityTypes', dedupe.changedTypes);
+	for (const id of dedupe.removedIds) await removeRecord('activityTypes', id);
+}
+
 export async function initDB(): Promise<void> {
 	const items = await getAll<Item>('items');
 	await upsertBuiltInRecords('items', items, builtInItems);
@@ -537,6 +578,7 @@ export async function initDB(): Promise<void> {
 	await upsertBuiltInRecords('programs', programs, builtInPrograms);
 
 	await seedHabitsIfEmpty();
+	await ensureActivityTypes();
 }
 
 export const db = {
@@ -570,7 +612,15 @@ export const db = {
 	activities: {
 		getAll: () => getAll<ActivityLog>('activities'),
 		put: (activity: ActivityLog) => putRecord('activities', activity),
+		putAll: (activities: ActivityLog[]) => putAllRecords('activities', activities),
 		remove: (id: string) => removeRecord('activities', id),
+	},
+
+	activityTypes: {
+		getAll: () => getAll<ActivityType>('activityTypes'),
+		put: (type: ActivityType) => putRecord('activityTypes', type),
+		putAll: (types: ActivityType[]) => putAllRecords('activityTypes', types),
+		remove: (id: string) => removeRecord('activityTypes', id),
 	},
 
 	habits: {

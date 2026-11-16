@@ -46,7 +46,7 @@ The staging step proves that every record can be stored — the right shape, not
 
 ## Old backups
 
-A backup from an older version restores, with two rules. A store that the backup does not have ends up empty, and the warning in step 2 says so. Baselines of the oldest shape cannot be read, so the restore skips them and restores the rest.
+A backup from an older version restores, with three rules. A store that the backup does not have ends up empty, and step 2 warns of it. Baselines of the oldest shape are skipped. A backup with no list of activity types gets one built from its activities, by the rules of the [schema upgrade](schema-upgrades.md), with no warning, since nothing is lost.
 
 ### Example
 
@@ -55,4 +55,3 @@ You restore a file with 412 sessions. The staging database receives 412 sessions
 ## Further reading
 
 - [QR backup](qr-backup.md): the same backup, carried by QR codes.
-- [Schema upgrades](schema-upgrades.md): why built-in content is written again after a restore.

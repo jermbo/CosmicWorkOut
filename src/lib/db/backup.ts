@@ -7,6 +7,7 @@ import {
 	replaceDateRange,
 	initDB,
 } from './database';
+import { generateId } from '$lib/utils';
 import {
 	BACKUP_FORMAT,
 	BACKUP_VERSION,
@@ -22,6 +23,7 @@ import {
 	assertWindowRecords,
 	dropLegacyBaselines,
 	expectedCounts,
+	fillActivityTypes,
 	localEntriesOf,
 	scopeEnvelope,
 	scopeOf,
@@ -64,6 +66,7 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		sessions,
 		itemLastUsed,
 		activities,
+		activityTypes,
 		habits,
 		habitLogs,
 		healthReadings,
@@ -76,6 +79,7 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 		db.sessions.getAll(),
 		db.itemLastUsed.getAll(),
 		db.activities.getAll(),
+		db.activityTypes.getAll(),
 		db.habits.getAll(),
 		db.habitLogs.getAll(),
 		db.healthReadings.getAll(),
@@ -100,6 +104,7 @@ export async function exportBackup(): Promise<BackupEnvelope> {
 			sessions,
 			itemLastUsed,
 			activities,
+			activityTypes,
 			habits,
 			habitLogs,
 			healthReadings,
@@ -320,6 +325,10 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 	if (dropLegacyBaselines(plain)) {
 		console.info('[backup-restore] dropped pre-v1.10.0 baselines from the backup');
 	}
+	assertStoresAreArrays(plain);
+	if (fillActivityTypes(plain, generateId, new Date().toISOString())) {
+		console.info('[backup-restore] built the activity type list from a pre-v1.13.0 backup');
+	}
 	const expected = expectedCounts(plain);
 
 	console.info('[backup-restore] starting', {
@@ -327,8 +336,6 @@ export async function importBackup(envelope: BackupEnvelope): Promise<void> {
 		version: plain.version,
 		stores: expected,
 	});
-
-	assertStoresAreArrays(plain);
 
 	try {
 		structuredClone(plain.db);

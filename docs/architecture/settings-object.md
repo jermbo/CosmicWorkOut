@@ -30,6 +30,7 @@ Every setting of the app is one field of one JSON object, stored in `cwout:prefs
 | `homeCardOrder`        | A list of card ids                   | `habits`, `practice`, `activity`, `baselines`, `health` | Personalization      |
 | `hiddenCharts`         | A list of chart ids                  | Empty                                                   | Settings → Insights  |
 | `healthChartView`      | `readings`, `trend`, `log`           | `readings`                                              | The Health card      |
+| `mascotMotion`         | `true`, `false`                      | `true`                                                  | Personalization      |
 
 ```json
 {

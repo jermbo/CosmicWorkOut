@@ -16,7 +16,7 @@ This page is the contract for the database. Use it to read the data in the brows
 
 ## The database
 
-The database name is `cosmic-workout`. Its version is `11`. The version goes up only when a store or an index is added, or when a store changes shape. The [schema upgrades](schema-upgrades.md) page tells how an upgrade keeps your data.
+The database name is `cosmic-workout`. Its version is `12`. The version goes up only when a store or an index is added, or when a store changes shape. The [schema upgrades](schema-upgrades.md) page tells how an upgrade keeps your data.
 
 ## The stores
 
@@ -27,6 +27,7 @@ The database name is `cosmic-workout`. Its version is `11`. The version goes up 
 | `sessions`       | `id`     | `by_date`                | Each finished session                           |
 | `itemLastUsed`   | `itemId` | —                        | The last weight and reps of each item           |
 | `activities`     | `id`     | `by_date`                | Each activity                                   |
+| `activityTypes`  | `id`     | —                        | Your list of activity types                     |
 | `habits`         | `id`     | —                        | Each habit, with Mood                           |
 | `habitLogs`      | `id`     | `by_date`, `by_habit`    | One value for each habit and date               |
 | `healthReadings` | `id`     | `by_date`, `by_metric`   | Each weight or blood-pressure reading           |

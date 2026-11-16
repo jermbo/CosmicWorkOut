@@ -20,7 +20,8 @@ This page is the contract for each surface that a toggle controls. Use it to che
 | ---------------- | -------------------------- | ----------------------- | --------------------------------------------------------------- | ---------------------------- | ---------------------------- |
 | Bottom bar       | —                          | —                       | Workout tab                                                     | —                            | —                            |
 | Screen when off  | `/habits` goes to Overview | `/log` goes to Overview | every `/workout` screen goes to Overview                        | `/health` goes to Overview   | `/baselines` shows a message |
-| Overview card    | Habits                     | Activity log            | Workout, and the week-streak badge                              | Health                       | Baselines                    |
+| Overview card    | Habits                     | Activity log            | Workout                                                         | Health                       | Baselines                    |
+| Streak badge     | `H`                        | `A`                     | `T`                                                             | `P`                          | `B`                          |
 | Week-strip marks | Habit dots                 | Activity dots           | Session dots                                                    | Health dots                  | —                            |
 | Insights charts  | Mood vs Habits, All Habits | Activity Mix            | Weekly Volume                                                   | Health Summary               | —                            |
 | Clear rows       | Habits                     | Activity log            | Custom exercises, Custom programs, Workout sessions, Plan goals | — (Health data always shows) | Baselines                    |

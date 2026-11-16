@@ -8,20 +8,20 @@ New stories follow the [user story standards](../standards/user-story-standards.
 
 ## Releases
 
-| Version                      | Theme                                                       | Stories                               |
-| ---------------------------- | ----------------------------------------------------------- | ------------------------------------- |
-| [v1.1.0](v1.1.0/README.md)   | Core workout flows                                          | US-001 – US-006                       |
-| [v1.2.0](v1.2.0/README.md)   | Daily dashboard & habits                                    | US-007, 008, 011                      |
-| [v1.3.0](v1.3.0/README.md)   | Habit management & calendar history                         | US-009, 010, 013                      |
-| [v1.4.0](v1.4.0/README.md)   | Belly dance & the Discipline model                          | US-015 – US-021                       |
-| [v1.5.0](v1.5.0/README.md)   | Insights hub                                                | US-022 – US-027                       |
-| [v1.6.0](v1.6.0/README.md)   | Belly dance catalog & course programs                       | Backfilled (no per-story files)       |
-| [v1.7.0](v1.7.0/README.md)   | Full strength catalog, PWA, health & backup                 | US-028 – US-031                       |
-| [v1.8.0](v1.8.0/README.md)   | Granular data clearing                                      | US-032                                |
-| [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                                      | US-033 – US-036                       |
-| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings, one Workout section | US-037 – US-054 (053 – 054 not built) |
-| [v1.12.0](v1.12.0/README.md) | Color fields redesign (dark only), tap feel, QR backup      | US-055 – US-058                       |
-| [v1.13.0](v1.13.0/README.md) | Insights cleanup, one Health card                           | US-059 – US-060                       |
+| Version                      | Theme                                                                    | Stories                               |
+| ---------------------------- | ------------------------------------------------------------------------ | ------------------------------------- |
+| [v1.1.0](v1.1.0/README.md)   | Core workout flows                                                       | US-001 – US-006                       |
+| [v1.2.0](v1.2.0/README.md)   | Daily dashboard & habits                                                 | US-007, 008, 011                      |
+| [v1.3.0](v1.3.0/README.md)   | Habit management & calendar history                                      | US-009, 010, 013                      |
+| [v1.4.0](v1.4.0/README.md)   | Belly dance & the Discipline model                                       | US-015 – US-021                       |
+| [v1.5.0](v1.5.0/README.md)   | Insights hub                                                             | US-022 – US-027                       |
+| [v1.6.0](v1.6.0/README.md)   | Belly dance catalog & course programs                                    | Backfilled (no per-story files)       |
+| [v1.7.0](v1.7.0/README.md)   | Full strength catalog, PWA, health & backup                              | US-028 – US-031                       |
+| [v1.8.0](v1.8.0/README.md)   | Granular data clearing                                                   | US-032                                |
+| [v1.9.0](v1.9.0/README.md)   | Lift plans + Baselines                                                   | US-033 – US-036                       |
+| [v1.10.0](v1.10.0/README.md) | Baselines & Insights refresh, Settings, one Workout section              | US-037 – US-054 (053 – 054 not built) |
+| [v1.12.0](v1.12.0/README.md) | Color fields redesign (dark only), tap feel, QR backup                   | US-055 – US-058                       |
+| [v1.13.0](v1.13.0/README.md) | Insights cleanup, one Health card, custom activity types, Mascot Phase 1 | US-059 – US-068                       |
 
 ## What was removed later
 
@@ -36,6 +36,8 @@ A story tells what was built in its release. Some of it was taken out in a later
 | Exercise progress chart                 | v1.10.0      | Commit `9798644`; found missing during v1.10.0    |
 | Light mode, accent colour, roundness    | v1.12.0      | [US-055](v1.12.0/US-055-color-fields-redesign.md) |
 | Eight Insights charts                   | v1.13.0      | [US-059](v1.13.0/US-059-trim-insights-charts.md)  |
+| The fixed list of activity types        | v1.13.0      | [US-061](v1.13.0/US-061-own-activity-types.md)    |
+| The one week-streak badge               | v1.13.0      | [US-065](v1.13.0/US-065-streak-per-tracker.md)    |
 
 ## Notes
 

@@ -67,6 +67,13 @@ The owner wants a small pet in the app, inspired by the Claude crab: it shows on
     - a. **The page change stays as it is today, with one addition: the paper block of the current tab glides to the new tab.** It moves with a small spring, and the labels cross-fade inside it. The owner liked it in a prototype and wants nothing more. This decision is built, and the [Navigation](../../architecture/navigation.md) page tells it.
     - b. **Six variants were rejected.** A push in the direction of travel: "a bit amateurish". The blocks of the page rising in turn: it did not run, so it could not be judged. A wipe in the colour of the part: the part colours are used too often already. The page that sinks into its shadow: it did not work on every page. A title that flips like a departure board, and a scan line that prints the new page: not better than today.
 
+### Confirmed at the end of the grill
+
+19. **Each frame is a pixel map in the code, drawn as SVG.** The favicon and the app icon come from the same drawing. The reason: no image files to keep in step, and the frames stay sharp at every size.
+20. **A Baselines day counts when you log toward any baseline.** The reason: the same check-in rule as Habits (decision 7 c); a day with no log at all breaks it.
+21. **A badge reads as the code of its tracker, the count, and D or W:** "T 4W", "H 12D". The reason: the codes are already on each card, such as `[H] HABITS`.
+22. **The welcome line names your longest streak that is going:** "Morning! Habits: day 12". With no streak going: "Morning!".
+
 ## Choices that are not confirmed
 
-1. **Each frame is a pixel map in the code, drawn as SVG.** The favicon and the app icon come from the same drawing. The reason: no image files to keep in step, and the frames stay sharp at every size.
+None. The owner agreed the scope of Phase 1 on 16 November 2026, and the spec is `agreed`. From here this log is append-only.

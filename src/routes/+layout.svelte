@@ -15,6 +15,7 @@
 	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
 	import { baselineStore } from '$lib/stores/baselines.svelte';
 	import BottomNav from '$lib/components/BottomNav.svelte';
+	import MascotPeek from '$lib/components/MascotPeek.svelte';
 	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
 	import SessionComplete from '$lib/components/SessionComplete.svelte';
 	import Toaster from '$lib/components/Toaster.svelte';
@@ -105,6 +106,7 @@
 		</main>
 
 		<BottomNav pathname={page.url.pathname} />
+		<MascotPeek />
 
 		{#if prefsStore.practiceEnabled}
 			{#if sessionStore.isActive}

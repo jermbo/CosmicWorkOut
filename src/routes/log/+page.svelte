@@ -27,7 +27,7 @@
 	}
 
 	function chipLabel(activity: (typeof activityStore.activities)[0]): string {
-		return formatActivitySummary(activity);
+		return formatActivitySummary(activityStore.nameOf(activity), activity);
 	}
 
 	let sheetInitialDate = $derived.by(() => {
@@ -89,11 +89,10 @@
 					>
 						<div class="activity-item__info">
 							<span class="activity-item__name">
-								{#if activity.type === 'Other'}{activity.customType ||
-										'Other'}{:else}{activity.type}{/if}
+								{activityStore.nameOf(activity)}
 							</span>
 							<span class="activity-item__meta">
-								{formatActivitySummary(activity)}
+								{chipLabel(activity)}
 							</span>
 						</div>
 						<svg

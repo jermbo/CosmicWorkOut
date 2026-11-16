@@ -16,6 +16,7 @@ const DEFAULTS: UserPrefs = {
 	baselinesEnabled: false,
 	hiddenCharts: [],
 	healthChartView: 'readings',
+	mascotMotion: true,
 };
 
 const HEALTH_CHART_VIEWS: readonly HealthChartView[] = ['readings', 'trend', 'log'];
@@ -33,6 +34,7 @@ class PrefsStore {
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 	hiddenCharts = $state<string[]>([]);
 	healthChartView = $state<HealthChartView>(DEFAULTS.healthChartView);
+	mascotMotion = $state(DEFAULTS.mascotMotion);
 
 	/**
 	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
@@ -71,6 +73,7 @@ class PrefsStore {
 				)
 					? (parsed.healthChartView as HealthChartView)
 					: DEFAULTS.healthChartView;
+				this.mascotMotion = parsed.mascotMotion ?? DEFAULTS.mascotMotion;
 			}
 		} catch (e) {
 			// Corrupt prefs must never block app startup — fall back to defaults.
@@ -94,6 +97,7 @@ class PrefsStore {
 			baselinesEnabled: this.baselinesEnabled,
 			hiddenCharts: this.hiddenCharts,
 			healthChartView: this.healthChartView,
+			mascotMotion: this.mascotMotion,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
@@ -174,11 +178,18 @@ class PrefsStore {
 		this.save();
 	}
 
+	/** The Mascot's welcome and celebrations (US-067). Off keeps the still star. */
+	setMascotMotion(enabled: boolean): void {
+		this.mascotMotion = enabled;
+		this.save();
+	}
+
 	resetToDefaults(): void {
 		this.density = DEFAULTS.density;
 		this.weightUnit = DEFAULTS.weightUnit;
 		this.hapticsEnabled = DEFAULTS.hapticsEnabled;
 		this.soundEnabled = DEFAULTS.soundEnabled;
+		this.mascotMotion = DEFAULTS.mascotMotion;
 		this.applyDensity();
 		this.save();
 	}

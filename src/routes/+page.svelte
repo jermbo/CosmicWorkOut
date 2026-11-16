@@ -12,7 +12,7 @@
 	import { todayIso } from '$lib/date';
 	import { computeWorkoutNextUp } from '$lib/workoutNextUp';
 	import PageHeader from '$lib/components/PageHeader.svelte';
-	import WeekStreakBadge from '$lib/components/WeekStreakBadge.svelte';
+	import OverviewMascot from '$lib/components/OverviewMascot.svelte';
 	import HomeHabitsCard from '$lib/components/HomeHabitsCard.svelte';
 	import HomePracticeHubCard from '$lib/components/HomePracticeHubCard.svelte';
 	import HomeActivityCard from '$lib/components/HomeActivityCard.svelte';
@@ -116,10 +116,8 @@
 		dayIndicators={weekIndicators}
 		onDateChange={() => goto(resolve('/'), { replaceState: true })}
 	>
-		{#snippet trailing()}
-			{#if practiceEnabled}
-				<WeekStreakBadge streak={programStore.combinedWeekStreak} />
-			{/if}
+		{#snippet aside()}
+			<OverviewMascot />
 		{/snippet}
 	</PageHeader>
 

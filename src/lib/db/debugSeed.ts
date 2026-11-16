@@ -4,7 +4,7 @@ import type {
 	HabitLog,
 	LoggedItem,
 	LoggedSet,
-	ActivityType,
+	LegacyActivityType,
 	ActivityIntensity,
 	HealthReading,
 	Baseline,
@@ -171,7 +171,7 @@ function buildSession(date: Date, type: WorkoutKey, idx: number): Session {
 	};
 }
 
-const ACTIVITY_DURATION: Partial<Record<ActivityType, [number, number]>> = {
+const ACTIVITY_DURATION: Partial<Record<LegacyActivityType, [number, number]>> = {
 	Walk: [25, 60],
 	Run: [20, 50],
 	Bike: [30, 75],
@@ -183,10 +183,11 @@ const ACTIVITY_DURATION: Partial<Record<ActivityType, [number, number]>> = {
 	Yoga: [30, 60],
 	Stretching: [15, 30],
 	Cardio: [20, 45],
+	Other: [45, 90],
 };
 
-const EASY_ACTIVITIES: ActivityType[] = ['Yoga', 'Stretching', 'Walk'];
-const ALL_ACTIVITIES: ActivityType[] = [
+const EASY_ACTIVITIES: LegacyActivityType[] = ['Yoga', 'Stretching', 'Walk'];
+const ALL_ACTIVITIES: LegacyActivityType[] = [
 	'Walk',
 	'Walk',
 	'Run',
@@ -201,27 +202,37 @@ const ALL_ACTIVITIES: ActivityType[] = [
 	'Yoga',
 	'Stretching',
 	'Cardio',
+	'Other',
 ];
 
-function pickActivityType(light: boolean): ActivityType {
+function pickActivityType(light: boolean): LegacyActivityType {
 	if (light) return pick(EASY_ACTIVITIES);
 	return pick(ALL_ACTIVITIES);
 }
 
-function intensityFor(type: ActivityType, light: boolean): ActivityIntensity {
+function intensityFor(type: LegacyActivityType, light: boolean): ActivityIntensity {
 	if (EASY_ACTIVITIES.includes(type)) return 'Easy';
 	if (light) return pick<ActivityIntensity>(['Easy', 'Moderate']);
 	return pick<ActivityIntensity>(['Easy', 'Moderate', 'Moderate', 'Hard']);
 }
 
-function buildActivity(date: Date, idx: number, light = false): ActivityLog {
-	const type = pickActivityType(light);
+function buildActivity(
+	date: Date,
+	idx: number,
+	light = false,
+	forced?: LegacyActivityType,
+): ActivityLog {
+	const type = forced ?? pickActivityType(light);
 	const [minD, maxD] = ACTIVITY_DURATION[type] ?? [30, 60];
 	const intensity = intensityFor(type, light);
+	// Seeded as entries from before v1.13.0: initDB gives each one its type id, so the
+	// debug data also runs the upgrade. Other is always "Mowing" (US-061 5).
 	return {
 		id: `seed-activity-${idx}`,
 		date: toDateStr(date),
+		typeId: '',
 		type,
+		...(type === 'Other' ? { customType: 'Mowing' } : {}),
 		durationMinutes: rInt(minD, maxD),
 		intensity,
 		createdAt: date.toISOString(),
@@ -461,6 +472,11 @@ export function generateDebugSeedData(): {
 	}
 	for (const offset of dualActivityOffsets) {
 		activities.push(buildActivity(shiftDays(start, offset), actIdx++, true));
+	}
+	// Mowing on the last three Saturdays, so the last 30 days always have a Mowing slice.
+	const lastSaturday = shiftDays(today, -((today.getDay() + 1) % 7 || 7));
+	for (let week = 0; week < 3; week++) {
+		activities.push(buildActivity(shiftDays(lastSaturday, -7 * week), actIdx++, false, 'Other'));
 	}
 
 	const habitLogs: HabitLog[] = [];

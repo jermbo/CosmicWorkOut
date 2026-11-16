@@ -1,28 +1,16 @@
 <script lang="ts">
 	import { holdRepeat } from '$lib/feedback/holdRepeat';
 	import { untrack } from 'svelte';
-	import type { ActivityLog, ActivityType, ActivityIntensity } from '$lib/db/types';
-	import { activityStore } from '$lib/stores/activities.svelte';
+	import type { ActivityLog, ActivityIntensity } from '$lib/db/types';
+	import { activityStore, type ActivityTypeChoice } from '$lib/stores/activities.svelte';
 	import { todayIso } from '$lib/date';
 	import { formatMinutes } from '$lib/format';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import SheetBody from './SheetBody.svelte';
 
-	const ACTIVITY_TYPES: ActivityType[] = [
-		'Run',
-		'Walk',
-		'Bike',
-		'Swim',
-		'Hike',
-		'Pickleball',
-		'Tennis',
-		'Basketball',
-		'Yoga',
-		'Stretching',
-		'Cardio',
-		'Other',
-	];
+	/** Other is not a type: it is the way to add one (US-061). */
+	const OTHER = 'other';
 
 	const INTENSITIES: ActivityIntensity[] = ['Easy', 'Moderate', 'Hard'];
 
@@ -37,47 +25,53 @@
 
 	const todayStr = todayIso();
 
-	let selectedType = $state<ActivityType>(
-		untrack(() => editing?.type ?? activityStore.lastUsedType),
+	// The picker order is fixed while the sheet is open, so a save never reshuffles it.
+	// An entry of a hidden type keeps its type in the list while it is edited.
+	const choices = untrack(() => {
+		const list = [...activityStore.pickerTypes];
+		const own = editing ? activityStore.typesById.get(editing.typeId) : undefined;
+		if (own && !list.some((t) => t.id === own.id)) list.push(own);
+		return list;
+	});
+
+	let selected = $state<string>(
+		untrack(() => editing?.typeId ?? activityStore.lastUsedTypeId ?? OTHER),
 	);
-	let customType = $state(untrack(() => editing?.customType ?? ''));
+	let otherName = $state('');
 	let durationMinutes = $state(untrack(() => editing?.durationMinutes ?? 30));
 	let intensity = $state<ActivityIntensity>(untrack(() => editing?.intensity ?? 'Moderate'));
 	let date = $state(untrack(() => editing?.date ?? initialDate ?? todayStr));
 	let saving = $state(false);
 	let confirming = $state(false);
 
+	let otherInput: HTMLInputElement | undefined = $state();
+
+	// Picking Other opens the name field; put the cursor in it.
+	$effect(() => {
+		if (selected === OTHER) otherInput?.focus();
+	});
+
+	/** Save stays off until Other has a name (US-061 3b). */
+	let canSave = $derived(selected !== OTHER || otherName.trim().length > 0);
+
 	let deleteAriaLabel = $derived.by(() => {
 		if (confirming) return 'Tap again to confirm delete';
 		return 'Delete this activity';
 	});
 
-	function resolveCustomType(): string | undefined {
-		if (selectedType === 'Other') return customType.trim() || undefined;
-		return undefined;
+	function choice(): ActivityTypeChoice {
+		if (selected === OTHER) return { otherName: otherName.trim() };
+		return { typeId: selected };
 	}
 
 	async function handleSave() {
-		if (saving) return;
+		if (saving || !canSave) return;
 		saving = true;
 		try {
 			if (editing) {
-				await activityStore.update({
-					...editing,
-					type: selectedType,
-					customType: resolveCustomType(),
-					durationMinutes,
-					intensity,
-					date,
-				});
+				await activityStore.update({ ...editing, durationMinutes, intensity, date }, choice());
 			} else {
-				await activityStore.add({
-					date,
-					type: selectedType,
-					customType: resolveCustomType(),
-					durationMinutes,
-					intensity,
-				});
+				await activityStore.add({ date, type: choice(), durationMinutes, intensity });
 			}
 			onSave?.();
 			onClose();
@@ -123,24 +117,34 @@
 					role="radiogroup"
 					aria-label="Activity type"
 				>
-					{#each ACTIVITY_TYPES as type (type)}
+					{#each choices as type (type.id)}
 						<button
 							class="act-type-btn"
-							class:act-type-btn--active={selectedType === type}
+							class:act-type-btn--active={selected === type.id}
 							role="radio"
-							aria-checked={selectedType === type}
+							aria-checked={selected === type.id}
 							onclick={() => {
-								selectedType = type;
-							}}>{type}</button
+								selected = type.id;
+							}}>{type.name}</button
 						>
 					{/each}
+					<button
+						class="act-type-btn"
+						class:act-type-btn--active={selected === OTHER}
+						role="radio"
+						aria-checked={selected === OTHER}
+						onclick={() => {
+							selected = OTHER;
+						}}>Other</button
+					>
 				</div>
-				{#if selectedType === 'Other'}
+				{#if selected === OTHER}
 					<input
+						bind:this={otherInput}
 						class="act-custom-input"
 						type="text"
-						placeholder="Describe your activity…"
-						bind:value={customType}
+						placeholder="Name your activity, like Mowing"
+						bind:value={otherName}
 						maxlength={50}
 						aria-label="Custom activity name"
 					/>
@@ -192,7 +196,7 @@
 				class="act-sheet__save-btn"
 				data-feedback="success"
 				onclick={handleSave}
-				disabled={saving}
+				disabled={saving || !canSave}
 				aria-busy={saving}
 			>
 				{#if saving}Saving…{:else if editing}Save changes{:else}Log activity{/if}

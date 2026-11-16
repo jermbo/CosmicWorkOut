@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ActivityLog } from '$lib/db/types';
 	import { formatActivityChip } from '$lib/activities';
+	import { activityStore } from '$lib/stores/activities.svelte';
 	import { formatCountWithWord } from '$lib/format';
 	import HomeCard from './HomeCard.svelte';
 
@@ -33,7 +34,7 @@
 		<div class="home-activity-card__chips">
 			{#each activities.slice(0, 3) as activity (activity.id)}
 				<span class="home-activity-card__chip">
-					{formatActivityChip(activity)}
+					{formatActivityChip(activityStore.nameOf(activity), activity)}
 				</span>
 			{/each}
 			{#if activities.length > 3}

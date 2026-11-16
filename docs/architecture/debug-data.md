@@ -19,7 +19,7 @@ A chart with three days of data tells you little about a chart with a year of da
 | Data            | What you get                                                                 |
 | --------------- | ---------------------------------------------------------------------------- |
 | Sessions        | Workout sessions on most training days of the last 180 days                  |
-| Activities      | Activities on other days, some days with two                                 |
+| Activities      | Activities on other days, some days with two, and Mowing on three Saturdays  |
 | Habit logs      | Values for the five built-in habits and Mood, across the 180 days            |
 | Health readings | A weight that trends down from about 165 to 155, and blood-pressure readings |
 | Baselines       | "Daily 10" and "Bike ride", each with its metrics and daily entries          |
@@ -28,6 +28,7 @@ A chart with three days of data tells you little about a chart with a year of da
 ## Rules
 
 - It keeps your data. It adds records and deletes none.
+- Its activities are written in the old shape, with no type id and Other "Mowing" for the custom name. The reload gives them their types, as the [schema upgrades](schema-upgrades.md) page tells, so the debug data also tests the upgrade.
 - It does not turn on a tracker. Data of a tracker that is off stays hidden, and the confirmation lists the trackers that are off.
 - It takes over the active plan, because one plan is active at a time. It pauses any goal that was running, makes its own plan the active one, and then reloads the app.
 

@@ -44,6 +44,10 @@ A gym machine shows its frame, its labels, and its plates. The app does the same
 
 The colour tells you where you are without a word. Blue is also the accent of the app. Charts use the same colours: a workout chart is blue and a health chart is yellow. A habit is different: its tile and its charts use the colour of that habit, which you set in Settings → Habits.
 
+## The star and the app icons
+
+The [Mascot](mascot.md) is a pixel star in the yellow of Health. The app icon, the favicon, and the Overview header all come from one pixel map in the code: `npm run icons` draws the icon files from it, so they cannot drift apart. The star is drawn with square pixels at a whole number of screen pixels each, so it stays sharp at every size.
+
 ## Type
 
 Two fonts ship inside the app, so it makes no network request for them. Unbounded, in heavy weights and capitals, sets titles and big figures. JetBrains Mono sets labels, codes, data, and body text.

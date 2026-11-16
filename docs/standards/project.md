@@ -28,6 +28,7 @@ This page holds the facts about the project that a contributor or a tool must kn
 | Type check          | `npm run check`                                                                                                           |
 | Lint and format     | `npm run lint` (writes fixes), `npm run format`                                                                           |
 | Docs check          | `npm run docs:links` — links, anchors, page parts, and settings coverage. It fails on an error                            |
+| App icons           | `npm run icons` — draws the icon files in `static/` from the Mascot's pixel maps. Run it after a change to the star       |
 | Inspect data        | Browser tools → Application → IndexedDB → `cosmic-workout`; localStorage keys start with `cwout:`                         |
 | Docs root           | `docs/`                                                                                                                   |
 | Wiki pages          | `docs/README.md`, `docs/vision.md`, `docs/principles.md`, `docs/glossary.md`, `docs/architecture/`, `docs/standards/`     |

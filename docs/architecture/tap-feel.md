@@ -46,11 +46,11 @@ When you hold a plus or minus button, it waits 420 ms, and then repeats faster a
 
 ## Moments that need more
 
-When an exercise is done, a stamp lands, and the blue plate behind the list slides down to the next exercise. When the session is done, five coloured bars sweep the screen and the totals count up. A figure that changes rolls up when it grows and down when it shrinks.
+When an exercise is done, a stamp lands, and the blue plate behind the list slides down to the next exercise. When the session is done, five coloured bars sweep the screen, the totals count up, and the [Mascot](mascot.md) dances. A habit at its goal brings the star up to hop. A figure that changes rolls up when it grows and down when it shrinks.
 
 ## Reduced motion
 
-When your device asks for reduced motion, the press motion, the page transitions, and the count-ups do not run, and each CSS animation ends at once. Haptics and sound still follow their switches.
+When your device asks for reduced motion, the press motion, the page transitions, the count-ups, and every move of the star do not run, and each CSS animation ends at once. Haptics and sound still follow their switches.
 
 ### Example
 

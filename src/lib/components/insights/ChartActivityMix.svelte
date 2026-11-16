@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { SvelteMap } from 'svelte/reactivity';
 	import { defineChart } from '@tanstack/charts';
 	import { pie, polar, radialArc } from '@tanstack/charts/polar';
 	import { Chart } from '@tanstack/charts/svelte';
 	import { activityStore } from '$lib/stores/activities.svelte';
 	import { ACTIVITY_PALETTE } from '$lib/chart-utils';
 	import { chartTooltip } from '$lib/charts/theme';
+	import { countByType } from '$lib/activityTypes';
 
 	let { dates, rangeLabel }: { dates: string[]; rangeLabel: string } = $props();
 
@@ -13,19 +13,14 @@
 
 	let breakdown = $derived.by<Slice[]>(() => {
 		if (dates.length === 0) return [];
-		const dateSet = new Set(dates);
-		const counts = new SvelteMap<string, number>();
-		for (const a of activityStore.activities) {
-			if (!dateSet.has(a.date)) continue;
-			counts.set(a.type, (counts.get(a.type) ?? 0) + 1);
-		}
-		return [...counts.entries()]
-			.sort((a, b) => b[1] - a[1])
-			.map(([type, count], i) => ({
-				type,
+		// One slice per visible type, labelled with its name (US-061 4, US-063 2a).
+		return countByType(activityStore.types, activityStore.activities, new Set(dates)).map(
+			({ name, count }, i) => ({
+				type: name,
 				count,
 				color: ACTIVITY_PALETTE[i % ACTIVITY_PALETTE.length],
-			}));
+			}),
+		);
 	});
 
 	let total = $derived(breakdown.reduce((s, a) => s + a.count, 0));
@@ -128,7 +123,6 @@
 
 	.activity-mix__name {
 		flex: 1;
-		text-transform: capitalize;
 	}
 
 	.activity-mix__count {

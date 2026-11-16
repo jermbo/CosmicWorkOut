@@ -35,9 +35,9 @@ The transfer is **one-way**. Nothing travels back from the receiver, so the send
 
 ## Scopes
 
-| Scope                | Sent                                                           | Receiver                                                                                                              |
-| -------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Recent** (default) | Records dated inside a window, plus every user-made definition | Replaces its own records inside the window; upserts definitions; nothing outside the window changes                   |
+| Scope                | Sent                                                           | Receiver                                                                                                                 |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Recent** (default) | Records dated inside a window, plus every user-made definition | Replaces its own records inside the window; upserts definitions; nothing outside the window changes                      |
 | **Everything**       | The full Phase 1 envelope                                      | Same as file restore — staged replace of all data ([US-028](../../features/v1.7.0/US-028-data-export-backup.md#restore)) |
 
 ### Recent — replace the window

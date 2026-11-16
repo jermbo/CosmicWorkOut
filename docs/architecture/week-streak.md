@@ -1,43 +1,51 @@
 ---
-name: Week streak
-description: 'How the Overview counts your week streak: the weeks in a row that each have at least one session, and why the current week cannot break it.'
+name: Streaks
+description: 'How the Overview counts one streak for each tracker: the days or weeks in a row with a record, and why the current day or week cannot break it.'
 altitude: mechanism
 tags:
-  - workout
+  - overview
   - streak
 parent: overview-screen.md
 ---
 
-[Wiki](../README.md) / [Overview screen](overview-screen.md) / Week streak
+[Wiki](../README.md) / [Overview screen](overview-screen.md) / Streaks
 
-# Week streak
+# Streaks
 
-A streak rewards you for coming back. The badge in the Overview header shows how many weeks in a row you trained. This page tells how the app counts it.
+A streak rewards you for coming back. Each tracker has its own, so a day of water and mood counts as much as a week of workouts. This page tells how the app counts them. The page keeps its old address, `week-streak.md`, so old links still work.
 
-## What counts as a week
+## One streak for each tracker
 
-A week is an ISO week: Monday to Sunday. A week counts when it has at least one session of any plan. The number of sessions that a plan asks for does not matter here. So a week with one session keeps the streak.
+| Tracker   | Badge | Unit | A day or week counts with            |
+| --------- | ----- | ---- | ------------------------------------ |
+| Workout   | `T`   | Week | One session of any plan              |
+| Habits    | `H`   | Day  | One log of any habit, Mood included  |
+| Activity  | `A`   | Week | One activity                         |
+| Health    | `P`   | Week | One weight or blood-pressure reading |
+| Baselines | `B`   | Day  | One entry toward any baseline        |
+
+A week is an ISO week: Monday to Sunday. A habit log counts when its value is above 0, because a yes/no habit that you toggle back off keeps a log of 0. Mood counts at any value, since its scale holds 0 and below. Nothing is stored: each streak is counted from the records on each view.
 
 ## How the count runs
 
-1. Look at the current week. If it has a session, add one.
-2. Go back one week.
-3. While that week has a session, add one and go back one more week.
-4. Stop at the first week with no session.
+1. Look at the current day or week. If it has a record, add one.
+2. Go back one day or week.
+3. While that one has a record, add one and go back one more.
+4. Stop at the first full past day or week with no record.
 
-## Why the current week cannot break the streak
+## Why the current one cannot break it
 
-On Monday morning you have not trained yet this week. If an empty current week broke the streak, every streak would fall to zero each Monday. So step 1 only adds; it never stops the count. The streak breaks only when a full week in the past has no session.
+On Monday morning you have not trained yet this week. If an empty current week broke the streak, every week streak would fall to zero each Monday, and every day streak each morning. So step 1 only adds; it never stops the count.
 
 ### Example
 
-You trained in the weeks of Monday 12 October, 19 October, and 26 October. Today is Tuesday 3 November, and you have not trained yet this week. Step 1 adds nothing. Steps 2 and 3 find three weeks in a row, so the badge shows 3. You train today, and the badge shows 4. If you had skipped the week of 19 October, the badge would show 1.
+You trained in the weeks of 12 October and 26 October, but not the week of 19 October. Today is Tuesday 3 November, and you have not trained this week. Step 1 adds nothing; step 2 finds the week of 26 October, and step 3 stops at the empty week of 19 October. The Workout badge reads `T 1W`. For Habits, you logged on each of the last 12 days but not yet today: the badge reads `H 12D`, and after you log Water it reads `H 13D`.
 
-## Where the streak shows
+## The badges
 
-The badge shows only while Workout is on, because the sessions belong to Workout. A session on a past day counts in its own week, so a session that you add later for last week can mend a gap.
+The Overview header shows one badge for each tracker that is on, in its colour, read as the code, the count, and D or W. A badge at 0 is empty, as the [design system](design-system.md) draws empty: stripes and a dashed border, `A 0`. Tap a badge, and the [Mascot](mascot.md) tells you about that streak. No other screen shows the badges.
 
 ## Further reading
 
+- [Feature toggles](feature-toggles.md): a badge shows only while its tracker is on.
 - [Session lifecycle](session-lifecycle.md): when a session is stored and gets its date.
-- [Insights](insights.md): the All Habits chart for a longer view of gaps.

@@ -31,6 +31,8 @@ A bar at the top picks the date range: This week, Last 7d, MTD (month to date), 
 
 Health Summary is one card for both health metrics, with three views of blood pressure. The [Health card](health-card.md) page tells how it works.
 
+Activity Mix has one slice for each of your activity types, named after it, so Mowing is its own slice and not part of Other. A hidden type has no slice; its entries still count everywhere else. The [Activity log](activity-log.md) page tells how the list of types is made.
+
 These six charts are the ones that use showed to be helpful; trial charts that did not help were removed. A chart can carry an "Experimental" label while it is on trial, and none does now.
 
 ## Hide a chart

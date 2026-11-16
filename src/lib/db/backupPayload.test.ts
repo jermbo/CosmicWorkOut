@@ -24,14 +24,16 @@ import {
 	datedCounts,
 	dropLegacyBaselines,
 	expectedCounts,
+	fillActivityTypes,
 	localEntriesOf,
 	parseBackup,
+	restoreWarnings,
 	scopeEnvelope,
 	scopeOf,
 	toPlainEnvelope,
 } from './backupPayload.ts';
 import type { BackupEnvelope } from './backupPayload.ts';
-import type { Habit, Item, Session } from './types.ts';
+import type { ActivityLog, Habit, Item, Session } from './types.ts';
 
 const item: Item = {
 	id: 'ex-bench',
@@ -451,4 +453,60 @@ test('datedCounts counts each dated store', () => {
 	assert.equal(counts.sessions, 3);
 	assert.equal(counts.habitLogs, 2);
 	assert.equal(counts.baselineLogs, 0);
+});
+
+// ── Activity types (US-062) ───────────────────────────────────────────
+
+function oldMowing(id: string, customType: string): ActivityLog {
+	return {
+		id,
+		date: '2026-09-06',
+		typeId: '',
+		type: 'Other',
+		customType,
+		durationMinutes: 60,
+		intensity: 'Moderate',
+		createdAt: `2026-09-06T0${id}:00:00.000Z`,
+	};
+}
+
+test('a list of activity types round-trips through the payload', () => {
+	const types = [
+		{ id: 'activity-type-stretching', name: 'Stretching', createdAt: '2026-11-01' },
+		{ id: 'm', name: 'Mowing', hidden: true, createdAt: '2026-11-01' },
+	];
+	const activities: ActivityLog[] = [{ ...oldMowing('1', 'Mowing'), typeId: 'm' }];
+	const parsed = parseBackup(
+		JSON.stringify(envelope({ db: { ...envelope().db, activities, activityTypes: types } })),
+	);
+	assert.equal(
+		fillActivityTypes(parsed, () => 'new', '2026-11-16'),
+		false,
+	);
+	assert.deepEqual(parsed.db.activityTypes, types);
+	assert.deepEqual(parsed.db.activities, activities);
+});
+
+test('a backup with no list gets one built from its activities', () => {
+	const env = envelope({
+		db: { ...envelope().db, activities: [oldMowing('1', 'Mowing'), oldMowing('2', 'mowing ')] },
+	});
+	let n = 0;
+	assert.equal(
+		fillActivityTypes(env, () => `t${++n}`, '2026-11-16'),
+		true,
+	);
+	assert.deepEqual(
+		env.db.activityTypes?.map((t) => t.name),
+		['Stretching', 'Cardio', 'Mowing'],
+	);
+	assert.deepEqual(
+		env.db.activities.map((a) => a.typeId),
+		['t1', 't1'],
+	);
+});
+
+test('a backup with no list does not warn that activity types are removed', () => {
+	const env = envelope();
+	assert.deepEqual(restoreWarnings(env), []);
 });

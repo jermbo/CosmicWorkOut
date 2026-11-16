@@ -14,7 +14,11 @@ export const STRENGTH_CATS = [
 export type ItemCat = (typeof STRENGTH_CATS)[number];
 export type ExerciseType = 'compound' | 'isolation' | 'dynamic' | 'isometric';
 export type CatalogDifficulty = 'beginner' | 'intermediate' | 'advanced';
-export type ActivityType =
+/**
+ * The fixed activity types before v1.13.0 (US-061). Kept only to type the old `type`
+ * field that stays, unread, on entries logged before the upgrade.
+ */
+export type LegacyActivityType =
 	| 'Run'
 	| 'Walk'
 	| 'Bike'
@@ -192,6 +196,8 @@ export interface UserPrefs {
 	hiddenCharts: string[];
 	/** Blood-pressure view on the Health card (v1.13.0, US-060). */
 	healthChartView: HealthChartView;
+	/** The Mascot's welcome and celebrations (v1.13.0, US-067). Default on; the image stays. */
+	mascotMotion: boolean;
 }
 
 export type HealthChartView = 'readings' | 'trend' | 'log';
@@ -231,10 +237,23 @@ export interface ActiveSession {
 	originalDurationSeconds?: number;
 }
 
+/** One entry of the user's own list of activity types (US-061). */
+export interface ActivityType {
+	id: string;
+	name: string;
+	/** Hidden types leave the picker and Activity Mix; their entries stay (US-063). */
+	hidden?: boolean;
+	createdAt: string;
+}
+
 export interface ActivityLog {
 	id: string;
 	date: string;
-	type: ActivityType;
+	/** The id of its ActivityType (US-061). Missing only on entries not yet upgraded. */
+	typeId: string;
+	/** Before v1.13.0: the fixed type. Kept on old entries, read only by the upgrade. */
+	type?: LegacyActivityType;
+	/** Before v1.13.0: the name typed with Other. Kept on old entries, read only by the upgrade. */
 	customType?: string;
 	durationMinutes: number;
 	intensity: ActivityIntensity;

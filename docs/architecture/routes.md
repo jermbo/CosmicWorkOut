@@ -33,20 +33,21 @@ This page is the contract for each address in the app. A screen that needs a tog
 
 No Settings screen needs a toggle, because the feature pages hold the switches.
 
-| Address                     | Screen                                                        |
-| --------------------------- | ------------------------------------------------------------- |
-| `/settings`                 | The hub: one row for each feature and each app area           |
-| `/settings/habits`          | Habits switch; make, edit, order, colour habits; Mood colours |
-| `/settings/baselines`       | Baselines switch; make and edit baselines                     |
-| `/settings/workout`         | Workout switch                                                |
-| `/settings/activity`        | Activity log switch                                           |
-| `/settings/health`          | Health metrics switch                                         |
-| `/settings/insights`        | Show or hide each chart                                       |
-| `/settings/personalization` | Weight unit, density, haptics, sound, Overview card order     |
-| `/settings/overview`        | Overview card order. Kept for old links                       |
-| `/settings/data`            | Export, restore, QR backup, clear rows, debug data            |
-| `/settings/data/send`       | Send a backup by QR                                           |
-| `/settings/data/receive`    | Receive a backup by QR                                        |
+| Address                            | Screen                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------ |
+| `/settings`                        | The hub: one row for each feature and each app area                      |
+| `/settings/habits`                 | Habits switch; make, edit, order, colour habits; Mood colours            |
+| `/settings/baselines`              | Baselines switch; make and edit baselines                                |
+| `/settings/workout`                | Workout switch                                                           |
+| `/settings/activity`               | Activity log switch                                                      |
+| `/settings/health`                 | Health metrics switch                                                    |
+| `/settings/insights`               | Show or hide each chart                                                  |
+| `/settings/personalization`        | Weight unit, density, haptics, sound, Mascot motion, Overview card order |
+| `/settings/personalization/mascot` | The Mascot gallery: each move of the star on a loop                      |
+| `/settings/overview`               | Overview card order. Kept for old links                                  |
+| `/settings/data`                   | Export, restore, QR backup, clear rows, debug data                       |
+| `/settings/data/send`              | Send a backup by QR                                                      |
+| `/settings/data/receive`           | Receive a backup by QR                                                   |
 
 ## Rules for routes
 

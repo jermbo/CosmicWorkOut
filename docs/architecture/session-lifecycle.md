@@ -38,7 +38,7 @@ Each set that you log is saved at once, so the stored copy always matches the sc
 
 ## Finish
 
-The footer button says **Finish session** when every set is done, and **Finish early · 9/12 sets** when some are not. It asks no question. The app stores only the completed sets, with the duration, the total sets, and the volume — the sum of weight × reps. Then it removes the copy in progress and shows the result screen.
+The footer button says **Finish session** when every set is done, and **Finish early · 9/12 sets** when some are not. It asks no question. The app stores only the completed sets, with the duration, the total sets, and the volume — the sum of weight × reps. Then it removes the copy in progress and shows the result screen. On it, five bars sweep the screen, and then the [Mascot](mascot.md) dances once above the totals, while the totals and the button stay usable. With Mascot motion off or reduced motion, a check mark shows in place of the star.
 
 ## End without saving
 

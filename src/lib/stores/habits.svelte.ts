@@ -4,6 +4,8 @@ import { generateId } from '$lib/utils';
 import { todayIso } from '$lib/date';
 import { isHabitComplete, habitProgressPct } from '$lib/habits';
 import { nextDefaultColor, withDefaultColors } from '$lib/habitColors';
+import { reachesDailyGoal } from '$lib/mascot/celebrate';
+import { mascotStore } from './mascot.svelte';
 
 const TODAY_KEY = 'cwout:habitDay';
 
@@ -140,9 +142,12 @@ class HabitStore {
 	async logValue(habitId: string, value: number, date?: string): Promise<void> {
 		const d = date ?? this.todayStr();
 		const logId = `${habitId}:${d}`;
+		const before = this.logs.find((l) => l.id === logId)?.value ?? 0;
 		const entry: HabitLog = { id: logId, habitId, date: d, value };
 		await db.habitLogs.put(entry);
 		this.logs = [...this.logs.filter((l) => l.id !== logId), entry];
+		const habit = this.habits.find((h) => h.id === habitId);
+		if (habit && reachesDailyGoal(habit, before, value)) mascotStore.celebrateHabitGoal();
 	}
 
 	async increment(habitId: string, date?: string): Promise<void> {
