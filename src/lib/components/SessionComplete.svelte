@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { formatDuration, formatVolume } from '$lib/format';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { formatDuration, formatVolume } from '#lib/format';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import { onMount } from 'svelte';
-	import { feedback } from '$lib/feedback';
+	import { MediaQuery } from 'svelte/reactivity';
+	import { feedback } from '#lib/feedback';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { planGoalReached } from '#lib/goalPlans/goalReached';
 	import BottomSheet from './BottomSheet.svelte';
 	import CountUp from './CountUp.svelte';
+	import Mascot from './Mascot.svelte';
 
 	function handleBackToToday() {
 		sessionStore.dismissComplete();
@@ -15,7 +19,34 @@
 	let totalSets = $derived(session?.items.reduce((sum, ex) => sum + ex.sets.length, 0) ?? 0);
 	let itemsCompleted = $derived(session?.items.length ?? 0);
 
-	onMount(() => feedback('win'));
+	/** The session in which the focus lift is logged at the goal weight × reps (US-068 2). */
+	let goalReached = $derived(
+		session ? planGoalReached(session, goalPlanStore.planForProgram(session.programId)) : false,
+	);
+
+	const reducedMotion = new MediaQuery('prefers-reduced-motion: reduce');
+
+	/**
+	 * A session done and a plan goal reached both bring the star, dancing above the
+	 * totals (US-068 1, 2; decision 15, open to change after use). With Mascot motion off
+	 * or reduced motion, the check mark shows as before (US-068 4b).
+	 */
+	const celebrate = prefsStore.mascotMotion && !reducedMotion.current;
+	let mascot: ReturnType<typeof Mascot> | undefined = $state();
+
+	onMount(() => {
+		feedback('win');
+		if (!celebrate) return;
+		// After the bars have swept away, the star comes in (a way picked at random) and
+		// dances once. The buttons stay
+		// usable throughout.
+		const t = setTimeout(async () => {
+			const ways = ['runIn', 'hopIn', 'dashIn', 'dropIn'] as const;
+			await mascot?.play(ways[Math.floor(Math.random() * ways.length)]);
+			await mascot?.play('dance');
+		}, 750);
+		return () => clearTimeout(t);
+	});
 
 	/** One bar per domain field, swept across the screen in turn. */
 	const BURST = ['train', 'habit', 'base', 'health', 'active'] as const;
@@ -44,24 +75,34 @@
 				></span>
 			{/each}
 		</div>
-		<div
-			class="session-complete__graphic"
-			aria-hidden="true"
-		>
-			<div class="session-complete__circle">
-				<svg
-					viewBox="0 0 48 48"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="3.5"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					aria-hidden="true"
-				>
-					<polyline points="10 24 20 34 38 14" />
-				</svg>
+		{#if celebrate}
+			<div class="session-complete__star">
+				<Mascot
+					bind:this={mascot}
+					scale={5}
+					offstage
+				/>
 			</div>
-		</div>
+		{:else}
+			<div
+				class="session-complete__graphic"
+				aria-hidden="true"
+			>
+				<div class="session-complete__circle">
+					<svg
+						viewBox="0 0 48 48"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<polyline points="10 24 20 34 38 14" />
+					</svg>
+				</div>
+			</div>
+		{/if}
 
 		<div class="session-complete__text">
 			<p
@@ -76,7 +117,9 @@
 			>
 				Session logged.
 			</h2>
-			<p class="session-complete__subtitle">Nice work today.</p>
+			<p class="session-complete__subtitle">
+				{goalReached ? 'Goal reached. Nice work today.' : 'Nice work today.'}
+			</p>
 		</div>
 
 		{#if session}
@@ -218,6 +261,19 @@
 		block-size: 100%;
 		gap: var(--space-6);
 		padding-inline: var(--space-8);
+	}
+
+	/*
+	 * The star comes in from the left edge of the sheet or from above, by whole star pixels (decision 13);
+	 * the clip spans the sheet's full width, and its jumps go up past it.
+	 */
+	.session-complete__star {
+		display: flex;
+		justify-content: center;
+		align-self: stretch;
+		margin-inline: calc(var(--space-8) * -1);
+		overflow-x: clip;
+		overflow-y: visible;
 	}
 
 	.session-complete__graphic {

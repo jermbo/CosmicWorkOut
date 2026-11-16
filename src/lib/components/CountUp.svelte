@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { prefersReducedMotion } from '$lib/feedback';
+	import { prefersReducedMotion } from '#lib/feedback';
 
 	let {
 		value,

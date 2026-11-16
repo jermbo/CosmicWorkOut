@@ -1,4 +1,4 @@
-import type { Program, Routine, Session } from '$lib/db/types';
+import type { Program, Routine, Session } from '#lib/db/types';
 
 /**
  * What the Overview Workout card shows. With one active plan enforced

@@ -1,7 +1,7 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import { goto } from '$app/navigation';
-	import { resolveHref } from '$lib/navigation';
+	import { resolveHref } from '#lib/navigation';
 
 	type Props = {
 		title: string;

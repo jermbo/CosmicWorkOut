@@ -1,17 +1,18 @@
 <!--
-	Settings → Personalization (US-046): weight unit, density, haptics and sound (v1.12.0),
+	Settings → Personalization (US-046): weight unit, density, haptics and sound (v1.12.0), Mascot motion (v1.13.0),
 	and Overview card order.
 	Appearance, accent color, and roundness were removed in v1.12.0 — the app is dark only
 	with fixed per-domain colors (docs/architecture/design-system.md).
 -->
 <script lang="ts">
-	import type { Density } from '$lib/db/types';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import OverviewLayoutEditor from '$lib/components/OverviewLayoutEditor.svelte';
-	import SegmentedControl from '$lib/components/SegmentedControl.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
-	import { canVibrate, feedback } from '$lib/feedback';
+	import type { Density } from '#lib/db/types';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import OverviewLayoutEditor from '#lib/components/OverviewLayoutEditor.svelte';
+	import SegmentedControl from '#lib/components/SegmentedControl.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
+	import SettingsRow from '#lib/components/SettingsRow.svelte';
+	import { canVibrate, feedback } from '#lib/feedback';
 
 	// Only offer haptics where the browser can actually vibrate.
 	const vibrationSupported = canVibrate();
@@ -102,6 +103,17 @@
 					prefsStore.setSoundEnabled(on);
 					if (on) feedback('success');
 				}}
+			/>
+			<SettingsToggleRow
+				label="Mascot motion"
+				description="The star waves hello each morning and celebrates your wins. The star stays when off."
+				checked={prefsStore.mascotMotion}
+				onchange={(on) => prefsStore.setMascotMotion(on)}
+			/>
+			<SettingsRow
+				href="/settings/personalization/mascot"
+				label="Mascot gallery"
+				detail="Every move"
 			/>
 		</div>
 	</section>

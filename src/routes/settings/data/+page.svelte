@@ -10,28 +10,28 @@
 		clearBaselinesData,
 		clearEverything,
 		loadDebugSeedData,
-	} from '$lib/db/database';
+	} from '#lib/db/database';
 	import {
 		downloadBackup,
 		parseBackup,
 		importBackup,
 		assertBackupSize,
 		BackupValidationError,
-	} from '$lib/db/backup';
+	} from '#lib/db/backup';
 	import { onMount } from 'svelte';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { toastStore } from '$lib/stores/toast.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsActionRow from '$lib/components/SettingsActionRow.svelte';
-	import SettingsRow from '$lib/components/SettingsRow.svelte';
-	import { lastQrBackupDate } from '$lib/qrBackup/sendPrefs';
-	import { restoreWarnings } from '$lib/db/backupPayload';
-	import { requestPersistentStorage } from '$lib/db/persistence';
-	import { formatShortDate } from '$lib/date';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { toastStore } from '#lib/stores/toast.svelte';
+	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsActionRow from '#lib/components/SettingsActionRow.svelte';
+	import SettingsRow from '#lib/components/SettingsRow.svelte';
+	import { lastQrBackupDate } from '#lib/qrBackup/sendPrefs';
+	import { restoreWarnings } from '#lib/db/backupPayload';
+	import { requestPersistentStorage } from '#lib/db/persistence';
+	import { formatShortDate } from '#lib/date';
 
 	type ClearAction =
 		| 'exercises'

@@ -1,4 +1,4 @@
-import { todayIso } from '$lib/date';
+import { todayIso } from '#lib/date';
 
 class LoggingContextStore {
 	date = $state(todayIso());

@@ -1,19 +1,27 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference lib="webworker" />
-import { build, files, version } from '$service-worker';
-
-declare const self: ServiceWorkerGlobalScope;
+import { version } from '$app/env';
+import { assets, immutable } from '$app/manifest';
+import { resolve } from '$app/paths';
+import { self } from '$app/service-worker';
 
 // Unique cache name per deploy — `version` changes on every build, so a new
 // service worker activates and evicts the previous shell automatically.
 const CACHE = `cwout-cache-${version}`;
 
 // SPA shell entry — `/` only; dev has no `/index.html` file (static build does).
-const SHELL = ['/'];
-const PRECACHE = [...build, ...files, ...SHELL];
+const SHELL = [resolve('/')];
+
+// `immutable`/`assets` paths are relative to the base path — resolve them to
+// absolute pathnames that match `url.pathname` in the fetch handler.
+const PRECACHE = [
+	...immutable.map((entry) => resolve(entry.path)),
+	...assets.map((entry) => resolve(entry.path)),
+	...SHELL,
+];
 
 async function serveShell(cache: Cache): Promise<Response | undefined> {
-	return (await cache.match('/')) ?? (await cache.match('/index.html')) ?? undefined;
+	return (await cache.match(SHELL[0]!)) ?? (await cache.match('/index.html')) ?? undefined;
 }
 
 self.addEventListener('install', (event) => {

@@ -28,15 +28,18 @@ This page is the contract for the records of the four daily trackers. Each date 
 
 A habit log has the key `<habitId>:<date>`, the `habitId`, the `date`, and one `value`: 0 or 1 for `boolean`, −5 to +5 for `mood`, and a count for the rest.
 
-## Activity
+## Activity and activity type
 
-| Field             | Rule                                                                                            |
-| ----------------- | ----------------------------------------------------------------------------------------------- |
-| `type`            | Run, Walk, Bike, Swim, Hike, Pickleball, Tennis, Basketball, Yoga, Stretching, Cardio, or Other |
-| `customType`      | The name that you type when the type is Other                                                   |
-| `durationMinutes` | A whole number of minutes                                                                       |
-| `intensity`       | Easy, Moderate, or Hard                                                                         |
-| `date`            | The logging date                                                                                |
+| Field             | Rule                                                                                         |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `typeId`          | The id of its activity type (v1.13.0)                                                        |
+| `durationMinutes` | A whole number of minutes                                                                    |
+| `intensity`       | Easy, Moderate, or Hard                                                                      |
+| `date`            | The logging date                                                                             |
+| `type`            | Before v1.13.0 only: the fixed type, such as `Run` or `Other`. Kept on old entries, unread   |
+| `customType`      | Before v1.13.0 only: the name typed with Other. Kept on old entries, read only by an upgrade |
+
+An activity type has an `id`, a `name`, a `createdAt` time, and `hidden`, which is true for a type that you hid. Names are unique in any mix of capital letters, and the end spaces do not count: `Mowing` and `mowing ` are one type. The starter types have fixed ids, `activity-type-stretching` and `activity-type-cardio`; a type that you add gets a new id.
 
 ## Health reading
 

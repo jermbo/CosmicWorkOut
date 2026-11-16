@@ -57,6 +57,10 @@ A goal uses the same count as every plan, as [next routine](next-routine.md) tel
 
 When a block was too hard, you can repeat it. The app does not delete sessions. It stores an offset, so the count of the plan starts again at week 1 of the current block, and it adds four weeks to the plan. When a plan with a goal ends, **Run it again** repeats its last block in the same way.
 
+## When the goal is reached
+
+A goal counts as reached in the session in which you log the focus lift at the goal weight and the goal reps, or more: with a goal of 185 × 5, a set of 185 × 5 or 190 × 5 reaches it, and 185 × 4 does not. A weight logged as text, such as `BW`, never reaches it. Its result screen says "Goal reached", and the [Mascot](mascot.md) dances, as it does for every finished session.
+
 ## Further reading
 
 - [Workout records](workout-records.md): the fields of a goal and its blocks.

@@ -40,13 +40,15 @@ flowchart TD
 4. **Commit.** Only now does it clear the live stores and write the backup into them, and count again. If this fails, it tries once more from the same prepared data. If that fails too, it keeps the staging database and tells you to import the same file again.
 5. **Finish.** It removes the session in progress, writes the backup's localStorage keys, and writes the built-in content again. Then the app reloads.
 
+The steps 3 and 4 live in `src/lib/db/restore.ts`, which takes the databases as an argument; `backup.ts` passes the real ones. `restore.test.ts` runs the steps against a fake that fails a write or loses a row, and checks that live data is never cleared before staging passes.
+
 ## Why two databases
 
 The staging step proves that every record can be stored — the right shape, nothing that the database rejects — before any data is lost. The risk moves from "your data is gone" to "the restore did not start".
 
 ## Old backups
 
-A backup from an older version restores, with two rules. A store that the backup does not have ends up empty, and the warning in step 2 says so. Baselines of the oldest shape cannot be read, so the restore skips them and restores the rest.
+A backup from an older version restores, with three rules. A store that the backup does not have ends up empty, and step 2 warns of it. Baselines of the oldest shape are skipped. A backup with no list of activity types gets one built from its activities, by the rules of the [schema upgrade](schema-upgrades.md), with no warning, since nothing is lost.
 
 ### Example
 
@@ -55,4 +57,3 @@ You restore a file with 412 sessions. The staging database receives 412 sessions
 ## Further reading
 
 - [QR backup](qr-backup.md): the same backup, carried by QR codes.
-- [Schema upgrades](schema-upgrades.md): why built-in content is written again after a restore.

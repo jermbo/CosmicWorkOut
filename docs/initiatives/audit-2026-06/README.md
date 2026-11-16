@@ -236,7 +236,7 @@ above stay readable as the snapshot they were.
   components, each owning its scoped CSS. `app.css` is unchanged and stays global-only.
   Component CSS: **10,604 → 9,782 lines**; rule bodies duplicated 4+ times: **20 → 2 groups**.
 - **`LibrarySheet`** replaces `ItemLibrarySheet` + `ExerciseLibrarySheet` (~40% identical),
-  driven by a per-Discipline config in `$lib/itemLibrary.ts`.
+  driven by a per-Discipline config in `#lib/itemLibrary.ts`.
 - **Backup restore is under test** — the pure payload path (validation, count
   verification, proxy stripping, pre-wipe preflight) moved to `db/backupPayload.ts` with
   21 unit tests. Restore is the one failure a user cannot recover from.

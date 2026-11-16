@@ -4,14 +4,16 @@ import type {
 	Session,
 	ItemLastUsed,
 	ActivityLog,
+	ActivityType,
 	Habit,
 	HabitLog,
 	HealthReading,
 	Baseline,
 	BaselineLog,
 } from './types';
-import type { GoalPlan } from '$lib/goalPlans/types';
+import type { GoalPlan } from '#lib/goalPlans/types';
 import { isLegacyBaseline } from '../baselines/logic.ts';
+import { assignTypeIds, starterTypes } from '../activityTypes.ts';
 
 /**
  * The pure half of backup/restore: the envelope shape, its validation, and the
@@ -43,6 +45,7 @@ export const DEVICE_ONLY_KEYS = [
 	'cwout:lastQrBackupAt', // when this device last sent a QR backup
 	'cwout:qrSendOptions', // this device's QR density and speed
 	'cwout:qrReceived', // sessionStorage flag for one toast after reload
+	'cwout:lastWelcome', // the date the Mascot last welcomed you on this device (US-067)
 ] as const;
 
 export interface BackupDb {
@@ -51,6 +54,8 @@ export interface BackupDb {
 	sessions: Session[];
 	itemLastUsed: ItemLastUsed[];
 	activities: ActivityLog[];
+	/** Absent in pre-v1.13.0 backups; restore builds it from the activities (US-062). */
+	activityTypes?: ActivityType[];
 	habits: Habit[];
 	habitLogs: HabitLog[];
 	healthReadings: HealthReading[];
@@ -84,6 +89,7 @@ export const DB_STORES: (keyof BackupDb)[] = [
 	'sessions',
 	'itemLastUsed',
 	'activities',
+	'activityTypes',
 	'habits',
 	'habitLogs',
 	'healthReadings',
@@ -98,6 +104,7 @@ export const STORE_KEY_PATH: Record<keyof BackupDb, string> = {
 	sessions: 'id',
 	itemLastUsed: 'itemId',
 	activities: 'id',
+	activityTypes: 'id',
 	habits: 'id',
 	habitLogs: 'id',
 	healthReadings: 'id',
@@ -229,6 +236,7 @@ export const STORE_LABELS: Record<keyof BackupDb, string> = {
 	sessions: 'workout sessions',
 	itemLastUsed: 'weight memory',
 	activities: 'activities',
+	activityTypes: 'activity types',
 	habits: 'habits',
 	habitLogs: 'habit logs',
 	healthReadings: 'health readings',
@@ -240,9 +248,29 @@ export const STORE_LABELS: Record<keyof BackupDb, string> = {
 /**
  * Stores a backup doesn't carry at all — it was made before they existed (a v1.8.0 file
  * has no plan goals or baselines). Restore replaces everything, so these end up empty.
+ * The list of activity types is left out: restore builds it (`fillActivityTypes`).
  */
 export function missingStores(plain: BackupEnvelope): (keyof BackupDb)[] {
-	return DB_STORES.filter((store) => plain.db[store] === undefined);
+	return DB_STORES.filter((store) => store !== 'activityTypes' && plain.db[store] === undefined);
+}
+
+/**
+ * A backup from before v1.13.0 has no list of activity types. Build it from its
+ * activities by the rules of the upgrade (US-062 1c, US-061 2), and give each activity
+ * its type id. A backup that has the list is left as it is. Returns true when built.
+ */
+export function fillActivityTypes(
+	plain: BackupEnvelope,
+	makeId: () => string,
+	now: string,
+): boolean {
+	if (Array.isArray(plain.db.activityTypes)) return false;
+	const activities = Array.isArray(plain.db.activities) ? plain.db.activities : [];
+	const { types, changedActivities } = assignTypeIds(starterTypes(now), activities, makeId, now);
+	const changed = new Map(changedActivities.map((a) => [a.id, a]));
+	plain.db.activityTypes = types;
+	plain.db.activities = activities.map((a) => changed.get(a.id) ?? a);
+	return true;
 }
 
 /**
@@ -281,6 +309,7 @@ export type DatedStore = (typeof DATED_STORES)[number];
 /** Stores a window backup adds to or updates, and never deletes from. */
 export const UPSERT_STORES = [
 	'items',
+	'activityTypes',
 	'programs',
 	'habits',
 	'goalPlans',

@@ -1,8 +1,8 @@
-// Week-boundary tests for the streak math. The audit flagged ISO week bucketing near
-// year ends as unverified — these pin it down. Dates are local calendar days.
+// The streak math (US-065): ISO week bucketing near year ends, and one streak for each
+// tracker, by day or by week. Dates are local calendar days.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isoWeekKey, computeWeekStreak } from './streak.ts';
+import { isoWeekKey, computeStreak, habitStreakDates } from './streak.ts';
 
 function day(iso: string): Date {
 	const [y, m, d] = iso.split('-').map(Number);
@@ -28,16 +28,76 @@ test('isoWeekKey ignores the time of day', () => {
 	assert.equal(isoWeekKey(late), isoWeekKey(day('2026-09-20')));
 });
 
-test('computeWeekStreak counts straight through a year boundary', () => {
+test('a week streak counts straight through a year boundary', () => {
 	const dates = ['2026-12-15', '2026-12-22', '2026-12-29', '2027-01-05'];
-	assert.equal(computeWeekStreak(dates, 1, day('2027-01-06')), 4);
+	assert.deepEqual(computeStreak(dates, 'week', day('2027-01-06')), {
+		count: 4,
+		currentCounts: true,
+	});
 });
 
-test('computeWeekStreak still counts last week when this week has no session yet', () => {
-	assert.equal(computeWeekStreak(['2026-09-14', '2026-09-07'], 1, day('2026-09-21')), 2);
+test('this week with no record yet does not break a week streak', () => {
+	// A weight reading in each of the last 3 weeks, none this week (US-065 AC 1d).
+	const dates = ['2026-10-27', '2026-11-04', '2026-11-12'];
+	assert.deepEqual(computeStreak(dates, 'week', day('2026-11-16')), {
+		count: 3,
+		currentCounts: false,
+	});
 });
 
-test('computeWeekStreak stops at a week below the threshold', () => {
-	const dates = ['2026-09-15', '2026-09-16', '2026-09-08', '2026-08-25', '2026-08-26'];
-	assert.equal(computeWeekStreak(dates, 2, day('2026-09-17')), 1);
+test('a week streak breaks at the first full past week with no record', () => {
+	// Sessions in the weeks of 12 and 26 October, none in the week of 19 October (AC 1e).
+	const dates = ['2026-10-13', '2026-10-27'];
+	assert.equal(computeStreak(dates, 'week', day('2026-11-03')).count, 1);
+});
+
+test('a day streak counts back from yesterday when today has no record', () => {
+	const dates = Array.from({ length: 12 }, (_, i) => `2026-11-${String(4 + i).padStart(2, '0')}`);
+	assert.deepEqual(computeStreak(dates, 'day', day('2026-11-16')), {
+		count: 12,
+		currentCounts: false,
+	});
+	// A log today adds one (AC 1b).
+	assert.deepEqual(computeStreak([...dates, '2026-11-16'], 'day', day('2026-11-16')), {
+		count: 13,
+		currentCounts: true,
+	});
+});
+
+test('a day streak breaks at a gap in the past', () => {
+	const dates = ['2026-11-15', '2026-11-14', '2026-11-12', '2026-11-11'];
+	assert.equal(computeStreak(dates, 'day', day('2026-11-16')).count, 2);
+});
+
+test('a day streak runs across a month end', () => {
+	const dates = ['2026-10-30', '2026-10-31', '2026-11-01'];
+	assert.equal(computeStreak(dates, 'day', day('2026-11-02')).count, 3);
+});
+
+test('no records gives 0', () => {
+	assert.deepEqual(computeStreak([], 'day', day('2026-11-16')), { count: 0, currentCounts: false });
+	assert.deepEqual(computeStreak([], 'week', day('2026-11-16')), {
+		count: 0,
+		currentCounts: false,
+	});
+});
+
+test('the time of day of today does not matter', () => {
+	const late = day('2026-11-16');
+	late.setHours(23, 59);
+	assert.equal(computeStreak(['2026-11-15'], 'day', late).count, 1);
+});
+
+test('Habits counts a Mood log of any value, and other habits above 0', () => {
+	const mood = new Set(['mood']);
+	const logs = [
+		{ habitId: 'mood', date: '2026-11-13', value: 0 },
+		{ habitId: 'mood', date: '2026-11-14', value: -3 },
+		{ habitId: 'mood', date: '2026-11-15', value: 2 },
+		{ habitId: 'water', date: '2026-11-12', value: 0 },
+	];
+	const dates = habitStreakDates(logs, mood);
+	assert.deepEqual(dates, ['2026-11-13', '2026-11-14', '2026-11-15']);
+	// Only Mood logs on the last 3 days reads "H 3D" (AC 1c).
+	assert.equal(computeStreak(dates, 'day', day('2026-11-16')).count, 3);
 });

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Item } from '$lib/db/types';
-	import type { LibraryConfig } from '$lib/itemLibrary';
-	import { programStore } from '$lib/stores/program.svelte';
+	import type { Item } from '#lib/db/types';
+	import type { LibraryConfig } from '#lib/itemLibrary';
+	import { programStore } from '#lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import ExerciseFormSheet from './ExerciseFormSheet.svelte';

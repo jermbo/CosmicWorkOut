@@ -16,17 +16,17 @@ Each clear row deletes one kind of data and keeps the rest. This page is the con
 
 ## The rows
 
-| Row              | Shows while  | Deletes                                                                                 | Keeps                                                                     |
-| ---------------- | ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Custom exercises | Workout      | Each item that is not built-in                                                          | Built-in items, sessions                                                  |
-| Custom programs  | Workout      | Each plan that is not built-in and has no goal                                          | Templates, plans with a goal, sessions, items                             |
-| Workout sessions | Workout      | `sessions`, `itemLastUsed`, the session in progress, the active plan                    | Plans, items, activities                                                  |
-| Activity log     | Activity log | `activities`                                                                            | Everything else                                                           |
-| Habits           | Habits       | `habits`, `habitLogs`                                                                   | Everything else. Built-in habits come back on the reload                  |
-| Health data      | Always       | `healthReadings`                                                                        | Everything else                                                           |
-| Plan goals       | Workout      | `goalPlans`, and the plan that each goal made; removes those plans from the active list | Sessions                                                                  |
-| Baselines        | Baselines    | `baselines`, `baselineLogs`                                                             | Everything else                                                           |
-| Clear everything | Always       | Every IndexedDB store, the session in progress, the active plan                         | Your settings in `cwout:prefs`. Built-in content comes back on the reload |
+| Row              | Shows while  | Deletes                                                                                  | Keeps                                                                     |
+| ---------------- | ------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Custom exercises | Workout      | Each item that is not built-in                                                           | Built-in items, sessions                                                  |
+| Custom programs  | Workout      | Each plan that is not built-in and has no goal                                           | Templates, plans with a goal, sessions, items                             |
+| Workout sessions | Workout      | `sessions`, `itemLastUsed`, the session in progress, the active plan                     | Plans, items, activities                                                  |
+| Activity log     | Activity log | `activities`, `activityTypes`, `cwout:lastActivityType`. The list resets to the starters | Everything else                                                           |
+| Habits           | Habits       | `habits`, `habitLogs`                                                                    | Everything else. Built-in habits come back on the reload                  |
+| Health data      | Always       | `healthReadings`                                                                         | Everything else                                                           |
+| Plan goals       | Workout      | `goalPlans`, and the plan that each goal made; removes those plans from the active list  | Sessions                                                                  |
+| Baselines        | Baselines    | `baselines`, `baselineLogs`                                                              | Everything else                                                           |
+| Clear everything | Always       | Every IndexedDB store, the session in progress, the active plan                          | Your settings in `cwout:prefs`. Built-in content comes back on the reload |
 
 ## Rules
 

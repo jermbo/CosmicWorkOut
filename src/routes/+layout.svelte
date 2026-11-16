@@ -2,22 +2,23 @@
 	import { page } from '$app/state';
 	import { onNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { installPress } from '$lib/feedback/press';
-	import { prefersReducedMotion } from '$lib/feedback';
+	import { installPress } from '#lib/feedback/press';
+	import { prefersReducedMotion } from '#lib/feedback';
 	import '../app.css';
-	import { initDB } from '$lib/db/database';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { sessionStore } from '$lib/stores/session.svelte';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { activityStore } from '$lib/stores/activities.svelte';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import BottomNav from '$lib/components/BottomNav.svelte';
-	import SessionOverlay from '$lib/components/SessionOverlay.svelte';
-	import SessionComplete from '$lib/components/SessionComplete.svelte';
-	import Toaster from '$lib/components/Toaster.svelte';
+	import { initDB } from '#lib/db/database';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { sessionStore } from '#lib/stores/session.svelte';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { activityStore } from '#lib/stores/activities.svelte';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import BottomNav from '#lib/components/BottomNav.svelte';
+	import MascotPeek from '#lib/components/MascotPeek.svelte';
+	import SessionOverlay from '#lib/components/SessionOverlay.svelte';
+	import SessionComplete from '#lib/components/SessionComplete.svelte';
+	import Toaster from '#lib/components/Toaster.svelte';
 
 	let { children } = $props();
 
@@ -105,6 +106,7 @@
 		</main>
 
 		<BottomNav pathname={page.url.pathname} />
+		<MascotPeek />
 
 		{#if prefsStore.practiceEnabled}
 			{#if sessionStore.isActive}

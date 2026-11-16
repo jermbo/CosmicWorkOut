@@ -3,10 +3,10 @@
 	import { defineChart, lineY, ruleY } from '@tanstack/charts';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { scalePoint } from '@tanstack/charts/scales/point';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
-	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '$lib/charts/theme';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
+	import { chartGrid, PLOT_MARGIN, chartTooltip, longDate, shortDate } from '#lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -57,7 +57,7 @@
 		return defineChart({
 			marks: [
 				ruleY(moodAxis.ticks, { stroke: chartGrid() }),
-				// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+				// See ChartHealthTrend: `group-x` needs a distinct `z` per series.
 				lineY(coffee, {
 					id: 'coffee',
 					x: 'date',

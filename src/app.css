@@ -438,7 +438,7 @@ a {
 /* ============================================================
    Page transitions (View Transitions API, started in +layout)
    The old page drops away fast; the new one rises in. The nav
-   has its own name, so it holds still.
+   has its own name, so it holds still, and its paper block glides.
    ============================================================ */
 ::view-transition-old(root) {
 	animation: vt-out 110ms var(--ease-out) both;
@@ -446,6 +446,55 @@ a {
 
 ::view-transition-new(root) {
 	animation: vt-in 220ms var(--ease-out) both;
+}
+
+/* The paper block of the current tab glides from the old tab to the new one,
+   and settles with a small spring. The two labels cross-fade inside it. */
+::view-transition-group(nav-active) {
+	animation-duration: 520ms;
+	animation-timing-function: linear(
+		0,
+		0.083,
+		0.224,
+		0.394,
+		0.568,
+		0.727,
+		0.861,
+		0.965,
+		1.05,
+		1.092,
+		1.111,
+		1.113,
+		1.104,
+		1.087,
+		1.068,
+		1.048,
+		1.03,
+		1.015,
+		1.003,
+		0.995,
+		0.99,
+		0.988,
+		0.987,
+		0.988,
+		0.99,
+		0.992,
+		0.995,
+		0.997,
+		0.998,
+		1,
+		1.001,
+		1.001,
+		1
+	);
+	z-index: 2;
+}
+
+::view-transition-old(nav-active),
+::view-transition-new(nav-active) {
+	animation-duration: 160ms;
+	block-size: 100%;
+	object-fit: none;
 }
 
 @keyframes vt-out {

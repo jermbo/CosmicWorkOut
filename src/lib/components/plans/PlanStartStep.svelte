@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Program } from '$lib/db/types';
-	import { SCRATCH_TEMPLATE_ID } from '$lib/goalPlans/templates';
+	import type { Program } from '#lib/db/types';
+	import { SCRATCH_TEMPLATE_ID } from '#lib/goalPlans/templates';
 	import FieldLabel from '../FieldLabel.svelte';
 
 	type Props = {

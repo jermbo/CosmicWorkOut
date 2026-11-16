@@ -1,20 +1,20 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { GoalPlan } from '$lib/goalPlans/types';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { goalPlanStore } from '$lib/stores/goalPlans.svelte';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { effectiveSections } from '$lib/discipline';
-	import { formatDuration, formatCountWithWord } from '$lib/format';
-	import { unitLabel } from '$lib/goalPlans/format';
-	import { allPlans, activatePlan, pausePlan, runItAgain } from '$lib/plans/actions';
-	import PageHeader from '$lib/components/PageHeader.svelte';
-	import ActiveGoalPlanCard from '$lib/components/goals/ActiveGoalPlanCard.svelte';
-	import ActivePlanCard from '$lib/components/plans/ActivePlanCard.svelte';
-	import PlanRow from '$lib/components/plans/PlanRow.svelte';
-	import ConfirmDialog from '$lib/components/ConfirmDialog.svelte';
-	import { redirectWhenDisabled } from '$lib/featureGate.svelte';
+	import type { GoalPlan } from '#lib/goalPlans/types';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { goalPlanStore } from '#lib/stores/goalPlans.svelte';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { effectiveSections } from '#lib/discipline';
+	import { formatDuration, formatCountWithWord } from '#lib/format';
+	import { unitLabel } from '#lib/goalPlans/format';
+	import { allPlans, activatePlan, pausePlan, runItAgain } from '#lib/plans/actions';
+	import PageHeader from '#lib/components/PageHeader.svelte';
+	import ActiveGoalPlanCard from '#lib/components/goals/ActiveGoalPlanCard.svelte';
+	import ActivePlanCard from '#lib/components/plans/ActivePlanCard.svelte';
+	import PlanRow from '#lib/components/plans/PlanRow.svelte';
+	import ConfirmDialog from '#lib/components/ConfirmDialog.svelte';
+	import { redirectWhenDisabled } from '#lib/featureGate.svelte';
 
 	redirectWhenDisabled(() => prefsStore.practiceEnabled);
 

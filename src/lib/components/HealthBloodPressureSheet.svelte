@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { HealthReading, BloodPressureValues } from '$lib/db/types';
-	import { healthStore } from '$lib/stores/health.svelte';
+	import type { HealthReading, BloodPressureValues } from '#lib/db/types';
+	import { healthStore } from '#lib/stores/health.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import SheetBody from './SheetBody.svelte';

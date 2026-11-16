@@ -30,6 +30,13 @@ Work that is not in a release yet. This page is a plan, not a wiki page, so it m
 | Activity distance / pace | Distance and pace for cardio, on the Activity log                | —                                                         |
 | Health history view      | A dedicated history of health readings, beyond the logging date  | [US-029](v1.7.0/US-029-health-metrics.md)                 |
 
+## Planned for v1.13.0
+
+| Item                  | Notes                                                                                | Decisions                                                                                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Custom activity types | Each user builds their own list of activity types; each one gets its own chart slice | [Spec](../initiatives/custom-activity-types/spec.md) (agreed) · [Decision log](../initiatives/custom-activity-types/decision-log.md) · [Glossary](../initiatives/custom-activity-types/glossary.md) |
+| Mascot                | A star mascot, streak badges for each tracker, and later a Pet with mood and level   | [Spec](../initiatives/mascot/spec.md) (agreed) · [Decision log](../initiatives/mascot/decision-log.md) · [Glossary](../initiatives/mascot/glossary.md)                                              |
+
 ## Data
 
 | Item               | Notes                                                                      |

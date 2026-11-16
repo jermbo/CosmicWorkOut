@@ -1,4 +1,4 @@
-import type { DatedStore } from '$lib/db/backupPayload';
+import type { DatedStore } from '#lib/db/backupPayload';
 
 const LABELS: Record<DatedStore, [one: string, many: string]> = {
 	sessions: ['session', 'sessions'],

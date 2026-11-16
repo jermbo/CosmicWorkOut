@@ -5,7 +5,7 @@ import type {
 	RoutineSection,
 	Metric,
 	Program,
-} from '$lib/db/types';
+} from '#lib/db/types';
 
 export const STRENGTH_DISCIPLINE_ID = 'strength';
 

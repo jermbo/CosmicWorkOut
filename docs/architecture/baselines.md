@@ -34,7 +34,7 @@ For each metric, the app shows the day's total minus the floor, with its sign: +
 
 ## Where baselines show
 
-Each baseline on the Baselines screen has its own progress chart. The Overview card shows which baselines are done for the date. Insights has a Baseline Growth chart, which marks your best day with a ring, and a Time of Day chart, which shows when you log.
+Each baseline on the Baselines screen has its own progress chart. The Overview card shows which baselines are done for the date. On Insights, This Week vs Last Week counts your baselines next to habits and workouts.
 
 ### Example
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic href props use resolveHref() */
-	import { resolveHref } from '$lib/navigation';
+	import { resolveHref } from '#lib/navigation';
 	import type { Snippet } from 'svelte';
 
 	/** Domain hue for the card's color field (v1.12.0). */

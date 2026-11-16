@@ -3,10 +3,10 @@
 	import { barY, defineChart, ruleY } from '@tanstack/charts';
 	import { scaleBand } from '@tanstack/charts/scales/band';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { getMondayOf } from '$lib/chart-utils';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { getMondayOf } from '#lib/chart-utils';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
 	import {
 		chartGrid,
 		PLOT_MARGIN,
@@ -15,7 +15,7 @@
 		shortDate,
 		withAlpha,
 		CHART_ACCENT,
-	} from '$lib/charts/theme';
+	} from '#lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 

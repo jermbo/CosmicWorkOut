@@ -1,6 +1,6 @@
 ---
 name: Working agreement
-description: 'How code is written in this repo, for a person or an agent: the code rules and why each one exists, what a unit test can reach, and how to add built-in content.'
+description: 'How code is written in this repo, for a person or an agent: the code rules and why each one exists, what is worth a test, and how to add built-in content.'
 altitude: part
 tags:
   - standards
@@ -23,11 +23,9 @@ These rules keep the code small and the same in each file. They apply to each co
 - **Do the work, then show it.** For a task with many steps, do all of it and show it for review at the end. One review of the whole is faster than many stops. Stop to ask only when a decision blocks you and has no clear answer.
 - **The docs are the memory.** When a decision is made or a behavior changes, change the page that tells it, in the same commit. An agent forgets each session, so a decision that is not in the docs is lost. A new feature gets its page first.
 
-## What a unit test can reach
+## Tests
 
-`npm test` runs Node's own test runner, with types stripped, and no browser. So a test reaches only pure modules, which import nothing at run time except other pure modules. A store or a browser module is out of reach.
-
-When logic worth a test sits behind IndexedDB or the DOM, move the decision into a pure module. The backup code is split this way: the checks before a restore are pure and tested. A new test folder needs its glob in the `test` script.
+`npm test` reaches only pure modules, and a test earns its place only when a bug would cost the user and using the app would not show it. [Testing](testing.md) tells both rules.
 
 ## Add a built-in exercise
 

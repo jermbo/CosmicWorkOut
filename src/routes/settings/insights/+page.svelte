@@ -1,15 +1,15 @@
 <!-- Settings → Insights: show / hide each Insights chart (US-043). -->
 <script lang="ts">
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 	import {
 		INSIGHT_CHARTS,
 		chartAvailable,
 		unavailableReason,
 		type InsightFeature,
-	} from '$lib/insights/charts';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
+	} from '#lib/insights/charts';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
 
 	let enabled = $derived<Record<InsightFeature, boolean>>({
 		habits: prefsStore.habitsEnabled,

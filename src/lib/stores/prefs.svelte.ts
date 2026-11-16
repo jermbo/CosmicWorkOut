@@ -1,5 +1,5 @@
-import type { UserPrefs, Density } from '$lib/db/types';
-import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '$lib/homeCards';
+import type { UserPrefs, Density, HealthChartView } from '#lib/db/types';
+import { DEFAULT_HOME_CARD_ORDER, resolveHomeCardOrder, type HomeCardId } from '#lib/homeCards';
 
 const PREFS_KEY = 'cwout:prefs';
 
@@ -15,7 +15,11 @@ const DEFAULTS: UserPrefs = {
 	healthMetricsEnabled: false,
 	baselinesEnabled: false,
 	hiddenCharts: [],
+	healthChartView: 'readings',
+	mascotMotion: true,
 };
+
+const HEALTH_CHART_VIEWS: readonly HealthChartView[] = ['readings', 'trend', 'log'];
 
 class PrefsStore {
 	density = $state<Density>(DEFAULTS.density);
@@ -29,6 +33,8 @@ class PrefsStore {
 	healthMetricsEnabled = $state(DEFAULTS.healthMetricsEnabled);
 	baselinesEnabled = $state(DEFAULTS.baselinesEnabled);
 	hiddenCharts = $state<string[]>([]);
+	healthChartView = $state<HealthChartView>(DEFAULTS.healthChartView);
+	mascotMotion = $state(DEFAULTS.mascotMotion);
 
 	/**
 	 * Every tracking feature is opt-in, so a fresh install has nothing to show.
@@ -62,6 +68,12 @@ class PrefsStore {
 				this.hiddenCharts = Array.isArray(parsed.hiddenCharts)
 					? parsed.hiddenCharts.filter((id): id is string => typeof id === 'string')
 					: [];
+				this.healthChartView = HEALTH_CHART_VIEWS.includes(
+					parsed.healthChartView as HealthChartView,
+				)
+					? (parsed.healthChartView as HealthChartView)
+					: DEFAULTS.healthChartView;
+				this.mascotMotion = parsed.mascotMotion ?? DEFAULTS.mascotMotion;
 			}
 		} catch (e) {
 			// Corrupt prefs must never block app startup — fall back to defaults.
@@ -84,6 +96,8 @@ class PrefsStore {
 			healthMetricsEnabled: this.healthMetricsEnabled,
 			baselinesEnabled: this.baselinesEnabled,
 			hiddenCharts: this.hiddenCharts,
+			healthChartView: this.healthChartView,
+			mascotMotion: this.mascotMotion,
 		};
 		localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
 	}
@@ -133,6 +147,12 @@ class PrefsStore {
 		this.save();
 	}
 
+	/** Remember the Health card's blood-pressure view on this device (US-060). */
+	setHealthChartView(view: HealthChartView): void {
+		this.healthChartView = view;
+		this.save();
+	}
+
 	private applyDensity(): void {
 		document.documentElement.dataset.density = this.density;
 	}
@@ -158,11 +178,18 @@ class PrefsStore {
 		this.save();
 	}
 
+	/** The Mascot's welcome and celebrations (US-067). Off keeps the still star. */
+	setMascotMotion(enabled: boolean): void {
+		this.mascotMotion = enabled;
+		this.save();
+	}
+
 	resetToDefaults(): void {
 		this.density = DEFAULTS.density;
 		this.weightUnit = DEFAULTS.weightUnit;
 		this.hapticsEnabled = DEFAULTS.hapticsEnabled;
 		this.soundEnabled = DEFAULTS.soundEnabled;
+		this.mascotMotion = DEFAULTS.mascotMotion;
 		this.applyDensity();
 		this.save();
 	}

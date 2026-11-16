@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Baseline, BaselineMetric } from '$lib/db/types';
+	import type { Baseline, BaselineMetric } from '#lib/db/types';
 	import {
 		durationInputText,
 		formatValue,
 		metricUnit,
 		parseDuration,
 		visibleMetrics,
-	} from '$lib/baselines/logic';
+	} from '#lib/baselines/logic';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';
 	import DialogTitle from './DialogTitle.svelte';

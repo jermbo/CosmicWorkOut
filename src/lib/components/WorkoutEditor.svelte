@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import type { Routine, RoutineItem, Item } from '$lib/db/types';
-	import { formatCountWithWord } from '$lib/format';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '$lib/discipline';
+	import type { Routine, RoutineItem, Item } from '#lib/db/types';
+	import { formatCountWithWord } from '#lib/format';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection } from '#lib/discipline';
 	import LibrarySheet from './LibrarySheet.svelte';
-	import { strengthLibrary } from '$lib/itemLibrary';
+	import { strengthLibrary } from '#lib/itemLibrary';
 
 	type Props = {
 		programId: string;

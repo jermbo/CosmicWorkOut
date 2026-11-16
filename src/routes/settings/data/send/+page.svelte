@@ -6,10 +6,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { exportQrBackup } from '$lib/db/backup';
-	import type { BackupScope } from '$lib/db/backup';
-	import { datedCounts } from '$lib/db/backupPayload';
-	import { addDays, formatShortDate, todayIso } from '$lib/date';
+	import { exportQrBackup } from '#lib/db/backup';
+	import type { BackupScope } from '#lib/db/backup';
+	import { datedCounts } from '#lib/db/backupPayload';
+	import { addDays, formatShortDate, todayIso } from '#lib/date';
 	import {
 		DENSITIES,
 		SPEEDS,
@@ -17,21 +17,21 @@
 		deflate,
 		frameCount,
 		loopSeconds,
-	} from '$lib/qrBackup/frames';
-	import type { Density, Speed } from '$lib/qrBackup/frames';
+	} from '#lib/qrBackup/frames';
+	import type { Density, Speed } from '#lib/qrBackup/frames';
 	import {
 		lastQrBackupDate,
 		loadSendOptions,
 		saveLastQrBackupDate,
 		saveSendOptions,
-	} from '$lib/qrBackup/sendPrefs';
-	import { describeCounts } from '$lib/qrBackup/summary';
-	import { requestPersistentStorage } from '$lib/db/persistence';
-	import { toastStore } from '$lib/stores/toast.svelte';
-	import AnimatedQr from '$lib/components/AnimatedQr.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import SegmentedControl from '$lib/components/SegmentedControl.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
+	} from '#lib/qrBackup/sendPrefs';
+	import { describeCounts } from '#lib/qrBackup/summary';
+	import { requestPersistentStorage } from '#lib/db/persistence';
+	import { toastStore } from '#lib/stores/toast.svelte';
+	import AnimatedQr from '#lib/components/AnimatedQr.svelte';
+	import Button from '#lib/components/Button.svelte';
+	import SegmentedControl from '#lib/components/SegmentedControl.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
 
 	type ScopeChoice = 'since' | 'days30' | 'days90' | 'all';
 

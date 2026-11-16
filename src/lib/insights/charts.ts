@@ -1,5 +1,6 @@
 /*
- * Every chart on the Insights page, in page order (v1.10.0, US-043 / US-044).
+ * Every chart on the Insights page, in page order (v1.10.0, US-043; trimmed to
+ * six in v1.13.0, US-059).
  * The page renders from this list, and Settings → Insights uses it for the
  * show / hide switches. A chart appears only when one of its features is on.
  */
@@ -12,7 +13,7 @@ export interface InsightChartDef {
 	desc: string;
 	/** Shown when any of these features is on. */
 	features: readonly InsightFeature[];
-	/** US-044 trial charts carry an "Experimental" label. */
+	/** Shows an "Experimental" label. No chart uses it since v1.13.0 (US-059). */
 	experimental?: boolean;
 	/** Spans both columns on wide screens. */
 	wide?: boolean;
@@ -30,51 +31,13 @@ export const INSIGHT_CHARTS: readonly InsightChartDef[] = [
 		title: 'All Habits',
 		desc: 'Every habit by day. Tap a habit to see it by week and weekday.',
 		features: ['habits'],
-		experimental: true,
 		wide: true,
-	},
-	{
-		id: 'baseline-growth',
-		title: 'Baseline Growth',
-		desc: 'Each metric over time against its baseline. Rings mark your best day.',
-		features: ['baselines'],
-		experimental: true,
-		wide: true,
-	},
-	{
-		id: 'show-up-rate',
-		title: 'Showing Up',
-		desc: 'Share of days you logged each baseline and habit, week by week.',
-		features: ['baselines', 'habits'],
-		experimental: true,
 	},
 	{
 		id: 'week-vs-week',
 		title: 'This Week vs Last Week',
 		desc: 'Totals so far this week against the same days last week.',
 		features: ['baselines', 'habits', 'practice'],
-		experimental: true,
-	},
-	{
-		id: 'day-of-week',
-		title: 'Day of Week',
-		desc: 'Your average for each weekday.',
-		features: ['baselines', 'habits'],
-		experimental: true,
-	},
-	{
-		id: 'on-days-when',
-		title: 'On Days When…',
-		desc: 'Compare a habit or mood on days something happened vs days it didn’t.',
-		features: ['habits'],
-		experimental: true,
-	},
-	{
-		id: 'time-of-day',
-		title: 'Time of Day',
-		desc: 'When your baseline entries get logged.',
-		features: ['baselines'],
-		experimental: true,
 	},
 	{
 		id: 'weekly-volume',
@@ -89,29 +52,11 @@ export const INSIGHT_CHARTS: readonly InsightChartDef[] = [
 		features: ['activity'],
 	},
 	{
-		id: 'habit-radar',
-		title: 'Habit Balance',
-		desc: 'Average habit consistency over the selected period.',
-		features: ['habits'],
-	},
-	{
 		id: 'health-summary',
 		title: 'Health Summary',
-		desc: 'Latest weight and 7-day blood pressure.',
+		desc: 'Weight and blood pressure, with each reading against the standard zones.',
 		features: ['health'],
 		wide: true,
-	},
-	{
-		id: 'weight',
-		title: 'Weight Trend',
-		desc: 'Body weight over the selected period.',
-		features: ['health'],
-	},
-	{
-		id: 'blood-pressure',
-		title: 'Blood Pressure',
-		desc: 'Daily average systolic and diastolic.',
-		features: ['health'],
 	},
 ];
 

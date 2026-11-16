@@ -29,6 +29,8 @@ Every setting of the app is one field of one JSON object, stored in `cwout:prefs
 | `soundEnabled`         | `true`, `false`                      | `false`                                                 | Personalization      |
 | `homeCardOrder`        | A list of card ids                   | `habits`, `practice`, `activity`, `baselines`, `health` | Personalization      |
 | `hiddenCharts`         | A list of chart ids                  | Empty                                                   | Settings → Insights  |
+| `healthChartView`      | `readings`, `trend`, `log`           | `readings`                                              | The Health card      |
+| `mascotMotion`         | `true`, `false`                      | `true`                                                  | Personalization      |
 
 ```json
 {
@@ -37,13 +39,13 @@ Every setting of the app is one field of one JSON object, stored in `cwout:prefs
 	"weightUnit": "kg",
 	"density": "compact",
 	"homeCardOrder": ["practice", "habits", "activity", "baselines", "health"],
-	"hiddenCharts": ["day-of-week"]
+	"hiddenCharts": ["mood-habits"]
 }
 ```
 
 ## Rules
 
-- A field that is missing takes its default. So the object above is valid, and the five fields that it leaves out take their defaults.
+- A field that is missing takes its default. So the object above is valid, and the fields that it leaves out take their defaults.
 - The app reads only the fields on this page. A field that it does not know is ignored, and the next save drops it.
 - The card id `practice` names the Workout card.
 - The docs check fails when a field in the code is not on this page. So a new setting cannot ship without its row.

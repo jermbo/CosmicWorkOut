@@ -1,9 +1,8 @@
-import type { Program, Item, Routine, RoutineItem, Session, RoutineColor } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { todayIso } from '$lib/date';
-import { computeWeekStreak, computeCombinedStreak } from '$lib/streak';
-import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines } from '$lib/discipline';
+import type { Program, Item, Routine, RoutineItem, Session, RoutineColor } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { todayIso } from '#lib/date';
+import { STRENGTH_DISCIPLINE_ID, flattenItems, singleSection, disciplines } from '#lib/discipline';
 import { SvelteMap } from 'svelte/reactivity';
 
 const ACTIVE_PROGRAMS_KEY = 'cwout:activeProgramIds';
@@ -92,24 +91,6 @@ class ProgramStore {
 		);
 	}
 
-	weekStreakFor(disciplineId: string): number {
-		const program = this.activeProgramFor(disciplineId);
-		if (!program) return 0;
-		return computeWeekStreak(
-			this.sessionsForDiscipline(disciplineId).map((s) => s.date),
-			program.daysPerWeek,
-		);
-	}
-
-	combinedWeekStreak = $derived(
-		computeCombinedStreak(
-			disciplines.map((d) =>
-				this.sessions.filter((s) => s.disciplineId === d.id).map((s) => s.date),
-			),
-			1,
-		),
-	);
-
 	isDisciplineActive(disciplineId: string): boolean {
 		return this.activeProgramsForDiscipline(disciplineId).length > 0;
 	}
@@ -171,7 +152,6 @@ class ProgramStore {
 
 	activeProgram = $derived(this.activeProgramFor(STRENGTH_DISCIPLINE_ID));
 	allRoutines = $derived(this.allRoutinesFor(STRENGTH_DISCIPLINE_ID));
-	weekStreak = $derived(this.weekStreakFor(STRENGTH_DISCIPLINE_ID));
 	completedSessionCount = $derived(this.completedCountFor(STRENGTH_DISCIPLINE_ID));
 	isProgramComplete = $derived(this.isProgramCompleteFor(STRENGTH_DISCIPLINE_ID));
 	currentWeekNumber = $derived(this.currentWeekFor(STRENGTH_DISCIPLINE_ID));

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import SettingsGroup from '$lib/components/SettingsGroup.svelte';
-	import SettingsRow from '$lib/components/SettingsRow.svelte';
-	import SettingsSubHeader from '$lib/components/SettingsSubHeader.svelte';
-	import SettingsToggleRow from '$lib/components/SettingsToggleRow.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import SettingsGroup from '#lib/components/SettingsGroup.svelte';
+	import SettingsRow from '#lib/components/SettingsRow.svelte';
+	import SettingsSubHeader from '#lib/components/SettingsSubHeader.svelte';
+	import SettingsToggleRow from '#lib/components/SettingsToggleRow.svelte';
 </script>
 
 <svelte:head>

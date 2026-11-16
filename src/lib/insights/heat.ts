@@ -1,4 +1,4 @@
-import type { Habit, HabitLog } from '$lib/db/types';
+import type { Habit, HabitLog } from '#lib/db/types';
 import { withAlpha } from '../charts/color.ts';
 import { habitColor, moodBadColor } from '../habitColors.ts';
 

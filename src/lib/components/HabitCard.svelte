@@ -1,12 +1,12 @@
 <script lang="ts">
 	import RollingNumber from './RollingNumber.svelte';
-	import { holdRepeat } from '$lib/feedback/holdRepeat';
-	import type { Habit } from '$lib/db/types';
-	import { formatCount, formatMinutes, minuteUnitLabel } from '$lib/format';
-	import { formatHabitBooleanValue } from '$lib/habits';
+	import { holdRepeat } from '#lib/feedback/holdRepeat';
+	import type { Habit } from '#lib/db/types';
+	import { formatCount, formatMinutes, minuteUnitLabel } from '#lib/format';
+	import { formatHabitBooleanValue } from '#lib/habits';
 	import { untrack } from 'svelte';
-	import { habitColor } from '$lib/habitColors';
-	import { feedback } from '$lib/feedback';
+	import { habitColor } from '#lib/habitColors';
+	import { feedback } from '#lib/feedback';
 	import Icon from './Icon.svelte';
 	import ProgressBlocks from './ProgressBlocks.svelte';
 

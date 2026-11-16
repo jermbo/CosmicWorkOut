@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { GoalTemplateRoutine } from '$lib/goalPlans/types';
-	import { programStore } from '$lib/stores/program.svelte';
+	import type { GoalTemplateRoutine } from '#lib/goalPlans/types';
+	import { programStore } from '#lib/stores/program.svelte';
 
 	type Props = {
 		routines: GoalTemplateRoutine[];

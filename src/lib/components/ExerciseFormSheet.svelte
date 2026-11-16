@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Item, ItemCat, WeightUnit } from '$lib/db/types';
-	import { STRENGTH_CATS } from '$lib/db/types';
-	import { programStore } from '$lib/stores/program.svelte';
+	import type { Item, ItemCat, WeightUnit } from '#lib/db/types';
+	import { STRENGTH_CATS } from '#lib/db/types';
+	import { programStore } from '#lib/stores/program.svelte';
 	import BottomSheet from './BottomSheet.svelte';
 	import SheetHeader from './SheetHeader.svelte';
 	import Chip from './Chip.svelte';

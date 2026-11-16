@@ -28,7 +28,7 @@ A session is not a page. When you start a routine, the session opens as an overl
 
 ## Page changes
 
-When you change the page, the old page drops away and the new one rises in, and the bottom bar holds still. The motion is short, so it shows where you went without making you wait.
+When you change the page, the old page drops away and the new one rises in, and the bottom bar holds still. The motion is short, so it shows where you went without making you wait. Only the paper block of the current tab moves: it glides from the old tab to the new one and settles with a small spring, so your eye follows it to the place that you chose. With reduced motion, the page and the block change at once.
 
 ## Settings is a hub
 

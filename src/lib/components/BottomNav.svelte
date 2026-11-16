@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
 
 	let { pathname }: { pathname: string } = $props();
 
@@ -108,9 +108,11 @@
 		white-space: nowrap;
 	}
 
+	/* Its own view-transition-name, so the paper block glides to the new tab (app.css). */
 	.bottom-nav__link--active {
 		background: var(--color-paper);
 		color: var(--color-ink);
+		view-transition-name: nav-active;
 
 		.bottom-nav__index {
 			color: inherit;

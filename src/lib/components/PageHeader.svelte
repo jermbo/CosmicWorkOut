@@ -2,12 +2,12 @@
 	/* eslint-disable svelte/no-navigation-without-resolve -- dynamic backHref uses resolveHref() */
 	import type { Snippet } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { resolveHref } from '$lib/navigation';
-	import { loggingContext } from '$lib/stores/loggingContext.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { formatWeekdayShortDate, todayIso } from '$lib/date';
-	import WeekStrip from '$lib/components/WeekStrip.svelte';
+	import { resolveHref } from '#lib/navigation';
+	import { loggingContext } from '#lib/stores/loggingContext.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { formatWeekdayShortDate, todayIso } from '#lib/date';
+	import WeekStrip from '#lib/components/WeekStrip.svelte';
 
 	type Props = {
 		title: string;
@@ -17,6 +17,11 @@
 		dayIndicators?: Record<string, Array<'habits' | 'strength' | 'activity' | 'health'>>;
 		onDateChange?: (date: string) => void;
 		trailing?: Snippet;
+		/**
+		 * Rendered straight into the header grid, beside the title, so its own elements
+		 * place themselves (the Overview's Mascot and streak badges, US-064 / US-065).
+		 */
+		aside?: Snippet;
 	};
 
 	let {
@@ -27,6 +32,7 @@
 		dayIndicators = {},
 		onDateChange,
 		trailing,
+		aside,
 	}: Props = $props();
 
 	const todayStr = todayIso();
@@ -58,7 +64,10 @@
 </script>
 
 <header class="page-header">
-	<div class="page-header__row">
+	<div
+		class="page-header__row"
+		class:page-header__row--aside={aside}
+	>
 		<div class="page-header__text">
 			<div class="page-header__eyebrow-row">
 				{#if showBack}
@@ -113,6 +122,7 @@
 				{@render trailing()}
 			</div>
 		{/if}
+		{@render aside?.()}
 	</div>
 </header>
 
@@ -215,6 +225,11 @@
 			opacity: 0;
 			transform: translateX(-24px);
 		}
+	}
+
+	/* With an aside, the title keeps to the first column; the aside takes the second. */
+	.page-header__row--aside .page-header__title {
+		grid-column: 1;
 	}
 
 	.page-header__trailing {

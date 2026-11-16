@@ -1,13 +1,14 @@
-import type { Baseline, BaselineLog } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
+import type { Baseline, BaselineLog } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { mascotStore } from './mascot.svelte';
 import {
 	entriesForDate,
 	isDone,
 	mergeMetrics,
 	totalsFor,
 	type BaselineMetricDraft,
-} from '$lib/baselines/logic';
+} from '#lib/baselines/logic';
 
 export type { BaselineMetricDraft };
 
@@ -133,6 +134,7 @@ class BaselineStore {
 		};
 		await db.baselineLogs.put(entry);
 		this.logs = [...this.logs, entry];
+		mascotStore.celebrateLog();
 	}
 
 	async updateEntry(id: string, values: Record<string, number>): Promise<void> {

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { GoalPlan, WaveWeek, ProgressionBlock } from '$lib/goalPlans/types';
-	import { WEEKS_PER_BLOCK } from '$lib/goalPlans/generator';
-	import { targetLabel } from '$lib/goalPlans/format';
+	import type { GoalPlan, WaveWeek, ProgressionBlock } from '#lib/goalPlans/types';
+	import { WEEKS_PER_BLOCK } from '#lib/goalPlans/generator';
+	import { targetLabel } from '#lib/goalPlans/format';
 	import GoalBlockTimeline from './GoalBlockTimeline.svelte';
 
 	type Props = {

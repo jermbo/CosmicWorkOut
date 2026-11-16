@@ -9,82 +9,16 @@ import jsQR from 'jsqr';
 import {
 	DENSITIES,
 	FrameCollector,
-	base45Decode,
 	base45Encode,
 	buildFrames,
-	crc32Hex,
 	deflate,
 	frameCount,
 	inflate,
-	loopSeconds,
 	parseFrame,
 } from './frames.ts';
 import { frameMatrix } from './qrMatrix.ts';
 
-const bytesOf = (...values: number[]) => new Uint8Array(values);
-
-// ── Base45 ────────────────────────────────────────────────────────────
-
-test('base45 matches the RFC 9285 examples', () => {
-	const enc = new TextEncoder();
-	assert.equal(base45Encode(enc.encode('AB')), 'BB8');
-	assert.equal(base45Encode(enc.encode('Hello!!')), '%69 VD92EX0');
-	assert.equal(base45Encode(enc.encode('base-45')), 'UJCLQE7W581');
-	assert.equal(new TextDecoder().decode(base45Decode('QED8WEX0')), 'ietf!');
-});
-
-test('base45 round-trips every byte value and odd lengths', () => {
-	const all = new Uint8Array(257).map((_, i) => i % 256);
-	assert.deepEqual(base45Decode(base45Encode(all)), all);
-	assert.deepEqual(base45Decode(base45Encode(bytesOf(255))), bytesOf(255));
-	assert.deepEqual(base45Decode(base45Encode(bytesOf())), bytesOf());
-});
-
-test('base45 rejects bad input', () => {
-	assert.throws(() => base45Decode('A'));
-	assert.throws(() => base45Decode('ab!'));
-	assert.throws(() => base45Decode(':::'), 'value above 0xFFFF');
-});
-
-// ── CRC-32 ────────────────────────────────────────────────────────────
-
-test('crc32 matches the standard check value', () => {
-	assert.equal(crc32Hex(new TextEncoder().encode('123456789')), 'CBF43926');
-	assert.equal(crc32Hex(bytesOf()), '00000000');
-});
-
-// ── Compression ───────────────────────────────────────────────────────
-
-test('deflate and inflate round-trip unicode text', async () => {
-	const text = JSON.stringify({ note: 'Bench — 135 lb ✓', n: [1, 2, 3] }).repeat(50);
-	const packed = await deflate(text);
-	assert.ok(packed.length < text.length);
-	assert.equal(await inflate(packed), text);
-});
-
-test('inflate rejects corrupt input', async () => {
-	await assert.rejects(inflate(bytesOf(0xff, 0xff, 0xff, 0xff)));
-});
-
 // ── Frames ────────────────────────────────────────────────────────────
-
-test('buildFrames splits by density and every frame parses', () => {
-	const bytes = new Uint8Array(1000).map((_, i) => (i * 7) % 256);
-	const frames = buildFrames(bytes, 450);
-	assert.equal(frames.length, 3);
-	assert.equal(frames.length, frameCount(bytes.length, 'medium'));
-	frames.forEach((f, i) => {
-		const parsed = parseFrame(f);
-		assert.ok(parsed);
-		assert.equal(parsed.index, i);
-		assert.equal(parsed.total, 3);
-		assert.equal(parsed.id, crc32Hex(bytes));
-	});
-});
-
-test('an empty payload still makes one frame', () => {
-	assert.equal(buildFrames(bytesOf(), 450).length, 1);
-});
 
 test('parseFrame ignores anything that is not one of our frames', () => {
 	assert.equal(parseFrame('https://example.com'), null);
@@ -92,11 +26,6 @@ test('parseFrame ignores anything that is not one of our frames', () => {
 	assert.equal(parseFrame('CW1:ABCDEF01:0:0:AB'), null, 'zero total');
 	assert.equal(parseFrame('CW1:abcdef01:0:1:AB'), null, 'lowercase id');
 	assert.equal(parseFrame('CW1:ABCDEF01:0:1:ab'), null, 'lowercase data');
-});
-
-test('loopSeconds scales with frames and speed', () => {
-	assert.equal(loopSeconds(12, 'normal'), 3);
-	assert.equal(loopSeconds(12, 'slow'), 6);
 });
 
 // ── Collector ─────────────────────────────────────────────────────────

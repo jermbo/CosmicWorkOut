@@ -3,8 +3,7 @@ import type {
 	HealthReading,
 	WeightValues,
 	BloodPressureValues,
-} from '$lib/db/types';
-import { addDays } from '$lib/date';
+} from '#lib/db/types';
 
 export type MetricCardinality = 'single' | 'multiple';
 
@@ -48,8 +47,8 @@ export interface BloodPressureDailyAverage {
 }
 
 /**
- * Collapse a list of BP readings into one average row per date. Used by Insights
- * charts and summary stats. Readings without pulse are excluded from the pulse
+ * Collapse a list of BP readings into one average row per date. Used by the Trend
+ * view of the Health card. Readings without pulse are excluded from the pulse
  * average; a date with no pulse readings yields `pulse: null`.
  */
 export function bloodPressureDailyAverages(readings: HealthReading[]): BloodPressureDailyAverage[] {
@@ -76,22 +75,4 @@ export function bloodPressureDailyAverages(readings: HealthReading[]): BloodPres
 	}
 
 	return result.sort((a, b) => a.date.localeCompare(b.date));
-}
-
-/** Average of the last `days` of BP daily averages, or null when no data in window. */
-export function rollingBpAverage(
-	readings: HealthReading[],
-	days: number,
-	today: string,
-): { systolic: number; diastolic: number } | null {
-	const cutoffStr = addDays(today, -(days - 1));
-
-	const dailies = bloodPressureDailyAverages(readings).filter(
-		(d) => d.date >= cutoffStr && d.date <= today,
-	);
-	if (dailies.length === 0) return null;
-
-	const sys = dailies.reduce((s, d) => s + d.systolic, 0) / dailies.length;
-	const dia = dailies.reduce((s, d) => s + d.diastolic, 0) / dailies.length;
-	return { systolic: Math.round(sys), diastolic: Math.round(dia) };
 }

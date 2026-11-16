@@ -12,7 +12,7 @@ parent: settings.md
 
 # Personalization
 
-Personalization changes how the app feels, not what it tracks. It has five options. This page tells what each one does, and why the list is short.
+Personalization changes how the app feels, not what it tracks. It has six options. This page tells what each one does, and why the list is short.
 
 ## Weight unit
 
@@ -30,13 +30,17 @@ Haptics are on by default. The switch shows only where the browser can vibrate. 
 
 Sound is off by default. When it is on, each tap gives a short mechanical click or clunk that the app makes at run time, so there are no audio files.
 
+## Mascot motion
+
+Mascot motion is on by default. Off, the star's [daily welcome](mascot.md) and its celebrations stop; the star still shows, breathes, and answers a badge tap. Below the switch, **Mascot gallery** opens a page that plays each move of the star on a loop.
+
 ## Overview card order
 
 You drag the cards, or use the arrow buttons, to set the order of the Overview cards. A reset puts back the default order: Habits, Workout, Activity log, Baselines, Health. The editor is also at an older address, kept for old links. The [Overview screen](overview-screen.md) page tells how the app repairs a stored order that is old or damaged.
 
 ## What is not here, and why
 
-The app is dark only, with fixed colours for each part and square corners, so there is no theme, accent colour, or corner option. Old stored values for those options are ignored, and the next save drops them. There is no option to turn off the finish animation, and no button to reset all options. Each option has a cost, and these did not earn their place.
+The app is dark only, with fixed colours for each part and square corners, so there is no theme, accent colour, or corner option. Old stored values for those options are ignored, and the next save drops them. There is no option to turn off the finish bars, no switch to hide the star, and no button to reset all options. Each option has a cost, and these did not earn their place.
 
 ### Example
 

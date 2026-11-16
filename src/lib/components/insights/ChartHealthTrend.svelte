@@ -1,11 +1,12 @@
+<!-- Trend view of the Health card (US-060): daily averages of systolic, diastolic and pulse. -->
 <script lang="ts">
 	import { defineChart, lineY, ruleY } from '@tanstack/charts';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { scalePoint } from '@tanstack/charts/scales/point';
-	import { healthStore } from '$lib/stores/health.svelte';
-	import { bloodPressureDailyAverages } from '$lib/health/metrics';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
+	import { healthStore } from '#lib/stores/health.svelte';
+	import { bloodPressureDailyAverages } from '#lib/health/metrics';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
 	import {
 		chartGrid,
 		FIELD,
@@ -13,7 +14,7 @@
 		chartTooltip,
 		longDate,
 		shortDate,
-	} from '$lib/charts/theme';
+	} from '#lib/charts/theme';
 
 	let { dates }: { dates: string[] } = $props();
 
@@ -79,7 +80,7 @@
 <ScrollChart
 	columns={dates.length}
 	definition={build}
-	ariaLabel="Line chart: daily average systolic and diastolic blood pressure over the selected period"
+	ariaLabel="Line chart: daily average systolic, diastolic and pulse over the selected period"
 	left={{ axis, unit: 'mmHg' }}
 />
 

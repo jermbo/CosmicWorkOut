@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import type { Habit, HabitType } from '$lib/db/types';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '$lib/habits';
+	import type { Habit, HabitType } from '#lib/db/types';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { HABIT_PRESETS, habitTypeLabel, CREATABLE_HABIT_TYPES } from '#lib/habits';
 	import {
 		COLOR_NAMES,
 		HABIT_COLOR_PALETTE,
 		habitColor,
 		moodBadColor,
 		nextDefaultColor,
-	} from '$lib/habitColors';
+	} from '#lib/habitColors';
 	import ColorSwatches from './ColorSwatches.svelte';
 	import Button from './Button.svelte';
 	import FieldLabel from './FieldLabel.svelte';

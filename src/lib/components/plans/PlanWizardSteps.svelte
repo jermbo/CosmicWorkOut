@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { PlanWizardStep } from '$lib/plans/wizard.svelte';
-	import { PLAN_WIZARD_STEPS, PLAN_WIZARD_STEP_LABELS } from '$lib/plans/wizard.svelte';
+	import type { PlanWizardStep } from '#lib/plans/wizard.svelte';
+	import { PLAN_WIZARD_STEPS, PLAN_WIZARD_STEP_LABELS } from '#lib/plans/wizard.svelte';
 
 	type Props = {
 		step: PlanWizardStep;

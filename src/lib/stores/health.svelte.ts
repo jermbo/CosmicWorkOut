@@ -1,7 +1,8 @@
-import type { HealthReading, WeightValues, BloodPressureValues } from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { isWeightReading, isBloodPressureReading } from '$lib/health/metrics';
+import type { HealthReading, WeightValues, BloodPressureValues } from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { isWeightReading, isBloodPressureReading } from '#lib/health/metrics';
+import { mascotStore } from './mascot.svelte';
 
 class HealthStore {
 	readings = $state<HealthReading[]>([]);
@@ -54,6 +55,8 @@ class HealthStore {
 		};
 		await db.healthReadings.put(reading);
 		this.readings = [...this.readings.filter((r) => r.id !== reading.id), reading];
+		// The day's first weigh-in brings the star; a fix to it does not (US-068 5).
+		if (!existing) mascotStore.celebrateLog();
 	}
 
 	async addBloodPressure(date: string, values: BloodPressureValues): Promise<void> {
@@ -66,6 +69,7 @@ class HealthStore {
 		};
 		await db.healthReadings.put(reading);
 		this.readings = [...this.readings, reading];
+		mascotStore.celebrateLog();
 	}
 
 	async updateReading(reading: HealthReading): Promise<void> {

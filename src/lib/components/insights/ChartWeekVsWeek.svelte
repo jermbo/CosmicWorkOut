@@ -5,19 +5,19 @@
 -->
 <script lang="ts">
 	import { SvelteMap } from 'svelte/reactivity';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { habitStore } from '$lib/stores/habits.svelte';
-	import { prefsStore } from '$lib/stores/prefs.svelte';
-	import { programStore } from '$lib/stores/program.svelte';
-	import { formatValue, visibleMetrics } from '$lib/baselines/logic';
-	import { todayIso } from '$lib/date';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { habitStore } from '#lib/stores/habits.svelte';
+	import { prefsStore } from '#lib/stores/prefs.svelte';
+	import { programStore } from '#lib/stores/program.svelte';
+	import { formatValue, visibleMetrics } from '#lib/baselines/logic';
+	import { todayIso } from '#lib/date';
 	import {
 		WEEKDAY_LABELS,
 		compareWeeks,
 		habitDailyValues,
 		metricDailyTotals,
 		type WeekComparison,
-	} from '$lib/insights/logic';
+	} from '#lib/insights/logic';
 
 	type Row = { id: string; label: string; cmp: WeekComparison; format: (v: number) => string };
 

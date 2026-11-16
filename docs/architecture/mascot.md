@@ -1,0 +1,60 @@
+---
+name: Mascot
+description: 'The pixel star that is the face of the app: how it is drawn, its actions, where it shows, when it talks and celebrates, and the switch and reduced motion that calm it.'
+altitude: part
+tags:
+  - mascot
+  - overview
+  - design
+parent: ../README.md
+---
+
+[Wiki](../README.md) / Mascot
+
+# Mascot
+
+The app records well, but nothing in it used to be glad that you came back. The Mascot is a small pixel star in the yellow of Health, with two eyes and a mouth, lit from the top left. It is the app icon, the browser-tab icon, and a picture in the Overview header. Reasons are in the [decision log](../initiatives/mascot/decision-log.md).
+
+## Drawn frames only
+
+Each pose and each face is a pixel map in `src/lib/mascot/sprite.ts`, drawn as SVG with square pixels. It moves only by changing frames and by whole pixels of its grid; it is never rotated, stretched, or slid by a tween. `npm run icons` draws the icons from the same maps. **Settings › Personalization › Mascot gallery** loops every action with the same component.
+
+## Actions
+
+| Action    | When                                         | Frames                                                   |
+| --------- | -------------------------------------------- | -------------------------------------------------------- |
+| Idle      | Always, in the Overview header               | A slow breath, and a bit of personality every 3 to 7 s   |
+| Wave      | The first open of each day                   | An arm up and down, three times                          |
+| Talk      | A line types in, after a badge tap           | The mouth opens and closes                               |
+| Shrug     | A badge at 0                                 | Both arms up                                             |
+| Happy hop | A habit reaches its daily goal               | Crouch, jump, land                                       |
+| Dance     | A session is done, or a plan goal is reached | Jumps, a turn, sways, sparkles                           |
+| Ways in   | Before a hop or a dance                      | Run in, hop in, peek in, dash in, drop in from the sky   |
+| Ways out  | After the habit hop                          | Jump off, run off, run back, blast off, wave bye and hop |
+
+## Idle and the celebrations
+
+At rest, only its top point dips as it breathes. Every 3 to 7 s it does a random bit, like a foot tap. After 45 s with no tap, it sleeps.
+
+For a habit goal or any new log, it comes in along the bottom bar, away from your tap, hops, and leaves. The ways in and out are random, never the same twice in a row; each side has its own ways in.
+
+## Lines
+
+A tap on a [streak](week-streak.md) badge makes the star say one line in a speech box, typed letter by letter: "Habits: 12 days! Log one today for 13." When today already counts: "Habits: 13 days. Today counts." At 0 it shrugs: "Activity: 0. Log one this week to start." The line goes 2.6 s after it is shown, or at the next tap. The speech box takes no taps.
+
+## The daily welcome
+
+On the first open of each calendar day, the Overview star waves and names the longest streak that is going: "Morning! Habits: day 12", or "Morning!" with none. The date is kept in `cwout:lastWelcome`, so a second open that day shows nothing.
+
+## Calm it down
+
+The **Mascot motion** switch in [Personalization](personalization.md) is on by default. Off, there is no welcome and no celebration; the star image, its idle, and its lines stay. With reduced motion on your device, the star stands still, a line shows at once, and nothing celebrates.
+
+### Example
+
+Monday morning, your Habits streak is 12 days. You open the app: the star waves, "Morning! Habits: day 12". You tap the grey `A 0` badge; it shrugs. Tonight you finish Day B: the star runs in and dances above your totals.
+
+## Further reading
+
+- [Overview screen](overview-screen.md): where the star and the badges sit.
+- [Tap feel](tap-feel.md): the other moments that need more.

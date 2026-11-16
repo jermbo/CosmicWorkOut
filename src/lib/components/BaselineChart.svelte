@@ -7,12 +7,12 @@
 	import { defineChart, dot, lineY, ruleY } from '@tanstack/charts';
 	import { scaleLinear } from '@tanstack/charts/scales/linear';
 	import { scalePoint } from '@tanstack/charts/scales/point';
-	import type { Baseline } from '$lib/db/types';
-	import { baselineStore } from '$lib/stores/baselines.svelte';
-	import { dailySeries, formatValue, visibleMetrics } from '$lib/baselines/logic';
-	import { bestDay } from '$lib/insights/logic';
-	import ScrollChart from '$lib/charts/ScrollChart.svelte';
-	import { niceAxis } from '$lib/charts/scale';
+	import type { Baseline } from '#lib/db/types';
+	import { baselineStore } from '#lib/stores/baselines.svelte';
+	import { dailySeries, formatValue, visibleMetrics } from '#lib/baselines/logic';
+	import { bestDay } from '#lib/insights/logic';
+	import ScrollChart from '#lib/charts/ScrollChart.svelte';
+	import { niceAxis } from '#lib/charts/scale';
 	import {
 		chartGrid,
 		PLOT_MARGIN,
@@ -20,7 +20,7 @@
 		chartTooltip,
 		longDate,
 		shortDate,
-	} from '$lib/charts/theme';
+	} from '#lib/charts/theme';
 
 	let {
 		baseline,
@@ -83,7 +83,7 @@
 						id: s.metric.id,
 						x: 'date',
 						y: 'value',
-						// See ChartHealthBP: `group-x` needs a distinct `z` per series.
+						// See ChartHealthTrend: `group-x` needs a distinct `z` per series.
 						z: () => s.metric.id,
 						stroke: s.color,
 						strokeWidth: 2,

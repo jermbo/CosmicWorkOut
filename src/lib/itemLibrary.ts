@@ -1,5 +1,5 @@
-import type { Item } from '$lib/db/types';
-import { STRENGTH_CATS } from '$lib/db/types';
+import type { Item } from '#lib/db/types';
+import { STRENGTH_CATS } from '#lib/db/types';
 
 /**
  * Per-discipline configuration for `LibrarySheet`. The sheet owns the chrome —

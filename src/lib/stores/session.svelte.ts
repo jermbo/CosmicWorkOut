@@ -9,11 +9,11 @@ import type {
 	RoutineItem,
 	LoggedItem,
 	Metric,
-} from '$lib/db/types';
-import { db } from '$lib/db/database';
-import { generateId } from '$lib/utils';
-import { todayIso } from '$lib/date';
-import { effectiveSections } from '$lib/discipline';
+} from '#lib/db/types';
+import { db } from '#lib/db/database';
+import { generateId } from '#lib/utils';
+import { todayIso } from '#lib/date';
+import { effectiveSections } from '#lib/discipline';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 const ACTIVE_SESSION_KEY = 'cwout:activeSession';

@@ -1,6 +1,6 @@
-import type { Habit, HabitLog, HabitType } from '$lib/db/types';
-import { MOOD_SCALE } from '$lib/db/types';
-import { formatCount, formatMinutes } from '$lib/format';
+import type { Habit, HabitLog, HabitType } from '#lib/db/types';
+import { MOOD_SCALE } from '#lib/db/types';
+import { formatCount, formatMinutes } from '#lib/format';
 
 export const MOOD_HABIT_ID = 'habit-mood';
 

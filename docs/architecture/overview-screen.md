@@ -1,6 +1,6 @@
 ---
 name: Overview screen
-description: 'What the Overview shows for the logging date: one card for each tracker that is on, in your order, a week strip, a streak, and the empty state.'
+description: 'What the Overview shows for the logging date: the Mascot and a streak badge for each tracker, one card for each tracker that is on, in your order, a week strip, and the empty state.'
 altitude: part
 tags:
   - overview
@@ -18,7 +18,7 @@ The Overview is the first tab and the first screen. It answers one question: how
 
 The header holds the date and a week strip of seven days, Monday to Sunday. The same header is on each tracker screen. Each day of the strip has small marks for what you logged on it: a session, an activity, a habit, a health reading. You tap a past day, and the whole app moves to that day; on a tracker screen, you stay on that screen. You cannot tap a day in the future. The [logging date](logging-date.md) page tells how one date drives every tracker.
 
-While Workout is on, a badge in the header shows your week streak. The [week streak](week-streak.md) page tells how it counts.
+Beside the title sits the [Mascot](mascot.md), a pixel star. Under the title is one streak badge for each tracker that is on, such as `H 12D`; tap one, and the star talks about it. The [streaks](week-streak.md) page tells how each counts.
 
 ## One card for each tracker
 

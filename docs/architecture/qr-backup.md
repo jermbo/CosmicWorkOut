@@ -17,7 +17,7 @@ You want your phone's records on your laptop, with no cable, no cloud, and no ne
 
 ## What the sender sends
 
-You pick a range: **Since last** (when this device sent before), the last 30 days, the last 90 days, or **Everything**. A range of days sends only the records dated in it, plus every definition — your habits, plans, custom items, baselines, and goals — and none of your settings. Everything sends all of your data, with your settings. Built-in items and templates are never sent, because every device writes them on start.
+You pick a range: **Since last** (when this device sent before), the last 30 days, the last 90 days, or **Everything**. A range of days sends only the records dated in it, plus every definition — your habits, plans, custom items, baselines, goals, and activity types — and none of your settings. Everything sends all of your data, with your settings. Built-in items and templates are never sent, because every device writes them on start.
 
 ## From data to frames
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Habit } from '$lib/db/types';
-	import { habitTypeLabel, isProtectedHabit } from '$lib/habits';
-	import { habitColor } from '$lib/habitColors';
+	import type { Habit } from '#lib/db/types';
+	import { habitTypeLabel, isProtectedHabit } from '#lib/habits';
+	import { habitColor } from '#lib/habitColors';
 	import Icon from './Icon.svelte';
 
 	type Props = {

@@ -1,6 +1,6 @@
 ---
 name: Insights
-description: 'What the Insights tab shows: a chart for each tracker that is on, one date range for all charts, experimental charts, and how you hide a chart.'
+description: 'What the Insights tab shows: six charts for the trackers that are on, one date range for all charts, and how you hide a chart.'
 altitude: part
 tags:
   - insights
@@ -20,24 +20,20 @@ A bar at the top picks the date range: This week, Last 7d, MTD (month to date), 
 
 ## The charts
 
-| Chart                  | It answers                                                  | Shows while                   |
-| ---------------------- | ----------------------------------------------------------- | ----------------------------- |
-| Mood vs Habits         | Does mood follow coffee and water?                          | Habits                        |
-| All Habits             | Which habits did I log each day? Tap one for its weeks      | Habits                        |
-| Baseline Growth        | How does each metric grow against its floor?                | Baselines                     |
-| Showing Up             | What share of days did I log, week by week?                 | Habits or Baselines           |
-| This Week vs Last Week | Am I ahead of the same days last week?                      | Habits, Baselines, or Workout |
-| Day of Week            | Which weekday is my best?                                   | Habits or Baselines           |
-| On Days When…          | Is a habit or mood different on days when a thing occurred? | Habits                        |
-| Time of Day            | When do I log my baseline entries?                          | Baselines                     |
-| Weekly Volume          | How much weight did I lift each week?                       | Workout                       |
-| Activity Mix           | What kinds of activity did I do?                            | Activity log                  |
-| Habit Balance          | How even is my habit consistency?                           | Habits                        |
-| Health Summary         | What is my last weight, and my blood pressure this week?    | Health metrics                |
-| Weight Trend           | How does my weight move?                                    | Health metrics                |
-| Blood Pressure         | How does the daily average move?                            | Health metrics                |
+| Chart                  | It answers                                                         | Shows while                   |
+| ---------------------- | ------------------------------------------------------------------ | ----------------------------- |
+| Mood vs Habits         | Does mood follow coffee and water?                                 | Habits                        |
+| All Habits             | Which habits did I log each day? Tap one for its weeks             | Habits                        |
+| This Week vs Last Week | Am I ahead of the same days last week?                             | Habits, Baselines, or Workout |
+| Weekly Volume          | How much weight did I lift each week?                              | Workout                       |
+| Activity Mix           | What kinds of activity did I do?                                   | Activity log                  |
+| Health Summary         | Where do my weight and blood pressure stand, and how do they move? | Health metrics                |
 
-Seven charts carry an "Experimental" label: All Habits, Baseline Growth, Showing Up, This Week vs Last Week, Day of Week, On Days When…, and Time of Day. The label tells you that a chart can change or go away after people use it.
+Health Summary is one card for both health metrics, with three views of blood pressure. The [Health card](health-card.md) page tells how it works.
+
+Activity Mix has one slice for each of your activity types, named after it, so Mowing is its own slice and not part of Other. A hidden type has no slice; its entries still count everywhere else. The [Activity log](activity-log.md) page tells how the list of types is made.
+
+These six charts are the ones that use showed to be helpful; trial charts that did not help were removed. A chart can carry an "Experimental" label while it is on trial, and none does now.
 
 ## Hide a chart
 
@@ -45,11 +41,11 @@ Each chart has a menu, ⋯, with **Hide chart**. Settings → Insights has a swi
 
 ## Colours
 
-Each chart uses the colour of its part from the [design system](design-system.md): Weekly Volume is blue, the health charts are yellow. A habit chart uses the colour of each habit, and Mood uses its good and bad colours.
+Each chart uses the colour of its part from the [design system](design-system.md): Weekly Volume is blue, and the Health card is yellow, apart from its blood-pressure zones. A habit chart uses the colour of each habit, and Mood uses its good and bad colours.
 
 ### Example
 
-You select MTD on 20 November. Weekly Volume shows three weeks of bars. All Habits shows 20 columns, and you scroll left to see the first days of the month. You hide Day of Week, because you train on fixed days; it no longer shows, until you turn it on in Settings.
+You select MTD on 20 November. Weekly Volume shows three weeks of bars. All Habits shows 20 columns, and you scroll left to see the first days of the month. You hide Mood vs Habits, because you do not drink coffee; it no longer shows, until you turn it on in Settings.
 
 ## Further reading
 

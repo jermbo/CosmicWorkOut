@@ -141,8 +141,8 @@ A custom exercise can be referenced by one or more programs (built-in or custom)
 
 ## Out of Scope
 
-| Item                          | Notes                                                                                                                                                                                                                                                                                              |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item                          | Notes                                                                                                                                                                                                                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Per-date workout log clearing | Clearing a single day's logged workout (as opposed to the whole Workout sessions store). Activities and habit logs already support per-entry editing/removal elsewhere in the app; workout sessions don't. Raised during this story's build but deferred — see [roadmap](../backlog.md). |
 
 ---
